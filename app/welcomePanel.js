@@ -1,5 +1,5 @@
 function WelcomePanel() {
-	
+
 	this.videoStyle = "position:absolute;width:100%;height:100%;left:0";
 
 	this.videoConfigs = {
@@ -46,7 +46,7 @@ WelcomePanel.prototype.playVideo = function(videoName) {
 
 	// Load the video if the iframe doesn't exist
 	if (videoContainer.find("iframe").length == 0) {
-		var iframe = $("<iframe/>", 
+		var iframe = $("<iframe/>",
 		{
 			"class":           "screencast-video",
 			"src":             config.src,

@@ -37,7 +37,7 @@ function DataCard() {
 	this.demoNames = {
 		proband: 'NA12878',
 		mother:  'NA12892',
-		father:  'NA12891' 
+		father:  'NA12891'
 	};
 	this.demoUrls = {
 		proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
@@ -52,7 +52,7 @@ function DataCard() {
 	this.demoSampleNames = {
 		proband: 'NA12878',
 		mother:  'NA12892',
-		father:  'NA12891' 
+		father:  'NA12891'
 	};
 
 	this.eduTourModes = [
@@ -62,7 +62,7 @@ function DataCard() {
 	];
 
 
-	this.eduTourUrls = [ 
+	this.eduTourUrls = [
 	{
 		proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
 		mother:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
@@ -80,7 +80,7 @@ function DataCard() {
 	}
 	];
 
-	this.eduTourUrlsOffline = [ 
+	this.eduTourUrlsOffline = [
 	{
 		proband: 'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
 		mother:  'http://frontend/exhibit_cache/nhmu-case-studies.vcf.gz',
@@ -113,7 +113,7 @@ function DataCard() {
 			mother:  false,
 			father:  false
 		}
-	];	
+	];
 	this.eduTourNames = [
 		{
 			proband: 'Alex'
@@ -124,12 +124,12 @@ function DataCard() {
 		{
 			proband: 'John'
 		}
-	];	
+	];
 	this.eduTourSampleNames = [
 		{
 			proband: 'sample3',
-			mother:  'sample1', 
-			father:  'sample2' 
+			mother:  'sample1',
+			father:  'sample2'
 		},
 		{
 			proband: 'sample2'
@@ -146,7 +146,7 @@ function DataCard() {
 	this.mygene2Genes = [
 		'KDM1A'
 	];
-	
+
 
 
 	this.mode = 'single';
@@ -163,11 +163,11 @@ DataCard.prototype.loadDemoData = function() {
 		this.demoCards      = this.eduTourCards[idx];
 		this.demoUrls        = isOffline ? this.eduTourUrlsOffline[idx] : this.eduTourUrls[idx];
 		this.demoNames       = this.eduTourNames[idx];
-		this.demoSampleNames = this.eduTourSampleNames[idx];			
+		this.demoSampleNames = this.eduTourSampleNames[idx];
 		this.demoMode        = this.eduTourModes[idx];
-	} 
+	}
 
-	$('#splash').addClass("hide");	
+	$('#splash').addClass("hide");
 	this.mode = this.demoMode;
 
 	// Clear the cache
@@ -181,42 +181,42 @@ DataCard.prototype.loadDemoData = function() {
 	$('#select-build-box').removeClass("attention");
 
 
-	window.updateUrl('rel0', "proband");	
-	window.updateUrl('rel1', "mother");	
-	window.updateUrl('rel2', "father");	
+	window.updateUrl('rel0', "proband");
+	window.updateUrl('rel1', "mother");
+	window.updateUrl('rel2', "father");
 
-	window.updateUrl('name0', this.demoNames.proband);	
-	window.updateUrl('vcf0',  this.demoUrls.proband);	
+	window.updateUrl('name0', this.demoNames.proband);
+	window.updateUrl('vcf0',  this.demoUrls.proband);
 	window.updateUrl("tbi0", "");
 	if (!window.isLevelEdu) {
-		window.updateUrl('bam0',  this.demoBamUrls.proband);	
-		window.updateUrl('bai0',  "");	
+		window.updateUrl('bam0',  this.demoBamUrls.proband);
+		window.updateUrl('bai0',  "");
 	}
-	window.updateUrl('sample0',  this.demoSampleNames.proband);	
+	window.updateUrl('sample0',  this.demoSampleNames.proband);
 
 	if (this.demoCards.mother) {
-		window.updateUrl('name1', this.demoNames.mother);	
-		window.updateUrl('vcf1',  this.demoUrls.mother);	
-		window.updateUrl('tbi1',  "");	
+		window.updateUrl('name1', this.demoNames.mother);
+		window.updateUrl('vcf1',  this.demoUrls.mother);
+		window.updateUrl('tbi1',  "");
 		if (!window.isLevelEdu) {
 			window.updateUrl('bam1',  this.demoBamUrls.mother);
 			window.updateUrl('bai1',  "");
-		}	
-		window.updateUrl('sample1',  this.demoSampleNames.mother);			
-	} 
-
-	if (this.demoNames.father) {
-		window.updateUrl('name2', this.demoNames.father);	
-		window.updateUrl('vcf2',  this.demoUrls.father);	
-		window.updateUrl('tbi2',  "");	
-		if (!window.isLevelEdu) {		
-			window.updateUrl('bam2',  this.demoBamUrls.father);
-			window.updateUrl('bai2',  "");
-		}	
-		window.updateUrl('sample2',  this.demoSampleNames.father);			
+		}
+		window.updateUrl('sample1',  this.demoSampleNames.mother);
 	}
 
-	
+	if (this.demoNames.father) {
+		window.updateUrl('name2', this.demoNames.father);
+		window.updateUrl('vcf2',  this.demoUrls.father);
+		window.updateUrl('tbi2',  "");
+		if (!window.isLevelEdu) {
+			window.updateUrl('bam2',  this.demoBamUrls.father);
+			window.updateUrl('bai2',  "");
+		}
+		window.updateUrl('sample2',  this.demoSampleNames.father);
+	}
+
+
 	if (!window.isLevelEdu) {
 		window.updateUrl("gene", me.demoGenes[0]);
 		window.updateUrl("genes", me.demoGenes.join(","));
@@ -241,7 +241,7 @@ DataCard.prototype.loadDemoData = function() {
 		})
 
 
-		me.promiseSetVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,  
+		me.promiseSetVcfUrl("proband", me.eduTourNames[+eduTourNumber].proband,
 			me.demoSampleNames.proband, me.demoUrls.proband)
 		  .then(function() {
 			$('#select-build-box').removeClass("attention");
@@ -249,16 +249,16 @@ DataCard.prototype.loadDemoData = function() {
 			window.setGeneratedSampleNames();
 			window.loadTracksForGene();
 			window.cacheHelper.clearCache();
-			window.matrixCard.reset();	
-			genesCard.selectGene(theGenes[0]);		  	
+			window.matrixCard.reset();
+			genesCard.selectGene(theGenes[0]);
 		  });
-	
+
 	} else {
 		loadUrlSources();
 
 	}
 
-	
+
 
 }
 
@@ -287,7 +287,7 @@ DataCard.prototype.loadMygene2Data = function() {
 					window.setGeneratedSampleNames();
 					window.loadTracksForGene();
 					window.cacheHelper.clearCache();
-					window.matrixCard.reset();		
+					window.matrixCard.reset();
 				  })
 			} else {
 				alertify.alert("Cannot load data.  The genome build must be specified.");
@@ -302,20 +302,20 @@ DataCard.prototype.loadMygene2Data = function() {
 	var missingVariables = "";
 	if (mygene2Endpoint == "") {
 		missingVariables += "mygene2Endpoint ";
-	} 
+	}
 	if (mygene2XAuthToken == "") {
 		missingVariables += "mygene2XAuthToken ";
-	} 
+	}
 	if (missingVariables.length > 0) {
 		alertify.confirm("Cannot load data files until the following variables are initialized in globalDeployments.js: " + missingVariables + ".",
-					    function(){ 
-					    }, 
-					    function(){ 
+					    function(){
+					    },
+					    function(){
 					    	loadProband();
 					    }
-					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});   			
+					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
 	} else {
-		
+
 		var endpointUrl = mygene2Endpoint + "?token=" + getUrlParameter("token");
 		$.ajax({
 		    url : endpointUrl,
@@ -326,7 +326,7 @@ DataCard.prototype.loadMygene2Data = function() {
 		    crossDomain: true,
 		    type: "GET",
 			success: function(response) {
-				loadProband(response);	    	
+				loadProband(response);
 		    },
 		    error: function( xhr, status, errorThrown ) {
 		        console.log( "Error: " + errorThrown );
@@ -334,13 +334,13 @@ DataCard.prototype.loadMygene2Data = function() {
 		        console.log( xhr );
 		        console.log("Unable to get MyGene2 endpoint filenames");
 		        alertify.confirm("Unable to obtain variant files using MyGene2 token.",
-				    function(){ 
-				    }, 
-				    function(){ 
+				    function(){
+				    },
+				    function(){
 				    	loadProband();
 				    }
 				 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
-		         
+
 		    }
 		});
 	}
@@ -355,18 +355,18 @@ DataCard.prototype.loadSampleData = function(relationship, name, sampleName, mod
 
 
 	//cacheHelper.clearCache();
-	window.loadTracksForGene();		
+	window.loadTracksForGene();
 }
 
 DataCard.prototype.listenToEvents = function(panelSelector) {
 	var me = this;
 
     panelSelector.find('#datasource-name').on('change', function() {
-    	me.setDataSourceName(panelSelector); 
+    	me.setDataSourceName(panelSelector);
     });
-    
+
     // listen to checkbox for filtering exonic only variants
-	panelSelector.find('#affected-cb').click(function() {	   
+	panelSelector.find('#affected-cb').click(function() {
 		me.setAffected(panelSelector);
 	});
 
@@ -425,8 +425,8 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     panelSelector.find("#vcf-dropdown-button").on("click", function() {
     	me.panelSelectorFilesSelected = panelSelector;
     });
-   
-   
+
+
     panelSelector.find('#vcf-file-upload').on('change', function(event) {
 		me.onVcfFilesSelected(event);
     });
@@ -436,7 +436,7 @@ DataCard.prototype.listenToEvents = function(panelSelector) {
     	this.value = null;
     });
 
-   
+
 
 }
 
@@ -478,12 +478,12 @@ DataCard.prototype.addSpeciesListener = function() {
 	        var selectizeBuild = $('#select-build')[0].selectize;
 	        selectizeBuild.disable();
 	        selectizeBuild.clearOptions();
-	        
+
 	        selectizeBuild.load(function(callback) {
 	        	selectizeBuild.enable();
 	        	callback(genomeBuildHelper.speciesToBuilds[value]);
 	        });
-			
+
 	    });
 	}
 
@@ -521,13 +521,13 @@ DataCard.prototype.addBuildListener = function() {
 				removeUrl("build");
 				$('#build-link').text("?");
 				window.disableLoadButton();
-				setTimeout( function() { 
+				setTimeout( function() {
 					//$('#select-build-box .selectize-input').animateIt('tada');
 					$('#select-build-box').addClass("attention");
 				}, 2000);
-				
+
 			}
-			
+
 		});
 	}
 
@@ -547,9 +547,9 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 					window.enableLoadButton();
 				}
 
-			} else if (buildsInData.length == 1) {			
+			} else if (buildsInData.length == 1) {
 				var buildInfo = buildsInData[0];
-				
+
 				me.removeBuildListener();
 				genomeBuildHelper.setCurrentSpecies(buildInfo.species.name);
 				genomeBuildHelper.setCurrentBuild(buildInfo.build.name);
@@ -557,18 +557,18 @@ DataCard.prototype.setDefaultBuildFromData = function() {
 				$('#select-build-box').removeClass("attention");
 
 				$('#select-species')[0].selectize.setValue(buildInfo.species.name);
-				$('#select-build')[0].selectize.setValue(buildInfo.build.name);	
+				$('#select-build')[0].selectize.setValue(buildInfo.build.name);
 				me.addBuildListener();
 
-				$('#species-build-warning').addClass("hide");				
-				window.enableLoadButton();		
+				$('#species-build-warning').addClass("hide");
+				window.enableLoadButton();
 			} else {
 				var message = genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData);
 				$('#species-build-warning').html(message);
 				$('#species-build-warning').removeClass("hide");
 				window.disableLoadButton();
 			}
-		});		
+		});
 	}
 
 }
@@ -666,8 +666,8 @@ DataCard.prototype.init = function() {
 		me.onShow();
 	})
 
-	$('#separate-url-for-index-files-cb').click(function() {	
-		var checked = $('#separate-url-for-index-files-cb').is(":checked");   
+	$('#separate-url-for-index-files-cb').click(function() {
+		var checked = $('#separate-url-for-index-files-cb').is(":checked");
 		d3.selectAll('#url-tbi-input').classed("hide", !checked);
 		d3.selectAll('#bai-url-input').classed("hide", !checked);
 
@@ -690,8 +690,8 @@ DataCard.prototype.init = function() {
 
 
 	$('#select-species').selectize(
-		{	
-			create: true, 			
+		{
+			create: true,
 			valueField: 'name',
 	    	labelField: 'name',
 	    	searchField: ['name'],
@@ -701,7 +701,7 @@ DataCard.prototype.init = function() {
 	);
 	$('#select-build').selectize(
 		{
-			create: true, 			
+			create: true,
 			valueField: 'name',
 	    	labelField: 'name',
 	    	searchField: ['name'],
@@ -709,7 +709,7 @@ DataCard.prototype.init = function() {
 	    	onOptionAdd: function(value) {
 	    		if (!me.buildDefaulted) {
 	    			// You can default the build in the dropdown here
-	    			me.buildDefaulted = true; 
+	    			me.buildDefaulted = true;
 	    		}
 	    	}
     	}
@@ -722,8 +722,8 @@ DataCard.prototype.init = function() {
 
 	$('#proband-data').append(dataCardEntryTemplate());
 	$('#proband-data #vcf-sample-select').selectize(
-		{ 
-			create: true, 			
+		{
+			create: true,
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
@@ -739,25 +739,25 @@ DataCard.prototype.init = function() {
 	addVariantCard();
 	me.setDataSourceRelationship($('#proband-data'));
 	me.setAffected($('#proband-data'))
-	
-	
+
+
 	$('#unaffected-sibs-select').selectize(
-		{ 
-			create: true, 
-			maxItems: null,  
+		{
+			create: true,
+			maxItems: null,
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
     	}
 	);
 	$('#affected-sibs-select').selectize(
-		{ 
-			create: true, 
-			maxItems: null,  
+		{
+			create: true,
+			maxItems: null,
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
-	    	
+
     	}
 	);
 
@@ -765,8 +765,8 @@ DataCard.prototype.init = function() {
 	$('#mother-data').append(dataCardEntryTemplate());
 	$('#mother-data #sample-data-label').text("MOTHER");
 	$('#mother-data #vcf-sample-select').selectize(
-		{ 
-			create: true, 			
+		{
+			create: true,
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
@@ -774,7 +774,7 @@ DataCard.prototype.init = function() {
 	);
 	this.listenToEvents($('#mother-data'));
 	$('#mother-data').find("#url-input").removeClass('hide');
-	if ($('#separate-url-for-index-files-cb').is(":checked")) {	
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {
 		$('#mother-data').find("#url-tbi-input").removeClass('hide');
 		$('#mother-data').find("#bai-url-input").removeClass('hide');
 	}
@@ -787,8 +787,8 @@ DataCard.prototype.init = function() {
 	$('#father-data').append(dataCardEntryTemplate());
 	$('#father-data #sample-data-label').text("FATHER");
 	$('#father-data #vcf-sample-select').selectize(
-		{ 
-			create: true, 			
+		{
+			create: true,
 			valueField: 'value',
 	    	labelField: 'value',
 	    	searchField: ['value']
@@ -806,7 +806,7 @@ DataCard.prototype.init = function() {
 	$('#father-data').find("#bam-url-input").removeClass('hide');
 	me.setDataSourceRelationship($('#father-data'));
 
-	
+
 	var dataCardSelector = $('#data-card');
 	dataCardSelector.find('#expand-button').on('click', function() {
 		dataCardSelector.find('.fullview').removeClass("hide");
@@ -814,16 +814,16 @@ DataCard.prototype.init = function() {
 	dataCardSelector.find('#minimize-button').on('click', function() {
 		dataCardSelector.find('.fullview').addClass("hide");
 	});
-	dataCardSelector.find('#ok-button').on('click', function() {	
+	dataCardSelector.find('#ok-button').on('click', function() {
 
 		// Save the currently select gene name before clearing
 		// out the gene info, which is necessary if the genome build or dataset(s) change
 		var theGeneName = window.gene ? window.gene.gene_name : null;
-		
+
 		// Clear out annotations and gene models (and transcripts)
 		genesCard.clearGeneInfos();
 
-		genesCard.showAnalyzeAllButton();		
+		genesCard.showAnalyzeAllButton();
 		// Clear the cache
 		cacheHelper.clearCache();
 		cacheHelper.hideAnalyzeAllProgress();
@@ -835,7 +835,7 @@ DataCard.prototype.init = function() {
 		// generated from the data
 		filterCard.clearDataGeneratedFilters();
 
-		
+
 
 		 // If we switched from a trio back to a single, clear out the mother and father
 		// data
@@ -853,7 +853,7 @@ DataCard.prototype.init = function() {
 		window.loadSibs(unaffectedSibIds, 'unaffected');
 
 		window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
-		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");			
+		window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
 
 		window.getAffectedInfo(true);
 		filterCard.displayAffectedFilters();
@@ -866,7 +866,7 @@ DataCard.prototype.init = function() {
 
 		window.matrixCard.reset();
 
-		
+
 		if (theGeneName) {
 			setGeneBloodhoundInputElement(theGeneName, false, true);
 		} else if (getUrlParameter("gene")) {
@@ -875,7 +875,7 @@ DataCard.prototype.init = function() {
 			// list.
 			setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
 		} else {
-			window.loadTracksForGene();		
+			window.loadTracksForGene();
 		}
 
 
@@ -915,7 +915,7 @@ DataCard.prototype.onShow = function() {
 DataCard.prototype.resetExportPanel = function() {
 	$('#export-loader').addClass("hide");
 	$('#download-bookmarks').addClass("hide");
-	$('#export-bookmarks').removeClass("hide");	
+	$('#export-bookmarks').removeClass("hide");
 }
 
 DataCard.prototype.onBookmarkImportSource = function(radio) {
@@ -929,7 +929,7 @@ DataCard.prototype.onBookmarkImportSource = function(radio) {
 }
 
 
-DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {	
+DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -951,7 +951,7 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
 
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];	
+	var variantCard = variantCards[+cardIndex];
 
 	variantCard.onBamFilesSelected(event, function(bamFileName) {
 		me.panelSelectorFilesSelected.find('#bam-file-info').removeClass('hide');
@@ -965,13 +965,13 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
 	if (genomeBuildHelper.getCurrentBuild()) {
 		window.enableLoadButton();
-	} else {		
+	} else {
 		if (wiggleWhenEmpty) {
-			//$('#select-build-box .selectize-input').animateIt('tada');	
-			$('#select-build-box').addClass('attention');		
+			//$('#select-build-box .selectize-input').animateIt('tada');
+			$('#select-build-box').addClass('attention');
 		}
 		window.disableLoadButton();
-	}	
+	}
 }
 
 
@@ -981,12 +981,12 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 		panelSelector = $('#datasource-dialog');
 	}
 	$('#tourWelcome').removeClass("open");
-	
+
 	var bamUrlInput = panelSelector.find('#bam-url-input');
 	bamUrlInput.removeClass("hide");
 
 	var baiUrl = '';
-	if ($('#separate-url-for-index-files-cb').is(":checked")) {		
+	if ($('#separate-url-for-index-files-cb').is(":checked")) {
 		var baiUrlInput = panelSelector.find('#bai-url-input');
 		baiUrlInput.removeClass("hide");
 		baiUrl = baiUrlInput.val();
@@ -1015,7 +1015,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 			window.updateUrl('bam' + cardIndex, encodeURIComponent(bamUrl));
 			window.updateUrl('bai' + cardIndex, encodeURIComponent(baiUrl));
 			me.setDefaultBuildFromData();
-			me.enableLoadButtonIfBuildSet(true);		
+			me.enableLoadButtonIfBuildSet(true);
 		} else {
 			window.disableLoadButton();
 		}
@@ -1024,7 +1024,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 			callback(success);
 		}
 
-	});	
+	});
 
 }
 
@@ -1036,7 +1036,7 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     panelSelector.find('#bam-file-info').val('');
     panelSelector.find('#bam-url-input').removeClass("hide");
     panelSelector.find("#bam-url-input").focus();
-    if ($('#separate-url-for-index-files-cb').is(":checked")) {		
+    if ($('#separate-url-for-index-files-cb').is(":checked")) {
 	    panelSelector.find('#bai-url-input').removeClass("hide");
 	} else {
 	    panelSelector.find('#bai-url-input').addClass("hide");
@@ -1050,9 +1050,9 @@ DataCard.prototype.displayBamUrlBox = function(panelSelector) {
     var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
-	
+
     this.onBamUrlEntered(panelSelector);
-	
+
 
 }
 DataCard.prototype.displayPlatinumBamUrlBox = function(panelSelector) {
@@ -1071,7 +1071,7 @@ DataCard.prototype.displayPlatinumBamUrlBox = function(panelSelector) {
 
 	panelSelector.find('#bam-url-input').val(this.defaultBamUrls[variantCard.getRelationship()]);
 	this.onBamUrlEntered(panelSelector);
-	
+
 
 }
 
@@ -1131,7 +1131,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
 
 	variantCard.setDefaultSampleName(this.defaultSampleNames[variantCard.getRelationship()]);
 	window.updateUrl('sample' + cardIndex, this.defaultSampleNames[variantCard.getRelationship()]);
-	
+
 	panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
 	panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
 	panelSelector.find("#url-input").removeClass('hide');
@@ -1155,7 +1155,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.removeUrl('vcf'+cardIndex);
 	panelSelector.find("#url-input").val("");
 	panelSelector.find("#url-tbi-input").val("");
-	panelSelector.find("#vcf-file-info").val("");	
+	panelSelector.find("#vcf-file-info").val("");
 	panelSelector.find('#vcf-sample-select')[0].selectize.clearOptions();
 	panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 	panelSelector.find('#vcf-sample-box').addClass('hide');
@@ -1170,7 +1170,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
 	window.enableLoadButton();
 }
 
-DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {	
+DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -1181,16 +1181,16 @@ DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
 	panelSelector.find('#url-tbi-input').addClass('hide');
 	panelSelector.find('#url-tbi-input').val('');
 
-	
+
 	window.disableLoadButton();
 }
 
 DataCard.prototype.onVcfFilesSelected = function(event) {
 	var me = this;
-	
+
 	$('#tourWelcome').removeClass("open");
 
-	// Show the file name 
+	// Show the file name
 	me.panelSelectorFilesSelected.find('#vcf-file-info').removeClass('hide');
 	for (var i = 0; i < event.currentTarget.files.length; i++) {
 		var file = event.currentTarget.files[i];
@@ -1203,13 +1203,13 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 	this.setDataSourceRelationship(this.panelSelectorFilesSelected);
 
 	var cardIndex = this.panelSelectorFilesSelected.find('#card-index').val();
-	var variantCard = variantCards[+cardIndex];	
+	var variantCard = variantCards[+cardIndex];
 
 	// We cannot load a vcf local file from a URL (must be choosen by user), so we just
 	// need to clear out any previously selected vcf url.
 	window.removeUrl('vcf'+cardIndex);
 	window.removeUrl('sample'+cardIndex);
-	
+
 
 	me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
 	$('#unaffected-sibs-box').addClass('hide');
@@ -1218,7 +1218,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 
 	variantCard.onVcfFilesSelected(
-		event, 
+		event,
 		function(vcfFileName, sampleNames) {
 			me.setDefaultBuildFromData();
 
@@ -1233,15 +1233,15 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
 			} else {
 				if (sampleNames.length == 1) {
-					variantCard.setSampleName(sampleNames[0]);									
+					variantCard.setSampleName(sampleNames[0]);
 				} else {
-					variantCard.setSampleName("");									
+					variantCard.setSampleName("");
 					variantCard.setDefaultSampleName(null);
 				}
 				me.panelSelectorFilesSelected.find('#vcf-sample-select-box').removeClass("attention");
 
 				window.removeUrl('sample'+cardIndex);
-				
+
 				me.enableLoadButtonIfBuildSet(true);
 			}
 		},
@@ -1272,21 +1272,21 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 	if (sampleNames.length > 1) {
 		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:""});
 		if (variantCard.getRelationship() == 'proband') {
-			$('#unaffected-sibs-select')[0].selectize.addOption({value:""});			                             
-			$('#affected-sibs-select')[0].selectize.addOption({value:""});			                             
+			$('#unaffected-sibs-select')[0].selectize.addOption({value:""});
+			$('#affected-sibs-select')[0].selectize.addOption({value:""});
 		}
-	}							         
+	}
 
 	// Populate the sample name in the dropdown
 	sampleNames.forEach( function(sampleName) {
 		panelSelector.find('#vcf-sample-select')[0].selectize.addOption({value:sampleName});
 		if (variantCard.getRelationship() == 'proband') {
 			$('#unaffected-sibs-select')[0].selectize.addOption({value:sampleName});
-			$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});		                                     		                                    
+			$('#affected-sibs-select')[0].selectize.addOption({value:sampleName});
 		}
 	});
 
-	
+
 
 	if (variantCard.getRelationship() == 'proband') {
 		me.initSibs();
@@ -1306,7 +1306,7 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
 		panelSelector.find('#vcf-sample-select-box').addClass("attention");
 
 		window.disableLoadButton();
-	}	
+	}
 
 	// When the sample name dropdown is selected
     panelSelector.find('#vcf-sample-select')[0].selectize.on('change', function() {
@@ -1325,7 +1325,7 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
 	variantCard.setName(sampleName);
 	panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 
-	
+
 	window.updateUrl('sample' + cardIndex, sampleName);
 	window.updateUrl('name' + cardIndex, sampleName);
 	if (variantCard.isReadyToLoad()) {
@@ -1339,7 +1339,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 		panelSelector = $('#datasource-dialog');
 	}
 	$('#tourWelcome').removeClass("open");
-	
+
 	var cardIndex = panelSelector.find('#card-index').val();
 	var variantCard = variantCards[+cardIndex];
 
@@ -1366,30 +1366,30 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 
 	window.updateUrl('vcf'+cardIndex, encodeURIComponent(vcfUrl));
 	window.updateUrl('tbi'+cardIndex, encodeURIComponent(tbiUrl));
-	
+
 	variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
 		if (vcfUrl && vcfUrl != "") {
 			panelSelector.find('.vcf-sample.loader').addClass('hide');
 
 			if (success) {
 				me.setDefaultBuildFromData();
-				
+
 				// Only show the sample dropdown if there is more than one sample
 				if (sampleNames.length > 1) {
 					me.populateSampleDropdowns(variantCard, panelSelector, sampleNames);
 
 				} else {
 					if (sampleNames.length == 1) {
-						variantCard.setSampleName(sampleNames[0]);									
+						variantCard.setSampleName(sampleNames[0]);
 					} else {
-						variantCard.setSampleName("");									
+						variantCard.setSampleName("");
 						variantCard.setDefaultSampleName(null);
 					}
 					panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 					window.removeUrl('sample'+cardIndex);
 
 
-					me.enableLoadButtonIfBuildSet(true);			
+					me.enableLoadButtonIfBuildSet(true);
 				}
 
 			} else {
@@ -1403,8 +1403,8 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
 			window.enableLoadButton();
 			callback(success);
 		}
-		
-		
+
+
 	});
 }
 
@@ -1415,20 +1415,20 @@ DataCard.prototype.promiseSetVcfUrl = function(relationship, name, sampleName, v
 
 	return new Promise(function(resolve, reject) {
 		var variantCard = getVariantCard(relationship);
-		variantCard.setRelationship(relationship);		
+		variantCard.setRelationship(relationship);
 		variantCard.setName(name);
 		variantCard.setVariantCardLabel();
 		variantCard.showDataSources(name);
 		variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
 			if (sampleName) {
-				variantCard.setSampleName(sampleName);				
-			} 
+				variantCard.setSampleName(sampleName);
+			}
 			resolve();
 		});
 	});
 }
 
-DataCard.prototype.setDataSourceName = function(panelSelector) {	
+DataCard.prototype.setDataSourceName = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -1438,14 +1438,14 @@ DataCard.prototype.setDataSourceName = function(panelSelector) {
 	var dsName = panelSelector.find('#datasource-name').val();
 	variantCard.setName(dsName);
 	variantCard.showDataSources(dsName);
-	
+
 	//	$('#variant-card-button-' + cardIndex ).text(dsName);
 	window.updateUrl('name' + cardIndex, dsName);
 
 }
 
 
-DataCard.prototype.setAffected = function(panelSelector) {	
+DataCard.prototype.setAffected = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -1465,10 +1465,10 @@ DataCard.prototype.setAffected = function(panelSelector) {
 		window.updateUrl('affectedStatus' + cardIndex, isAffected);
 
 	}
-	
+
 }
 
-DataCard.prototype.setDataSourceRelationship = function(panelSelector) {		
+DataCard.prototype.setDataSourceRelationship = function(panelSelector) {
 	if (!panelSelector) {
 		panelSelector = $('#datasource-dialog');
 	}
@@ -1477,7 +1477,7 @@ DataCard.prototype.setDataSourceRelationship = function(panelSelector) {
 	var variantCard = variantCards[+cardIndex];
 
 	var dsRelationship = panelSelector.find('#datasource-relationship').val();
-	variantCard.setRelationship(dsRelationship);	
+	variantCard.setRelationship(dsRelationship);
 	window.updateUrl('rel' + cardIndex, dsRelationship);
 }
 

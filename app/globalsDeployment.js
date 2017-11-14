@@ -1,5 +1,5 @@
 /*  These global variables determine which iobio servers the gene.iobio app with interact
-    with for a local deployment.  This entire .js can be replaced or modified to suit the 
+    with for a local deployment.  This entire .js can be replaced or modified to suit the
     specific iobio deployment environment.
 */
 var version               = "2.5";
@@ -45,16 +45,16 @@ var global_browserCache         = BROWSER_CACHE_INDEXED_DB;
 
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
-* a simplified interface and logic.  
+* a simplified interface and logic.
 * See @import statements for levelEdu  in css/assets/sass.
 */
 var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
 
 /*
 * These variables control special behavior for running gene.iobio basic mode, with
-* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode, 
+* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode,
 * TURN ON BOTH isLevelBasic and isMygene2.  For running Mygene2 gene.iobio advanced mode,
-* TURN ON only isMygene2. 
+* TURN ON only isMygene2.
 * See @import statements for levelEdu and levelEduTour in css/assets/sass.
 */
 var isLevelBasic          = false;    // is gene.iobio basic mode?

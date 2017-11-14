@@ -80,7 +80,7 @@ gulp e2e -e chrome
 
 Debugging selenium tests can be difficult.
 
-One way is to inspect the page by using `browser.pause()` in your test and then running it with chrome  
+One way is to inspect the page by using `browser.pause()` in your test and then running it with chrome
 (`gulp e2e -e chrome`).
 
 You can also output any error messages that were logged to the console using `getLog`:

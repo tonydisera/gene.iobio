@@ -332,7 +332,7 @@ describe('MatrixCard', function() {
 
 		beforeEach(function() {
 			setFixtures(
-				'<g class="cell"></g>' 
+				'<g class="cell"></g>'
 			);
 			data = [
 				{ clazz: "afhighest_rare" }
@@ -541,7 +541,7 @@ describe('MatrixCard', function() {
 			selection.datum({
 				value: 'present_some',
 				clazz: 'affected'
-			});			
+			});
 			mc.showAffectedPresentSymbol(selection, {cellSize: 22});
 			var useElem = d3.select('#test use');
 			expect($('#test g').attr('transform')).toEqual('translate(1,2)');
@@ -595,7 +595,7 @@ describe('MatrixCard', function() {
 			expect($('#test g').attr('transform')).toEqual('translate(2,2)');
 			expect(useElem.attr('width')).toEqual('16');
 			expect(useElem.attr('height')).toEqual('16');
-		});		
+		});
 	});
 
 	describe('#showPhenotypeSymbol', function() {

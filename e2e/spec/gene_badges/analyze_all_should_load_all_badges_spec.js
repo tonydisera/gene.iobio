@@ -16,9 +16,9 @@ module.exports = {
   },
 
   'Analyzing all in batch sizes of 1 should load all badges': function(client) {
-    indexPage.load();    
+    indexPage.load();
     nav.clickGenes();
-    findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);    
+    findGenesPanel.importGeneSet(['BRCA1', 'BRCA2', 'TP53', 'STK11', 'MLH1']);
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild();

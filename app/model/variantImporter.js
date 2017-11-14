@@ -86,7 +86,7 @@ VariantImporter.parseRecordsCSV = function(data) {
 		}
 		recCount++;
 	});
-	return importRecords;	
+	return importRecords;
 }
 
 VariantImporter.parseRecordsGemini = function(data) {
@@ -96,7 +96,7 @@ VariantImporter.parseRecordsGemini = function(data) {
 	var recs = data.split(/[\r\n]+/g);
 	recs.forEach( function(rec) {
 		var fields = rec.split(/\s+/);
-		if (fields.length == 0 || fields[0] == "chrom" || fields[0] == '') { 
+		if (fields.length == 0 || fields[0] == "chrom" || fields[0] == '') {
 			// Ignore the header line or a blank link
 		} else {
 			// Parse the tab separate record into fields
@@ -105,7 +105,7 @@ VariantImporter.parseRecordsGemini = function(data) {
 				importRec[fieldNames[i]] = fields[i];
 			}
 			importRec.importSource = "gemini"
-			importRec.importFormat = "tsv";			
+			importRec.importFormat = "tsv";
 			importRecords.push(importRec);
 		}
 	});

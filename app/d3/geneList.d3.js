@@ -12,39 +12,39 @@
 
 	    xValue = function(d) { return d[0]; },
 	    yValue = function(d) { return d[1]; },
-	  
+
 	    tooltipText = function(d, i) {
-	      return d[0] + ", " + d[1]; 
+	      return d[0] + ", " + d[1];
 	    },
   	    x = d3.scale.linear(),
 	    y = d3.scale.ordinal();
 
 	var widthPercent = null;
 	var heightPercent = null;
-	  
+
 	function chart(selection, options) {
 		var me = this;
 		// merge options and defaults
 		options = $.extend(defaults,options);
-   
+
 	    selection.each(function(data) {
 	        // select the container for the svg
 		    var container  = d3.select(this);
-	    
+
 		    var height = barHeight * data.length;
-			var innerHeight = height - margin.top - margin.bottom;  
-			var innerWidth = width - margin.left - margin.right;  
-	       
+			var innerHeight = height - margin.top - margin.bottom;
+			var innerWidth = width - margin.left - margin.right;
+
 			x = d3.scale.linear()
 						 .domain([0, d3.max(data, function(d) { return xValue(d);})])
 						 .range([0, innerWidth]);
 
-			
+
 			y = d3.scale.ordinal()
 					    .domain(function(d){ return yValue(d) })
 					    .rangeBands([0, (barHeight + 2 * gap) * data.length]);
 
-			container.selectAll("svg").remove();		    
+			container.selectAll("svg").remove();
 
 
 			// Select the svg element, if it exists.
@@ -65,12 +65,12 @@
 
 
 		    var line = svg.selectAll('.line')
-		                .data(data)    
+		                .data(data)
 		                .enter()
 		                .append("g")
 		                .attr("class", "line")
-		                .attr("transform", function(d, i) { 
-		                	var y = i*(barHeight + gap * 2) + (barHeight / 2) + 2; 
+		                .attr("transform", function(d, i) {
+		                	var y = i*(barHeight + gap * 2) + (barHeight / 2) + 2;
 		                	return "translate(0," + y + ")";
 		                });
 
@@ -81,7 +81,7 @@
 			 .attr("dy", ".36em")
 			 .attr("text-anchor", "start")
 			 .attr('class', 'score')
-			 .text(function(d, i) {return i+1 + "."});		    	
+			 .text(function(d, i) {return i+1 + "."});
 
 			line.append("rect")
 			    .attr("class", "cellbox")
@@ -106,7 +106,7 @@
 				    	}
 				      });
 
-				   
+
 					dispatch.d3click(d);
 			    })
 			    .on("mouseover", function(d,i) {
@@ -141,15 +141,15 @@
 					.style("pointer-events", "none");
 
 
-		
+
 
 			line.append("text")
 				 .attr("x", 40)
 				 .attr("y", 0 )
 				 .attr("dy", ".36em")
 				 .attr("text-anchor", "start")
-				 .attr('class', 'name')				 
-				 .text(function(d) {return yValue(d)});	
+				 .attr('class', 'name')
+				 .text(function(d) {return yValue(d)});
 			if (!options.simpleGeneList) {
 				line.append("text")
 				     .attr("class", "score")
@@ -162,7 +162,7 @@
 					 .text(function(d) {return xValue(d)});
 
 			}
-			
+
 
 		});
 	}
@@ -208,11 +208,11 @@
 	    labelWidth = _;
 	    return chart;
 	};
-	  
+
 	chart.brush = function(_) {
 	    if (!arguments.length) return brush;
 	    brush = _;
-	    return chart; 
+	    return chart;
 	};
 
 

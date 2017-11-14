@@ -10,7 +10,7 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;  
+    matrixTrack = indexPage.section.matrixTrack;
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
     fatherVariantCard = indexPage.section.fatherVariantCard;
@@ -51,17 +51,17 @@ module.exports = {
 
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
-    client.pause(1000);   
+    client.pause(1000);
 
     filterPanel.clickClearAll();
     client.pause(1000);
-    
+
     filterPanel.clickInheritanceDenovo();
     client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
-  
-  
+
+
   'Known causative filter': function(client) {
     nav.clickFilter();
     client.pause(1000);
@@ -103,13 +103,13 @@ module.exports = {
     client.pause(1000);
     filterPanel.clickClearAll();
     client.pause(2000);
-    
+
     filterPanel.clickInheritanceDenovo();
     client.pause(2000);
     appTitleSection.assertAnalyzeAllCounts(2,3,1,4);
   },
-  
-  
+
+
 
   'Low gene coverage filter': function(client) {
 
@@ -135,7 +135,7 @@ module.exports = {
 
   'Click on AIRE and validate recfilter . (unassigned) counts': function(client) {
     nav.clickFilter();
-    client.pause(2000);   
+    client.pause(2000);
 
     nav.searchGene('AIRE');
     client.pause(2000);
@@ -147,12 +147,12 @@ module.exports = {
 
   },
 
-  
+
   'Click on AIRE, PDHA1 and look for low coverage exon glyph': function(client) {
 
     filterPanel.clickClearAll();
     nav.searchGene('AIRE');
-    
+
     client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
@@ -161,7 +161,7 @@ module.exports = {
     probandVariantCard.assertLowCoverageGlyphCountEquals(1);
 
     nav.searchGene('PDHA1');
-    
+
     client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
 
@@ -178,7 +178,7 @@ module.exports = {
 
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
-    
+
     client.pause(2000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(2);
@@ -224,13 +224,13 @@ module.exports = {
     tooltip.selector = tooltip.MATRIX_TOOLTIP;
     evaluateTooltip(tooltip);
 
-    
+
   },
 
   'end': function(client) {
     client.end();
   }
 
-  
+
 }
 

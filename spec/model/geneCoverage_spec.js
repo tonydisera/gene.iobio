@@ -74,7 +74,7 @@ xdescribe('geneCoverage', function() {
 				geneObjects[theGeneObject.gene_name] = theGeneObject;
 
 				promiseGetGeneCoverage(theGeneObject, theTranscript).then(function(geneCoverageAll) {
-					
+
 					var chrom = geneCoverageAll.proband[0].chrom;
 
 					getPileupCoverageForExons(chrom, geneCoverageAll.proband, 0, function() {
@@ -86,7 +86,7 @@ xdescribe('geneCoverage', function() {
 				})
 			});
 	}
-	
+
 	var getPileupCoverageForExons = function(chrom, geneCoverageExons, idx, callback) {
 
 		var exon = geneCoverageExons[idx];
@@ -101,7 +101,7 @@ xdescribe('geneCoverage', function() {
 				callback(geneCoverageExons);
 			}
 		} else {
-			getProbandVariantCard().model.bam.getCoverageForRegion(chrom, exon.start, exon.end, [], 5000, false, function(coverageForRegion, coverageForPoints) {						
+			getProbandVariantCard().model.bam.getCoverageForRegion(chrom, exon.start, exon.end, [], 5000, false, function(coverageForRegion, coverageForPoints) {
 				var total = 0;
 				var count = 0;
 				var min   = 999999;
@@ -140,9 +140,9 @@ xdescribe('geneCoverage', function() {
 						pileupSummary.count++;
 
 					}
-				})					
+				})
 				exon.mpileup = {min: (min == 999999 ? 0 : min), max: max, mean: (count > 0 ? total/count : 0)};
-				
+
 
 
 				idx++;
@@ -163,24 +163,24 @@ xdescribe('geneCoverage', function() {
 
 		expect(geneCoverage).not.toBeNull();
 
-		
+
 		var codingRegions = theTranscript.features.filter(function(feature) {
 			return feature.feature_type.toUpperCase() == 'CDS';
 		})
 		expect(Object.keys(geneCoverage).length).toEqual(codingRegions.length + 1);
 
 		geneCoverage.forEach(function(gc) {
-			
-			console.log(gc.id + " " 
-				+ (gc.region == 'NA' ? gc.region : (gc.start + "-" + gc.end)) 
-				+ "    sd="        + roundIt(gc.sd) 
-				+ "         mean=" + roundIt(gc.mean) 
-				+ " vs. "          + roundIt(gc.mpileup.mean) 
+
+			console.log(gc.id + " "
+				+ (gc.region == 'NA' ? gc.region : (gc.start + "-" + gc.end))
+				+ "    sd="        + roundIt(gc.sd)
+				+ "         mean=" + roundIt(gc.mean)
+				+ " vs. "          + roundIt(gc.mpileup.mean)
 				+                    (roundIt(Math.abs(gc.mean - gc.mpileup.mean)) > gc.sd ? "*" : " ")
-				+ "         min="  + roundIt(gc.min) 
-				+ " vs. "          + roundIt(gc.mpileup.min) 
+				+ "         min="  + roundIt(gc.min)
+				+ " vs. "          + roundIt(gc.mpileup.min)
 				+                    (roundIt(Math.abs(gc.min - gc.mpileup.min)) > gc.sd ? "*" : " ")
-				+ "         max="  + roundIt(gc.max) 
+				+ "         max="  + roundIt(gc.max)
 				+ " vs. "          + roundIt(gc.mpileup.max)
 				+                    (roundIt(Math.abs(gc.max - gc.mpileup.max)) > gc.sd ? "*" : " "));
 
@@ -209,7 +209,7 @@ xdescribe('geneCoverage', function() {
 			model.relationship = 'proband';
 			var vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
 		if (getVariantCard('mother') == null) {
@@ -218,7 +218,7 @@ xdescribe('geneCoverage', function() {
 			model.relationship = 'mother';
 			var vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
 		if (getVariantCard('father') == null) {
@@ -227,17 +227,17 @@ xdescribe('geneCoverage', function() {
 			model.relationship = 'father';
 			vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
-	
+
 		var doneCount = 0;
 
 		variantCards.forEach(function(vc) {
 			vc.model.onVcfUrlEntered(vcfUrl[vc.getRelationship()], null, function(success, samples) {
-		
+
 				vc.model.setSampleName(sample[vc.getRelationship()]);
-				
+
 				vc.model.onBamUrlEntered(bamUrl[vc.getRelationship()], function(success) {
 					doneCount++;
 					if (doneCount == variantCards.length) {
@@ -252,7 +252,7 @@ xdescribe('geneCoverage', function() {
 		beforeEach(function(done) {
 
 			getGeneCoverageForGene('AIRE', function() {
-				
+
 				done();
 
 			});
@@ -283,6 +283,6 @@ xdescribe('geneCoverage', function() {
 			done();
 
 		});
-	});	
+	});
 
 });

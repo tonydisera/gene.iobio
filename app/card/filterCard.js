@@ -5,13 +5,13 @@ function FilterCard() {
 	this.snpEffEffects = new Object();
 	this.vepConsequences = new Object();
 	this.recFilters = new Object();
-	
+
 	this.annotationScheme = "vep";
 	this.pathogenicityScheme = "clinvar";
-	
+
 	this.annotClasses     = ".type, .impact, ." + IMPACT_FIELD_TO_FILTER + ", .effect, .vepConsequence, .sift, .polyphen, .regulatory, .zygosity, .inheritance, .clinvar, .uasibs, .recfilter";
 	this.annotClassLabels = "Type, Impact, VEP Impact, Effect, VEP Consequence, SIFT, PolyPhen, Regulatory, Zygosity, Inheritance mode, ClinVar, Unaffected Sibs, VCF Filter Status";
-	
+
 	this.applyLowCoverageFilter = false;
 
 	// standard filters
@@ -47,7 +47,7 @@ FilterCard.prototype.clearDataGeneratedFilters = function() {
 	$('#effect-filter-box .effect').remove();
 	$('#effect-filter-box .vepConsequence').remove();
 
-	
+
 	this.recFilters = new Object();
 	$('#rec-filter-box .recfilter').remove();
 }
@@ -58,7 +58,7 @@ FilterCard.prototype.displayDataGeneratedFilters = function () {
 }
 
 FilterCard.prototype.autoSetFilters = function() {
-	
+
 	this.displayRecFilters();
 	this.initFilterListeners();
 }
@@ -83,16 +83,16 @@ FilterCard.prototype.displayAffectedFilters = function() {
     	} else {
 	    	$('#present-in-affected').removeClass("hide");
 	    	$('#present-in-affected-heading').removeClass("hide");
-	
+
 	    	$('#present-in-affected').append(filterAffectedTemplate());
 	    	var cb = $('#present-in-affected').find('.checkbox').last();
-	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);
 	    	cb.attr("id", info.id)
-	    	cb.click(function() {	
+	    	cb.click(function() {
 	    		me.getAffectedFilterInfo(true);
 	    		me.clearCurrentStandardFilter();
-	    		window.filterVariants();   
-	    	})    		
+	    		window.filterVariants();
+	    	})
     	}
     })
     affectedInfo.filter(function(info) {
@@ -106,13 +106,13 @@ FilterCard.prototype.displayAffectedFilters = function() {
 	    	$('#absent-in-unaffected-heading').removeClass("hide");
 	    	$('#absent-in-unaffected').append(filterAffectedTemplate());
 	    	var cb = $('#absent-in-unaffected').find('.checkbox').last();
-	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);  
+	    	cb.find('input').after("&nbsp;&nbsp;" + info.label);
 	    	cb.attr("id", info.id);
-			cb.click(function() {	
+			cb.click(function() {
 	    		me.getAffectedFilterInfo(true);
 	    		me.clearCurrentStandardFilter();
-	    		window.filterVariants();   
-	    	})    	
+	    		window.filterVariants();
+	    	})
     	}
     })
     me.getAffectedFilterInfo(true);
@@ -125,7 +125,7 @@ FilterCard.prototype.getAffectedFilterInfo = function(forceRefresh=false) {
 	if (this.affectedInfo == null || forceRefresh) {
 		this.affectedInfo = getAffectedInfo();
 		forceRefresh = true;
-	} 
+	}
 
 	if (forceRefresh) {
 		this.affectedInfo.filter(function(info) {
@@ -142,7 +142,7 @@ FilterCard.prototype.getAffectedFilterInfo = function(forceRefresh=false) {
 	    .forEach(function(info) {
 	    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
 	    	info.filter = (cb.is(":checked"));
-	    });    
+	    });
 
 	}
     return this.affectedInfo;
@@ -169,7 +169,7 @@ FilterCard.prototype.clearAffectedFilters = function() {
 	    	var cb = $('#absent-in-unaffected').find("#" + info.id + " input");
 	    	cb.prop('checked', false);
 	    	info.filter = false;
-	    });    
+	    });
 
 
 		this.affectedInfo = getAffectedInfo();
@@ -186,7 +186,7 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 	if ($('.standard-filter-btn.current').length > 0) {
 		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").addClass("hide");
 		$('.standard-filter-btn.current').parent().find("span.standard-filter-count .variant-count").text("");
-		$('.standard-filter-btn.current').removeClass("current");		
+		$('.standard-filter-btn.current').removeClass("current");
 	}
 }
 
@@ -194,7 +194,7 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
 	var me = this;
     filterCard.setStandardFilter(button, filterName);
-	filterVariants();		
+	filterVariants();
 }
 
 
@@ -266,7 +266,7 @@ FilterCard.prototype.setStandardFilterCount = function(field, counts, notAnalyze
 	if (this.hasFilters()) {
 		if ($('#standard-filter-panel .standard-filter-btn.current').attr("id") == "button-low-coverage" && field == 'called') {
 			// we bypass 'called' variant counts for the coverage filter
-		} else {		
+		} else {
 			var filterCountSelector = 'span.standard-filter-count #' + field + '-variant-count';
 			// If a standard filter has been applied, update its counts
 			if (clearStandardFilterCounts) {
@@ -283,7 +283,7 @@ FilterCard.prototype.setStandardFilterCount = function(field, counts, notAnalyze
 					$('#standard-filter-panel .standard-filter-btn.current').parent().find(filterCountSelector).removeClass("none");
 				}
 
-			}			
+			}
 		}
 	}
 
@@ -295,10 +295,10 @@ FilterCard.prototype.setStandardFilterCount = function(field, counts, notAnalyze
 		$('#standard-filter-panel .variant-count').each( function(i,val) {
 			if ($(val).attr('id') == filterCountId) {
 				if ($(val).hasClass("hide")) {
-					$(val).parent().find('#unanalyzed-' + field + '-warning').addClass("hide"); 
+					$(val).parent().find('#unanalyzed-' + field + '-warning').addClass("hide");
 				} else {
-					$(val).parent().find('#unanalyzed-' + field + '-warning').removeClass("hide"); 
-				}				
+					$(val).parent().find('#unanalyzed-' + field + '-warning').removeClass("hide");
+				}
 			}
 		})
 	} else {
@@ -322,7 +322,7 @@ FilterCard.prototype.getFilterObject = function() {
 			clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 		}
 		//annots.PASS = {key: 'recfilter', state: true, value: 'PASS'};
-		
+
 		return { afMin: 0, afMax: .01, annotsToInclude: annots };
 	}
 
@@ -359,8 +359,8 @@ FilterCard.prototype.getAnnotationScheme = function() {
 
 FilterCard.prototype.setAnnotationScheme = function(scheme) {
 	this.annotationScheme = scheme;
-    $('#select-annotation-scheme')[0].selectize.setValue(scheme, true);	
-    
+    $('#select-annotation-scheme')[0].selectize.setValue(scheme, true);
+
 	$('#effect-scheme .name').text(this.annotationScheme.toLowerCase() ==  'snpeff' ? 'Effect' : 'Consequence');
 	d3.select('#filter-card .impact').classed(IMPACT_FIELD_TO_FILTER,this.annotationScheme.toLowerCase() == 'vep');
 	d3.select('#filter-card .' + IMPACT_FIELD_TO_FILTER).classed('impact',!this.annotationScheme.toLowerCase() == 'vep');
@@ -453,19 +453,19 @@ FilterCard.prototype.init = function() {
 		window.filterVariants();
 	});
 	// listen to checkbox for filtering exonic only variants
-	$('#exonic-only-cb').click(function() {	   
+	$('#exonic-only-cb').click(function() {
 		me.clearCurrentStandardFilter();
-		window.filterVariants();	    
+		window.filterVariants();
 	});
 	// listen to loaded variants checkbox
-	$('#loaded-variants-cb').click(function() {	   
+	$('#loaded-variants-cb').click(function() {
 		me.clearCurrentStandardFilter();
-		window.filterVariants();	    
+		window.filterVariants();
 	});
 	// listen to called variants checkbox
-	$('#called-variants-cb').click(function() {	   
+	$('#called-variants-cb').click(function() {
 		me.clearCurrentStandardFilter();
-		window.filterVariants();	    
+		window.filterVariants();
 	});
 
 
@@ -502,10 +502,10 @@ FilterCard.prototype.init = function() {
 	    	d3.selectAll(".zygosity").classed("nocolor", true);
 
 			window.variantCards.forEach(function(variantCard) {
-		    	variantCard.setVariantColorClass(me.classifyByEffect);		    	
+		    	variantCard.setVariantColorClass(me.classifyByEffect);
 		  	});
 			window.filterVariants();
-		
+
 
 	    });
 		d3.selectAll('#zygosity-scheme')
@@ -526,11 +526,11 @@ FilterCard.prototype.init = function() {
 		    window.filterVariants();
 
 
-	    });	    
-	   
+	    });
+
 
 	    this.initFilterListeners();
-	  
+
 }
 
 FilterCard.prototype.initFilterListeners = function(filterSelector, theAnnotClassMap) {
@@ -540,7 +540,7 @@ FilterCard.prototype.initFilterListeners = function(filterSelector, theAnnotClas
 	theAnnotClassMap = theAnnotClassMap ? theAnnotClassMap : me.annotClassMap;
 
 	d3.select('#filter-track').selectAll(filterSelector)
-	  .on("mouseover", function(d) {  	  	
+	  .on("mouseover", function(d) {
 		var id = d3.select(this).attr("id");
 
 		d3.selectAll(".variant")
@@ -595,10 +595,10 @@ FilterCard.prototype.initFilterListeners = function(filterSelector, theAnnotClas
 	  	if (schemeClass == "recfilter" && d3.select(this).attr("id") == 'unassigned') {
 	  		theValue = ".";
 	  	}
-	  	me.annotsToInclude[d3.select(this).attr("id")] = {'key':   schemeClass , 
+	  	me.annotsToInclude[d3.select(this).attr("id")] = {'key':   schemeClass ,
 	  													  'label': schemeLabel,
 	  													  'value': theValue,
-	  													  'valueDisplay': valueDisplay,   
+	  													  'valueDisplay': valueDisplay,
 	  													  'state': on};
 
 	  	d3.select(this).classed("current", on);
@@ -625,7 +625,7 @@ FilterCard.prototype.setExonicOnlyFilter = function(on) {
 
 
 FilterCard.prototype.clearFilters = function() {
-	
+
 	this.clickedAnnotIds = [];
 	this.annotsToInclude = {};
 
@@ -637,7 +637,7 @@ FilterCard.prototype.clearFilters = function() {
 
 
 	d3.selectAll('.standard-filter-btn').classed('current', false);
-	
+
 	d3.selectAll('#filter-track .recfilter').classed('current', false);
 	d3.select('#recfilter-flag').classed("hide", true);
 
@@ -662,50 +662,50 @@ FilterCard.prototype.clearFilters = function() {
 	this.setExonicOnlyFilter(false);
 
 	this.clearAffectedFilters();
-	
+
 }
 
 FilterCard.prototype.resetAfRange = function() {
 	$('#af-amount-start').val("");
-	$('#af-amount-end').val("");	
+	$('#af-amount-end').val("");
 }
 
 
 FilterCard.prototype.enableFilters = function() {
-	d3.selectAll(".impact").each( function(d,i) {		
+	d3.selectAll(".impact").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".highestImpactVep").each( function(d,i) {		
+	d3.selectAll(".highestImpactVep").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".vepImpact").each( function(d,i) {		
+	d3.selectAll(".vepImpact").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".type").each( function(d,i) {		
+	d3.selectAll(".type").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".zygosity").each( function(d,i) {		
+	d3.selectAll(".zygosity").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".effect").each( function(d,i) {		
+	d3.selectAll(".effect").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".vepConsequence").each( function(d,i) {		
+	d3.selectAll(".vepConsequence").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".sift").each( function(d,i) {		
+	d3.selectAll(".sift").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".polyphen").each( function(d,i) {		
+	d3.selectAll(".polyphen").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".regulatory").each( function(d,i) {		
+	d3.selectAll(".regulatory").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".inheritance").each( function(d,i) {		
+	d3.selectAll(".inheritance").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
-	d3.selectAll(".clinvar").each( function(d,i) {		
+	d3.selectAll(".clinvar").each( function(d,i) {
 		d3.select(this).classed("inactive", false);
 	});
 
@@ -716,7 +716,7 @@ FilterCard.prototype.enableFilters = function() {
 FilterCard.prototype.disableFilters = function() {
 }
 
-FilterCard.prototype.enableClinvarFilters = function(theVcfData) {	
+FilterCard.prototype.enableClinvarFilters = function(theVcfData) {
 }
 
 FilterCard.prototype.enableInheritanceFilters = function(theVcfData) {
@@ -790,7 +790,7 @@ FilterCard.prototype.displayEffectFilters = function() {
 	  		$('#effect-filters').append(svgElem);
 
 		}
-	});	
+	});
 	me.initFilterListeners("." + field, {field: fieldLabel} )
 }
 
@@ -813,7 +813,7 @@ FilterCard.prototype.displayRecFilters = function() {
 			}
 		}
 	});
-	
+
 	recFilterKeys.forEach(function(key) {
 		var elmId = key === "." ? "unassigned" : key;
 		if ($('#filter-track #' + elmId).length == 0) {
@@ -824,7 +824,7 @@ FilterCard.prototype.displayRecFilters = function() {
 	                      '<text class="name" x="9" y="8" style="fill-opacity: 1;font-size: 9px;">' + me.capitalizeFirstLetter(label.toLowerCase()).split("-").join(" ") + '</text>' +
 	  					  '</g>' +
 						  '</svg>';
-	  		$('#rec-filter-box').append(svgElem);			
+	  		$('#rec-filter-box').append(svgElem);
 		}
 	});
 	me.initFilterListeners('.recfilter', {recfilter: 'VCF Filter Status'})
@@ -844,14 +844,14 @@ FilterCard.prototype.getCardSpecificFilters = function(relationship) {
 	var specificFilters = [];
 
 	var theFilterMap = me.cardSpecificFilters[relationship];
-	
+
 	if (theFilterMap) {
 		for (var key in theFilterMap) {
-			var theFilter = theFilterMap[key];			
+			var theFilter = theFilterMap[key];
 			specificFilters.push(theFilter);
-		}			
-	} 
-	
+		}
+	}
+
 	return specificFilters;
 }
 
@@ -865,7 +865,7 @@ FilterCard.prototype.getCardSpecificFilter = function(relationship, id) {
 	var theFilter = null;
 	if (this.cardSpecificFilters[relationship]) {
 		theFilter = this.cardSpecificFilters[relationship][id];
-	} 
+	}
 	return theFilter;
 }
 
@@ -873,7 +873,7 @@ FilterCard.prototype.setCardSpecificFilter = function(relationship, id, value) {
 	var theFilter = this.getCardSpecificFilter(relationship, id, value);
 	if (theFilter) {
 		theFilter.value = value;
-	}	
+	}
 }
 FilterCard.prototype.clearCardSpecificFilters = function(relationship) {
 	return this.getCardSpecificFilters(relationship).forEach(function(theFilter) {
@@ -903,7 +903,7 @@ FilterCard.prototype.filterGenes = function(callback) {
 		genesCard.setOrderBy(genesCard.LOW_COVERAGE_OPTION);
 		var geneCounts = cacheHelper.promiseRefreshGeneBadgesGeneCoverage()
 		 .then(function(geneCounts) {
-			cacheHelper.showGeneCounts(geneCounts);	
+			cacheHelper.showGeneCounts(geneCounts);
 			if (callback) {
 				callback();
 			}
@@ -916,10 +916,10 @@ FilterCard.prototype.filterGenes = function(callback) {
 	} else {
 		genesCard.setOrderBy(genesCard.HARMFUL_VARIANTS_OPTION);
 		var geneCounts = cacheHelper.refreshGeneBadges(function() {
-			cacheHelper.showAnalyzeAllProgress();	
+			cacheHelper.showAnalyzeAllProgress();
 			if (callback) {
 				callback();
-			}	
+			}
 		});
 	}
 }
@@ -965,7 +965,7 @@ FilterCard.prototype._getFilterString = function() {
 				buf += info.label;
 			})
 			filterString +=  AND(filterString) + filterBox("Present in affected: " + buf);
-		}		
+		}
 	}
 
 	var unaffectedFilters = [];
@@ -982,8 +982,8 @@ FilterCard.prototype._getFilterString = function() {
 				buf += info.label;
 			})
 			filterString +=  AND(filterString) +  filterBox("Absent in unaffected: " + buf);
-		}	
-	}	
+		}
+	}
 
 	if ($('#loaded-variants-cb').is(":checked") && !$('#called-variants-cb').is(":checked")) {
 		filterString += AND(filterString) + filterBox("loaded variants only");
@@ -1037,7 +1037,7 @@ FilterCard.prototype._getFilterString = function() {
 		if (annotObject.values.length > 1) {
 			theValues += ")";
 		}
-		
+
 		filterString += AND(filterString) + filterBox(annotObject.label + '&nbsp;&nbsp;' + theValues);
 	}
 	return filterString;
@@ -1048,8 +1048,8 @@ FilterCard.prototype.displayFilterSummary = function(filterString) {
 	filterString = filterString ? filterString : this._getFilterString();
 	if (filterString.length > 0) {
 		$("#filter-summary-track").removeClass("hide")
-		$('#filter-summary-track .loader').after(filterString);		
-	} 
+		$('#filter-summary-track .loader').after(filterString);
+	}
 }
 
 FilterCard.prototype.startFilterProgress = function() {
@@ -1073,16 +1073,16 @@ FilterCard.prototype.endFilterProgress = function() {
 }
 
 FilterCard.prototype.isLowCoverage = function(gc) {
-    return  +gc.min   < this.geneCoverageMin 
+    return  +gc.min   < this.geneCoverageMin
 		|| +gc.median < this.geneCoverageMedian
-		|| +gc.mean   < this.geneCoverageMean; 	
+		|| +gc.mean   < this.geneCoverageMean;
 }
 
 FilterCard.prototype.whichLowCoverage = function(gc) {
 	var fields = {};
 	fields.min    = +gc.min    < this.geneCoverageMin    ? '< ' + this.geneCoverageMin : null;
 	fields.median = +gc.median < this.geneCoverageMedian ? '< ' + this.geneCoverageMedian : null;
-	fields.mean   = +gc.mean   < this.geneCoverageMean   ? '< ' + this.geneCoverageMean : null;	
+	fields.mean   = +gc.mean   < this.geneCoverageMean   ? '< ' + this.geneCoverageMean : null;
 	return fields;
 }
 
@@ -1099,19 +1099,19 @@ FilterCard.prototype.classifyByImpact = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 
-	// this is not FilterCard because we are calling class function within d3 
+	// this is not FilterCard because we are calling class function within d3
 	var annotationScheme = filterCard.annotationScheme;
 
-	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);	
+	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);
 	for (key in effectList) {
       if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
       	var tokens = key.split("&");
       	tokens.forEach( function(token) {
 	      effects += " " + token;
-    		
+
       	});
       } else {
-	      effects += " " + key;	      
+	      effects += " " + key;
       }
     }
     var impactList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.impact : d[IMPACT_FIELD_TO_FILTER]);
@@ -1126,23 +1126,23 @@ FilterCard.prototype.classifyByImpact = function(d) {
     	colorimpacts = "impact_none";
     }
     for (key in d.sift) {
-    	sift += " " + key;		
+    	sift += " " + key;
     }
     for (key in d.polyphen) {
-    	polyphen += " " + key;		
+    	polyphen += " " + key;
     }
     for (key in d.regulatory) {
-    	regulatory += " " + key;		
+    	regulatory += " " + key;
     }
-	
-	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + (d.inheritance ? d.inheritance.toLowerCase() : "") + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory +  ' ' + FilterCard.getRecFilterClazz(d) + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts; 
+
+	return  'variant ' + d.type.toLowerCase()  + ' ' + d.zygosity.toLowerCase() + ' ' + (d.inheritance ? d.inheritance.toLowerCase() : "") + ' ua_' + d.ua + ' '  + sift + ' ' + polyphen + ' ' + regulatory +  ' ' + FilterCard.getRecFilterClazz(d) + ' ' + d.clinvar + ' ' + impacts + ' ' + effects + ' ' + d.consensus + ' ' + colorimpacts;
 }
 
 FilterCard.getRecFilterClazz = function(variant) {
-	return ' recfilter_' + (variant.recfilter == "." ? "unassigned" : variant.recfilter);	
+	return ' recfilter_' + (variant.recfilter == "." ? "unassigned" : variant.recfilter);
 }
 
-FilterCard.prototype.classifyByEffect = function(d) { 
+FilterCard.prototype.classifyByEffect = function(d) {
 	var effects = "";
 	var coloreffects = "";
 	var impacts = "";
@@ -1150,17 +1150,17 @@ FilterCard.prototype.classifyByEffect = function(d) {
 	var polyphen = "";
 	var regulatory = "";
 
-	// this is not FilterCard because we are calling class function within d3 
+	// this is not FilterCard because we are calling class function within d3
 	var annotationScheme = filterCard.annotationScheme;
-	
-	
+
+
 	var effectList = (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepConsequence);
     for (key in effectList) {
       if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
       	var tokens = key.split("&");
       	tokens.forEach( function(token) {
       	  effects += " " + token;
-	      coloreffects += " effect_" + token;      		
+	      coloreffects += " effect_" + token;
       	});
       } else {
       	  effects += " " + key;
@@ -1175,20 +1175,20 @@ FilterCard.prototype.classifyByEffect = function(d) {
       impacts += " " + key;
     }
     for (key in d.sift) {
-    	sift += " " + key;		
+    	sift += " " + key;
     }
     for (key in d.polyphen) {
-    	polyphen += " " + key;		
+    	polyphen += " " + key;
     }
     for (key in d.regulatory) {
-    	regulatory += " " + key;		
+    	regulatory += " " + key;
     }
-    
-    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d)  + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects; 
+
+    return  'variant ' + d.type.toLowerCase() + ' ' + d.zygosity.toLowerCase() + ' ' + + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d)  + ' ' + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ' + coloreffects;
 }
 
 
-FilterCard.prototype.classifyByZygosity = function(d) { 
+FilterCard.prototype.classifyByZygosity = function(d) {
 	var effects = "";
 	var impacts = "";
 	var sift = "";
@@ -1196,16 +1196,16 @@ FilterCard.prototype.classifyByZygosity = function(d) {
 	var regulatory = "";
 	var colorzygs = "";
 
-	// this is not FilterCard because we are calling class function within d3 
+	// this is not FilterCard because we are calling class function within d3
 	var annotationScheme = filterCard.annotationScheme;
-	
-	
+
+
 	var effectList =  (annotationScheme == null || annotationScheme.toLowerCase() == 'snpeff' ? d.effect : d.vepEffect);
 	for (key in effectList) {
       if (annotationScheme.toLowerCase() == 'vep' && key.indexOf("&") > 0) {
       	var tokens = key.split("&");
       	tokens.forEach( function(token) {
-	      effects += " " + token;	     
+	      effects += " " + token;
       	});
       } else {
 	      effects += " " + key;
@@ -1216,22 +1216,22 @@ FilterCard.prototype.classifyByZygosity = function(d) {
       impacts += " " + key;
     }
     for (key in d.sift) {
-    	sift += " " + key;		
+    	sift += " " + key;
     }
     for (key in d.polyphen) {
-    	polyphen += " " + key;		
+    	polyphen += " " + key;
     }
     for (key in d.regulatory) {
-    	regulatory += " " + key;		
+    	regulatory += " " + key;
     }
-    
-    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+ d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' '  + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' '; 
+
+    return  'variant ' + d.type.toLowerCase() + ' ' + 'zyg_'+ d.zygosity.toLowerCase() + ' ' + d.inheritance.toLowerCase() + ' ua_' + d.ua + ' ' + sift + ' ' + polyphen + ' ' + regulatory + ' ' + FilterCard.getRecFilterClazz(d) + ' '  + d.clinvar + ' ' + effects + ' ' + impacts + ' ' + d.consensus + ' ';
 }
 
 
 FilterCard.prototype.classifyByClinvar = function(d) {
-	
-	return  'variant ' + d.type.toLowerCase()  +  ' '  + d.clinvar + ' colorby_' + d.clinvar; 
+
+	return  'variant ' + d.type.toLowerCase()  +  ' '  + d.clinvar + ' colorby_' + d.clinvar;
 }
 
 

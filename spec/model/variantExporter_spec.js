@@ -26,8 +26,8 @@ xdescribe('variantExporter', function() {
 	var bookmarkEntries = [
  	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '17',start: 17698535	,end: 17698536	,ref: 'G'	,alt: 'A'	,gene: 'RAI1'	,transcript: 'ENST00000353383.1' ,   freebayesCalled: '',     isFavorite: false },
 	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '20',start: 30409363	,end: 30409364	,ref: 'A'	,alt: 'G'	,gene: 'MYLK2'	,transcript: 'ENST00000375994.2' ,   freebayesCalled: 'Y',    isFavorite: false},
-	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},	
-	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}		
+	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: '22',start: 39636863	,end: 39636865	,ref: 'GCC'	,alt: 'G'	,gene: 'PDGFB'	,transcript: 'ENST00000331163.6' ,   freebayesCalled: '',     isFavorite: false},
+	 {importSource: 'gene', isProxy: true, importFormat: 'csv', chrom: 'X', start: 19369471	,end: 19369472	,ref: 'G'	,alt: 'T'	,gene: 'PDHA1'	,transcript: 'ENST00000379806.5', 	 freebayesCalled: '', 	  isFavorite: false}
 	];
 
 	var validateRecs = [
@@ -124,7 +124,7 @@ xdescribe('variantExporter', function() {
 			refCountFather: '46',
 			depthFather: '46'
 
-		},	
+		},
 		{
 			chrom: 'chrX',
 			gene: 'PDHA1',
@@ -157,7 +157,7 @@ xdescribe('variantExporter', function() {
 			altCountFather: '0',
 			refCountFather: '42',
 			depthFather: '42'
-		}			
+		}
 	]
 
 	var speciesData = [
@@ -225,7 +225,7 @@ xdescribe('variantExporter', function() {
 			model.relationship = 'proband';
 			var vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
 		if (getVariantCard('mother') == null) {
@@ -234,7 +234,7 @@ xdescribe('variantExporter', function() {
 			model.relationship = 'mother';
 			var vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
 		if (getVariantCard('father') == null) {
@@ -243,17 +243,17 @@ xdescribe('variantExporter', function() {
 			model.relationship = 'father';
 			vc = new VariantCard();
 			vc.model = model;
-			variantCards.push(vc);			
+			variantCards.push(vc);
 		}
 
-	
+
 		var doneCount = 0;
 
 		variantCards.forEach(function(vc) {
 			vc.model.onVcfUrlEntered(vcfUrl[vc.getRelationship()], null, function(success, samples) {
-		
+
 				vc.model.setSampleName(sample[vc.getRelationship()]);
-				
+
 				vc.model.onBamUrlEntered(bamUrl[vc.getRelationship()], function(success) {
 					doneCount++;
 					if (doneCount == variantCards.length) {

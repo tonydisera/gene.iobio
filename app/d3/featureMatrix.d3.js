@@ -2,7 +2,7 @@ function featureMatrixD3() {
    var dispatch = d3.dispatch("d3click", "d3mouseover", "d3mouseout", "d3rowup", "d3rowdown");
 
   // dimensions
-  var margin = {top: 10, right: 10, bottom: 10, left: 10};  
+  var margin = {top: 10, right: 10, bottom: 10, left: 10};
   // scales
   var x = d3.scale.ordinal(),
       y = d3.scale.ordinal();
@@ -27,8 +27,8 @@ function featureMatrixD3() {
     return "";
   }
   var columnLabelSymbol = null;
- 
-  // variables 
+
+  // variables
   var heightPercent = "100%",
       widthPercent = "100%",
       showTransition = true,
@@ -40,11 +40,11 @@ function featureMatrixD3() {
       cellHeights = null,
       rowLabelWidth = 100,
       columnLabelHeight = 100;
-      
+
   //  options
   var defaults = {};
 
-      
+
   function chart(selection, options) {
     var me = this;
     // merge options and defaults
@@ -59,7 +59,7 @@ function featureMatrixD3() {
         matrixHeight = cellHeights.reduce(function(pv, cv) { return pv + cv; }, 0);
         firstCellHeight = cellHeights[0];
       } else {
-        matrixHeight  = matrixRowNames.length * (cellHeight != null ? cellHeight : cellSize);   
+        matrixHeight  = matrixRowNames.length * (cellHeight != null ? cellHeight : cellSize);
         firstCellHeight = (cellHeight != null ? cellHeight : cellSize);
       }
       height = matrixHeight;
@@ -70,9 +70,9 @@ function featureMatrixD3() {
       var innerHeight = height - margin.top - margin.bottom;
       if (options.showColumnLabels) {
         innerHeight -= columnLabelHeight;
-      } 
+      }
 
-      width = data.length *  (cellWidth != null ? cellWidth : cellSize);   
+      width = data.length *  (cellWidth != null ? cellWidth : cellSize);
       width += margin.left + margin.right + rowLabelWidth +  (cellWidth != null ? cellWidth : cellSize);
       var innerWidth = width - margin.left - margin.right - rowLabelWidth;
 
@@ -80,32 +80,32 @@ function featureMatrixD3() {
 
 
 
-    
+
       x.domain(data.map(function(d) {  return d.type + " " + d.start + " " + d.ref + "->" + d.alt }));
       x.rangeRoundBands([0, innerWidth], 0, 0);
- 
+
       y.domain(matrixRowNames);
       y.rangeRoundBands([0, innerHeight], 0, 0);
 
-    
+
       // axis
       //var xAxis = d3.svg.axis()
       //                  .scale(x)
       //                  .orient("start")
       //                  .ticks(data.length);
-                       
+
 
       var yAxis = d3.svg.axis()
                         .scale(y)
                         .orient("left")
-                        .outerTickSize(0)   
+                        .outerTickSize(0)
                         .ticks(matrixRowNames.length);
 
 
 
-                       
-                        
-      
+
+
+
       // Select the svg element, if it exists.
       var svg = container.selectAll("svg").data([0]);
 
@@ -119,7 +119,7 @@ function featureMatrixD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-          .filter(function() { 
+          .filter(function() {
             return this.parentNode === container.node();
           })
          .attr("width", parseInt(width))
@@ -151,7 +151,7 @@ function featureMatrixD3() {
                                   .data(data)
                                   .enter().append('g')
                                   .attr('class', 'colhdr')
-                                  .attr('transform', function(d,i) { 
+                                  .attr('transform', function(d,i) {
                                     return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
                                   });
 
@@ -191,8 +191,8 @@ function featureMatrixD3() {
         .attr("transform",  translate);
 
 
-      // Create the y-axis at the top.  This will show the labels for the rows 
-      svg.selectAll(".y.axis").remove();    
+      // Create the y-axis at the top.  This will show the labels for the rows
+      svg.selectAll(".y.axis").remove();
       svg.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
@@ -287,7 +287,7 @@ function featureMatrixD3() {
             d3.select(this.parentNode.parentNode).select("text").classed("active", true);
 
          });
-  
+
       // Highlight of the last row label that we moved up or down.  Highlight this
       // row label so that user can keep track of the row he just moved.
       svg.selectAll(".y.axis .tick text").each( function(d,i) {
@@ -315,7 +315,7 @@ function featureMatrixD3() {
             var y = 0;
             for (var idx = 0; idx < i; idx++) {
               y += cellHeights[idx] ;
-            }  
+            }
             y += 8;
             d3.select(this).attr('transform', 'translate(0,' + y + ')');
         })
@@ -327,27 +327,27 @@ function featureMatrixD3() {
           .attr('class', function(d,i) {
             return "col  " + d.featureClass;
           })
-          .attr('transform', function(d,i) { 
+          .attr('transform', function(d,i) {
             return "translate(" + ( (cellWidth != null ? cellWidth : cellSize) * (i+1)) + ",0)";
           });
-      
+
 
       // Generate cells
-      var cells = cols.selectAll('.cell').data(function(d) { 
+      var cells = cols.selectAll('.cell').data(function(d) {
         return d['features'];
       }).enter().append('g')
-          .attr('class', "cell") 
+          .attr('class', "cell")
           .attr('transform', function(d,i) {
             var yPos = 0;
             if (cellHeights && cellHeights.length > 0) {
               var pos = (i+1) % matrixRows.length;
               if (pos == 0) {
                 pos = matrixRows.length;
-              } 
+              }
               for (var idx = 0; idx < pos-1; idx++) {
                 yPos += cellHeights[idx] ;
-              }  
-              yPos = yPos + firstCellHeight;            
+              }
+              yPos = yPos + firstCellHeight;
             } else {
               yPos = y(matrixRowNames[i]) + y.rangeBand();
             }
@@ -357,13 +357,13 @@ function featureMatrixD3() {
 
 
       cells.append('rect')
-          .attr('class', function(d,i) { 
+          .attr('class', function(d,i) {
             return "cellbox";
-          })          
-          .attr('x', function(d,i) { 
+          })
+          .attr('x', function(d,i) {
             return 0;
           })
-          .attr('height', function(d, i) { 
+          .attr('height', function(d, i) {
             if (cellHeights && cellHeights.length > 0) {
               var pos = (i+1) % matrixRows.length;
               if (pos == 0) {
@@ -373,12 +373,12 @@ function featureMatrixD3() {
               }
               return cellHeights[pos] - 1;
             } else {
-              return  (cellHeight != null ? cellHeight : cellSize) - 1; 
+              return  (cellHeight != null ? cellHeight : cellSize) - 1;
             }
           })
           .attr('y', 0)
           .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
-         
+
 
 
       cells.append("text")
@@ -387,7 +387,7 @@ function featureMatrixD3() {
           })
           .attr('class', 'hide')
           .attr("x", 0)
-          .attr("y", function(d,i) { 
+          .attr("y", function(d,i) {
             return (y.rangeBand()/2);
           });
 
@@ -404,10 +404,10 @@ function featureMatrixD3() {
 
       cols.append('rect')
           .attr('class', 'colbox')
-          .attr('x', function(d,i) { 
+          .attr('x', function(d,i) {
             return 0;
           })
-          .attr('height', function(d, i) { 
+          .attr('height', function(d, i) {
             return matrixHeight - 1;
           })
           .attr('y', function(d,i) {
@@ -417,12 +417,12 @@ function featureMatrixD3() {
               return y(matrixRowNames[0]) + y.rangeBand();
             }
 
-          }) 
+          })
           .attr('width',  (cellWidth != null ? cellWidth : cellSize) - 1);
 
 
       g.selectAll('rect.cellbox')
-           .on("mouseover", function(d) {  
+           .on("mouseover", function(d) {
               var colObject = d3.select(this.parentNode.parentNode).datum();
 
               var column = d3.select(this.parentNode.parentNode);
@@ -436,9 +436,9 @@ function featureMatrixD3() {
 
               // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
               // so instead the app will use getBoundingClientRect() method instead which does take into consideration
-              // the transform. 
-              var boundRect = column.node().getBoundingClientRect();   
-              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;                     
+              // the transform.
+              var boundRect = column.node().getBoundingClientRect();
+              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;
               //colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
               colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
@@ -446,26 +446,26 @@ function featureMatrixD3() {
               chart.adjustTooltipCoordinates()(colObject);
 
 
-              dispatch.d3mouseover(colObject); 
+              dispatch.d3mouseover(colObject);
 
 
-            })                  
-           .on("mouseout", function(d) {      
+            })
+           .on("mouseout", function(d) {
               var column = d3.select(this.parentNode.parentNode);
               column.classed("active", false);
 
-              dispatch.d3mouseout(); 
+              dispatch.d3mouseout();
             })
-            .on("click", function(d, i) {                
+            .on("click", function(d, i) {
               var colObject = d3.select(this.parentNode.parentNode).datum();
 
               if (d.clickFunction) {
                 d.clickFunction(colObject, d);
               }
 
-              var colIndex = Math.floor(i / matrixRowNames.length);  
+              var colIndex = Math.floor(i / matrixRowNames.length);
               var on = !(d3.select(this.parentNode.parentNode).select(".colbox").attr("class").indexOf("current") > -1);
-              d3.select(this.parentNode.parentNode.parentNode).select(".colbox.current").classed("current", false);             
+              d3.select(this.parentNode.parentNode.parentNode).select(".colbox.current").classed("current", false);
               if (on) {
                 d3.select(this.parentNode.parentNode).select(".colbox").classed("current", on);
                 dispatch.d3click(colObject);
@@ -475,32 +475,32 @@ function featureMatrixD3() {
             });
 
 
-      // update 
+      // update
       /*
       if (showTransition) {
         cols.transition()
             .duration(1000)
-            .attr('transform', function(d,i) { 
+            .attr('transform', function(d,i) {
                 return "translate(" + (x.rangeBand() * (i+1)) + ",0)";
             });
 
 
         cols.selectAll('rect.cell')
-              .transition()        
+              .transition()
               .duration(1000)
-              .attr('x', function(d,i) { 
+              .attr('x', function(d,i) {
                 return 0;
               })
-              .attr('width', function(d) { 
+              .attr('width', function(d) {
                 return  cellSize - 1;
               })
-              .attr('y', function(d, i) {             
+              .attr('y', function(d, i) {
                 return y(matrixRowNames[i]) + y.rangeBand();
               })
-              .attr('height', function(d) { 
-                return cellSize - 1; 
+              .attr('height', function(d) {
+                return cellSize - 1;
               });
- 
+
       }
       */
     });
@@ -570,7 +570,7 @@ function featureMatrixD3() {
     _adjustTooltipCoordinates = _;
     return chart;
   }
-  
+
   chart.x = function(_) {
     if (!arguments.length) return x;
     x = _;
@@ -582,18 +582,18 @@ function featureMatrixD3() {
     y = _;
     return chart;
   };
-    
+
   chart.xAxis = function(_) {
     if (!arguments.length) return xAxis;
     xAxis = _;
-    return chart; 
+    return chart;
   };
 
   chart.yAxis = function(_) {
     if (!arguments.length) return yAxis;
     yAxis = _;
-    return chart; 
-  };  
+    return chart;
+  };
 
 
   chart.showTransition = function(_) {
@@ -663,7 +663,7 @@ function featureMatrixD3() {
   }
 
 
-  
+
   // This adds the "on" methods to our custom exports
   d3.rebind(chart, dispatch, "on");
 

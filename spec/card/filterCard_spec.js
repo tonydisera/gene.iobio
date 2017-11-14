@@ -23,9 +23,9 @@ describe('filterCard', function() {
 				afMax: 0.55,
 				annotsToInclude: "blah",
 				exonicOnly: false,
-				loadedVariants: false, 
+				loadedVariants: false,
 				calledVariants: false,
-				affectedInfo: [] 
+				affectedInfo: []
 			});
 		});
 
@@ -38,9 +38,9 @@ describe('filterCard', function() {
 				afMax: null,
 				annotsToInclude: "blah",
 				exonicOnly: false,
-				loadedVariants: false, 
+				loadedVariants: false,
 				calledVariants: false,
-				affectedInfo: []  
+				affectedInfo: []
 			});
 		});
 
@@ -52,9 +52,9 @@ describe('filterCard', function() {
 				afMax: 0.55,
 				annotsToInclude: "blah",
 				exonicOnly: true,
-				loadedVariants: false, 
+				loadedVariants: false,
 				calledVariants: false,
-				affectedInfo: [] 
+				affectedInfo: []
 			});
 		});
 
@@ -66,7 +66,7 @@ describe('filterCard', function() {
 				clinvar_cd:       {key: 'clinvar',       state: true, value: 'clinvar_cd'},
 				clinvar_other:    {key: 'clinvar',       state: true, value: 'clinvar_other'},
 				clinvar_lbenign:  {key: 'clinvar',       state: true, value: 'clinvar_lbenign'},
-				clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}		
+				clinvar_benign:   {key: 'clinvar',       state: true, value: 'clinvar_benign'}
 			};
 			var expectedFilterObject = {
 				afMin: 0,

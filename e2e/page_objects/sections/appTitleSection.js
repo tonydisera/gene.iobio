@@ -88,8 +88,8 @@ module.exports = {
     assertAnalyzeAllProgressLabel: function(label) {
       var self = this;
       self.api.useXpath().getText(
-        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]/div[@class="text"]', 
-        function(result) 
+        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]/div[@class="text"]',
+        function(result)
       {
         self.assert.equal(result.value, label);
       })
@@ -99,8 +99,8 @@ module.exports = {
     assertCallAllProgressLabel: function(label) {
       var self = this;
       self.api.useXpath().getText(
-        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]/div[@class="text"]', 
-        function(result) 
+        '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]/div[@class="text"]',
+        function(result)
       {
         self.assert.equal(result.value, label);
       })
@@ -113,44 +113,44 @@ module.exports = {
 
       if (analyzedPassedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
-          function(result) 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]',
+          function(result)
         {
           self.assert.equal(result.value, analyzedPassedCount);
-        })        
+        })
       }
 
       if (analyzedFailedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
-          function(result) 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="analyze-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]',
+          function(result)
         {
           self.assert.equal(result.value, analyzedFailedCount);
-        })        
+        })
       }
 
       if (calledPassedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]', 
-          function(result) 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="passed-filter-bar"]',
+          function(result)
         {
           self.assert.equal(result.value, calledPassedCount);
-        })        
+        })
       }
 
       if (calledFailedCount) {
         self.api.useXpath().getText(
-          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]', 
-          function(result) 
+          '//div[@id="genes-panel"]//div[@id="analyzed-progress-bar"]//div[@id="call-all-progress"]//div[@id="analyzed-bar"]/div[@id="not-passed-filter-bar"]',
+          function(result)
         {
           self.assert.equal(result.value, calledFailedCount);
-        })        
+        })
       }
 
       this.api.useCss();
       return this;
     }
-    
+
   }],
   elements: {
     selectedGeneBadge: { selector: '#gene-badge.selected' },

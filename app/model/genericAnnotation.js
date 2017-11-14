@@ -3,7 +3,7 @@ function GenericAnnotation() {
 	me.descriptor = {
 		AVIA3: {
 			'GENE':              { hide: true},
-			'STRAND':            { hide: true},	
+			'STRAND':            { hide: true},
 
 			'EXAC':              { hide:  true},
 
@@ -32,7 +32,7 @@ function GenericAnnotation() {
 			'EXAC_AF.AN_SAS':    { label: 'Allele Number SAS'},
 			'EXAC_AF.AN_FEMALE': { label: 'Allele Number Female'},
 			'EXAC_AF.AN_MALE':   { label: 'Allele Number Male'},
-			'EXAC_AF.AN_Adj':    { label: 'Allele Number Adj'},		
+			'EXAC_AF.AN_Adj':    { label: 'Allele Number Adj'},
 
 			'EXAC_AF.AF_ALL':    { label: 'Allele Freq All'},
 			'EXAC_AF.AF_AFR':    { label: 'Allele Freq AFR'},
@@ -45,17 +45,17 @@ function GenericAnnotation() {
 			'EXAC_AF.AF_SAS':    { label: 'Allele Freq SAS'},
 			'EXAC_AF.AF_FEMALE': { label: 'Allele Freq Female'},
 			'EXAC_AF.AF_MALE':   { label: 'Allele Freq Male'},
-			'EXAC_AF.AF_Adj':    { label: 'Allele Freq Adj'},		
+			'EXAC_AF.AF_Adj':    { label: 'Allele Freq Adj'},
 
 
 			'GNOMAD_EXOME':                  { label: 'gnomAD Exome'},
 			'GNOMAD_EXOME.gnomAD_exome_ALL': {
-				label: 		'AF All', 
-				fieldPath:  ['genericAnnots','AVIA3','GNOMAD_EXOME', 'gnomAD_exome_ALL'],   
-				fieldName:  'avia3_gnomad_af_all',   
+				label: 		'AF All',
+				fieldPath:  ['genericAnnots','AVIA3','GNOMAD_EXOME', 'gnomAD_exome_ALL'],
+				fieldName:  'avia3_gnomad_af_all',
 				type:       'number',
 				filter:     'range',
-				valueMap: [ 
+				valueMap: [
                    {min:    0,   max: +0,     value: +2,  badge: false,  clazz:  'af_unique',     symbolFunction: matrixCard.showAfSymbol},
                    {min:    0,   max: +.0001, value: +3,  badge: false,  clazz:  'af_uberrare',   symbolFunction: matrixCard.showAfSymbol},
                    {min:    0,   max: +.001,  value: +4,  badge: false,  clazz:  'af_superrare',  symbolFunction: matrixCard.showAfSymbol},
@@ -75,9 +75,9 @@ function GenericAnnotation() {
 
 			'MT':                            { label: 'Mutation taster'},
 			'MT:KEY': {
-				label: 		'Mutation taster', 
-				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.KEY'],  
-				fieldName:  'avia3_mt',     
+				label: 		'Mutation taster',
+				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.KEY'],
+				fieldName:  'avia3_mt',
 				type:       'category',
 				filter:     'category',
 				valueMap:   {
@@ -86,36 +86,36 @@ function GenericAnnotation() {
 		                'Polymorphism':              {value: 103,  badge: false, clazz: 'mt_polymorphism',         symbolFunction: matrixCard.showMutationTasterSymbol},
 		                'Polymorphism Automatic':    {value: 104,  badge: false, clazz: 'mt_polymorphism_auto',    symbolFunction: matrixCard.showMutationTasterSymbol},
                         none:                        {value: 105,  badge: false, clazz: ''}
-                     }            
+                     }
 			},
 			'MT:VALUE':  {
-				label: 		'Mutation taster score', 
-				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.VALUE'],   
-				fieldName:  'avia3_mt_score', 
+				label: 		'Mutation taster score',
+				fieldPath:  ['genericAnnots','AVIA3','MT','OBJECT.VALUE'],
+				fieldName:  'avia3_mt_score',
 				type:       'number',
 				filter:     'range'
 			}
-		} 
+		}
 	}
 
-	me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].matrixRow = 
-	{ 
-		name:      'Allele Frequency - gnomAD', 
-	    id:        'af-gnomad',        
-	    match:     'range', 
-	    attribute: me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].fieldPath,      
+	me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].matrixRow =
+	{
+		name:      'Allele Frequency - gnomAD',
+	    id:        'af-gnomad',
+	    match:     'range',
+	    attribute: me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].fieldPath,
 	    map:       me.descriptor.AVIA3['GNOMAD_EXOME.gnomAD_exome_ALL'].valueMap
 	}
-	
-	me.descriptor.AVIA3['MT:KEY'].matrixRow = 
-	{ 
-		name:      'Mutation taster', 
-	    id:        'mt',        
-	    match:     'exact', 
-	    attribute: me.descriptor.AVIA3['MT:KEY'].fieldPath, 
+
+	me.descriptor.AVIA3['MT:KEY'].matrixRow =
+	{
+		name:      'Mutation taster',
+	    id:        'mt',
+	    match:     'exact',
+	    attribute: me.descriptor.AVIA3['MT:KEY'].fieldPath,
 	    map:       me.descriptor.AVIA3['MT:KEY'].valueMap
-	} 
-    	
+	}
+
 }
 
 GenericAnnotation.prototype.getMatrixRows = function(annotators) {
@@ -132,7 +132,7 @@ GenericAnnotation.prototype.getMatrixRows = function(annotators) {
 					}
 				}
 			}
-		})		
+		})
 	}
 	return matrixRows;
 }
@@ -190,11 +190,11 @@ GenericAnnotation.prototype.appendGenericFilters = function(annotators) {
 						classToLabel[annot.fieldName] = annot.label;
 						filterCard.initFilterListeners(filterSelector, classToLabel)
 
-							  
+
 					}
 				}
 			}
-		})		
+		})
 	}
 	return html;
 
@@ -223,12 +223,12 @@ GenericAnnotation.prototype.formatContent = function(variant, clazzMap, EMPTY_VA
 							}
 							if (me.shouldShow(annotator,  [fieldName, tag])) {
 								var sublabel = me.getLabel(annotator, [fieldName, tag]);
-								tagValues += sublabel + ": " + annotValue[tag];								
+								tagValues += sublabel + ": " + annotValue[tag];
 							}
 						}
 					}
 
-					
+
 					annotDiv += me._formatContentRow(label, (tagValues ? tagValues : annotValue), clazzMap, EMPTY_VALUE);
 
 				}
@@ -237,7 +237,7 @@ GenericAnnotation.prototype.formatContent = function(variant, clazzMap, EMPTY_VA
 			}
 		}
 		annotDiv += "</div>"
-	}	
+	}
 	return annotDiv;
 }
 
@@ -261,8 +261,8 @@ GenericAnnotation.prototype.shouldShow = function(annotator, fieldPath) {
 		if (theDescriptor[key] && theDescriptor[key].hide) {
 			hide = theDescriptor[key].hide;
 		}
-		
-	} 
+
+	}
 
 	return !hide;
 }
@@ -278,8 +278,8 @@ GenericAnnotation.prototype.getLabel = function(annotator, fieldPath) {
 		if (theDescriptor[key] && theDescriptor[key].label) {
 			label = theDescriptor[key].label
 		}
-		
-	} 
+
+	}
 
 	return label ? label : fieldPath[fieldPath.length-1];
 }
@@ -293,7 +293,7 @@ GenericAnnotation.prototype.getValue = function(variant, fieldPath) {
 				node = Object.keys(node).join(",");
 			} else if (fieldName == 'OBJECT.VALUE' && Object.values(node).length > 0) {
 				node = Object.values(node).join(",");
-			} else if (node[fieldName]) {			
+			} else if (node[fieldName]) {
 				node = node[fieldName];
 			} else {
 				node = null;
@@ -315,7 +315,7 @@ GenericAnnotation.prototype.setSimpleFields = function(variant) {
 				var theValue = me.getValue(variant, annotInfo.fieldPath);
 				if (annotInfo.filter == 'category' && annotInfo.valueMap && annotInfo.valueMap[theValue]) {
 					theValue = annotInfo.valueMap[theValue].clazz;
-				} 
+				}
 				variant[annotInfo.fieldName] = theValue;
 			}
 

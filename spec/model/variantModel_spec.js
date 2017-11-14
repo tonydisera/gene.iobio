@@ -99,7 +99,7 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				AF: {},
 				featureCount: 5,
-				loadedCount: 5, 
+				loadedCount: 5,
 				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
@@ -137,8 +137,8 @@ describe('variantModel', function() {
 				},
 				AF: {},
 				featureCount: 5,
-				loadedCount: 5, 
-				calledCount: 0,				
+				loadedCount: 5,
+				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
 				failedFilter: false,
@@ -164,7 +164,7 @@ describe('variantModel', function() {
 				SIFT: { 'sift_deleterious_low_confidence': { deleterious_low_confidence: {} } },
 				AF: {},
 				featureCount: 4,
-				loadedCount: 4, 
+				loadedCount: 4,
 				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
@@ -191,7 +191,7 @@ describe('variantModel', function() {
 				POLYPHEN: { 'polyphen_possibly_damaging': { possibly_damaging: {} } },
 				AF: {},
 				featureCount: 4,
-				loadedCount: 4, 
+				loadedCount: 4,
 				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
@@ -219,13 +219,13 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				AF: {},
 				featureCount: 4,
-				loadedCount: 4, 
+				loadedCount: 4,
 				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
-				geneCoverageProblem: false				
+				geneCoverageProblem: false
 			});
 		});
 
@@ -245,13 +245,13 @@ describe('variantModel', function() {
 				CONSEQUENCE: {},
 				AF: {},
 				featureCount: 4,
-				loadedCount: 4, 
+				loadedCount: 4,
 				calledCount: 0,
 				harmfulVariantsInfo: [],
 				harmfulVariantsLevel: null,
 				failedFilter: false,
 				geneCoverageInfo: {},
-				geneCoverageProblem: false	
+				geneCoverageProblem: false
 			});
 		});
 
@@ -273,13 +273,13 @@ describe('variantModel', function() {
 						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
-					loadedCount: 2, 
+					loadedCount: 2,
 					calledCount: 0,
 					harmfulVariantsInfo: [],
 					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
-					geneCoverageProblem: false	
+					geneCoverageProblem: false
 				});
 			});
 		});
@@ -302,13 +302,13 @@ describe('variantModel', function() {
 						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
-					loadedCount: 2, 
+					loadedCount: 2,
 					calledCount: 0,
 					harmfulVariantsInfo: [],
 					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
-					geneCoverageProblem: false			
+					geneCoverageProblem: false
 				});
 			});
 		});
@@ -331,13 +331,13 @@ describe('variantModel', function() {
 						afhighest_rare: { field: 'afExAC', value: 5 }
 					},
 					featureCount: 2,
-					loadedCount: 2, 
+					loadedCount: 2,
 					calledCount: 0,
 					harmfulVariantsInfo: [],
 					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
-					geneCoverageProblem: false				
+					geneCoverageProblem: false
 				});
 			});
 		});
@@ -360,13 +360,13 @@ describe('variantModel', function() {
 						afhighest_rare: { field: 'af1000G', value: 2 }
 					},
 					featureCount: 2,
-					loadedCount: 2, 
+					loadedCount: 2,
 					calledCount: 0,
 					harmfulVariantsInfo: [],
 					harmfulVariantsLevel: null,
 					failedFilter: false,
 					geneCoverageInfo: {},
-					geneCoverageProblem: false			
+					geneCoverageProblem: false
 				});
 			});
 		});
@@ -515,7 +515,7 @@ describe('variantModel', function() {
 				end: 200,
 				features: [],
 				maxLevel: 11,
-				featureWidth: 100, 
+				featureWidth: 100,
 				name: "vcf track",
 				start: 100,
 				strand: "+",
@@ -739,21 +739,21 @@ describe('variantModel', function() {
 			});
 		});
 
-		describe('when filtering on present in affected', function() {			
+		describe('when filtering on present in affected', function() {
 			it('filters on affected present', function() {
 				variantModel.affectedStatus = "affected";
-				var probandVariantCard = 
+				var probandVariantCard =
 				{
 						getRelationship: jasmine.createSpy().and.returnValue('proband'),
 						getSampleName:   jasmine.createSpy().and.returnValue('NA12878'),
 						model: variantModel
 				};
-				var motherVariantCard = 
+				var motherVariantCard =
 				{
 						getRelationship: jasmine.createSpy().and.returnValue('mother'),
 						getSampleName:   jasmine.createSpy().and.returnValue('NA12892')
 				};
-				var fatherVariantCard = 
+				var fatherVariantCard =
 				{
 						getRelationship: jasmine.createSpy().and.returnValue('father'),
 						getSampleName:   jasmine.createSpy().and.returnValue('NA12891')
@@ -775,7 +775,7 @@ describe('variantModel', function() {
 						status: "affected",
 						variantCard: motherVariantCard
 					}
-					
+
 				];
 				window.variantCards = [
 					probandVariantCard,
@@ -790,7 +790,7 @@ describe('variantModel', function() {
 				expect(filteredData.features).toEqual([variant_2, variant_3, variant_4]);
 
 				variant_1.genotypes = {NA12878: {zygosity: 'HOM', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HOM', absent: false} };
-				variant_2.genotypes = {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HET', absent: false} }; 
+				variant_2.genotypes = {NA12878: {zygosity: 'HET', absent: false}, NA12892: {zygosity: 'HOM', absent: false},  NA12891: {zygosity: 'HET', absent: false} };
 				filterObject.affectedInfo.push(
 				{
 						filter: true,

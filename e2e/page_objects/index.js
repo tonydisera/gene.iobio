@@ -58,7 +58,7 @@ module.exports = {
       var loc = "(//*[contains(@class, 'ajs-button')])[2]";
       return this.api.useXpath().moveTo(loc).click(loc).useCss();
 //      return this.click('@alertifyCancel');
-    }    
+    }
   }],
 
   sections: {
@@ -83,6 +83,6 @@ module.exports = {
     }
 
 
- 
+
   }
 };

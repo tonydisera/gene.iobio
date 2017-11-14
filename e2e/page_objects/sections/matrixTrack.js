@@ -194,13 +194,13 @@ module.exports = {
       this.assertSymbolsNotPresent(INHERITANCE.LABEL, variants, INHERITANCE.SYMBOL);
     },
 
-  
+
     // AF highest
     assertAfHighest: function(variants) {
       this.assertSymbolsPresent(AFHIGHEST.LABEL, variants, AFHIGHEST.RARE);
     },
 
-   
+
     // Zygosity
     assertZygosityHom: function(variants) {
       this.assertSymbolsPresent(ZYGOSITY.LABEL, variants, ZYGOSITY.HOM);
@@ -236,7 +236,7 @@ module.exports = {
         self.api.useCss();
       });
     },
-  
+
     assertSymbols: function(label, variants, symbolSelector, expectation) {
       var self = this;
       this.api.elements('xpath', precedingSiblingsToLabel(label), function(precedingLabelElements) {

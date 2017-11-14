@@ -6,7 +6,7 @@ var filter = {
 
   inheritanceDenovo:    '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="denovo"]',
   inheritanceRecessive: '//div[@id="filter-track"]//*[local-name()="svg" and @class="inheritance" and @id="recessive"]',
-  
+
   vepHigh: '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="HIGH"]',
   vepModerate: '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="MODERATE"]',
   vepModifier: '//div[@id="filter-track"]//*[local-name()="svg" and @class="highestImpactVep" and @id="MODIFIER"]',
@@ -33,7 +33,7 @@ var filter = {
   af1000gRare: '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_rare"]',
   af1000gUncommon: '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_uncommon"]',
   af1000gCommon: '//div[@id="filter-track"]//*[local-name()="svg" and @class="af1000glevels" and @id="af1000g_common"]'
-}  
+}
 
 
 module.exports = {
@@ -129,12 +129,12 @@ module.exports = {
       if (analyzedCount) {
         this.getText('@knownCausativeAnalyzedCount', function(result) {
           self.assert.equal(result.value, analyzedCount);
-        })        
+        })
       }
       if (calledCount) {
         this.getText('@knownCausativeCalledCount', function(result) {
           self.assert.equal(result.value, calledCount);
-        })        
+        })
       }
     },
 
@@ -146,12 +146,12 @@ module.exports = {
       if (analyzedCount) {
         this.getText('@denovoVusAnalyzedCount', function(result) {
           self.assert.equal(result.value, analyzedCount);
-        })        
+        })
       }
       if (calledCount) {
         this.getText('@denovoVusCalledCount', function(result) {
           self.assert.equal(result.value, calledCount);
-        })        
+        })
       }
     },
 
@@ -163,12 +163,12 @@ module.exports = {
       if (analyzedCount) {
         this.getText('@recessiveVusAnalyzedCount', function(result) {
           self.assert.equal(result.value, analyzedCount);
-        })        
+        })
       }
       if (calledCount) {
         this.getText('@recessiveVusCalledCount', function(result) {
           self.assert.equal(result.value, calledCount);
-        })        
+        })
       }
     },
 
@@ -180,12 +180,12 @@ module.exports = {
       if (analyzedCount) {
         this.getText('@highOrModerateImpactAnalyzedCount', function(result) {
           self.assert.equal(result.value, analyzedCount);
-        })        
+        })
       }
       if (calledCount) {
         this.getText('@highOrModerateImpactCalledCount', function(result) {
           self.assert.equal(result.value, calledCount);
-        })        
+        })
       }
     },
 
@@ -197,12 +197,12 @@ module.exports = {
       if (analyzedCount) {
         this.getText('@lowCoverageAnalyzedCount', function(result) {
           self.assert.equal(result.value, analyzedCount);
-        })        
+        })
       }
       if (calledCount) {
         this.getText('@lowCoverageCalledCount', function(result) {
           self.assert.equal(result.value, calledCount);
-        })        
+        })
       }
     }
 
@@ -213,7 +213,7 @@ module.exports = {
     unassignedFilter: { selector: '#rec-filter-box #unassigned'},
     excludeNonCoding: { selector: '#exonic-only-cb + span' },
     impact: { selector: '#impact-scheme i' },
-    effect: { selector: '#effect-scheme i' },   
+    effect: { selector: '#effect-scheme i' },
 
     clearAll: {selector: '#clear-filters-button'},
 

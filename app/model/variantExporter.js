@@ -1,23 +1,23 @@
 function VariantExporter() {
 	this.exportFields = [
-		{field: 'chrom', 				exportVcf: false}, 
-		{field: 'start', 				exportVcf: false}, 
-		{field: 'end', 					exportVcf: false}, 
-		{field: 'ref', 					exportVcf: false}, 
-		{field: 'alt', 					exportVcf: false}, 
-		{field: 'gene', 				exportVcf: true}, 
-		{field: 'transcript', 			exportVcf: true}, 
+		{field: 'chrom', 				exportVcf: false},
+		{field: 'start', 				exportVcf: false},
+		{field: 'end', 					exportVcf: false},
+		{field: 'ref', 					exportVcf: false},
+		{field: 'alt', 					exportVcf: false},
+		{field: 'gene', 				exportVcf: true},
+		{field: 'transcript', 			exportVcf: true},
 	    {field: 'starred', 				exportVcf: true},
 	    {field: 'freebayesCalled', 		exportVcf: true},
 	    {field: 'type', 				exportVcf: true},
 		{field: 'impact', 				exportVcf: true},
-		{field: 'highestImpact', 		exportVcf: true}, 
+		{field: 'highestImpact', 		exportVcf: true},
 		{field: 'highestImpactInfo', 	exportVcf: true},
 		{field: 'consequence', 			exportVcf: true},
 		{field: 'afExAC', 				exportVcf: true},
 		{field: 'af1000G', 				exportVcf: true},
 		{field: 'afgnomAD', 			exportVcf: true},
-		{field: 'inheritance', 			exportVcf: true}, 
+		{field: 'inheritance', 			exportVcf: true},
 		{field: 'polyphen', 			exportVcf: true},
 		{field: 'SIFT', 				exportVcf: true},
 		{field: 'rsId', 				exportVcf: true},
@@ -69,7 +69,7 @@ function VariantExporter() {
 		{field: 'depthFather',    target: 'genotypeDepthFather', isProxy: true },
 		{field: 'bamDepthFather', isProxy: true }
 	]
-	
+
 }
 
 VariantExporter.prototype.promiseExportVariants = function(variantEntries, format, sampleNames) {
@@ -93,7 +93,7 @@ VariantExporter.prototype.promiseExportVariants = function(variantEntries, forma
 			exportRec.alt          = entry.alt;
 			exportRec.gene         = entry.gene;
 			exportRec.transcript   = entry.transcript;
-			exportRec.starred      = entry.isFavorite == true ? "Y" : "";	
+			exportRec.starred      = entry.isFavorite == true ? "Y" : "";
 
 			var promise = null;
 			promise = me._promiseCreateExportRecord(entry, exportRec, format, getHeader, sampleNames)
@@ -117,19 +117,19 @@ VariantExporter.prototype.promiseExportVariants = function(variantEntries, forma
 					            	annotatedVcfRecs.forEach(function(vcfRecord) {
 										if (vcfRecord.indexOf("#") == 0) {
 											theHeaderRecords.push(vcfRecord);
-											
-										} 
-									});		
+
+										}
+									});
 				            	}
 								annotatedVcfRecs.forEach(function(vcfRecord) {
 									if (vcfRecord.indexOf("#") != 0) {
 										var newRec = me._appendVcfRecordAnnotations(vcfRecord, record);
 										records.push(newRec);
 									}
-								});						
+								});
 
 			            	}
-						}, 
+						},
 						function(error) {
 							var msg = "Cannot produce export record for variant " + exportRec.gene + " " + exportRec.chrom + " " + exportRec.start + " " + exportRec.ref + "->" + exportRec.alt;
 							alert(msg);
@@ -228,7 +228,7 @@ VariantExporter.prototype._appendHeaderRecords = function(headerRecords, headerR
 		}
 
 	});
-	
+
 	// Insert the info field for the iobio annotations
 	headerRecords.splice(insertInfoAtIdx, 0, "##INFO=<ID=IOBIO,Number=.,Type=String,Description=\"Annotations from gene.iobio. Format: field is represented as tag:value, fields delimited by |\">");
 
@@ -260,8 +260,8 @@ VariantExporter.prototype._appendVcfRecordAnnotations = function(vcfRecord, reco
 		if (exportField.exportVcf) {
 			if (buf.length > 0) {
 				buf += "|";
-			} 
-			buf += exportField.field + "#" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : ".");			
+			}
+			buf += exportField.field + "#" + (record[exportField.field] && record[exportField.field] != "" ? record[exportField.field] : ".");
 		}
 	})
 
@@ -288,7 +288,7 @@ VariantExporter.prototype._outputCSV = function(records) {
 
 	// Now create an output (csv) line for each of the bookmark records
 	records.forEach(function(rec) {
-		output += "\n";	
+		output += "\n";
 		var isFirstTime = true;
 		me.exportFields.forEach( function(exportField) {
 			if (isFirstTime) {
@@ -301,7 +301,7 @@ VariantExporter.prototype._outputCSV = function(records) {
 			output +=  "\"" + fieldValue + "\"";
 		});
 	});
-	return output;	
+	return output;
 }
 
 
@@ -329,14 +329,14 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 					(variantEntry.hasOwnProperty('freebayesCalled') && variantEntry.freebayesCalled == 'Y')) {
 					// If the variant was called on-demand, issue the service calls to
 					// generate the vcf records.
-					cacheJointCallVariants(theGeneObject, theTranscript, variantEntry, 
+					cacheJointCallVariants(theGeneObject, theTranscript, variantEntry,
 						function(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant) {
 							var theVariant = null;
 							var theVcfRecs = null;
 
 							if (format == 'vcf') {
 								theVcfRecs = me._formatJointVcfRecs(jointVcfRecs, sourceVariant);
-							} 
+							}
 
 							var sampleNamesToGenotype = getProbandVariantCard().getSampleNamesToGenotype();
 							getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0, global_vepAF)
@@ -344,8 +344,8 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
 		                			var theFbData = data[1];
 
 									theFbData.features.forEach(function(v) {
-										if (theVariant == null  
-											&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
+										if (theVariant == null
+											&& getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom)
 											&& v.start  == sourceVariant.start
 											&& v.ref    == sourceVariant.ref
 											&& v.alt    == sourceVariant.alt) {
@@ -402,7 +402,7 @@ VariantExporter.prototype._formatJointVcfRecs = function(jointVcfRecs, sourceVar
 			var alt   = fields[4];
 
 			if (theVcfRec == null
-				&& chrom  == getProbandVariantCard().model._stripRefName(sourceVariant.chrom) 
+				&& chrom  == getProbandVariantCard().model._stripRefName(sourceVariant.chrom)
 				&& start  == sourceVariant.start
 				&& ref    == sourceVariant.ref
 				&& alt    == sourceVariant.alt) {
@@ -414,7 +414,7 @@ VariantExporter.prototype._formatJointVcfRecs = function(jointVcfRecs, sourceVar
 				var fields = theVcfRec.split("\t");
 				if (fields.length > 10) {
 					fields.splice(10, fields.length - 10);
-					theVcfRec = fields.join("\t");	
+					theVcfRec = fields.join("\t");
 				}
 
 				theVcfRecs.push(theVcfRec);
@@ -422,7 +422,7 @@ VariantExporter.prototype._formatJointVcfRecs = function(jointVcfRecs, sourceVar
 		}
 	});
 
-	return theVcfRecs;							
+	return theVcfRecs;
 }
 
 
@@ -454,7 +454,7 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 				revisedVariant.genotypeDepthMother     = motherGenotype.genotypeDepth;
 
 	 		}
-	 		if (fatherGenotype) { 			
+	 		if (fatherGenotype) {
 				revisedVariant.fatherZygosity          = fatherGenotype.zygosity;
 				revisedVariant.genotypeAltCountFather  = fatherGenotype.altCount;
 				revisedVariant.genotypeRefCountFather  = fatherGenotype.refCount;
@@ -490,22 +490,22 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
 	 	var clinvarLoader = isClinvarOffline || clinvarSource == "vcf" ? getProbandVariantCard().model._refreshVariantsWithClinvarVCFRecs.bind(getProbandVariantCard().model, dummyVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvarEutils.bind(getProbandVariantCard().model, dummyVcfData);
 		getProbandVariantCard().model
 		   .vcf
-		   .promiseGetClinvarRecords(dummyVcfData, 
-		   						     getProbandVariantCard().model._stripRefName(revisedVariant.chrom), 
-		   						     theGeneObject, 
-		   	                         clinvarLoader)	
+		   .promiseGetClinvarRecords(dummyVcfData,
+		   						     getProbandVariantCard().model._stripRefName(revisedVariant.chrom),
+		   						     theGeneObject,
+		   	                         clinvarLoader)
 		   .then(function() {
-				
+
 				variantTooltip.formatContent(revisedVariant, null, "record", rec);
 
 				if (format == 'csv') {
-					resolve([rec]);				 		
+					resolve([rec]);
 			 	} else {
 			 		resolve([rec, theRawVcfRecords]);
 			 	}
 
 
-		   })                            			 	
+		   })
 
 	});
 

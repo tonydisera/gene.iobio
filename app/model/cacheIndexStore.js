@@ -26,7 +26,7 @@ CacheIndexStore.prototype.promiseInit = function(callback) {
 
 		open.onsuccess = function(ev) {
 			// assign the database for access outside
-			me.db = open.result;			
+			me.db = open.result;
 			resolve();
 		};
 
@@ -54,28 +54,28 @@ CacheIndexStore.prototype.promiseCreateObjectStores = function(event) {
 
 				var transaction = event.target.transaction;
 				var p = new Promise(function(resolve, reject) {
-		        	transaction.oncomplete = function(event) {    
+		        	transaction.oncomplete = function(event) {
 		                // Now store is available to be populated
 		                resolve();
-		            }				
+		            }
 		            transaction.onerror = function(event) {
 						var msg = "Error in CacheIndexStore.promiseCreateObjectStores():  " + event.target.errorCode;
 				    	console.log(msg);
 				    	reject(msg);
-	    			};				
+	    			};
 				})
 				promises.push(p);
 			}
 		}
 		Promise.all(promises).then(function() {
 			resolve();
-		}, 
+		},
 		function(error) {
 			reject(error);
 		})
 
 	})
-	
+
 }
 
 CacheIndexStore.prototype.promiseSetData = function(dataKind, gene, key, data) {
@@ -87,14 +87,14 @@ CacheIndexStore.prototype.promiseSetData = function(dataKind, gene, key, data) {
 
 		tx.oncomplete = function() {
 			resolve();
-		} 	
+		}
 		tx.onerror = function(event) {
 			var msg = "Error in CacheIndexStore.promiseSetData():  " + event.target.errorCode;
 	    	console.log(msg);
 	    	reject(msg);
 		}
-	    
-		store.put({id: key, gene: gene, data: data});		
+
+		store.put({id: key, gene: gene, data: data});
 	})
 
 
@@ -107,7 +107,7 @@ CacheIndexStore.prototype.promiseGetData = function(dataKind, key) {
 	return new Promise(function(resolve, reject) {
 	 	var tx        = me.db.transaction(dataKind, "readonly");
 	    var store     = tx.objectStore(dataKind);
-	    
+
 	    var getData = store.get(key);
 
 	    getData.onsuccess = function() {
@@ -140,7 +140,7 @@ CacheIndexStore.prototype.promiseRemoveData = function(dataKind, key) {
 	    	var msg = "Error in CacheIndexStore.promiseRemoveData():  " + event.target.errorCode + ". " + dataKind;
 	    	console.log(msg);
 	    	reject(msg);
-	    }		
+	    }
 	});
 
 }
@@ -197,7 +197,7 @@ CacheIndexStore.prototype.promiseGetAllKeys = function() {
 				getKeys.onerror = function(event) {
 					var msg = "Error in CacheIndexStore.promiseGetAllKeys():  " + event.target.errorCode + ". " + dataKind;
 			    	console.log(msg);
-			    	reject(msg);				
+			    	reject(msg);
 				}
 
 			    getKeys.onsuccess = function(event) {
@@ -211,7 +211,7 @@ CacheIndexStore.prototype.promiseGetAllKeys = function() {
 			    		resolve(allKeys);
 			    	}
 			    };
-			}		
+			}
 
  		} else {
  			resolve([]);
@@ -237,6 +237,6 @@ CacheIndexStore.prototype.showContents = function(dataKind, callback) {
 	  	if (callback) {
 	  		callback(cacheEntries);
 	  	}
-	  }	 
-	};	
+	  }
+	};
 }

@@ -34,7 +34,7 @@ function VariantTrioModel(probandVcfData, motherVcfData, fatherVcfData, sibsVcfD
 VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	var me = this;
 
-	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields 
+	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields
 	// stored in proband variants
 	me.probandVcfData.features.forEach(function(variant) {
 		variant.compareMother = null;
@@ -59,8 +59,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	if (me.motherVcfData == null || me.fatherVcfData == null) {
 		callback(me.probandVcfData);
 		return;
-	} 
-	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields 
+	}
+	// Clear out the inheritance, mother/father zygosity, mother/father genotype fields
 	// stored in proband variants
 	me.motherVcfData.features.forEach(function(variant) {
 		variant.compareMotherFather     = null;
@@ -89,8 +89,8 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		variant.genotypeRefCountMother  = null;
 		variant.genotypeDepthMother     = null;
 		variant.bamDepthMother          = null;
-		
-	
+
+
 	});
 
 
@@ -120,16 +120,16 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		    variantB.genotypeDepthProband    = variantA.genotypeDepth;
 		    variantB.bamDepthProband         = variantA.bamDepth;
 
-			me._syncGenotypes(variantA, variantB, 
+			me._syncGenotypes(variantA, variantB,
 				me.probandAffectedInfo ? me.probandAffectedInfo.variantCard.getSampleName() : null,
-				me.motherAffectedInfo  ? me.motherAffectedInfo.variantCard.getSampleName() : null);	
+				me.motherAffectedInfo  ? me.motherAffectedInfo.variantCard.getSampleName() : null);
 
 	    }
 	).then( function() {
 
 		 // Compare the proband variants to the father's variants
 		 return me.promiseCompareVariants(
-		 	me.probandVcfData, 
+		 	me.probandVcfData,
 		 	me.fatherVcfData,
 	       	 // This is the attribute on variant a (proband) and variant b (father)
 	        // that will store whether the variant is unique or matches.
@@ -150,20 +150,20 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 			    variantB.genotypeDepthProband    = variantA.genotypeDepth;
 			    variantB.bamDepthProband         = variantA.bamDepth;
 
-				me._syncGenotypes(variantA, variantB, 
+				me._syncGenotypes(variantA, variantB,
 					me.probandAffectedInfo ? me.probandAffectedInfo.variantCard.getSampleName() : null,
-					me.fatherAffectedInfo  ? me.fatherAffectedInfo.variantCard.getSampleName() : null);	
+					me.fatherAffectedInfo  ? me.fatherAffectedInfo.variantCard.getSampleName() : null);
 
 
-	        });  	
+	        });
 
 	}, function(error) {
 		console.log("error occured when comparing proband variants to mother?");
 	}).then( function() {
 		// This is the function that is called after the proband variants have been compared
-	    // to the father variant set. 
-	    
-		// Fill in the inheritance mode. 
+	    // to the father variant set.
+
+		// Fill in the inheritance mode.
 		me.probandVcfData.features.forEach(function(variant) {
 			VariantTrioModel.determineInheritance(variant, 'compareMother', 'compareFather');
 		});
@@ -180,7 +180,7 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 	},
 	function(error) {
 		console.log("error occured after comparison of proband to mother and father");
-		
+
 	});
 
 
@@ -209,14 +209,14 @@ VariantTrioModel.prototype.compareVariantsToMotherFather = function(callback) {
 		    variantFather.genotypeDepthMother    = variantMother.genotypeDepth;
 		    variantFather.bamDepthMother         = variantMother.bamDepth;
 
-	    	me._syncGenotypes(variantMother, variantFather); 
+	    	me._syncGenotypes(variantMother, variantFather);
 
 		}
 	).then( function() {
 
 	}, function(error) {
 		console.log("error occured when comparing proband variants to mother?");
-	})	
+	})
 
 }
 
@@ -238,19 +238,19 @@ VariantTrioModel.prototype._syncGenotypes = function(variantA, variantB, polyFil
 		if (!variantA.genotypes[sampleName]) {
 			variantA.genotypes[sampleName] = variantB.genotypes[sampleName];
 		}
-	}	    
+	}
 }
 
 
 /*
  *  Set the inhertance field on the variant.
  *  recessive  - if mom and dad are het and proband is hom
- *	denovo     - proband has variant, but not present in mom and dad 
+ *	denovo     - proband has variant, but not present in mom and dad
  *		         (homref parents are also the same as variant not being present)
  */
 VariantTrioModel.determineInheritance = function(variant, fieldCompareMother, fieldCompareFather) {
-	if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom' 
-		&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het' 
+	if (variant.zygosity != null && variant.zygosity.toLowerCase() == 'hom'
+		&& variant.motherZygosity != null && variant.motherZygosity.toLowerCase() == 'het'
 		&& variant.fatherZygosity != null && variant.fatherZygosity.toLowerCase() == 'het') {
 		variant.inheritance = 'recessive';
 	} else if (fieldCompareMother && fieldCompareFather
@@ -263,7 +263,7 @@ VariantTrioModel.determineInheritance = function(variant, fieldCompareMother, fi
 		variant.inheritance = 'denovo';
 	} else {
 		variant.inheritance = 'none';
-	}	
+	}
 }
 
 VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfData, compareAttribute, onMatchFunction, onNoMatchFunction ) {
@@ -271,7 +271,7 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 	return new Promise( function(resolve, reject) {
 
-		
+
 
 	    var set1Label = 'unique1';
 	    var set2Label = 'unique2';
@@ -283,9 +283,9 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 	    otherVcfData.features = otherVcfData.features.sort(VariantModel.orderVariantsByPosition);
 		if (comparisonAttribute) {
-			otherVcfData.features.forEach( function(feature) {			
+			otherVcfData.features.forEach( function(feature) {
 				feature[comparisonAttribute] = '';
-			});			
+			});
 		}
 
 		variants1 = vcfData;
@@ -335,7 +335,7 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 
 	    // Iterate through the variants from the first set,
-	    // marking the consensus field based on whether a 
+	    // marking the consensus field based on whether a
 	    // matching variant from the second list is encountered.
 	    var idx1 = 0;
 	    var idx2 = 0;
@@ -354,7 +354,7 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 	      variant1 = features1[idx1];
 	      variant2 = features2[idx2];
-	      
+
 	      var refAlt1 = variant1.type.toLowerCase() + ' ' + variant1.ref + "->" + variant1.alt;
 	      var refAlt2 = variant2.type.toLowerCase() + ' ' + variant2.ref + "->" + variant2.alt;
 
@@ -410,20 +410,20 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 	            onNoMatchFunction(variant1, null);
 	        }
 	      }
-	    } 
+	    }
 	    if (idx2 < features2.length) {
 	      for(x = idx2; x < features2.length; x++) {
 	        var variant2 = features2[x];
 	        variant2[comparisonAttribute] = set2Label;
 	        if (onNoMatchFunction) {
 	            onNoMatchFunction(null, variant2);
-	        }        
+	        }
 	      }
-	    } 
+	    }
 
 
-		resolve();	
-	
+		resolve();
+
 	});
 
 

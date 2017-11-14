@@ -10,7 +10,7 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;  
+    matrixTrack = indexPage.section.matrixTrack;
     probandVariantCard = indexPage.section.probandVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
@@ -23,8 +23,8 @@ module.exports = {
     indexPage.load();
 
     nav.clickGenes();
-    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);   
-    nav.searchGene("RAI1"); 
+    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);
+    nav.searchGene("RAI1");
 
     nav.clickData();
     dataCard.selectTrio();
@@ -43,7 +43,7 @@ module.exports = {
 
   },
 
-  
+
 
   'Call variants for selected gene': function(client) {
 
@@ -78,5 +78,5 @@ module.exports = {
     client.end();
   }
 
-  
+
 }

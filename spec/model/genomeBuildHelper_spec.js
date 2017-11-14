@@ -95,7 +95,7 @@ describe('genomeBuildHelper', function() {
 			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'homo_sapiens', build: 'GRCh37'});
 			expect(speciesBuild.species.name).toEqual('Human');
 			expect(speciesBuild.build.name).toEqual('GRCh37');
-			
+
 			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Human', build: 'hg38'});
 			expect(speciesBuild.species.name).toEqual('Human');
 			expect(speciesBuild.build.name).toEqual('GRCh38');
@@ -127,7 +127,7 @@ describe('genomeBuildHelper', function() {
 			expect(speciesBuild.species.name).toEqual('Human');
 			expect(speciesBuild.build).toBeNull();
 
-			// Make sure it works when all reference lengths provided 
+			// Make sure it works when all reference lengths provided
 			speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild({species: 'Mouse', build: null, references: {1:1000, 2: 2000}});
 			expect(speciesBuild.species.name).toEqual('Mouse');
 			expect(speciesBuild.build.name).toEqual('mm10');

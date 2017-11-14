@@ -20,13 +20,13 @@ function MatrixCard() {
 
 	this.clinvarMap     = {
 						'pathogenic'            : {value: 1,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
-			  		    'pathogenic/likely_pathogenic' : 
+			  		    'pathogenic/likely_pathogenic' :
 			  		                              {value: 2,   badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: this.showClinVarSymbol},
                         'likely_pathogenic'     : {value: 3,   badge: true, examineBadge: true, clazz: 'clinvar_lpath', symbolFunction: this.showClinVarSymbol},
                         'uncertain_significance': {value: 4,   badge: true, examineBadge: true, clazz: 'clinvar_uc', symbolFunction: this.showClinVarSymbol},
-						'conflicting_interpretations_of_pathogenicity':  
+						'conflicting_interpretations_of_pathogenicity':
 						                          {value: 4,   badge: true, examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
-                        'conflicting_data_from_submitters': 
+                        'conflicting_data_from_submitters':
                                                   {value: 5,   badge: true,  examineBadge: true, clazz: 'clinvar_cd', symbolFunction: this.showClinVarSymbol},
                         'drug_response'         : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
                         'confers_sensitivity'   : {value: 131, badge: false, examineBadge: true, clazz: 'clinvar_other', symbolFunction: this.showClinVarSymbol},
@@ -158,13 +158,13 @@ MatrixCard.prototype.setCellSize = function(sizeEnum) {
 	} else if (sizeEnum == 'large' && this.CELL_SIZE != this.CELL_SIZE_LARGE) {
 		this.CELL_SIZE = this.CELL_SIZE_LARGE;
 		toggle = true;
-	} 
+	}
 
 	if (toggle && this.featureMatrix) {
 		this.featureMatrix.cellSize(this.CELL_SIZE);
 		if (getProbandVariantCard().model && getProbandVariantCard().model.vcfData) {
 			this.fillFeatureMatrix(getProbandVariantCard().model.vcfData);
-		}		
+		}
 	}
 
 }
@@ -536,7 +536,7 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip, adjust
 	      	var screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
 	      	var screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
 
-	      
+
 	      	matrix = column.node()
 	          			   .getScreenCTM()
 	        		       .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
@@ -615,7 +615,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
 	}
 
 
-	
+
 	if (lock && !isLevelEdu && !isLevelBasic) {
 
 
@@ -682,7 +682,7 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 	var screenY = variant.screenYMatrix;
 	if (isLevelEdu) {
 		screenY += $('#nav-edu-tour').outerHeight();
-	} 
+	}
 
 	variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, getProbandVariantCard(), null, adjustPosition);
 	tooltip.select("#unpin").on('click', function() {
@@ -819,7 +819,7 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 									symbolFunction = entry.symbolFunction;
 									theValue = val;
 								}
-							}							
+							}
 						} else {
 							var entry = matrixRow.map.none;
 							if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
@@ -940,13 +940,13 @@ MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
 	    	$('#zero-variants').text("");
 	    	$('#zero-variants').addClass("hide");
 			$('#matrix-panel').removeClass("hide");
-		}		
+		}
      })
 
 
 
 
-   
+
 }
 
 MatrixCard.prototype.setFeatureMatrixSource = function(theVcfData) {
@@ -1009,7 +1009,7 @@ MatrixCard.prototype.showHarmfulVariantSymbol = function(selection, options) {
 		clazz: ""
 	};
 
-	
+
 	var cellSizeAttrs = {};
 	if (options.cellSize > 18) {
 		cellSizeAttrs.width = "16",
@@ -1084,7 +1084,7 @@ MatrixCard.prototype.showPolyPhenSymbol = function(selection, options) {
 	if (options.cellSize > 18) {
 		cellSizeAttrs.width = "17",
 		cellSizeAttrs.height = "17",
-		cellSizeAttrs.transform = "translate(2,2)"		
+		cellSizeAttrs.transform = "translate(2,2)"
 	}
 
 	var datumAttrs = selection.datum() || {};
@@ -1121,7 +1121,7 @@ MatrixCard.prototype.showSiftSymbol = function(selection, options) {
 	if (options.cellSize > 18) {
 		cellSizeAttrs.width = "17",
 		cellSizeAttrs.height = "17",
-		cellSizeAttrs.transform = "translate(2,2)"		
+		cellSizeAttrs.transform = "translate(2,2)"
 	}
 
 	var datumAttrs = selection.datum() || {};
@@ -1158,7 +1158,7 @@ MatrixCard.prototype.showMutationTasterSymbol = function(selection, options) {
 	if (options.cellSize > 18) {
 		cellSizeAttrs.width = "17",
 		cellSizeAttrs.height = "17",
-		cellSizeAttrs.transform = "translate(2,2)"		
+		cellSizeAttrs.transform = "translate(2,2)"
 	}
 
 	var datumAttrs = selection.datum() || {};
@@ -1244,7 +1244,7 @@ MatrixCard.prototype.showHomSymbol = function(selection, options) {
 	var symbolOptions = {x: 0, y: 7, fontSize: "6.5px", width: 15, height: 10};
 	if (options.cellSize > 18) {
 		symbolOptions = {x: 0, y: 10, fontSize: "9px",  width: 19, height: 14};
-	} 
+	}
 	var g = selection.append("g")
 	         				 .attr("transform", "translate(1,4)");
 
@@ -1364,9 +1364,9 @@ MatrixCard.prototype.showAffectedPresentSymbol = function (selection, options) {
 			         .attr("xlink:href", symbolLink)
 			         .attr("width",   options && options.cellSize > 18 ? "16" : "14")
 			         .attr("height",  options && options.cellSize > 18 ? "16" : "14")
-			         .style("pointer-events", "none");		
+			         .style("pointer-events", "none");
 
-	
+
 };
 
 MatrixCard.prototype.showNoInheritSymbol = function (selection) {
@@ -1526,7 +1526,7 @@ MatrixCard.prototype.clickClinvar = function(variant, cell) {
 	if (variant.clinVarUid != null && variant.clinVarUid != '') {
 		var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
 		window.open(url);
-	} 	
+	}
 }
 
 MatrixCard.prototype.formatClinvar = function(variant, clinvarSig) {

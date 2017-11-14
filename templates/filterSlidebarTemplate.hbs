@@ -1,5 +1,5 @@
 <div id="filter-track">
- 
+
   <div class="card-label">Filter Variants</div>
 
    <div id="called-and-loaded-checkboxes" class="hide" style="text-align:center;margin-bottom:15px">
@@ -24,55 +24,55 @@
   <div id="standard-filter-panel">
      <div class="subheading level-edu level-basic">- Variant filters -</div>
      <div>
-       <button id="button-known-causative" class="standard-filter-btn btn btn-default btn-raised" 
+       <button id="button-known-causative" class="standard-filter-btn btn btn-default btn-raised"
         onclick="filterCard.applyStandardFilter(this, 'known_causative')">
         <i class="done material-icons glyph">done</i>
         <span>Known Pathogenic</span>
        </button>
        <span id="known_causative_count" class="standard-filter-count">
           <div id="loaded-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>          
+          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>
           <div id="called-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>             
+          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>
       </span>
      </div>
      <div>
-       <button id="button-denovo-vus" class="standard-filter-btn btn btn-default btn-raised" 
+       <button id="button-denovo-vus" class="standard-filter-btn btn btn-default btn-raised"
         onclick="filterCard.applyStandardFilter(this, 'denovo')">
         <i class="done material-icons glyph">done</i>
         <span>De novo VUS</span>
        </button>
        <span id="denovo_count" class="standard-filter-count">
           <div id="loaded-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>          
+          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>
           <div id="called-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>        
+          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>
        </span>
      </div>
      <div>
-       <button id="button-recessive-vus" class="standard-filter-btn btn btn-default btn-raised" 
+       <button id="button-recessive-vus" class="standard-filter-btn btn btn-default btn-raised"
         onclick="filterCard.applyStandardFilter(this, 'recessive')">
         <i class="done material-icons glyph">done</i>
         <span>Recessive VUS</span>
        </button>
        <span id="recessive_count" class="standard-filter-count">
           <div id="loaded-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>          
+          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>
           <div id="called-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>                  
+          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>
        </span>
      </div>
      <div>
-       <button id="button-high-or-moderate-impact" class="standard-filter-btn btn btn-default btn-raised" 
+       <button id="button-high-or-moderate-impact" class="standard-filter-btn btn btn-default btn-raised"
         onclick="filterCard.applyStandardFilter(this, 'functional_impact')">
         <i class="done material-icons glyph">done</i>
         <span>High or moderate impact</span>
        </button>
        <span id="functional_impact_count" class="standard-filter-count">
           <div id="loaded-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>          
+          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>
           <div id="called-variant-count" data-toggle="tooltip"  title="" class="hide variant-count"></div>
-          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>                  
+          <span id="unanalyzed-called-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have had variants called.">!</span>
        </span>
      </div>
 
@@ -80,14 +80,14 @@
 
        <div class="subheading level-basic level-edu" >- Alignment filters -</div>
 
-       <button id="button-low-coverage" class="standard-filter-btn btn btn-default btn-raised" 
+       <button id="button-low-coverage" class="standard-filter-btn btn btn-default btn-raised"
         onclick="filterCard.applyStandardFilter(this, 'low_coverage')">
         <i class="done material-icons glyph">done</i>
         <span>Insufficient coverage in exons</span>
        </button>
        <span id="functional_impact_count" class="standard-filter-count">
           <div id="loaded-variant-count" class="hide variant-count"></div>
-          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>                   
+          <span id="unanalyzed-loaded-warning" class="hide" data-toggle="tooltip" data-placement="top" title="Warning: not all genes have been analyzed.">!</span>
        </span>
 
 
@@ -118,13 +118,13 @@
           </div>
         </div>
         <div style="display:inline-block">
-          <a id="gene-coverage-go-button" href="javascript:void(0)" onclick="filterCard.refreshGeneCoverageBadges()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          <a id="gene-coverage-go-button" href="javascript:void(0)" onclick="filterCard.refreshGeneCoverageBadges()" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">
             Go
           </a>
         </div>
 
 
-      </div>       
+      </div>
      </div>
   </div>
 
@@ -147,25 +147,25 @@
                 -
                 <input type="number" id="af-amount-end" value="" style="width: 48px;margin-bottom: 1px;">
                 %
-                <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+                <a id="af-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">
                 Go
                 </a>
         </div>
       </div>
-      
-    </div>    
-        
 
-  </div>  
+    </div>
+
+
+  </div>
 
     <div style="display:flex;flex-direction:row;width:335px;justify-content:space-between">
      <!-- Inheritance -->
       <div >
-       
+
         <h4 >
-            Inheritance mode        
+            Inheritance mode
         </h4>
-       
+
         <div style="display:flex;flex-direction:column">
 
 
@@ -182,10 +182,10 @@
                   </g>
                 </svg>
         </div>
-        
+
       </div>
 
-    
+
 
     </div>
 
@@ -196,12 +196,12 @@
      <!-- Present in affected, absent in unaffected -->
         <h4 id="present-in-affected-heading" class="hide" style="margin-bottom:0px">
             <i class="material-icons tooltip-affected-symbol" style="float:none">spellcheck</i>
-            Present in affected     
+            Present in affected
         </h4>
         <div id="present-in-affected" class="hide" style="display:flex;flex-direction:row;flex-wrap:wrap;">
         </div>
         <h4 id="absent-in-unaffected-heading" class="hide"  style="margin-bottom:0px">
-            Absent in unaffected     
+            Absent in unaffected
         </h4>
         <div id="absent-in-unaffected" class="hide" style="display:flex;flex-direction:row;flex-wrap:wrap;">
         </div>
@@ -213,14 +213,14 @@
   <!-- Generic annotations -->
   <div id="generic-annotation-filters" style="display:flex;flex-direction:column;flex-wrap:wrap;width:335px;justify-content:flex-start;margin-bottom:5px">
 
-    
+
 
   </div>
 
 
   <!-- ClinVar -->
     <div >
-      
+
       <h4  >
         ClinVar
       </h4>
@@ -229,7 +229,7 @@
         <div style="display:table-cell;margin-right:5px;">
         <!-- ClinVar -->
           <div style="display:flex;flex-direction:column;">
-          
+
             <svg id="clinvar_path" class="clinvar" width="110" height="17" transform="translate(0,0)">
             <g class="clinvar_path" transform="translate(1,0)" style="opacity: 1;">
               <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11" height="11" style="fill: #ad494A;"></use>
@@ -271,7 +271,7 @@
               </g>
               <text class="name" style="fill-opacity: 1;" x="15" y="10">Other </text>
             </svg>
-     
+
           </div>
         </div>
 
@@ -293,7 +293,7 @@
             </svg>
           </div>
         </div>
-        
+
       </div>
 
     </div>
@@ -306,8 +306,8 @@
 
       <div class="hide" style="width:100px;margin-right:10px;margin-bottom:4px;">
         <select id="select-annotation-scheme" >
-                <option value="VEP" selected>VEP</option>                   
-                <option value="SnpEff">SnpEff</option> 
+                <option value="VEP" selected>VEP</option>
+                <option value="SnpEff">SnpEff</option>
         </select>
       </div>
 
@@ -319,7 +319,7 @@
             <h4 style="width:145px;">
               VEP<br>Most severe impact
               <a id="impact-scheme" href="javascript:(0)" class="current">
-                <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>            
+                <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>
               </a>
             </h4>
 
@@ -329,22 +329,22 @@
                   <text class="name" x="9" y="9" style="fill-opacity: 1;">High</text>
                   <rect class="filter-symbol  impact_HIGH" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;">
                   </rect>
-                </g>            
+                </g>
               </svg>
               <svg id="MODERATE" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-                <g transform="translate(0,2)">              
+                <g transform="translate(0,2)">
                   <text class="name" x="9" y="9" style="fill-opacity: 1;">Moderate</text>
                   <rect class="filter-symbol  impact_MODERATE" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
                 </g>
               </svg>
               <svg id="MODIFIER" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-                <g transform="translate(0,2)">              
+                <g transform="translate(0,2)">
                   <text class="name" x="9" y="9" style="fill-opacity: 1;">Modifier</text>
                   <rect class="filter-symbol  impact_MODIFIER" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
                   </g>
               </svg>
               <svg id="LOW" class="highestImpactVep" width="80" height="15" transform="translate(0,0)">
-                <g transform="translate(0,2)">              
+                <g transform="translate(0,2)">
                   <text class="name" x="9" y="9" style="fill-opacity: 1;">Low</text>
                   <rect class="filter-symbol  impact_LOW" rx="1" ry="1" x="1" width="5" y="2" height="5" style="opacity: 1;"></rect>
                 </g>
@@ -352,30 +352,30 @@
             </div>
 
         </div>
-         
+
         <div id="effect-filter-box" style=display:table-cell;text-align:left;width:180px;">
           <h4>
             VEP<br>Consequence
             <a id="effect-scheme" href="javascript:(0)" >
-              <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>          
+              <i class="material-icons" style="color:rgb(113, 113, 113);font-size:14px">color_lens</i>
             </a>
           </h4>
 
             <div id="effect-filters" style="display: flex;flex-direction: column;flex-wrap: wrap;">
-            </div>     
+            </div>
 
-          
+
         </div>
 
       </div>
     </div>
 
-   
+
 
      <!-- PolyPhen and SIFT  -->
     <div style="display:flex;flex-direction:row;justify-content:space-between;width:300px">
 
-        <!-- PolyPhen -->     
+        <!-- PolyPhen -->
         <div>
           <h4>PolyPhen</h4>
 
@@ -401,11 +401,11 @@
                 </g>
                 <text class="name" style="fill-opacity: 1;" x="15" y="10">Benign</text>
               </svg>
-            </div>  
+            </div>
         </div>
 
         <!-- SIFT -->
-        <div style="margin-left:20px;">        
+        <div style="margin-left:20px;">
           <h4 style="">SIFT</h4>
           <div style="display:flex;flex-direction: row;flex-wrap: wrap;">
 
@@ -439,7 +439,7 @@
 
           </div>
         </div>
-     
+
       </div>
 
 
@@ -448,10 +448,10 @@
      <!-- Zygosity -->
       <div  >
         <h4 >
-          
+
           Zygosity
           <a id="zygosity-scheme" href="javascript:(0)" >
-                <i class="material-icons" style="font-size:14px">color_lens</i>            
+                <i class="material-icons" style="font-size:14px">color_lens</i>
           </a>
         </h4>
 
@@ -468,7 +468,7 @@
      <!-- Type -->
       <div >
         <h4  >
-          Type        
+          Type
         </h4>
         <div  style="display:flex;flex-direction:column">
 
@@ -489,14 +489,14 @@
 
             <svg id="del" class="type" width="70" height="15" transform="translate(0,0)">
               <g transform="translate(1,2)">
-                <text class="name" x="11" y="9" style="fill-opacity: 1;">Deletion</text>       
+                <text class="name" x="11" y="9" style="fill-opacity: 1;">Deletion</text>
                 <polygon class="filter-symbol del" points="0,8 4,2 8,8" rx="1" ry="1" x="1" width="6" y="2" height="6" style="fill: none; stroke: rgb(0, 0, 0); stroke-width: 1px; opacity: 1;"></polygon>
               </g>
             </svg>
 
             <svg id="complex" class="type" width="70" height="15" transform="translate(0,0)">
               <g transform="translate(2,2)">
-                <text class="name" x="9" y="9" style="fill-opacity: 1;">Complex</text>       
+                <text class="name" x="9" y="9" style="fill-opacity: 1;">Complex</text>
                 <path d="M0,-4.161791450287818L2.4028114141447544,0 0,4.161791450287818 -2.4028114141447544,0Z" class="filter-symbol complex" transform="translate(4,5)" style="opacity: 1; fill: none; stroke: rgb(0, 0, 0);">
                 </path>
               </g>
@@ -542,10 +542,10 @@
       <!-- VCF Record Filters -->
       <div id="rec-filter-panel"  style="clear:both;margin-right:10px;width:150px">
           <h4>
-              <span style="float:left;">VCF Filter status </span> 
+              <span style="float:left;">VCF Filter status </span>
               <a id="vcf-filter-status-help" href="javascript:void(0)" data-toggle="collapse" data-target="#vcf-filter-status-info" class="collapsed " aria-expanded="false" data-toggle="tooltip" title="What is this field?">
-                <span id="vcf-filter-status-help-icon" class="material-icons">help</span> 
-              </a>         
+                <span id="vcf-filter-status-help-icon" class="material-icons">help</span>
+              </a>
 
               <div id="vcf-filter-status-info" class="collapse" aria-expanded="false">
                 The 'Filter status' is a tag set by filtering software to explain the result of
@@ -553,7 +553,7 @@
                 recommended to display variants marked with 'PASS' if present. Often, if some variants
                 are tagged with 'PASS', variants that failed the filters have no tag, shown as '.'.
                 For more detailed information, with examples, see the blog post on 'Filter status'.
-              </div>          
+              </div>
 
           </h4>
           <div style="clear:both;">
@@ -564,17 +564,17 @@
 
      <!-- Coverage -->
       <div >
-        
+
         <h4 >
           Coverage (minimum)
         </h4>
 
-        <!-- coverage -->  
+        <!-- coverage -->
         <div id="coverage-filter" style="text-align:left;" >
-          
+
           <input type="number" id="coverage-min" value="" style="width:40px;margin-bottom:1px">
           X
-          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">           
+          <a id="coverage-go-button" href="javascript:void(0)" class="icon-button-sm btn btn-default btn-raised" style="margin-left:4px;padding-top:0px;padding-bottom:0px;margin-top:0px;margin-bottom: 1px;line-height: 19px;">
           Go
           </a>
         </div>
@@ -599,7 +599,7 @@
     </div>
   </div>
 
-  
+
 
 
 
@@ -611,15 +611,15 @@
 
 
 </div>
-  
-
- 
-
-  
 
 
 
 
-   
 
-   
+
+
+
+
+
+
+

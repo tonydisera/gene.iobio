@@ -28,7 +28,7 @@ CacheHelper.prototype.promiseInit = function() {
 
 
 CacheHelper.prototype.isolateSession = function() {
-	this.launchTimestamp = Date.now().valueOf();	
+	this.launchTimestamp = Date.now().valueOf();
 }
 
 CacheHelper.prototype.promiseCheckCacheSize = function() {
@@ -55,13 +55,13 @@ CacheHelper.prototype.promiseCheckCacheSize = function() {
 							me._promiseClearCache(null, false, true)
 							 .then(function() {
 							 	resolve();
-							 }, 
+							 },
 							 function(error) {
 							 	reject(error);
 							 })
 						}
-				        
-				    } 
+
+				    }
 				}, function() {
 					// user clicked cancel
 					me.openDialog();
@@ -76,7 +76,7 @@ CacheHelper.prototype.promiseCheckCacheSize = function() {
 
 
 	})
-	
+
 }
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
@@ -84,7 +84,7 @@ CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCount
 
 	me.getAnalyzeAllCounts(function(counts) {
 		me.showGeneCounts(counts, clearStandardFilterCounts)
-	});	
+	});
 }
 
 CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCounts) {
@@ -93,7 +93,7 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
 		$('#analyzed-progress-bar').addClass("hide");
 		$('#total-genes-label').addClass("hide");
 		return;
-	} 
+	}
 	$('#analyzed-progress-bar').removeClass("hide");
 
 
@@ -107,7 +107,7 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
 	if (me.showCallAllProgress || counts.called.analyzed > 0 || counts.called.error > 0 ) {
 		me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
 	} else {
-		$('#called-progress-bar').addClass("hide");			
+		$('#called-progress-bar').addClass("hide");
 	}
 
 }
@@ -115,7 +115,7 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
 CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field, clearStandardFilterCounts) {
 	var geneCount = countObject.geneCount;
 	var counts    = countObject[field];
- 
+
 	progressBar.removeClass("hide");
 	if (counts.analyzed == 0) {
 		progressBar.find(".text").removeClass("hide");
@@ -129,13 +129,13 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 		progressBar.addClass("done");
 		progressBar.find(".text").text(counts.analyzed + " analyzed");
 	} else {
-		progressBar.removeClass("done");			
+		progressBar.removeClass("done");
 	}
 
 	var notAnalyzedCount        = geneCount - counts.analyzed;
 	var analyzedNotPassedCount  = counts.analyzed - counts.pass;
 
-	var analyzed                = Math.round(counts.analyzed / geneCount * 100) / 100;		
+	var analyzed                = Math.round(counts.analyzed / geneCount * 100) / 100;
 	var notAnalyzed             = 1 - analyzed;
 
 	var analyzedPassed          = filterCard.hasFilters() && counts.analyzed > 0 ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 1;
@@ -168,21 +168,21 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 	if (counts.analyzed > 0) {
 		if (filterCard.hasFilters()) {
 			progressBar.find('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
-		
-			
+
+
 			progressBar.find('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "");
 
 			progressBar.find('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
 			progressBar.find('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount +  " fail filter" : "");
-			
-			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");		
+
+			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");
 			progressBar.find('.text').html("&nbsp;");
-			
+
 
 		} else {
 			progressBar.find('#not-passed-filter-bar'    ).text("");
 			progressBar.find('#not-passed-filter-bar'    ).attr("title", "");
-			
+
 			if (geneCount > counts.analyzed) {
 				progressBar.find('#passed-filter-bar'  ).text(counts.analyzed);
 			} else {
@@ -191,7 +191,7 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 			}
 
 			progressBar.find('#passed-filter-bar').attr("title", counts.analyzed  + " analyzed");
-			progressBar.find('#not-analyzed-bar' ).attr("title", notAnalyzedCount + " not analyzed");		
+			progressBar.find('#not-analyzed-bar' ).attr("title", notAnalyzedCount + " not analyzed");
 
 		}
 	} else {
@@ -201,22 +201,22 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
 			progressBar.find('#not-passed-filter-bar').text("");
 			progressBar.find('#not-passed-filter-bar').attr("title", "");
 
-			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
+			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");
 	}
 
 
 
 	// Refresh the standard filter count if it applies
 	filterCard.setStandardFilterCount(field, counts, notAnalyzedCount, clearStandardFilterCounts);
-	
+
 
 }
 
 CacheHelper.prototype.hideAnalyzeAllProgress = function() {
-	$("#analyze-all-progress .bar").css("width", "0%");	
+	$("#analyze-all-progress .bar").css("width", "0%");
 
-	$("#call-all-progress .bar").css("width", "0%");	
-	$("#call-all-progress #not-analyzed-bar").text("");	
+	$("#call-all-progress .bar").css("width", "0%");
+	$("#call-all-progress #not-analyzed-bar").text("");
 }
 
 
@@ -244,7 +244,7 @@ CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 	var me = this;
 
 	this.start = new Date();
-	
+
 	if (analyzeCalledVariants) {
 		me.showCallAllProgress = true;
 	}
@@ -256,7 +256,7 @@ CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 	me.genesToCache = [];
 	me.cacheQueue = [];
 
-	genesCard.getGeneNames().forEach(function(geneName) {		
+	genesCard.getGeneNames().forEach(function(geneName) {
 		me.genesToCache.push(geneName);
 	});
 	me.cacheGenes(analyzeCalledVariants, function() {
@@ -280,7 +280,7 @@ CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
 CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
 	var me = this;
 
-	// If there are no more genes to cache, 
+	// If there are no more genes to cache,
 	if (me.genesToCache.length == 0 && me.cacheQueue.length == 0) {
 		if (callback) {
 			callback();
@@ -304,7 +304,7 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
 	}
 	var startingPos = me.cacheQueue.length == 0 ? 0 : me.cacheQueue.length;
 
-	// Place next batch of genes in caching queue 
+	// Place next batch of genes in caching queue
 	for (var i = 0; i < sizeToQueue; i++) {
 		me.cacheQueue.push(me.genesToCache[i]);
 	}
@@ -348,21 +348,21 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
     	return promiseMarkCodingRegions(geneObject, transcript);
      })
      .then( function() {
-    		
+
 
 		// This function will be performed once all loaded variants have been
 		// analyzed and cached.  Joint call the variants for
-		// the cached gene (if alignments provided and 'analyze all' 
-		// included calling variants) and then determine the inheritance 
+		// the cached gene (if alignments provided and 'analyze all'
+		// included calling variants) and then determine the inheritance
 		// (if this is a trio)
     	var analyzeVariantsForGene = function(geneObject, transcript, analyzeCalledVariants, callback) {
-			if (analyzeCalledVariants) {					
+			if (analyzeCalledVariants) {
 				// If 'analyze all' including calling variants from alignments, perform
 				// joint calling, then add clinvar annotations and determine the
 				// 'delta' (new) variants that are not present in the gene's loaded variants
-				cacheJointCallVariants(geneObject, transcript, false,  
+				cacheJointCallVariants(geneObject, transcript, false,
 					function(theGeneObject, theTranscript) {
-						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
+						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants,
 							function(theGeneObject1, theTranscript1) {
 		    					me.processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, true, callback);
 		    					if (window.gene && window.gene.gene_name == theGeneObject1.gene_name) {
@@ -379,7 +379,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 			}
     	}
 
-    	
+
     	me.promiseIsCachedForProband(geneObject, transcript, analyzeCalledVariants)
     	 .then(function(data) {
 
@@ -395,8 +395,8 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 		    	// if next batch of genes should be analyzed
 		    	genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
 		    	me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);
-		    
-			
+
+
 			} else {
 
 				// The gene is ready to be analyzed.  Annotate the variants in the vcf for
@@ -409,7 +409,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
 				// If the 'analyze all' will include calling variants, the gene may already have loaded
 				// variants (user has clicked on the gene).  In this case, we only want to invoke the
-				// code to joint call the variants for the trio (and determine inheritance) once.  			
+				// code to joint call the variants for the trio (and determine inheritance) once.
 				if (isAlignmentsOnly()) {
 					analyzeVariantsForGene(theGeneObject, theTranscript, shouldCallVariants, callback);
 
@@ -431,7 +431,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 								  }, function(error) {
 									// An error occurred.  Set the gene badge with an error glyph
 					    			// and move on to analyzing the next gene
-					    			genesCard.setGeneBadgeError(theGeneObject.gene_name);			    				
+					    			genesCard.setGeneBadgeError(theGeneObject.gene_name);
 				    				var message = error.hasOwnProperty("message") ? error.message : error;
 					    			console.log("problem caching data for gene " + theGeneObject.gene_name + ". " + message);
 					    			genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
@@ -440,7 +440,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 									 .then(function(dangerObject) {
 				    					// take this gene off of the queue and see
 				    					// if next batch of genes should be analyzed
-							    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);										  								 	
+							    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);
 									  },
 									  function(error) {
 									  	var msg = "A problem ocurred while summarizing error in CacheHelper.prototype.cacheGene(): " + error;
@@ -458,7 +458,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 						    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
 							    		variantCard.model.promiseCacheVariants(
 							    			theGeneObject.chr,
-							    			theGeneObject, 
+							    			theGeneObject,
 										 	theTranscript)
 							    		.then( function(vcfData) {
 											return me.promiseIsCachedForCards(vcfData.gene.gene_name, vcfData.transcript)
@@ -475,7 +475,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
 							    			// An error occurred.  Set the gene badge with an error glyph
 							    			// and move on to analyzing the next gene
-							    			genesCard.setGeneBadgeError(theGeneObject.gene_name);			    				
+							    			genesCard.setGeneBadgeError(theGeneObject.gene_name);
 						    				var message = error.hasOwnProperty("message") ? error.message : error;
 							    			console.log("problem caching data for gene " + theGeneObject.gene_name + ". " + message);
 							    			genesCard._geneBadgeLoading(theGeneObject.gene_name, false);
@@ -484,19 +484,19 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 											 .then(function(dangerObject) {
 						    					// take this gene off of the queue and see
 						    					// if next batch of genes should be analyzed
-									    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);														 	
+									    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);
 											 },
 											 function(error) {
 											 	var msg = "A problem occurred when summarize error in CacheHelper.cacheGene(): " + error;
 											 	console.log(msg);
-									    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);														 	
+									    		me.cacheNextGene(theGeneObject.gene_name, shouldCallVariants, callback);
 											 })
 							    		});
 
 						    		}
 
-						    	});							
-							}							
+						    	});
+							}
 
 						}
 					})
@@ -510,7 +510,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 
 	 },
 	 function(error) {
-		genesCard.setGeneBadgeError(geneName);			    				
+		genesCard.setGeneBadgeError(geneName);
 		console.log("problem caching data for gene " + geneName + ".");
 		genesCard._geneBadgeLoading(geneName, false);
 		getVariantCard("proband").promiseSummarizeError(geneName, error)
@@ -524,7 +524,7 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
 		 })
 	 });
 
-				
+
 }
 
 CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, transcript, analyzeCalledVariants, callback) {
@@ -535,7 +535,7 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 			.then( function(data) {
 
 				var theFbData = data.fbData;
-				var theVcfData = data.vcfData 
+				var theVcfData = data.vcfData
 				var theGeneObject = data.geneObject;
 				var theTranscript = data.transcript;
 
@@ -553,12 +553,12 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 							callback(theGeneObject, theTranscript);
 						}
 					}
-				 }, 
+				 },
 				 function(error) {
-					console.log("unable to cache data for gene " + theGeneObject.gene_name + " in CacheHelper._diffAndAnnotateCalledVariants(): " + error);		
+					console.log("unable to cache data for gene " + theGeneObject.gene_name + " in CacheHelper._diffAndAnnotateCalledVariants(): " + error);
 					if (callback) {
 						callback(null);
-					}		 	
+					}
 				 })
 
 			},
@@ -567,7 +567,7 @@ CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, tran
 				console.log(msg);
 				callback();
 			})
-		})		
+		})
 	} else {
 		if (callback) {
 			callback();
@@ -607,7 +607,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 					var msg = "Unable to CacheHelper.processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available";
 					console.log(msg);
 					genesCard.clearGeneGlyphs(geneObject.gene_name);
-					genesCard.setGeneBadgeError(geneObject.gene_name);	
+					genesCard.setGeneBadgeError(geneObject.gene_name);
 					if (cacheNext) {
 						me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
 					} else {
@@ -628,7 +628,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			 	var msg = "Problem occurred in VariantModel.processCachedTrio(): " + error;
 			 	console.log(msg);
 		 		genesCard.clearGeneGlyphs(geneObject.gene_name);
-				genesCard.setGeneBadgeError(geneObject.gene_name);	
+				genesCard.setGeneBadgeError(geneObject.gene_name);
 				if (cacheNext) {
 					me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
 				} else {
@@ -661,7 +661,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 
 				var p = getVariantCard(relationship).model._promiseCacheData(trioVcfData[relationship], CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
 				cachePromises.push(p);
-				
+
 			}
 
 			Promise.all(cachePromises).then(function() {
@@ -674,13 +674,13 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 				getProbandVariantCard().model.postInheritanceParsing(trioVcfData.proband, geneObject, transcript, getAffectedInfo(), function() {
 
 					//
-					// Now that inheritance has been determined,  analyze the alignments 
+					// Now that inheritance has been determined,  analyze the alignments
 					// in the gene coding regions to get coverage metrics
 					//
 					promiseGetCachedGeneCoverage(geneObject, transcript).then(function(data) {
 						var geneCoverageAll = data.geneCoverage;
 						//
-						// Summarize the variants for the proband to create the gene badges, 
+						// Summarize the variants for the proband to create the gene badges,
 						// representing the most pathogenic variants for this gene
 						//
 						var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
@@ -699,25 +699,25 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 								genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
 							}
 
-							
-							// Now clear out mother and father from cache.  
+
+							// Now clear out mother and father from cache.
 							if (analyzeCalledVariants) {
 								// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
 								// and father in cache as we need these to show allele counts and genotypes for trio
 								// with determineInheritance() on selected gene is invoked)
 								if (CacheHelper.useLocalStorage()) {
-									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
-									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);														
+									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
+									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
 								}
-								getVariantCard("proband" ).model.clearCacheItem(CacheHelper.FB_DATA, geneObject.gene_name, transcript);					
+								getVariantCard("proband" ).model.clearCacheItem(CacheHelper.FB_DATA, geneObject.gene_name, transcript);
 
 
 							} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
 								// Don't clear cache for currently selected
 								// gene though as this will result in no inheritance mode being detected.
 								if (CacheHelper.useLocalStorage()) {
-									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);					
-									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);														
+									getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
+									getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
 								}
 							}
 
@@ -740,7 +740,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			})
 
 
-		}, 
+		},
 		function(error) {
 			console.log("problem determining inheritance for " + geneObject.gene_name + ". " + error);
 			// take this gene off of the queue and see
@@ -750,7 +750,7 @@ CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analy
 			} else {
 				callback();
 			}
-		});		
+		});
 	})
 
 
@@ -794,7 +794,7 @@ CacheHelper.prototype.promiseIsCachedForProband = function(geneObject, transcrip
 		// if the above condition is met plus we have cached the called variants for this gene.
 		getProbandVariantCard().promiseGetDangerSummary(geneObject.gene_name)
 		 .then(function(dangerSummary) {
-			getProbandVariantCard().model.promiseIsCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants) 
+			getProbandVariantCard().model.promiseIsCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants)
 			 .then(function(isCached) {
 				if (isCached || (!checkForCalledVariants && dangerSummary)) {
 					resolve({geneObject: geneObject, transcript: transcript, shouldCallVariants: checkForCalledVariants, isCached: true});
@@ -830,7 +830,7 @@ CacheHelper.prototype.promiseIsCachedForCards = function(geneName, transcript) {
 				resolve(count == 1);
 			} else {
 				resolve(count == getRelevantVariantCards().length);
-			}					
+			}
 		},
 		function(error) {
 			reject(error);
@@ -873,9 +873,9 @@ CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callbac
 			}
 			if (danger.CALLED) {
 				counts.called[field]++;
-			}		
+			}
 		}
-	}	
+	}
 
 	if (genesToCount.length == 0) {
 		callback(counts);
@@ -891,7 +891,7 @@ CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callbac
     	me.promiseGetData(key)
     		.then(function(danger) {
 				if (danger != null) {
-					
+
 					// Increment the loaded variants count for the gene
 					incrementLoadedVsCalled(danger, counts, 'analyzed');
 
@@ -909,7 +909,7 @@ CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callbac
 
 				} else {
 					// We don't have a danger summary for the gene.  Increment the unanlyzed count
-					incrementLoadedVsCalled(danger, counts, 'unanalyzed');		
+					incrementLoadedVsCalled(danger, counts, 'unanalyzed');
 				}
 
 				// Now get the counts for the next gene in the list
@@ -919,14 +919,14 @@ CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callbac
     		function(error) {
     			console.log("An error occurred in getAnalyzeAllCounts when calling promiseGetData: " + error);
     			callback(counts);
-    		});		
+    		});
 	}
 
 
 }
 
 
-CacheHelper.prototype.refreshGeneBadges = function(callback) {  
+CacheHelper.prototype.refreshGeneBadges = function(callback) {
 	var me = this;
 	var geneCount = {total: 0, pass: 0};
 
@@ -936,14 +936,14 @@ CacheHelper.prototype.refreshGeneBadges = function(callback) {
 	genesCard.getGeneNames().forEach(function(geneName) {
 		theGeneNames[geneName] = true;
 	});
-	
+
 	var dataKind = CacheHelper.VCF_DATA;
 
 	me.promiseGetKeys()
 	 .then(function(allKeys) {
 	 	var keys = [];
 
-		allKeys.forEach(function(key) {			
+		allKeys.forEach(function(key) {
 			keyObject = CacheHelper._parseCacheKey(key);
 			if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
@@ -972,7 +972,7 @@ CacheHelper.prototype.refreshGeneBadges = function(callback) {
 }
 
 
-CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnly=false) {  
+CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnly=false) {
 	var me = this;
 
 	return new Promise(function(resolve, reject) {
@@ -981,7 +981,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 			all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
 			loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
 			called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
-		}	
+		}
 
 		$('#gene-badges-loader').removeClass("hide");
 
@@ -1020,7 +1020,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 							  			counts.loaded.pass++;
 							  			counts.called.pass++;
 							  		}
-									
+
 							 		getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name)
 							 		 .then(function() {
 										genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
@@ -1030,24 +1030,24 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 							  		counts.loaded.unanalyzed++;
 							  		counts.called.unanalyzed++;
 
-						 		}					 	
+						 		}
 							 })
-							 
-					 		
-		
+
+
+
 						 }, function(error) {
 						 	var msg = "Problem encountered in CacheHelper.refreshGeneBadgesGeneCoverage() " + error;
 						 	console.log(msg);
 						 	reject(msg);
 
-						 });	
+						 });
 
 						 thePromises.push(p);
-						 			
 
 
-				  	} 
-				} 
+
+				  	}
+				}
 
 		 	})
 
@@ -1065,8 +1065,8 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 			}
 
 			$('#gene-badges-loader').addClass("hide");
-			resolve(counts);		
-		})		
+			resolve(counts);
+		})
 	})
 
 
@@ -1075,7 +1075,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 CacheHelper.prototype.clearCache = function(launchTimestampToClear, showCacheDialog=false) {
 	var me = this;
 	if (keepLocalStorage) {
-		
+
 	} else {
 		me._promiseClearCache(launchTimestampToClear, false, false)
 		 .then(function() {
@@ -1092,7 +1092,7 @@ CacheHelper.prototype.promiseClearCache = function(launchTimestampToClear) {
 	return new Promise(function(resolve, reject) {
 		if (keepLocalStorage) {
 			resolve();
-			
+
 		} else {
 			me._promiseClearCache(launchTimestampToClear, false, false)
 			 .then(function() {
@@ -1102,7 +1102,7 @@ CacheHelper.prototype.promiseClearCache = function(launchTimestampToClear) {
 			 function(error) {
 			 	reject(error);
 			 })
-		}		
+		}
 	})
 
 }
@@ -1117,11 +1117,11 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 		var keyObject = theKey.keyObject;
 	  	var geneObject = window.geneObjects[keyObject.gene];
 
-  		me.promiseGetDataThreaded(key) 
+  		me.promiseGetDataThreaded(key)
   		 .then(function(theVcfData) {
 
 	  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-	  		
+
 	  		geneCount.total++;
 	  		if (filteredVcfData.features.length > 0) {
 	  			geneCount.pass++;
@@ -1145,11 +1145,11 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 			  		getVariantCard("proband").promiseSummarizeDanger(data.gene.gene_name, filteredVcfData, options, geneCoverageAll)
 			  		 .then(function(dangerObject) {
 						genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
-						me.refreshNextGeneBadge(keys, geneCount, callback);	
+						me.refreshNextGeneBadge(keys, geneCount, callback);
 			  		 })
 				 })
 
-		 	
+
 			 })
 
 
@@ -1159,9 +1159,9 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
 }
 
 CacheHelper.prototype.getCacheKey = function(cacheObject) {
-	var key =  "gene.iobio"  
+	var key =  "gene.iobio"
 		+ cacheHelper.KEY_DELIM + this.launchTimestamp
-	    + cacheHelper.KEY_DELIM + cacheObject.relationship 
+	    + cacheHelper.KEY_DELIM + cacheObject.relationship
 		+ cacheHelper.KEY_DELIM + cacheObject.sample
 		+ cacheHelper.KEY_DELIM + cacheObject.gene
 		+ cacheHelper.KEY_DELIM + cacheObject.transcript
@@ -1189,7 +1189,7 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 		 	var promises = []
 			allKeys.forEach(function(key) {
 				var keyObject = CacheHelper._parseCacheKey(key);
-				if (keyObject) {			
+				if (keyObject) {
 				  	var p = me.promiseGetData(key, false)
 				  	 .then(function(data) {
 				  	 	if (data != null) {
@@ -1198,10 +1198,10 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 							  	if (keyObject.dataKind == CacheHelper.BAM_DATA) {
 							  		coverageSize +=  data.length;
 							  	}
-							  	
+
 							} else {
 								otherSessionsSize += data.length;
-								
+
 
 								var sessionTotal = otherSessionsInfo[keyObject.launchTimestamp];
 								if (sessionTotal == null) {
@@ -1209,7 +1209,7 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 								}
 								sessionTotal += data.length;
 								otherSessionsInfo[keyObject.launchTimestamp] = sessionTotal;
-							}				  	 		
+							}
 				  	 	}
 					});
 				  	promises.push(p);
@@ -1219,22 +1219,22 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 				}
 		 	})
 			Promise.all(promises).then(function() {
-				
-					resolve({ total:           format ? (CacheHelper._sizeMB(size) + " MB") : size, 
+
+					resolve({ total:           format ? (CacheHelper._sizeMB(size) + " MB") : size,
 					          coverage:        format ? (CacheHelper._sizeMB(coverageSize) + " MB") : coverageSize,
 					          otherSessions:   format ? (CacheHelper._sizeMB(otherSessionsSize) + " MB") : otherSessionsSize,
 					          otherUse:        format ? (CacheHelper._sizeMB(otherUseSize) + " MB") : otherUseSize,
 					          'otherSessionsInfo':  otherSessionsInfo
 					        });
 
-							
+
 
 			},
 			function(error) {
 				var msg = "A problem ocurred in CacheHelper.promiseGetCacheSize(): +  " + error;
 				console.log(msg);
 				reject(msg);
-			})		 	
+			})
 
 		 },
 		 function(error) {
@@ -1250,8 +1250,8 @@ CacheHelper.prototype.cleanupCacheOnClose = function(launchTimestampToClear) {
 	var me = this;
 	if (CacheHelper.useLocalStorage() && localStorage) {
 		var keys = [];
-		for (var i=0; i<=localStorage.length-1; i++)  {  
-			var key = localStorage.key(i); 	
+		for (var i=0; i<=localStorage.length-1; i++)  {
+			var key = localStorage.key(i);
 			var keyObject = CacheHelper._parseCacheKey(key);
 			if (keyObject && keyObject.launchTimestamp == launchTimestampToClear) {
 				keys.push(key);
@@ -1291,7 +1291,7 @@ CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clea
 						}
 					} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther && !clearOtherApp) {
 						keysToRemove.push(key);
-					}				
+					}
 				} else if (clearOtherApp) {
 					keysToRemove.push(key);
 				}
@@ -1300,7 +1300,7 @@ CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clea
 		 	var promises = [];
 			keysToRemove.forEach( function(key) {
 				var keyObject = CacheHelper._parseCacheKey(key);
-				var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);		
+				var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);
 				promises.push(p);
 			})
 
@@ -1315,7 +1315,7 @@ CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clea
 					}
 					filterCard.resetStandardFilterCounts();
 
-					me.hideAnalyzeAllProgress();			
+					me.hideAnalyzeAllProgress();
 				}
 
 				//if (clearOther || clearOtherApp) {
@@ -1330,7 +1330,7 @@ CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clea
 		 	reject(error);
 		 })
 
-	});	
+	});
 
 }
 
@@ -1345,8 +1345,8 @@ CacheHelper.prototype.clearAll = function() {
 				cacheHelper.showAnalyzeAllProgress();
 	  			me.refreshDialog();
 			 });
-	        
-	    } 
+
+	    }
 	}, function() {
 		// user clicked "cancel"
 	})
@@ -1362,11 +1362,11 @@ CacheHelper.prototype.clearOther = function() {
 			 .then(function() {
 	  			me.refreshDialog();
 			 })
-	        
-	    } 
-	    		
+
+	    }
+
 	})
-	.set('labels', {ok:'OK', cancel:'Cancel'});   
+	.set('labels', {ok:'OK', cancel:'Cancel'});
 }
 CacheHelper.prototype.clearOtherApp = function() {
 	var me = this;
@@ -1379,10 +1379,10 @@ CacheHelper.prototype.clearOtherApp = function() {
 	  			me.refreshDialog();
 
 			 })
-	        
+
 	    }
-	   
-	}) .set('labels', {ok:'OK', cancel:'Cancel'});   		
+
+	}) .set('labels', {ok:'OK', cancel:'Cancel'});
 }
 
 CacheHelper.prototype.promiseClearCoverageCache = function() {
@@ -1392,7 +1392,7 @@ CacheHelper.prototype.promiseClearCoverageCache = function() {
 		me.promiseGetKeys()
 		 .then(function(allKeys) {
 		 	var promises = [];
-		 	allKeys.forEach(function(key) {		 		
+		 	allKeys.forEach(function(key) {
 				var keyObject = CacheHelper._parseCacheKey(key);
 		  		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 					if (keyObject.dataKind == CacheHelper.BAM_DATA) {
@@ -1443,7 +1443,7 @@ CacheHelper.prototype.refreshDialog = function() {
 				$("#other-sessions-cache-detail-link").attr("aria-expanded", true);
 				$("#other-sessions-cache-detail").attr("aria-expanded", true);
 				$("#other-sessions-cache-detail").addClass("in");
-			} 
+			}
 
 			if (counts.otherUse > 0) {
 				$('#other-use-cache-alert').removeClass("hide");
@@ -1451,7 +1451,7 @@ CacheHelper.prototype.refreshDialog = function() {
 				$("#other-app-use-cache-detail-link").attr("aria-expanded", true);
 				$("#other-app-use-cache-detail").attr("aria-expanded", true);
 				$("#other-app-use-cache-detail").addClass("in");
-			} 
+			}
 
 
 			$("#cache-size").text(CacheHelper._sizeMB(counts.total) + " MB");
@@ -1460,7 +1460,7 @@ CacheHelper.prototype.refreshDialog = function() {
 			$('#other-sessions-cache-info').html(formatOtherSessions(counts.otherSessionsInfo));
 			$("#other-use-cache-size").text(CacheHelper._sizeMB(counts.otherUse) + " MB");
 			resolve();
-		 })		
+		 })
 	})
 
 }
@@ -1486,7 +1486,7 @@ CacheHelper.prototype.clearCacheForGene = function(geneName) {
 				if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 					if (keyObject.gene == geneName) {
 						keys.push(key);
-					}			
+					}
 				}
 		 	})
 
@@ -1525,8 +1525,8 @@ CacheHelper.prototype.clearCacheForGene = function(geneName) {
 
 CacheHelper.prototype._isProbandVariantCache = function(key) {
 	var cacheObject = CacheHelper._parseCacheKey(key);
-	return (cacheObject 
-		&& cacheObject.launchTimestamp == this.launchTimestamp 
+	return (cacheObject
+		&& cacheObject.launchTimestamp == this.launchTimestamp
 		&& ( cacheObject.dataKind == CacheHelper.VCF_DATA  || cacheObject.dataKind == CacheHelper.FB_DATA)
 		&& cacheObject.relationship == "proband");
 
@@ -1547,17 +1547,17 @@ CacheHelper._parseCacheKey = function(cacheKey) {
 	if (cacheKey.indexOf(cacheHelper.KEY_DELIM) > 0) {
 		var tokens = cacheKey.split(cacheHelper.KEY_DELIM);
 		if (tokens.length >= 7 && tokens[0] == "gene.iobio") {
-			var keyObject = { 
+			var keyObject = {
 			     app: tokens[0],
 			     launchTimestamp: tokens[1],
-			     relationship: tokens[2], 
-			     sample: tokens[3], 
-			     gene: tokens[4], 
-			     transcript: tokens[5], 
+			     relationship: tokens[2],
+			     sample: tokens[3],
+			     gene: tokens[4],
+			     transcript: tokens[5],
 			     dataKind: tokens[6]
 			};
 			if (tokens.length == 8) {
-				keyObject.annotationScheme = tokens[7]; 
+				keyObject.annotationScheme = tokens[7];
 			}
 			return keyObject;
 
@@ -1588,7 +1588,7 @@ CacheHelper.showError = function(key, cacheError) {
 		var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
 	    console.log(consoleMessage);
 	    console.log(cacheError.toString());
-	    
+
 	    // Only show the error once
 	    if (!recordedCacheErrors[errorKey] ) {
 	    	recordedCacheErrors[errorKey] = message;
@@ -1597,15 +1597,15 @@ CacheHelper.showError = function(key, cacheError) {
 		    // of showning dialog with ok/cancel.
 			if (errorCount < 3) {
 				alertify.alert(message, function() {
-					recordedCacheErrors[errorKey] = null;			
-				});					
-			} else if (errorCount < 8) { 
+					recordedCacheErrors[errorKey] = null;
+				});
+			} else if (errorCount < 8) {
 		    	var msg = "<span style='font-size:12px'>" + message + "</span>";
 		    	alertify.set('notifier','position', 'top-right');
-		    	alertify.error(msg,  5);				
-				recordedCacheErrors[errorKey] = null;			
+		    	alertify.error(msg,  5);
+				recordedCacheErrors[errorKey] = null;
 			}
-	    }		
+	    }
 	}
 
 }
@@ -1624,11 +1624,11 @@ CacheHelper.promiseCompressData = function(data) {
 			var dataString = JSON.stringify(data);
 			var dataStringCompressed = null;
 			try {
-				dataStringCompressed = LZString.compressToUTF16(dataString);	
-				resolve(dataStringCompressed);	    		
+				dataStringCompressed = LZString.compressToUTF16(dataString);
+				resolve(dataStringCompressed);
 			} 	catch(error) {
 				reject("Unable to compress data: " + error);
-			}			
+			}
 		} else {
 			resolve(null);
 		}
@@ -1643,8 +1643,8 @@ CacheHelper.promiseDecompressData = function(dataCompressed, decompressIt) {
 			var data = null;
 			try {
 				 dataString = LZString.decompressFromUTF16(dataCompressed);
-	 			 data =  JSON.parse(dataString);    
-	 			 resolve(data);  		
+	 			 data =  JSON.parse(dataString);
+	 			 resolve(data);
 			} catch(e) {
 				var errorMsg = "an error occurred when uncompressing data";
 				console.log(errorMsg);
@@ -1663,7 +1663,7 @@ CacheHelper.prototype.promiseCacheData = function(key, data) {
 
 		if (CacheHelper.useLocalStorage()) {
 			if (localStorage) {
-				
+
 		    	CacheHelper.promiseCompressData(data)
 		    	 .then(function(dataStringCompressed) {
 				 	localStorage.setItem(key, dataStringCompressed);
@@ -1688,7 +1688,7 @@ CacheHelper.prototype.promiseCacheData = function(key, data) {
 	    	 	var msg = "A problem occurred in CacheHelper.promiseCacheData() when calling cacheIndexStore.promiseSetData(): " + error;
 		 		console.log(msg);
 		 		reject(msg);
-	    	 });			 
+	    	 });
 		} else {
 			reject("Unable to determine browser cache method")
 		}
@@ -1713,7 +1713,7 @@ CacheHelper.prototype.promiseGetData = function(key, decompressIt=true) {
 					console.log(errorMsg);
 					reject(errorMsg);
 	      		 });
-		    } 
+		    }
 		} else if (CacheHelper.useIndexedDB()) {
 			var keyObject = CacheHelper._parseCacheKey(key);
 			me.cacheIndexStore.promiseGetData(keyObject.dataKind, key, decompressIt)
@@ -1726,7 +1726,7 @@ CacheHelper.prototype.promiseGetData = function(key, decompressIt=true) {
 					var errorMsg = "an error occurred when uncompressing data for key " + key;
 					console.log(errorMsg);
 					reject(errorMsg);
-	      		 });			 	
+	      		 });
 			 })
 		} else {
 			reject("Unable to determine browser cache method")
@@ -1745,17 +1745,17 @@ CacheHelper.prototype.promiseGetDataThreaded = function(key) {
 
 	      	if (dataCompressed != null) {
 
-				var worker = new Worker('./app/model/cacheHelperWorker.js');	
-				
-				worker.onmessage = function(e) { 
+				var worker = new Worker('./app/model/cacheHelperWorker.js');
+
+				worker.onmessage = function(e) {
 					resolve(e.data);
 				};
 
 				// We will also want to be notified if the worker runs into trouble
-				worker.onerror = function(e) { 
+				worker.onerror = function(e) {
 					console.log("An error occurred when uncompressing data for key " + key);
 					var msg = 'An error occurred while decompressing cached data:' + e;
-					console.log(msg) 
+					console.log(msg)
 					reject(msg);
 				};
 
@@ -1770,7 +1770,7 @@ CacheHelper.prototype.promiseGetDataThreaded = function(key) {
 		 	var msg = "An error occurred in CacheHelper.promiseGetDataThreaded(): " + error;
 		 	console.log(msg);
 		 	reject(msg);
-		 });		
+		 });
 	})
 
 }
@@ -1782,8 +1782,8 @@ CacheHelper.prototype.promiseRemoveCacheItem = function(dataKind, key) {
 
 		if (CacheHelper.useLocalStorage()) {
 			if (localStorage) {
-				localStorage.removeItem(key);			
-		    } 
+				localStorage.removeItem(key);
+		    }
 		} else if (CacheHelper.useIndexedDB()) {
 			me.cacheIndexStore.promiseRemoveData(dataKind, key)
 			 .then(function() {
@@ -1794,7 +1794,7 @@ CacheHelper.prototype.promiseRemoveCacheItem = function(dataKind, key) {
 			 })
 		} else {
 			reject("Unknown caching method")
-		}	
+		}
 	});
 }
 
@@ -1811,7 +1811,7 @@ CacheHelper.prototype.promiseGetKeys = function() {
 				return keyObject && (keyObject.launchTimestamp == me.launchTimestamp);
 			})
 			resolve(filteredKeys);
-		 }, 
+		 },
 		 function(error) {
 		 	reject(error);
 		 })
@@ -1828,8 +1828,8 @@ CacheHelper.prototype.promiseGetAllKeys = function() {
 		if (CacheHelper.useLocalStorage()) {
 			if (localStorage) {
 				var keys = [];
-				for (var i=0; i<=localStorage.length-1; i++)  {  
-					var key = localStorage.key(i); 	
+				for (var i=0; i<=localStorage.length-1; i++)  {
+					var key = localStorage.key(i);
 					keys.push(key);
 				}
 				resolve(keys);
@@ -1870,7 +1870,7 @@ CacheHelper.prototype.logAllCacheContents = function(filterObject) {
 CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
 	var me = this;
 
-	var itemSize = 0; 
+	var itemSize = 0;
 	var lines = [];
 	var totalKb = 0;
 
@@ -1897,8 +1897,8 @@ CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
  				if (keyObject.dataKind != filterObject.dataKind) {
  					matchesDataKind = false;
  				}
- 			} 
- 			keep = matchesRel && matchesGene && matchesDataKind;			
+ 			}
+ 			keep = matchesRel && matchesGene && matchesDataKind;
  		}
  		if (keep) {
 	 		var p = me.promiseGetData(key, false)
@@ -1906,11 +1906,11 @@ CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
 
 	 		 	if (data) {
 		 		 	var dataSize = data.length + key.length;
-					itemSize =  (dataSize/1024); 
-					totalKb += itemSize; 
-					lines.push(key + " = " +  itemSize.toFixed(2) + " KB"); 
+					itemSize =  (dataSize/1024);
+					totalKb += itemSize;
+					lines.push(key + " = " +  itemSize.toFixed(2) + " KB");
 	 		 	} else {
-					lines.push(key + " = " + " 0KB"); 
+					lines.push(key + " = " + " 0KB");
 	 		 	}
 	 		 })
 	 		 promises.push(p);
@@ -1922,7 +1922,7 @@ CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
 	 	if (totalKb > 1024){
 			lines.unshift("Total = " + (totalKb/1024).toFixed(2)+ " MB");
 		} else {
-			lines.unshift("Total = " + totalKb.toFixed(2)+ " KB"); 
+			lines.unshift("Total = " + totalKb.toFixed(2)+ " KB");
 		}
 		console.log(lines.join("\n"));
 	});

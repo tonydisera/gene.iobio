@@ -144,11 +144,11 @@ var effectCategories = [
     vcfURL = url;
     tbiUrl = theTbiUrl;
 
-    
+
     this.checkVcfUrl(url, tbiUrl, function(success, message) {
         callback(success, message);
     });
-    
+
   }
 
   exports.getHeader = function(callback) {
@@ -186,7 +186,7 @@ var effectCategories = [
           console.log(error);
         })
         cmd.run();
-        
+
     } else if (vcfFile) {
         var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
           vcfReader.getHeader( function(theHeader) {
@@ -350,7 +350,7 @@ var effectCategories = [
         } else {
             window.location = 'http://IOBIO.io/2015/09/03/install-run-tabix/';
         }
-     }).set('labels', {ok:'OK', cancel:'Cancel'});      
+     }).set('labels', {ok:'OK', cancel:'Cancel'});
   }
 
   function endsWith(str, suffix) {
@@ -425,7 +425,7 @@ var effectCategories = [
 
   exports._getLocalReferenceLengths = function(callback, callbackError) {
     var me = this;
- 
+
     vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
       var tbiIdx = tbiR;
       refDensity.length = 0;
@@ -443,7 +443,7 @@ var effectCategories = [
       for (var i = 0; i < tbiIdx.idxContent.head.n_ref; i++) {
         var ref   = tbiIdx.idxContent.head.names[i];
         referenceNames.push(ref);
-      }      
+      }
 
       for (var i = 0; i < referenceNames.length; i++) {
         var ref   = referenceNames[i];
@@ -458,11 +458,11 @@ var effectCategories = [
 
       // Sort ref data so that refs are ordered numerically
       refData = me.sortRefData(refData);
-    
+
       if (callback) {
         callback(refData);
       }
-    
+
     });
 
   }
@@ -674,7 +674,7 @@ var effectCategories = [
         if (callback) {
           callback(theRecords);
         }
-      } 
+      }
     }
 
 
@@ -753,19 +753,19 @@ var effectCategories = [
 
     // if af not retreived from vep, get allele frequencies from 1000G and ExAC in af service
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
-    
+
     // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
     if (annotationEngine == 'none') {
       // skip annotation if annotationEngine set to  'none'
 
-      
+
     } else if (isRefSeq || annotationEngine == 'vep') {
       // VEP
       var vepArgs = [];
       vepArgs.push(" --assembly");
       vepArgs.push(genomeBuildHelper.getCurrentBuildName());
       vepArgs.push(" --format vcf");
-      vepArgs.push(" --allele_number");      
+      vepArgs.push(" --allele_number");
       if (vepAF) {
         vepArgs.push("--af");
         vepArgs.push("--af_gnomad");
@@ -802,12 +802,12 @@ var effectCategories = [
           cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
       } else {
           cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
-      }        
-    
+      }
+
     } else if (annotationEngine == 'snpeff') {
         cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
-    }    
-    
+    }
+
 
 
 
@@ -829,7 +829,7 @@ var effectCategories = [
       annotatedRecs.forEach(function(record) {
         if (record.charAt(0) == "#") {
           me._parseHeaderForInfoFields(record);
-          
+
         } else {
 
           // Parse the vcf record into its fields
@@ -872,7 +872,7 @@ var effectCategories = [
 
 
 
-  
+
   exports.promiseGetKnownVariants = function(refName, geneObject, transcript, binLength) {
     var me = this;
 
@@ -976,8 +976,8 @@ var effectCategories = [
             })
             // Find the mid-point of the interval (binned region)
             resultRec.point = resultRec.start + ((resultRec.end - resultRec.start) / 2);
-            
-            results.push(resultRec);            
+
+            results.push(resultRec);
           }
         }
         idx++;
@@ -995,8 +995,8 @@ var effectCategories = [
 
 
   exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
-    var key =  "backend.gene.iobio"  
-      + "-" + cacheHelper.launchTimestamp 
+    var key =  "backend.gene.iobio"
+      + "-" + cacheHelper.launchTimestamp
       + "-" + (vcfURL ? vcfURL : (vcfFile ? vcfFile.name : ""))
       + "-" + service
       + "-" + refName
@@ -1028,7 +1028,7 @@ var effectCategories = [
     } else if (record.indexOf("INFO=<ID=AVIA3") > 0 && !me.infoFields.AVIA3) {
       var fieldMap = me._parseInfoHeaderRecord(record);
       me.infoFields.AVIA3 = fieldMap;
-    }    
+    }
   }
 
   exports._parseInfoHeaderRecord = function(record) {
@@ -1597,7 +1597,7 @@ var effectCategories = [
 
     // If af not retreived from VEP, get Allele Frequencies from 1000G and ExAC service
     cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL})
-    
+
 
     if (annotationEngine == 'none') {
       // skip annotation with vep or snpeff if annotationEngine is not set
@@ -1614,7 +1614,7 @@ var effectCategories = [
         vepArgs.push("--af_esp");
         vepArgs.push("--af_1kg");
         vepArgs.push("--max_af");
-      }      
+      }
       if (isRefSeq) {
         vepArgs.push("--refseq");
       }
@@ -1664,9 +1664,9 @@ var effectCategories = [
 
       // Use the sample index to grab the right genotype column from the vcf record
       // If it isn't provided, assume that the first genotype column is the one
-      // to be evaluated and parsed.  If sampleNames (a comma separated value string) is 
+      // to be evaluated and parsed.  If sampleNames (a comma separated value string) is
       // provided, evaluate the sample indices as ordinals since vt select will return only those
-      // sample (genotype) columns.     
+      // sample (genotype) columns.
       var gtSampleIndices = [];
       var gtSampleNames = null;
 
@@ -1675,22 +1675,22 @@ var effectCategories = [
         gtSampleIndices = gtSampleNames.map(function(sampleName,i) {
           return i;
         });
-      } 
+      }
       // If no sample name provided, get the genotype for the provided
       // index.  If no index provided, get the first genotype.
-      if (gtSampleIndices.length == 0) {        
+      if (gtSampleIndices.length == 0) {
         gtSampleIndices.push(sampleIndex != null ? sampleIndex : 0);
-      } 
+      }
       if (gtSampleNames == null) {
         gtSampleNames = gtSampleIndices.map(function(elem, i) {
           return elem.toString();
         })
-      }       
+      }
       var allVariants = null;
       if (parseMultiSample) {
         allVariants = gtSampleIndices.map(function(element) {
           return [];
-        })        
+        })
       } else {
         allVariants = [ [] ];
       }
@@ -1761,7 +1761,7 @@ var effectCategories = [
             var clinvarResult = me.parseClinvarInfo(rec.info, clinvarMap);
 
             var gtResult = me._parseGenotypes(rec, alt, altIdx, gtSampleIndices, gtSampleNames);
-            
+
             var clinvarObject = me._formatClinvarCoordinates(rec, alt);
 
             if (gtResult.keep) {
@@ -1778,17 +1778,17 @@ var effectCategories = [
                 // or we are parsing multiple samples and this sample's genotype is het or hom
                 if (!parseMultiSample || genotype.keep) {
                   var variant = {
-                    'start':                    +rec.pos, 
-                    'end':                      +end, 
-                    'len':                      +len, 
+                    'start':                    +rec.pos,
+                    'end':                      +end,
+                    'len':                      +len,
                     'level':                    +0,
                     'strand':                   geneObject.strand,
                     'chrom':                    refName,
                     'type':                     annot.typeAnnotated && annot.typeAnnotated != '' ? annot.typeAnnotated : type,
-                    'id':                       rec.id, 
+                    'id':                       rec.id,
                     'ref':                      rec.ref,
-                    'alt':                      alt, 
-                    'qual':                     rec.qual, 
+                    'alt':                      alt,
+                    'qual':                     rec.qual,
                     'recfilter':                rec.filter.split(";").join("-"),
 
                     'extraAnnot':               hasExtraAnnot,
@@ -1851,7 +1851,7 @@ var effectCategories = [
                     // generic annots
                     'genericAnnots':          annot.genericAnnots,
 
-                    //  when multiple impacts, pick the highest one (by variant type and transcript)                  
+                    //  when multiple impacts, pick the highest one (by variant type and transcript)
                     'highestImpactSnpeff':     highestImpactSnpeff,
                     'highestImpactVep':        highestImpactVep,
                     'highestSIFT':             highestSIFT,
@@ -1859,14 +1859,14 @@ var effectCategories = [
                   }
 
                   for (var key in clinvarResult) {
-                    variant[key] = clinvarResult[key]; 
-                  }                  
+                    variant[key] = clinvarResult[key];
+                  }
 
                   if (window.genericAnnotation !== undefined) {
                     genericAnnotation.setSimpleFields(variant);
                   }
 
-                  allVariants[i].push(variant);                  
+                  allVariants[i].push(variant);
                 }
 
               }
@@ -1890,13 +1890,13 @@ var effectCategories = [
       for (var i = 0; i < allVariants.length; i++) {
         var data = {
           'name':              'vcf track',
-          'ref':                refName, 
-          'gene':               geneObject.gene_name, 
-          'start':              +geneObject.start, 
-          'end':                +geneObject.end, 
-          'strand':             geneObject.strand, 
+          'ref':                refName,
+          'gene':               geneObject.gene_name,
+          'start':              +geneObject.start,
+          'end':                +geneObject.end,
+          'strand':             geneObject.strand,
           'transcript':         selectedTranscript,
-          'variantRegionStart': variantRegionStart, 
+          'variantRegionStart': variantRegionStart,
           'features':           allVariants[i],
           'genericAnnotators':  me.infoFields ? Object.keys(me.infoFields) : []
         };
@@ -1915,9 +1915,9 @@ exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selected
     typeAnnotated: null,
     combinedDepth: null,
     af1000G: '.',
-    afExAC: '.',    
+    afExAC: '.',
     rs: '',
-    snpEff: { 
+    snpEff: {
       effects: {},
       impacts: {},
       allSnpeff: {}
@@ -1941,7 +1941,7 @@ exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selected
       polyphen: {},   // need a special field for filtering purposes
       regulatory: {}, // need a special field for filtering purposes
       vepRegs: [],
-      af: {'1000G': {}, 'ESP': {}, 'gnomAD': {}, 'MAX': {}}     
+      af: {'1000G': {}, 'ESP': {}, 'gnomAD': {}, 'MAX': {}}
     },
     genericAnnots:  {}
   };
@@ -1950,9 +1950,9 @@ exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selected
 
   annotTokens.forEach(function(annotToken) {
     if (annotToken.indexOf("BGAF_1KG=") == 0) {
-      
+
       annot.af1000G = annotToken.substring(9, annotToken.length);
-    
+
     } else if (annotToken.indexOf("BGAF_EXAC=") == 0) {
 
       annot.afExAC = annotToken.substring(10, annotToken.length);
@@ -1968,17 +1968,17 @@ exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selected
       annot.af = me._parseAnnotForAlt(annotToken.substring(3, annotToken.length), 0);
 
     } else if (annotToken.indexOf("TYPE=") == 0) {
-      
+
       annot.typeAnnotated = me._parseAnnotForAlt(annotToken.substring(5, annotToken.length), altIdx);
-    
+
     } else if (annotToken.indexOf("DP=") == 0) {
-    
+
       annot.combinedDepth = annotToken.substring(3, annotToken.length);
-    
+
     } else if (annotToken.indexOf("EFF=") == 0) {
-    
+
       me._parseSnpEffAnnot(annotToken, annot, geneObject, selectedTranscriptID);
-    
+
     } else if (annotToken.indexOf("CSQ") == 0) {
 
       me._parseVepAnnot(altIdx, isMultiAllelic, annotToken, annot, geneObject, selectedTranscript, selectedTranscriptID, vepAF)
@@ -1993,12 +1993,12 @@ exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selected
 
   return annot;
 }
-/* To parse the VEP annot, split the CSQ string into its parts.  
+/* To parse the VEP annot, split the CSQ string into its parts.
    Each part represents the annotations for a given transcript.
 
   Here is the field mapping for each transcript
   which is separated by a comma
-   
+
    Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp
    |cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation
    |DISTANCE|STRAND|FLAGS|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|SIFT|PolyPhen|HGVS_OFFSET
@@ -2029,8 +2029,8 @@ exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, gen
             if (altIdx+1 != vepAlleleNumber) {
               keep = false;
             }
-          }  
-        }     
+          }
+        }
       }
 
       if (keep) {
@@ -2053,7 +2053,7 @@ exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, gen
 
           if (vepTokens[vepFields.EXON] && vepTokens[vepFields.EXON].length > 0) {
             annot.vep.vepExon[vepTokens[vepFields.EXON]] = vepTokens[vepFields.EXON];
-          } 
+          }
           annot.vep.vepHGVSc[vepTokens[vepFields.HGVSc]] = vepTokens[vepFields.HGVSc];
           annot.vep.vepHGVSp[vepTokens[vepFields.HGVSp]] = vepTokens[vepFields.HGVSp];
           annot.vep.vepAminoAcids[vepTokens[vepFields.Amino_acids]] = vepTokens[vepFields.Amino_acids];
@@ -2141,7 +2141,7 @@ exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, gen
               me._parseVepAfAnnot(VEP_FIELDS_AF_GNOMAD, vepFields, vepTokens, "gnomAD", "gnomAD", annot);
               me._parseVepAfAnnot(VEP_FIELDS_AF_1000G,  vepFields, vepTokens, "1000G",  null,     annot);
               me._parseVepAfAnnot(VEP_FIELDS_AF_ESP,    vepFields, vepTokens, "ESP",    null,     annot);
-              me._parseVepAfAnnot(VEP_FIELDS_AF_MAX,    vepFields, vepTokens, "MAX",    "MAX",    annot);            
+              me._parseVepAfAnnot(VEP_FIELDS_AF_MAX,    vepFields, vepTokens, "MAX",    "MAX",    annot);
             }
 
           } else {
@@ -2152,7 +2152,7 @@ exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, gen
         }
       }
 
-  });  
+  });
 
 
 }
@@ -2166,7 +2166,7 @@ exports._parseVepAfAnnot = function(fieldNames, vepFields, vepTokens, afSource, 
     } else {
       annot.vep.af[afSource][targetFieldName] = ".";
     }
-  })  
+  })
 }
 
 exports._parseGenericAnnot = function(annotator, annotToken, annot) {
@@ -2201,7 +2201,7 @@ exports._parseGenericAnnot = function(annotator, annotToken, annot) {
 
 /* Split the EFF annotation into its parts.  Each
     part represents the annotations for a given transcript.
-*/    
+*/
 exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTranscriptID) {
   var me = this;
 
@@ -2262,14 +2262,14 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
       //console.log(geneObject.gene_name + " " + theEffect + ": throwing out invalid transcript " + selectedTranscriptID)
     }
 
-  });   
+  });
 
   if ($.isEmptyObject(annot.snpEff.impacts)) {
     annot.snpEff.impacts["NOIMPACT"] = "NOIMPACT";
-  }  
+  }
 }
 
-exports.parseClinvarInfo = function(info, clinvarMap) {    
+exports.parseClinvarInfo = function(info, clinvarMap) {
   var me = this;
 
   var result = {
@@ -2291,9 +2291,9 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
 
 
   info.split(";").forEach( function (annotToken) {
-    
+
     if (annotToken.indexOf("CLNSIG=") == 0) {
-      var clinvarCode = annotToken.substring(7, annotToken.length);  
+      var clinvarCode = annotToken.substring(7, annotToken.length);
 
       initClinvarSubmissions(result.clinvarSubmissions, clinvarCode.split("|").length);
 
@@ -2307,25 +2307,25 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
             var mapEntry = clinvarMap[clinvarToken];
             if (mapEntry != null) {
               if (result.clinvarRank == null || mapEntry.value < result.clinvarRank) {
-              
+
                 result.clinvarRank = mapEntry.value;
                 result.clinvar = mapEntry.clazz;
-            
+
               }
               submission.clinsig += submission.clinsig.length > 0 ? "," : "";
               submission.clinsig += clinvarToken;
               result.clinVarClinicalSignificance[clinvarToken] = idx.toString();
-            } 
+            }
 
         })
 
         idx++;
       })
     } else if (annotToken.indexOf("CLNDBN=") == 0) {
-      var phenotypesStr = annotToken.substring(7, annotToken.length);  
+      var phenotypesStr = annotToken.substring(7, annotToken.length);
       var idx = 0;
       phenotypesStr.split("|").forEach(function(pheno) {
-        
+
         var submission = result.clinvarSubmissions[idx];
         submission.phenotype = pheno;
 
@@ -2343,7 +2343,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
           result.clinVarAccession[accessionId] = idx.toString();
           idx++;
       })
-    }  
+    }
 
   })
   return result;
@@ -2354,27 +2354,27 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
 /*
  *
  * Parse the genotype field from in the vcf rec
- * 
+ *
  */
  exports._parseGenotypes = function(rec, alt, altIdx, sampleIndices, sampleNames) {
     var me = this;
 
     // The result returned will be an object representing all
-    // genotypes for the sample indices provided. 
+    // genotypes for the sample indices provided.
     //
     //  all      the alternate for which these genotype(s) apply
     //  keep     a boolean indicating if any of the sample genotypes
-    //           contains this alternate.  For example, if this is a 
+    //           contains this alternate.  For example, if this is a
     //           multiallelic, if non of the samples contains this
-    //           alternate, keep will be set to false.  
+    //           alternate, keep will be set to false.
     //  gtNumber Normally, the gtNumber for an alterate will equal
     //           1.  For multi-allelics, this number ranges from
     //           1 to the number of alternate alleles.
     //
     //
     var result = {
-      alt:         alt, 
-      keep:        false, 
+      alt:         alt,
+      keep:        false,
       gtNumber:    altIdx +1,
       genotype:    {},
       genotypes:   [],
@@ -2382,14 +2382,14 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
 
 
 
-    // The results will contain an array of genotype objects for 
+    // The results will contain an array of genotype objects for
     // each sample index provided.  The first element in the
     // array is assumed to be the "target" genotype.  For example,
     // if we are parsing the genotypes for a trio, the first
     // genotype will be for the proband, followed by 2 more elements
     // for the mother and father's genotypes.
-    result.genotypes = sampleIndices.map( function(sampleIndex) { 
-      return { sampleIndex: sampleIndex, zygosity: null, phased: null}; 
+    result.genotypes = sampleIndices.map( function(sampleIndex) {
+      return { sampleIndex: sampleIndex, zygosity: null, phased: null};
     });
 
     // The results will also contain a map to obtain
@@ -2398,7 +2398,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
     result.genotypes.forEach(function(gt) {
       var key = sampleNames ? sampleNames[gt.sampleIndex] : gt.sampleIndex.toString();
       result.genotypeMap[key] = gt;
-    })      
+    })
 
     // Determine the format of the genotype fields
     var gtTokens = {};
@@ -2412,7 +2412,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
     }
 
     //
-    // For each applicable genotype (of the sample indices provided), 
+    // For each applicable genotype (of the sample indices provided),
     // parse the genotype field of the vcf record, creating an
     // object with the following fields:
     //    sampleIndex         - The applicable genotype column (for a sample)
@@ -2423,9 +2423,9 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
     //    altCount            - The number of observations where the alternate allele was observed
     //    refCount            - The number of observations where the reference allele was observed
     //    altForwardCount,    - The alternate counts for the strands
-    //    altReverseCount 
+    //    altReverseCount
     //    refForwardCount,    - The reference counts for the strands
-    //    refReverseCount 
+    //    refReverseCount
     //    eduGenotype         - The simplified format for showing genotype (e.g. C->T)
     //    eduGenotypeReversed - For reverse strand, show the compliment of the simplified genotype (e.g. A->G)
     //
@@ -2545,7 +2545,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
           gt.altForwardCount = null;
           gt.altReverseCount = null;
         }
-      
+
 
 
         // Only keep the alt if we have a genotype that matches.
@@ -2565,7 +2565,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
           gt.phased = false;
         } else {
           gt.keep = false;
-          gt.zygosity = "gt_unknown";          
+          gt.zygosity = "gt_unknown";
         }
         if (delim) {
           var tokens = gt.gt.split(delim);
@@ -2618,7 +2618,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
               gt.eduGenotype = alts[gtIdx1-1] + " " + alts[gtIdx1-1];
             } else if (gt.zygosity == "HOMREF") {
               gt.eduGenotype = rec.ref + " " + rec.ref;
-            }  
+            }
           }
           gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
 
@@ -2638,7 +2638,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
     // The 'target' genotype will be the first genotype in the array
     // For example, if the sampleIndex of '1' was sent in (sampleIndices = [1]),
     // the first element in the the array will be the second genotype
-    // column in the vcf record (sample index is 0 based).  
+    // column in the vcf record (sample index is 0 based).
     if (result.genotypes.length > 0) {
       result.genotype = result.genotypes[0];
     }
@@ -2748,12 +2748,12 @@ exports._getHighestScore = function(theObject, cullFunction, theTranscriptId) {
   }
   theObject[maxScore] = cullFunction(categoryObject, theTranscriptId);
   return theObject[maxScore];
-} 
+}
 
 /*
  *
  * Get rid of the left most anchor base for insertions and
- * deletions for accessing clinvar  
+ * deletions for accessing clinvar
  *
 */
   exports._formatClinvarCoordinates = function(rec, alt) {
@@ -2781,7 +2781,7 @@ exports._getHighestScore = function(theObject, cullFunction, theTranscriptId) {
         target.clinvarStart++;
         target.clinvarRef = target.clinvarRef.length == 1 ? "-" : target.clinvarRef.substr(1,target.clinvarRef.length-1);
         target.clinvarAlt = target.clinvarAlt.substr(1,target.clinvarAlt.length-1);
-      }   
+      }
       return target;
   }
 

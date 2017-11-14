@@ -22,7 +22,7 @@ module.exports = {
     	this.api.elements('css selector','#bookmark-card a.bookmark', function (result) {
 		    self.assert.equal(result.value.length, count);
 		});
-  	}	
+  	}
   }],
 
   elements: {
@@ -30,5 +30,5 @@ module.exports = {
   	currentBookmarkCoord: { selector: 'a.bookmark.current .variant-label .coord' },
   	currentBookmarkRsId: { selector: 'a.bookmark.current .variant-label .rsid' },
   	currentBookmarkHgvs: { selector: 'a.bookmark.current .variant-label .hgvs' }
-  }  
+  }
 };

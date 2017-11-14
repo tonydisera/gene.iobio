@@ -16,32 +16,32 @@ function VariantTooltip() {
 VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html, adjustPosition=true) {
 	var me = this;
 	tooltip.style("z-index", 1032);
-	tooltip.transition()        
-	 .duration(1000)      
-	 .style("opacity", .9)	
+	tooltip.transition()
+	 .duration(1000)
+	 .style("opacity", .9)
 	 .style("pointer-events", "all");
 
 	if (isLevelEdu || isLevelBasic) {
 		tooltip.classed("level-edu", "true");
-	} 
+	}
 
 	tooltip.classed("tooltip-wide", lock && !isLevelEdu);
 
 	var extraWide = lock && !isLevelEdu && variant.genericAnnots && Object.keys(variant.genericAnnots).length > 0;
 	tooltip.classed("tooltip-extra-wide", extraWide);
-	
+
 	if (html == null) {
 		if (lock) {
 			html = variantTooltip.formatContent(variant, null, 'tooltip-wide', null, null, null, variantCard);
-		} else {	
+		} else {
 			var pinMessage = variantCard ? "click on variant for more details" : "click on column for more details";
 			html = variantTooltip.formatContent(variant, pinMessage, null, null, null, null, variantCard);
-		}		
+		}
 	}
 	tooltip.html(html);
 	me.injectVariantGlyphs(tooltip, variant, lock ? '.tooltip-wide' : '.tooltip');
 
-	
+
 	if (variantCard == null) {
 		variantCard = window.getProbandVariantCard();
 	}
@@ -77,27 +77,27 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 		tooltip.classed("arrow-down-right", false);
 		tooltip.classed("arrow-down-center", false);
 		tooltip.style("width", w + "px")
-		       .style("left", (x-33) + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h) + "px");   
+		       .style("left", (x-33) + "px")
+		       .style("text-align", 'left')
+		       .style("top", (y - h) + "px");
 
 	} else if (x - w > 0 ) {
 		tooltip.classed("arrow-down-right", true);
 		tooltip.classed("arrow-down-left", false);
 		tooltip.classed("arrow-down-center", false);
 		tooltip.style("width", w + "px")
-		       .style("left", (x - w + 2) + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h) + "px");   
+		       .style("left", (x - w + 2) + "px")
+		       .style("text-align", 'left')
+		       .style("top", (y - h) + "px");
 	}	else {
 		tooltip.classed("arrow-down-right", false);
 		tooltip.classed("arrow-down-left", false);
 		tooltip.classed("arrow-down-center", true);
 		tooltip.style("width", w + "px")
-		       .style("left", (x - w/2) + "px") 
-		       .style("text-align", 'left')    
-		       .style("top", (y - h) + "px");   
-	}		
+		       .style("left", (x - w/2) + "px")
+		       .style("text-align", 'left')
+		       .style("top", (y - h) + "px");
+	}
 
 }
 
@@ -117,8 +117,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 					$(div).prepend("<svg class=\"clinvar-badge\" style=\"float:left\"  height=\"12\" width=\"14\">");
 					var svg = d3.select($(div).find("svg.clinvar-badge")[0]);
 					var selection = svg.data([{width:10, height:10, transform: (translate ? translate : 'translate(0,1)'), clazz: clazz}]);
-					matrixCard.showClinVarSymbol(selection);						    			    	
-			    }			
+					matrixCard.showClinVarSymbol(selection);
+			    }
 
 			}
 
@@ -127,27 +127,27 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 
 
 	var translate = variant.type.toLowerCase() == "snp" || variant.type.toLowerCase() == "mnp" ? 'translate(1,2)' : 'translate(5,6)';
-	
+
 	var impactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.impact : variant[IMPACT_FIELD_TO_COLOR]);
 	var impactDivSelector = selector == '.tooltip-wide' ? '.tooltip-value' : '.tooltip-title';
 	var impactStyle       = selector == '.tooltip-wide' ? " style='float:left' "             : " style='padding-top:2px;float:none' ";
 	for (impact in impactList) {
-		var theClazz = 'impact_' + impact;	
-		if (tooltipNode.find(impactDivSelector  + '.impact-badge').length > 0) {			
+		var theClazz = 'impact_' + impact;
+		if (tooltipNode.find(impactDivSelector  + '.impact-badge').length > 0) {
 			tooltipNode.find(impactDivSelector  + '.impact-badge').prepend("<svg class=\"impact-badge\" height=\"12\" width=\"14\" " + impactStyle + ">" );
 			var selection = tooltip.select(impactDivSelector + '.impact-badge svg.impact-badge ').data([{width:10, height:10,clazz: theClazz,  transform: translate, type: variant.type}]);
-			matrixCard.showImpactBadge(selection);	
+			matrixCard.showImpactBadge(selection);
 		}
-	}		
+	}
 
 	if ($(selector + ' ' + impactDivSelector + '.highest-impact-badge').length > 0) {
 		var highestImpactList =  (filterCard.annotationScheme == null || filterCard.annotationScheme.toLowerCase() == 'snpeff' ? variant.highestImpact : variant.highestImpactVep);
 		for (impact in highestImpactList) {
-			var theClazz = 'impact_' + impact;	
-			if (tooltipNode.find(impactDivSelector  + '.highest-impact-badge').length > 0) {				
+			var theClazz = 'impact_' + impact;
+			if (tooltipNode.find(impactDivSelector  + '.highest-impact-badge').length > 0) {
 				tooltipNode.find(impactDivSelector  + '.highest-impact-badge').prepend("<svg class=\"impact-badge\" height=\"12\" width=\"14\" " + impactStyle + ">");
 				var selection = tooltip.select(impactDivSelector + '.highest-impact-badge svg.impact-badge').data([{width:10, height:10,clazz: theClazz, transform: translate, type: variant.type}]);
-				matrixCard.showImpactBadge(selection);	
+				matrixCard.showImpactBadge(selection);
 			}
 		}
 	}
@@ -161,10 +161,10 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 				if (clazz) {
 					if (!tooltip.select(".sift").empty()) {
 						$(tooltip[0]).find(".sift").prepend("<svg class=\"sift-badge\" height=\"12\" width=\"13\">");
-						var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
-						matrixCard.showSiftSymbol(selection);				
+						var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);
+						matrixCard.showSiftSymbol(selection);
 					}
-				}			
+				}
 			}
 
 		}
@@ -175,12 +175,12 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 				if (clazz) {
 					if (!tooltip.select(".polyphen").empty()) {
 						$(tooltip[0]).find(".polyphen").prepend("<svg class=\"polyphen-badge\" height=\"12\" width=\"12\">");
-						var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
-						matrixCard.showPolyPhenSymbol(selection);				
+						var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);
+						matrixCard.showPolyPhenSymbol(selection);
 					}
 				}
 			}
-		}	
+		}
 
 		if (variant.clinvarSubmissions && variant.clinvarSubmissions.length > 0) {
 			var clinsigUniq = {};
@@ -197,7 +197,7 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 		    	var key = variant.clinVarClinicalSignificance[clinsig];
 		    	injectClinvarBadge(clinsig, key);
 			}
-		}		
+		}
 
 	} else {
 
@@ -227,9 +227,9 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			var clazz = matrixCard.siftMap[key].clazz;
 			if (clazz && tooltipNode.find(".tooltip-value.sift-glyph").length > 0) {
 				tooltipNode.find(".tooltip-value.sift-glyph").prepend("<svg class=\"sift-badge\" style=\"float:left\"  height=\"12\" width=\"13\">");
-				var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);					
-				matrixCard.showSiftSymbol(selection);				
-			}			
+				var selection = tooltip.select('.sift-badge').data([{width:11, height:11, transform: 'translate(0,1)', clazz: clazz }]);
+				matrixCard.showSiftSymbol(selection);
+			}
 		}
 
 	}
@@ -239,8 +239,8 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			var clazz = matrixCard.polyphenMap[key].clazz;
 			if (clazz && tooltipNode.find(".tooltip-value.polyphen-glyph").length > 0) {
 				tooltipNode.find(".tooltip-value.polyphen-glyph").prepend("<svg class=\"polyphen-badge\" style=\"float:left\"   height=\"12\" width=\"12\">");
-				var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);					
-				matrixCard.showPolyPhenSymbol(selection);				
+				var selection = tooltip.select('.polyphen-badge').data([{width:10, height:10, transform: 'translate(0,2)', clazz: clazz }]);
+				matrixCard.showPolyPhenSymbol(selection);
 			}
 		}
 	}
@@ -254,12 +254,12 @@ VariantTooltip.prototype.injectVariantGlyphs = function(tooltip, variant, select
 			$(selector + " .tooltip-title:contains('inheritance')").prepend("<svg class=\"inheritance-badge\"  height=\"15\" width=\"16\">");
 			var options = {width:15, height:15, transform: 'translate(0,0)'};
 			var selection = d3.select(selector + ' .inheritance-badge').data([{clazz: clazz}]);
-			symbolFunction(selection, options);					
+			symbolFunction(selection, options);
 		}
-	}	
+	}
 
 
-	
+
 }
 
 
@@ -299,7 +299,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else {
 			effectDisplay += tokens.join(" ");
 		}
-	}    
+	}
 	var impactDisplay = "";
 	for (var key in variant.impact) {
 		if (impactDisplay.length > 0) {
@@ -310,7 +310,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else {
 			impactDisplay += key;
 		}
-	} 
+	}
 
 	var coord = variant.chrom + ":" + variant.start;
 	var refalt = variant.ref + "->" + variant.alt;
@@ -325,8 +325,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				if (clinSigDisplay.length > 0 ) {
 				  	clinSigDisplay += ", ";
 				}
-				clinSigDisplay += key.split("_").join(" ");	
-			}		
+				clinSigDisplay += key.split("_").join(" ");
+			}
 		}
 	}
 
@@ -338,19 +338,19 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			}
 			phenotypeDisplay += key.split("_").join(" ").split("\\x2c").join(", ");
 		}
-	} 
+	}
 
 
 	var clinvarUrl = "";
 	var clinvarLink = "";
 	var clinvarSimpleRow1 = '';
 	var clinvarSimpleRow2 = '';
-	var knownVariantsClinvarLink = '';	
+	var knownVariantsClinvarLink = '';
 	if (isLevelEdu) {
 		if (clinSigDisplay != null && clinSigDisplay != "") {
-			clinvarSimpleRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');	
+			clinvarSimpleRow1 = me._tooltipWideHeadingRow('Known from research', clinSigDisplay, '6px');
 			if (phenotypeDisplay) {
-				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay, null, 'tooltip-clinvar-pheno');			
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('', phenotypeDisplay, null, 'tooltip-clinvar-pheno');
 			}
 		}
 	}
@@ -359,13 +359,13 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		if (variant.clinVarUid != null && variant.clinVarUid != '') {
 			clinvarUrl = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
 
-			clinvarLink  = '<div class="tooltip-clinsig-link0" style="clear:both">';			
+			clinvarLink  = '<div class="tooltip-clinsig-link0" style="clear:both">';
 			clinvarLink += '<a  href="' + clinvarUrl + '" target="_new"' + '>' + clinSigDisplay + '</a>';
 			clinvarLink += '</div>';
-			
-			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '</span>', null);		
+
+			clinvarSimpleRow1 = me._tooltipWideHeadingSecondRow('ClinVar', '<span class="tooltip-clinsig-link0">' + clinSigDisplay + '</span>', null);
 			if (phenotypeDisplay) {
-				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay, null, 'tooltip-clinvar-pheno');		
+				clinvarSimpleRow2 = me._tooltipWideHeadingSecondRow('&nbsp;', phenotypeDisplay, null, 'tooltip-clinvar-pheno');
 			}
 
 		} else if (variant.clinvarSubmissions != null && variant.clinvarSubmissions.length > 0) {
@@ -376,7 +376,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				var submission = variant.clinvarSubmissions[idx];
 
 				submission.clinsig.split(",").forEach(function(clinsig) {
-					clinsigUniq[clinsig] = "";					
+					clinsigUniq[clinsig] = "";
 				})
 
 				clinvarLink += "<div style='clear:both' class='tooltip-clinsig-link" + idx.toString() + "'>";
@@ -393,7 +393,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					knownVariantsClinvarLink += "<span style='clear:both' class='tooltip-clinsig-link" + clinsigSingle + "'>";
 					knownVariantsClinvarLink += '<a class="tooltip-clinvar-link"' + '" href="' + clinvarUrl + '" style="padding-right:4px" target="_new"' + '>' + clinsigSingle.split("_").join(" ") + '</a>';
 
-				}	
+				}
 				if (submission.phenotype != 'not_provided' && submission.phenotype != "not_specified") {
 					clinvarLink += '<span class="tooltip-clinvar-pheno" style="float:left;word-break:break-word">' + submission.phenotype.split("_").join(" ").split("\\x2c").join(", ") + '</span>';
 					if (simplePhenotypeDisplay.length > 0) {
@@ -414,12 +414,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				clinsigSummary += "<span style='" + style +"' class='tooltip-clinsig-link" + clinsig + "'>";
 				clinsigSummary += "<span style='float:left'>" + clinsig.split("_").join(" ") + "</span>";
 				clinsigSummary += "</span>";
-			}	
-			clinvarSimpleRow1 = me._tooltipSimpleClinvarSigRow('ClinVar', clinsigSummary );	
-			clinvarSimpleRow2 = me._tooltipHeaderRow(simplePhenotypeDisplay, '', '', '', '', null, 'style=padding-top:0px');	
+			}
+			clinvarSimpleRow1 = me._tooltipSimpleClinvarSigRow('ClinVar', clinsigSummary );
+			clinvarSimpleRow2 = me._tooltipHeaderRow(simplePhenotypeDisplay, '', '', '', '', null, 'style=padding-top:0px');
 		} else {
 			clinvarLink = clinSigDisplay;
-		}		
+		}
 	}
 
 	var zygosity = "";
@@ -439,12 +439,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else {
 			vepImpactDisplay += key.toLowerCase();
 		}
-	} 
-	
+	}
+
 	// If the highest impact occurs in a non-canonical transcript, show the impact followed by
 	// the consequence and corresponding transcripts
 	var vepHighestImpacts = VariantModel.getNonCanonicalHighestImpactsVep(variant);
-	var vepHighestImpactDisplay = "";	
+	var vepHighestImpactDisplay = "";
 	var vepHighestImpactDisplaySimple = "";
 	var vepHighestImpactSimple = "";
 	var vepHighestImpactInfo = "";
@@ -463,16 +463,16 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		vepHighestImpactDisplaySimple += impactKey.toLowerCase();
 		vepHighestImpactInfo          += impactKey.toLowerCase();
 		vepHighestImpactValue          = impactKey.toUpperCase();
-		
+
 		nonCanonicalEffects.forEach(function(nonCanonicalEffect) {
-			vepHighestImpactDisplay += "<span>  ("; 
+			vepHighestImpactDisplay += "<span>  (";
 			for (effectKey in nonCanonicalEffect) {
 				var transcriptString = nonCanonicalEffect[effectKey].url;
 				vepHighestImpactDisplay += " " + effectKey.split("\&").join(" & ") + 'in ' + transcriptString;
 				vepHighestImpactInfo += " " + effectKey.split("\&").join(" & ") + " in " + nonCanonicalEffect[effectKey].display;
 
 			}
-			vepHighestImpactDisplay += ")</span> "; 
+			vepHighestImpactDisplay += ")</span> ";
 		})
 		vepHighestImpactDisplaySimple += " in non-canonical transcripts";
 	}
@@ -494,7 +494,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else {
 			vepConsequenceDisplay += key.split("_").join(" ").toLowerCase();
 		}
-	}     	
+	}
 	var vepHGVScDisplay = "";
 	var vepHGVSpDisplay = "";
 	if (variant.fbCalled == 'Y' || variant.extraAnnot) {
@@ -503,17 +503,17 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				if (vepHGVScDisplay.length > 0) {
 				  	vepHGVScDisplay += ", ";
 				}
-				vepHGVScDisplay += key;				
+				vepHGVScDisplay += key;
 			}
-		}   		
+		}
 		for (var key in variant.vepHGVSp) {
 			if (key.length > 0) {
 				if (vepHGVSpDisplay.length > 0) {
 				  	vepHGVSpDisplay += ", ";
-				}			
+				}
 				vepHGVSpDisplay += key;
 			}
-		}   
+		}
 	} else {
 		// Show the loading gif for the hgvs notations (for tooltips only; not export record)
 		if (!rec) {
@@ -529,7 +529,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		  	vepSIFTDisplay += ", ";
 		}
 		vepSIFTDisplay += key.split("_").join(" ");
-	} 
+	}
 	var vepPolyPhenDisplay = "";
 	for (var key in variant.vepPolyPhen) {
 		if (vepPolyPhenDisplay.length > 0) {
@@ -540,8 +540,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		} else {
 			vepPolyPhenDisplay += key.split("_").join(" ");
 		}
-	} 
-	
+	}
+
 	var vepRegDisplay = "";
 	for (var key in variant.regulatory) {
 		// Bypass motif-based features
@@ -553,13 +553,13 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		}
 		var value = variant.regulatory[key];
 		vepRegDisplay += value;
-	} 
+	}
 	var vepRegMotifDisplay = "";
 	if (variant.vepRegs) {
 		for (var i = 0; i < variant.vepRegs.length; i++) {
 			vr = variant.vepRegs[i];
 			if (vr.motifName != null && vr.motifName != '') {
-				
+
 				if (vepRegMotifDisplay.length > 0) {
 				  	vepRegMotifDisplay += ", ";
 				}
@@ -573,7 +573,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 				var regUrl = "http://jaspar.genereg.net/cgi-bin/jaspar_db.pl?ID=" + baseMotifName + "&rm=present&collection=CORE"
 				vepRegMotifDisplay += '<a href="' + regUrl + '" target="_motif">' + vr.motifName + '</a>';
 			}
-		} 		
+		}
 	}
 
 	var dbSnpLink = "";
@@ -587,25 +587,25 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 						dbSnpLink += ",";
 					}
 					dbSnpUrl   = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + id;
-					dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + id + '</a>';					
+					dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + id + '</a>';
 				}
 			});
 		}
 	};
 	if (dbSnpLink.length == 0 && variant.rsid && variant.rsid.length > 0) {
 		dbSnpUrl   = "http://www.ncbi.nlm.nih.gov/projects/SNP/snp_ref.cgi?rs=" + variant.rsid;
-		dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + 'rs' + variant.rsid + '</a>';							
+		dbSnpLink +=  '<a href="' + dbSnpUrl + '" target="_dbsnp"' + '>' + 'rs' + variant.rsid + '</a>';
 	}
 
-	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none' 
+	var inheritanceModeRow =  variant.inheritance == null || variant.inheritance == '' || variant.inheritance == 'none'
 	                          ? ''
 						      : me._tooltipHeaderRow('<span class="tooltip-inheritance-mode-label">' + matrixCard.getInheritanceLabel(variant.inheritance) + ' inheritance</span>', '', '', '', null, 'padding-top:0px;');
 
 
-	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown' 
+	var siftLabel = vepSIFTDisplay != ''  && vepSIFTDisplay != 'unknown'
 	                ? 'SIFT ' + vepSIFTDisplay
 	                : "";
-	var polyphenLabel = vepPolyPhenDisplay != '' && vepPolyPhenDisplay != 'unknown' 
+	var polyphenLabel = vepPolyPhenDisplay != '' && vepPolyPhenDisplay != 'unknown'
 	                    ? 'PolyPhen ' + vepPolyPhenDisplay
 	                    : "";
 	var sep = siftLabel != '' && polyphenLabel != '' ? '&nbsp;&nbsp;&nbsp;&nbsp;' : ''
@@ -617,8 +617,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 	var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein', '3px') : "";
 
-	
-	var dbSnpId = getRsId(variant);	
+
+	var dbSnpId = getRsId(variant);
 
 	var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
 
@@ -632,17 +632,17 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 					if (popAF.length > 0) {
 						popAF += ", ";
 					}
-					popAF += label + " " + (afObject[key] == "." ? "0%" : percentage(afObject[key]));					
+					popAF += label + " " + (afObject[key] == "." ? "0%" : percentage(afObject[key]));
 				}
 			}
-		}		
+		}
 		return popAF;
 	}
 
 	var gnomADAfRow = "";
 	var gnomADAfRowWide = "";
 	var exacAfRow = "";
-	var exacAfRowWide = "";	
+	var exacAfRowWide = "";
 	if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37" && variant.vepAf.gnomAD.hasOwnProperty("AF")) {
 		gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF)), '6px');
 		var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF);
@@ -653,11 +653,11 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			gnomADAfRowWide += me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>', null, true, null, '0px');
 		}
 
-	} 	
+	}
 
 	exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)),  '0px' );
 	exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'), null, true, null, '0px');
-	
+
 	var popAf1000GRow = "";
 	var af1000GRow = "";
 	if (global_vepAF && variant.vepAf['1000G']) {
@@ -678,7 +678,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 		bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
 	}
 
-	
+
 
 
 	if (rec) {
@@ -744,17 +744,17 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ exacAfRow
 			+ me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
 			+ (variantCard.getRelationship() == 'known-variants' ? me._tooltipRow('&nbsp;', knownVariantsClinvarLink, '6px')  : clinvarSimpleRow1)
-			+ (variantCard.getRelationship() == 'known-variants' ? clinvarSimpleRow2 : '')	
+			+ (variantCard.getRelationship() == 'known-variants' ? clinvarSimpleRow2 : '')
 			+ me._linksRow(variant, pinMessage, variantCard)
-		);                  
+		);
 
 	} else if (type == 'tooltip-wide') {
 
-		var leftDiv =  
-		    '<div class="tooltip-left-column">' 
+		var leftDiv =
+		    '<div class="tooltip-left-column">'
 		    +   me._tooltipRow('VEP Consequence', vepConsequenceDisplay)
 			+   me._tooltipRow('VEP Impact', ' '  + vepImpactDisplay, null, true, 'impact-badge')
-			+   vepHighestImpactExamineRow			
+			+   vepHighestImpactExamineRow
 			+   me._tooltipRow('ClinVar', '<span style="float:left">' + (clinvarLink != '' ? clinvarLink : me.VALUE_EMPTY) + '</span>', null, true)
 			+   me._tooltipRow('&nbsp;', phenotypeDisplay, null, false, 'tooltip-clinvar-pheno')
 			+   me._tooltipRow('HGVSc', vepHGVScDisplay, null, true)
@@ -764,15 +764,15 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+   me._tooltipRowURL('Regulatory', vepRegDisplay, null, true)
 			+ "</div>";
 
-		var rightDiv = 
+		var rightDiv =
 			'<div class="tooltip-right-column">'
 			+ gnomADAfRowWide
 			+ exacAfRowWide
 			+ af1000GRow
 			+ popAf1000GRow
-			+ me._tooltipRowAlleleCounts() 
-			+   me._tooltipRow('Qual', variant.qual, null, true) 
-			+   me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true) 
+			+ me._tooltipRowAlleleCounts()
+			+   me._tooltipRow('Qual', variant.qual, null, true)
+			+   me._tooltipRow('VCF filter status', (variant.recfilter == '.' ? '. (unassigned)' : variant.recfilter), null, true)
 			+ "</div>";
 
 
@@ -785,12 +785,12 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipMainHeaderRow(bookmarkBadge + (geneObject ? geneObject.gene_name : ""), variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
 			+ calledVariantRow
 			+ inheritanceModeRow
-			+ '<div id="tooltip-body" class="row" style="max-height:' + me.HEIGHT_SCROLLABLE_AREA +  'px;overflow-y:scroll">' 
+			+ '<div id="tooltip-body" class="row" style="max-height:' + me.HEIGHT_SCROLLABLE_AREA +  'px;overflow-y:scroll">'
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
 			+ '</div>'
-			+ me._linksRow(variant, null, variantCard)	
+			+ me._linksRow(variant, null, variantCard)
 			+ "</div>";
 
 		return div;
@@ -803,7 +803,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
 			+ me._tooltipRow('VEP Consequence', vepConsequenceDisplay, "10px")
 			+ me._tooltipRow('VEP Impact', vepImpactDisplay.toLowerCase(), null, true, 'impact-badge')
-			+ vepHighestImpactExamineRow			
+			+ vepHighestImpactExamineRow
 			+ me._tooltipRow('SIFT', vepSIFTDisplay, null, false, 'sift-glyph')
 			+ me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
 			+ me._tooltipRow('ClinVar', clinvarLink, null, false, 'tooltip-clinvar-pheno')
@@ -814,16 +814,16 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipRowURL('Regulatory', vepRegDisplay)
 			+ me._tooltipRow('HGVSc', vepHGVScDisplay)
 			+ me._tooltipRow('HGVSp', vepHGVSpDisplay)
-			+ me._tooltipRow('Qual', variant.qual) 
-			+ me._tooltipRow('Filter', variant.recfilter) 
-			+ me._tooltipRowAlleleCounts() 
+			+ me._tooltipRow('Qual', variant.qual)
+			+ me._tooltipRow('Filter', variant.recfilter)
+			+ me._tooltipRowAlleleCounts()
 			+ me._linksRow(variant, null, variantCard)
-		);                  
+		);
 
 	}
-	
 
-	        
+
+
 
 }
 
@@ -838,13 +838,13 @@ VariantTooltip.prototype.variantTooltipMinimalHTML = function(variant) {
 	} else if (variant.zygosity.toLowerCase() == 'hom') {
 		zygosity = "Homozygous";
 	}
-	
-	
+
+
 	return (
 		me._tooltipRow('Zygosity',  zygosity)
-		+ me._tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter) 
+		+ me._tooltipRow('Qual &amp; Filter', variant.qual + ', ' + variant.filter)
 		);
-              
+
 
 }
 
@@ -858,7 +858,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
 
 
 	var bookmarkLink =  '<button id="bookmarkLink"  class="tooltip-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark</button>';
-	
+
 	var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</button>'
 	showAsBookmarked = function(container) {
 		$(container).parent().html(bookmarkBadge + removeBookmarkLink);
@@ -885,7 +885,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
 			  + '</div>';
 
 		}
-		
+
 	} else {
 		return '<div class="row tooltip-footer">'
 		  + '<div class="col-md-12 " style="text-align:right;">' +  '<em>' + pinMessage + '</em>' + '</div>'
@@ -907,7 +907,7 @@ VariantTooltip.prototype._tooltipHeaderRow = function(value1, value2, value3, va
 	}
 	return '<div class="row" style="' + theStyle + '">'
 	      + '<div class="' + clazzList + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 VariantTooltip.prototype._tooltipMainHeaderRow = function(value1, value2, value3, value4, clazz) {
 	var theClass = "col-md-12 tooltip-title main-header";
@@ -916,34 +916,34 @@ VariantTooltip.prototype._tooltipMainHeaderRow = function(value1, value2, value3
 	}
 	return '<div class="row">'
 	      + '<div class="' + theClass + '" style="text-align:center">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 VariantTooltip.prototype._tooltipLowQualityHeaderRow = function() {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title danger" style="text-align:center">' + 'FLAGGED FOR NOT MEETING FILTERING CRITERIA' + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipHeaderLeftJustifyRow = function(value1, value2, value3, value4) {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title" style="text-align:left">' + value1 + ' ' + value2 + ' ' + value3 +  ' ' + value4 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipHeaderLeftJustifySimpleRow = function(value1) {
 	return '<div class="row">'
 	      + '<div class="col-md-12 tooltip-title" style="text-align:left">' + value1 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipClassedRow = function(value1, class1, value2, class2, style) {
 	var theStyle = style ? style : '';
 	return '<div class="row" style="' + theStyle + '">'
-	      +  '<div class="col-md-12 tooltip-title" style="text-align:center">' 
-	      +    "<span class='" + class1 + "'>" + value1 + '</span>' 
-	      +    "<span class='" + class2 + "'>" + value2 + '</span>' 
+	      +  '<div class="col-md-12 tooltip-title" style="text-align:center">'
+	      +    "<span class='" + class1 + "'>" + value1 + '</span>'
+	      +    "<span class='" + class2 + "'>" + value2 + '</span>'
 	      +  '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipLabeledRow = function(value1, value2, paddingTop, paddingBottom) {
@@ -952,7 +952,7 @@ VariantTooltip.prototype._tooltipLabeledRow = function(value1, value2, paddingTo
 	return '<div class="row" style="' + thePaddingTop + thePaddingBottom + '">'
 	      + '<div class="col-sm-6 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-6 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipWideHeadingRow = function(value1, value2, paddingTop) {
@@ -960,20 +960,20 @@ VariantTooltip.prototype._tooltipWideHeadingRow = function(value1, value2, paddi
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
 	      + '<div class="col-sm-4 tooltip-title"  style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 VariantTooltip.prototype._tooltipWideHeadingSecondRow = function(value1, value2, paddingTop, valueClazz) {
 	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
 	return '<div class="row" style="padding-bottom:5px;' + thePaddingTop + '">'
 	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title' + (valueClazz ? ' ' + valueClazz : '') + '" style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 VariantTooltip.prototype._tooltipSimpleClinvarSigRow = function(value1, value2) {
 	return '<div class="row" style="padding-bottom:0px;padding-top: 5px">'
 	      + '<div class="col-sm-4 tooltip-title" style="text-align:right;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-8 tooltip-title style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 
 VariantTooltip.prototype._tooltipLongTextRow = function(value1, value2, paddingTop) {
@@ -981,7 +981,7 @@ VariantTooltip.prototype._tooltipLongTextRow = function(value1, value2, paddingT
 	return '<div class="row" style="' + thePaddingTop + '">'
 	      + '<div class="col-sm-3 tooltip-title" style="text-align:left;word-break:normal">' + value1  +'</div>'
 	      + '<div class="col-sm-9 tooltip-title" style="text-align:left;word-break:normal">' + value2 + '</div>'
-	      + '</div>';	
+	      + '</div>';
 }
 VariantTooltip.prototype._tooltipShortTextRow = function(value1, value2, value3, value4, paddingTop) {
 	var thePaddingTop = paddingTop ? "padding-top:" + paddingTop + ";" : "";
@@ -991,7 +991,7 @@ VariantTooltip.prototype._tooltipShortTextRow = function(value1, value2, value3,
 	      + '<div class="col-sm-2 " style="text-align:left;word-break:normal;padding-left:0px;">' + value2 + '</div>'
 	      + '<div class="col-sm-4 tooltip-label" style="text-align:right;word-break:normal;padding-right:5px;">' + value3  +'</div>'
 	      + '<div class="col-sm-2 " style="text-align:left;word-break:normal;padding-left:0px">' + value4 + '</div>'
-	      + '</div>';			
+	      + '</div>';
 
 }
 
@@ -999,10 +999,10 @@ VariantTooltip.prototype._tooltipShortTextRow = function(value1, value2, value3,
 
 VariantTooltip.prototype._tooltipRow = function(label, value, paddingTop, alwaysShow, valueClazz, paddingBottom) {
 	if (alwaysShow || (value && value != '')) {
-		var style = paddingTop || paddingBottom ? 
-		              (' style="' 
+		var style = paddingTop || paddingBottom ?
+		              (' style="'
 		               + (paddingTop    ? 'padding-top:'    + paddingTop + ';'  : '' )
-		               + (paddingBottom ? 'padding-bottom:' + paddingBottom + ';' : '') 
+		               + (paddingBottom ? 'padding-bottom:' + paddingBottom + ';' : '')
 		               + '"') : '';
 		var valueClazzes = "tooltip-value";
 		if (valueClazz) {
@@ -1060,7 +1060,7 @@ VariantTooltip.prototype.scroll = function(dir="down", parentContainerSelector) 
 	    scrollTop: (topPos + scrollHeight) * multiplier
 	}, 1000, function() {
 		me.showScrollButtons($(parentContainerSelector));
-	});	
+	});
 }
 
 VariantTooltip.prototype.showScrollButtons = function(parentNode) {
@@ -1078,18 +1078,18 @@ VariantTooltip.prototype.showScrollButtons = function(parentNode) {
 			parentNode.find('#tooltip-scroll-up').addClass("hide");
 		} else {
 			parentNode.find('#tooltip-scroll-up').removeClass("hide");
-		}	
+		}
 }
 
 VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, container, variant, barWidth) {
 	var me = this;
-	
+
 
 	container.select("div.ped-info").remove();
 
 	var firstTime = true;
-	getAffectedInfo().forEach(function(info) {			
-	
+	getAffectedInfo().forEach(function(info) {
+
 		var affectedStatus = info.status;
 		var sampleName     = info.variantCard.getSampleName();
 		var genotype       = variant.genotypes[sampleName];
@@ -1103,7 +1103,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 
 			var rel      = info.relationship;
 			row = container.append("div")
-	                       .attr("class", rel + "-alt-count tooltip-row ped-info");	
+	                       .attr("class", rel + "-alt-count tooltip-row ped-info");
 
 	        if (firstTime) {
 	        	me._appendReadCountHeading(row);
@@ -1111,10 +1111,10 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 	        }
 			row.append("div")
 		       .attr("class", rel + "-alt-count tooltip-header-small")
-		       .html("<span class='tooltip-ped-label " 
-		       	+ selectedClazz + "'>" 
-		       	+ " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel)) 
-		       	+ " " + (rel == 'sibling' ? sampleName : '') 
+		       .html("<span class='tooltip-ped-label "
+		       	+ selectedClazz + "'>"
+		       	+ " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel))
+		       	+ " " + (rel == 'sibling' ? sampleName : '')
 		       	+ "</span>"
 		        + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
 
@@ -1129,10 +1129,10 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 			if (genotype) {
 				getProbandVariantCard().promiseGetMaxAlleleCount()
 				 .then(function(maxAlleleCount) {
-					me._appendAlleleCountSVG(barContainer, 
-						genotype.altCount, 
-						genotype.refCount, 
-						genotype.genotypeDepth, 
+					me._appendAlleleCountSVG(barContainer,
+						genotype.altCount,
+						genotype.refCount,
+						genotype.genotypeDepth,
 						null,
 						barWidth,
 						maxAlleleCount);
@@ -1144,7 +1144,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 
 	});
 
-    
+
 }
 
 
@@ -1152,18 +1152,18 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 
 VariantTooltip.prototype._appendReadCountHeading = function(container) {
 	var me = this;
-	var svg = container.append("div")	
-					   .attr("id", "allele-count-legend")	
-		           	   .style("padding-top", "0px")		           	   
+	var svg = container.append("div")
+					   .attr("id", "allele-count-legend")
+		           	   .style("padding-top", "0px")
 				       .append("svg")
 				       .attr("width", me.WIDTH_ALLELE_COUNT_ROW)
 	           		   .attr("height", "20");
 	svg.append("text")
 		   .attr("x", "0")
 		   .attr("y", "14")
-		   .attr("anchor", "start")		 
+		   .attr("anchor", "start")
 		   .attr("class", "tooltip-header-small")
-		   .text("Read Counts");	  	           		   
+		   .text("Read Counts");
 
 	var g = svg.append("g")
 	           .attr("transform", "translate(77,0)");
@@ -1173,25 +1173,25 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 		   .attr("y", "9")
 		   .attr("class", "alt-count-under")
 		   .attr("anchor", "start")
-		   .text("alt");	           		   
+		   .text("alt");
 	g.append("text")
 		   .attr("x", "37")
 		   .attr("y", "9")
 		   .attr("class", "other-count-under")
 		   .attr("anchor", "start")
-		   .text("other");	           		   
+		   .text("other");
 	g.append("text")
 		   .attr("x", "70")
 		   .attr("y", "9")
 		   .attr("class", "ref-count")
 		   .attr("anchor", "start")
-		   .text("ref");	
+		   .text("ref");
 	g.append("text")
 		   .attr("x", "90")
 		   .attr("y", "14")
 		   .attr("class", "ref-count")
 		   .attr("anchor", "start")
-		   .text("total");	  		              		   
+		   .text("total");
 
 	g.append("rect")
 	   .attr("x", "1")
@@ -1214,7 +1214,7 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 
 }
 
-VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, 
+VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAltCount,
 	genotypeRefCount, genotypeDepth, bamDepth, barWidth, maxAlleleCount) {
 	var me = this;
 
@@ -1245,7 +1245,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
   		   .attr("height", 10)
 		   .attr("width",BAR_WIDTH)
 		   .attr("class", "ref-count");
-		
+
 		svg.append("text")
 		   .attr("x", BAR_WIDTH + 5)
 		   .attr("y", "9")
@@ -1260,7 +1260,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 		    .attr("class", "ref-count")
 	   		.text("?");
 		return;
-	} 
+	}
 
 	var totalCount = genotypeDepth;
 	var otherCount = totalCount - (+genotypeRefCount + +genotypeAltCount);
@@ -1277,7 +1277,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	var altWidth   = d3.round(altPercent * BAR_WIDTH);
 	var refPercent = +genotypeRefCount / totalCount;
 	var refWidth   = d3.round(refPercent * BAR_WIDTH);
-	var otherWidth = BAR_WIDTH - (altWidth+refWidth); 
+	var otherWidth = BAR_WIDTH - (altWidth+refWidth);
 
 	// Force a separate line if the bar width is too narrow for count to fit inside or
 	// this is a multi-allelic.
@@ -1288,7 +1288,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	            .append("svg")
 	            .attr("width", MAX_BAR_WIDTH + PADDING)
 	            .attr("height", separateLineForLabel ? "21" : "12");
-	
+
 	if (altWidth > 0) {
 		svg.append("rect")
 		 .attr("x", "1")
@@ -1305,19 +1305,19 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 			 .attr("y", "1")
 			 .attr("height", 10)
 			 .attr("width", otherWidth)
-			 .attr("class", "other-count");			
+			 .attr("class", "other-count");
 	}
-	 
+
 	if (refWidth > 0) {
 		svg.append("rect")
 		 .attr("x",  altWidth + otherWidth)
 		 .attr("y", "1")
 		 .attr("height", 10)
 		 .attr("width", refWidth)
-		 .attr("class", "ref-count");		
+		 .attr("class", "ref-count");
 	}
 
-	
+
 
 	svg.append("text")
 	   .attr("x", BAR_WIDTH + 5)
@@ -1351,7 +1351,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
  		// too close to the alt count.
  		if (otherX - 11 < altX) {
  			otherX = altX + 10;
- 		} 		
+ 		}
  		g.append("text")
 		   .attr("x", otherX)
 		   .attr("y", "9")
@@ -1368,7 +1368,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 				 .attr("text-anchor", "start")
 				 .attr("class", "other-count-under" )
 				 .text("(multi-allelic)");
-	}	 
+	}
 	if (genotypeRefCount > 0  && (altWidth > 0 || otherWidth > 0)) {
 		refX = altWidth + otherWidth + d3.round(refWidth / 2);
 		if (refX - 11 < otherX || refX - 11 < altX) {
@@ -1381,7 +1381,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 			   .attr("class", "ref-count")
 			   .text(genotypeRefCount);
 	}
-	 
+
 }
 
 

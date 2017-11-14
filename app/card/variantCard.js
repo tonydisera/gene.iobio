@@ -5,7 +5,7 @@ function VariantCard() {
 
   	this.vcfChart = null;
 	this.zoomRegionChart = null;
-	this.bamDepthChart = null;	 
+	this.bamDepthChart = null;
 
 	this.cardSelector = null;
 	this.d3CardSelector = null;
@@ -19,7 +19,7 @@ VariantCard.prototype.getSampleNamesToGenotype = function() {
 		getAffectedInfo().forEach(function(info) {
 			sampleNames.push(info.variantCard.getSampleName());
 		})
-	}	
+	}
 	return sampleNames;
 }
 
@@ -111,19 +111,19 @@ VariantCard.prototype.promiseVariantsHaveBeenCalled = function() {
 VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
- 
+
 
 VariantCard.prototype.promiseSummarizeDanger = function(geneName, data, options, geneCoverageAll) {
 	var me = this;
 	return new Promise(function(resolve, reject) {
-		var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);	
+		var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);
 		me.model.promiseCacheDangerSummary(dangerSummary, geneName)
 		 .then(function() {
 			resolve(dangerSummary);
-		 }, 
+		 },
 		 function(error) {
 		 	reject(error);
-		 })		
+		 })
 	})
 }
 
@@ -161,17 +161,17 @@ VariantCard.prototype.isolateVariants = function(variants) {
 		    .filter( function(d,i) {
 		     	var found = false;
 		     	variants.forEach(function(variant) {
-			        if (d.start == variant.start 
-			        	&& d.end == variant.end 
-			        	&& d.ref == variant.ref 
-			        	&& d.alt == variant.alt 
+			        if (d.start == variant.start
+			        	&& d.end == variant.end
+			        	&& d.ref == variant.ref
+			        	&& d.alt == variant.alt
 			        	&& d.type.toLowerCase() == variant.type.toLowerCase()) {
 			          found = true;
-			        } 
+			        }
 		     	});
 		     	return found;
 		     })
-		     .style("opacity", 1);  
+		     .style("opacity", 1);
 
 		this.d3CardSelector.selectAll("#fb-variants .variant")
 		    .style("opacity", .1);
@@ -179,35 +179,35 @@ VariantCard.prototype.isolateVariants = function(variants) {
 		    .filter( function(d,i) {
 		     	var found = false;
 		     	variants.forEach(function(variant) {
-			        if (d.start == variant.start 
-			        	&& d.end == variant.end 
-			        	&& d.ref == variant.ref 
-			        	&& d.alt == variant.alt 
+			        if (d.start == variant.start
+			        	&& d.end == variant.end
+			        	&& d.ref == variant.ref
+			        	&& d.alt == variant.alt
 			        	&& d.type.toLowerCase() == variant.type.toLowerCase()) {
 			          found = true;
-			        } 
+			        }
 		     	});
 		     	return found;
 		     })
-		     .style("opacity", 1);  				
+		     .style("opacity", 1);
 	} else {
 		this.d3CardSelector.selectAll("#vcf-variants .variant")
      			.style("opacity", 1);
      	this.d3CardSelector.selectAll("#fb-variants .variant")
      			.style("opacity", 1);
-	} 
+	}
 
 }
 
 
 VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
-	var me = this;	
+	var me = this;
 
 	// init model
 	if (this.model == null) {
 		this.model = new VariantModel();
 	}
-	this.model.init();		
+	this.model.init();
 
 	this.cardIndex = cardIndex;
 
@@ -221,14 +221,14 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		if (isLevelEdu) {
 			me.cardSelector.on('click', function() {
 				//me.unpin();
-				
+
 			});
 		}
 
 		this.cardSelector.find('#variant-panel').attr("id", "variant-panel-" + cardIndex);
 
 
-		// This is an x-axis for the selected region		    
+		// This is an x-axis for the selected region
 		this.zoomRegionChart = geneD3()
 				    .widthPercent("100%")
 				    .heightPercent("100%")
@@ -241,11 +241,11 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		    		.showLabel(false)
 		    		.featureClass( function(d,i) {
 		    			return d.feature_type.toLowerCase() + (d.danger[me.getRelationship()] ? " danger" : "");
-		    		})		    		
+		    		})
 		    		.on("d3featuretooltip", function(featureObject, feature, tooltip, lock=false, onClose=null) {
 						me.showExonTooltip(featureObject, feature, tooltip, lock, onClose);
 		    		})
-					
+
 
 
 
@@ -272,7 +272,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 								var parent = d3.select(this.parentNode);
 								var exonId = 'exon' + d.exon_number.replace("/", "-");
 								if (parent.select("g#" + exonId).empty()) {
-		 		    				parent.append('g')     
+		 		    				parent.append('g')
 		 		    						  .attr("id", exonId)
 		 	    							  .attr('class',      'region-glyph coverage-problem-glyph')
 		 	    							  .attr('transform',  'translate(' + (regionX - 12) + ',-16)')
@@ -282,7 +282,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 		 	    							  .attr('width',      '22')
 		 	    							  .attr('href', '#long-arrow-down-symbol')
 		 	    							  .attr('xlink','http://www.w3.org/1999/xlink')
-		 	    							  .data([d]);									
+		 	    							  .data([d]);
 								}
 							})
 							.showTooltip(true)
@@ -298,7 +298,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 								showSidebar('Filter')
     							$('#filter-track #coverage-thresholds').addClass('attention');
 				    		})
-							
+
 
 		// Create the vcf track
 		this.vcfChart = variantD3()
@@ -311,9 +311,9 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .variantHeight(isLevelEdu  || isLevelBasic ? EDU_TOUR_VARIANT_SIZE : 8)
 				    .verticalPadding(2)
 				    .showBrush(false)
-				    .tooltipHTML(variantTooltip.formatContent)				    
+				    .tooltipHTML(variantTooltip.formatContent)
 				    .on("d3rendered", function() {
-				    	
+
 				    })
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
@@ -324,7 +324,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	} else {
 				    		me.unpin();
 				    	}
-					})			    
+					})
 				    .on('d3mouseover', function(d) {
 				    	if (clickedVariant == null) {
 					    	me.showCoverageCircle(d, me);
@@ -353,8 +353,8 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    .showBrush(false)
 				    .tooltipHTML(variantTooltip.formatContent)
 				    .on("d3rendered", function() {
-				    	
-				    })	
+
+				    })
 				    .on('d3click', function(d) {
 				    	if (d != clickedVariant) {
 					    	clickedVariant = isLevelBasic ? null : d;
@@ -364,7 +364,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 				    	} else {
 				    		me.unpin();
 				    	}
-					})				    
+					})
 				    .on('d3mouseover', function(d) {
 						if (clickedVariant == null) {
 					    	me.showCoverageCircle(d, me);
@@ -373,7 +373,7 @@ VariantCard.prototype.init = function(cardSelector, d3CardSelector, cardIndex) {
 
 					})
 					.on('d3mouseout', function() {
-						if (clickedVariant == null) {					    
+						if (clickedVariant == null) {
 							me.hideCoverageCircle();
 							window.hideCircleRelatedVariants();
 							matrixCard.clearSelections();
@@ -421,7 +421,7 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
 	if (lock) {
 		tooltip.style("pointer-events", "all");
 	} else {
-		tooltip.style("pointer-events", "none");          
+		tooltip.style("pointer-events", "none");
 	}
 
 	var coverageRow = function(fieldName, coverageVal, covFields) {
@@ -433,27 +433,27 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
 		return row;
 	}
 
-	var html = '<div>' 
+	var html = '<div>'
 	         + '<span id="exon-tooltip-title"' + (lock ? 'style="margin-top:8px">' : '>') + (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number : "") + '</span>'
 	      	 + (lock ? '<a href="javascript:void(0)" id="exon-tooltip-close">X</a>' : '')
 	         + '</div>';
     html     += '<div style="clear:both">' + feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end) + '</div>';
     if (feature.geneCoverage && feature.geneCoverage[me.getRelationship()]) {
     	var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
-    	html += "<div style='margin-top:4px'>" + "Coverage:" 
-    	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields) 
-    	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields) 
-    	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields) 
-    	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields) 
-    	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields) 
+    	html += "<div style='margin-top:4px'>" + "Coverage:"
+    	     +  coverageRow('min',    feature.geneCoverage[me.getRelationship()].min, covFields)
+    	     +  coverageRow('median', feature.geneCoverage[me.getRelationship()].median, covFields)
+    	     +  coverageRow('mean',   feature.geneCoverage[me.getRelationship()].mean, covFields)
+    	     +  coverageRow('max',    feature.geneCoverage[me.getRelationship()].max, covFields)
+    	     +  coverageRow('sd',     feature.geneCoverage[me.getRelationship()].sd, covFields)
 
     }
     if (lock) {
-    	html += '<div style="text-align:right;margin-top:8px">' 
+    	html += '<div style="text-align:right;margin-top:8px">'
     	+ '<a href="javascript:void(0)" id="exon-tooltip-thresholds" class="danger" style="float:left"  >Set cutoffs</a>'
-    	+ '</div>'	    	
+    	+ '</div>'
     }
-    tooltip.html(html);	
+    tooltip.html(html);
     if (lock) {
     	tooltip.select("#exon-tooltip-thresholds").on("click", function() {
     		showSidebar('Filter')
@@ -464,17 +464,17 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
 		    	if (onClose) {
 			    	onClose();
 		    	}
-		    })    	    		
+		    })
     	}
     }
 
     var coord = getTooltipCoordinates(featureObject.node(), tooltip, true);
-    tooltip.style("left", coord.x + "px") 
-           .style("text-align", 'left')    
-           .style("top", (coord.y-60) + "px");        
-	tooltip.transition()        
-           .duration(200)      
-           .style("opacity", .9);   
+    tooltip.style("left", coord.x + "px")
+           .style("text-align", 'left')
+           .style("top", (coord.y-60) + "px");
+	tooltip.transition()
+           .duration(200)
+           .style("opacity", .9);
 }
 
 
@@ -497,7 +497,7 @@ VariantCard.prototype.onBamUrlEntered = function(bamUrl, baiUrl, callback) {
 				this.cardSelector.find("#fb-separator").addClass("hide");
 				this.cardSelector.find("#fb-variants").addClass("hide");
 				this.cardSelector.find("#called-variant-count").text("");
-			}			
+			}
 		}
 		if (callback) {
 			callback(success);
@@ -517,14 +517,14 @@ VariantCard.prototype.onVcfFilesSelected = function(event, callback, callbackErr
 	this.model.promiseVcfFilesSelected(event)
 	          .then(function(resolveObject) {
 				me.cardSelector.find('#vcf-name').text(resolveObject.fileName);
-				callback(resolveObject.fileName, resolveObject.sampleNames);		
+				callback(resolveObject.fileName, resolveObject.sampleNames);
 	          },
 	          function(error) {
 				if (callbackError) {
 					callbackError(error);
 				}
 	          });
-		
+
 }
 
 VariantCard.prototype.clearVcf = function() {
@@ -558,7 +558,7 @@ VariantCard.prototype.onVcfUrlEntered = function(vcfUrl, tbiUrl, callback) {
 		me.cardSelector.find('#vcf-variants').css("display", "none");
 		me.cardSelector.find(".vcfloader").addClass("hide");
 		me.cardSelector.find(".fbloader").addClass("hide");
-	 
+
 	}
 	this.model.onVcfUrlEntered(vcfUrl, tbiUrl,
 		function(success, samples) {
@@ -575,7 +575,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
     if (!isLevelBasic) {
 	    if (title == null || title == '' || title == 'NONE') {
 			title = 'Sample';
-		}    	
+		}
     }
 
 	this.setVariantCardLabel();
@@ -587,7 +587,7 @@ VariantCard.prototype.showDataSources = function(dataSourceName) {
 }
 
 VariantCard.prototype.setVariantCardLabel = function() {
-	
+
 	if (isLevelEdu) {
 		this.cardSelector.find('#variant-card-label').text(this.model.getName() + "'s Variants"  );
 	} else if (isLevelBasic) {
@@ -600,9 +600,9 @@ VariantCard.prototype.setVariantCardLabel = function() {
 		} else if (this.model.isGeneratedSampleName) {
 			label = this.model.getName();
 		} else {
-			label = 
-   				this.model.getName() == this.model.getSampleName()  ? 
-   		  		this.model.getName() : 
+			label =
+   				this.model.getName() == this.model.getSampleName()  ?
+   		  		this.model.getName() :
    		  		this.model.getSampleName() + " " + this.model.getName()
 		}
 
@@ -690,10 +690,10 @@ VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find('#no-variants-warning').addClass("hide");
 	this.cardSelector.find('#clinvar-warning').addClass("hide");
 	this.cardSelector.find('#no-ref-found-warning').addClass("hide");
-	this.cardSelector.find('#error-warning').addClass("hide");	
+	this.cardSelector.find('#error-warning').addClass("hide");
 }
 
-/* 
+/*
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
 VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
@@ -703,15 +703,15 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
 		if (fullRefresh) {
 			me.prepareToShowVariants();
 		}
-		
+
 		// Clear out previous variant data and set up variant card
 		// to show that loading messages.
 		if (me.isViewable()) {
 
-			// Load the variant chart.			
-			me._showVariants( regionStart, 
-				regionEnd, 
-				function() {	
+			// Load the variant chart.
+			me._showVariants( regionStart,
+				regionEnd,
+				function() {
 
 					readjustCards();
 					resolve();
@@ -723,8 +723,8 @@ VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
 
 
 	});
-	
-	
+
+
 }
 
 
@@ -771,23 +771,23 @@ VariantCard.prototype.prepareToShowVariants = function() {
 		me.cardSelector.find('#vcf-track').removeClass("hide");
 		me.cardSelector.find('#vcf-variants').css("display", "none");
 		me.cardSelector.find('#vcf-chart-label').addClass("hide");
-		me.cardSelector.find('#vcf-name').addClass("hide");	
+		me.cardSelector.find('#vcf-name').addClass("hide");
 
 		me.cardSelector.find('#fb-variants').addClass("hide");
 
 		if (me.getRelationship() == 'proband') {
 			$("#feature-matrix").addClass("hide");
 			$("#feature-matrix-note").addClass("hide");
-			$('#move-rows').addClass("hide");			
+			$('#move-rows').addClass("hide");
 		}
 
 		if (me.model.isVcfLoaded()) {
 			me.cardSelector.find(".vcfloader").removeClass("hide");
-			me.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")			
+			me.cardSelector.find(".vcfloader .loader-label").text("Loading variants for gene")
 		} else {
 			$("#filter-and-rank-card").addClass("hide");
 		}
-	}	
+	}
 }
 
 
@@ -831,29 +831,29 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	this.cardSelector.find('#vcf-variants').css("display", "block");
 	this.cardSelector.find(".vcfloader").addClass("hide");
 	this.cardSelector.find(".fbloader").addClass("hide");
-	this.cardSelector.find('#vcf-name').removeClass("hide");		
+	this.cardSelector.find('#vcf-name').removeClass("hide");
 
 	this._showBamDepth(regionStart, regionEnd);
 	this.highlightLowCoverageRegions(window.selectedTranscript,regionStart, regionEnd, filterCard.geneCoverageMedian);
-	
-	this._showVariants(regionStart, regionEnd, 
+
+	this._showVariants(regionStart, regionEnd,
 		function() {
 			me.promiseFilterAndShowCalledVariants(regionStart, regionEnd)
 			 .then(function(data) {
 				if (callback) {
 					callback();
-				}			 	
+				}
 			 })
-		}, 
+		},
 		null, true);
 }
 
 
-VariantCard.prototype.promiseLoadBamDepth = function() {	
+VariantCard.prototype.promiseLoadBamDepth = function() {
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		if (!me.model.isBamLoaded()) {		
+		if (!me.model.isBamLoaded()) {
 			resolve(null);
 		}
 
@@ -865,12 +865,12 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			} else {
 				// If we have variant, get coverage for every variant
 				me.showBamProgress("Calculating coverage");
-				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
+				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
 					me.endBamProgress();
 					genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 					resolve(coverageData);
 				});
-			}					
+			}
 
 		 },
 		 function(error) {
@@ -907,7 +907,7 @@ VariantCard.prototype.highlightLowCoverageRegions = function(transcript, regionS
 	}
 }
 
-VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {	
+VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth, callbackDataLoaded) {
 	var me = this;
 
 	filterCard.enableCoverageFilters();
@@ -945,7 +945,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 				} else {
 					me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
 				}
-				
+
 				if (callbackDataLoaded) {
 			   	    callbackDataLoaded(me);
 		   	    }
@@ -954,7 +954,7 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 				// If we have variants, get coverage for every variant
 				me.showBamProgress("Calculating coverage");
 
-				
+
 				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
 					me.endBamProgress();
 					me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
@@ -970,12 +970,12 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		 })
 
 
-	 }, 
+	 },
 	 function(error) {
 	 	me.endBamProgress();
 	 	console.log("A problem occurred in VariantCard._showBamDepth(): " + error);
 	 });
-	
+
 
 }
 
@@ -987,7 +987,7 @@ VariantCard.prototype.fillZoomRegionChart = function(filteredTranscript, start, 
 	var end   = end   ? end   : window.gene.end;
 
 
-	if (me.getRelationship() == 'known-variants' || me.model.isBamLoaded() || me.model.isVcfLoaded()) {	      
+	if (me.getRelationship() == 'known-variants' || me.model.isBamLoaded() || me.model.isVcfLoaded()) {
 
 		// Workaround.  For some reason, d3 doesn't clean up previous transcript
 		// as expected.  So we will just force the svg to be removed so that we
@@ -1001,7 +1001,7 @@ VariantCard.prototype.fillZoomRegionChart = function(filteredTranscript, start, 
 		me.zoomRegionChart.regionEnd(+end);
 		me.zoomRegionChart(selection);
 
-	}	
+	}
 
     if (filteredTranscript) {
 		this.d3CardSelector.select("#zoom-region-chart .x.axis .tick text").style("text-anchor", "start");
@@ -1022,13 +1022,13 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 		this.bamDepthChart.showXAxis(!(this.model.isVcfLoaded()));
 		this.bamDepthChart.height(!(this.model.isVcfLoaded()) ? 75 : 55 );
 		this.bamDepthChart.margin(!(this.model.isVcfLoaded()) ? {top: 16, right: 2, bottom: 20, left: 4} : {top: 16, right: 2, bottom: 0, left: 4} );
-	
+
 		// Detemine the y-scale be setting the maxDepth accross all samples
 		if (maxDepth) {
 			this.bamDepthChart.maxDepth(maxDepth);
 		}
 
-		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));		
+		this.bamDepthChart(this.d3CardSelector.select("#bam-depth").datum(reducedData));
 		this.d3CardSelector.select("#bam-depth .x.axis .tick text").style("text-anchor", "start");
 
 		this.bamDepthChart.showHorizontalLine(filterCard.geneCoverageMedian, "cutoff", "threshold" );
@@ -1038,20 +1038,20 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 /*
 *  This method is invoked with the variants have been fully annotated, including
 *  vep, clinvar, coverage (from alignments), and inheritance (for trio).
-*  
+*
 */
 VariantCard.prototype.showFinalizedVariants = function() {
 	var me = this;
 	me.endVariantProgress();
 
 	me._showVariants(regionStart, regionEnd, null, false);
-	
+
 	if (me.model.getRelationship() == 'proband') {
 		if (me.model.isVcfReadyToLoad() || me.model.isLoaded()) {
 			me.fillFeatureMatrix(regionStart, regionEnd);
 		}
 
-	} 	
+	}
 
 }
 
@@ -1066,19 +1066,19 @@ VariantCard.prototype.promiseGetBookmarkedVariant = function(variantProxy, data,
 		} else {
 			var theVariant = null;
 			theVcfData.features.forEach( function (d) {
-		       if (d.start == variantProxy.start 
-		          && d.ref == variantProxy.ref 
+		       if (d.start == variantProxy.start
+		          && d.ref == variantProxy.ref
 		          && d.alt == variantProxy.alt) {
 		          theVariant = d;
 		       }
-		    });	
-		    resolve(theVariant);					
+		    });
+		    resolve(theVariant);
 		}
 	}
 
 	return new Promise(function(resolve, reject) {
 		geneObject = geneObject ? geneObject : window.gene;
-		transcriptObject = transcriptObject ? transcriptObject: window.selectedTranscript;	
+		transcriptObject = transcriptObject ? transcriptObject: window.selectedTranscript;
 		if (data != null) {
 			resolveIt(resolve, data);
 		} else {
@@ -1087,10 +1087,10 @@ VariantCard.prototype.promiseGetBookmarkedVariant = function(variantProxy, data,
 			 	resolveIt(data.vcfData);
 			 })
 		}
-		
+
 
 	});
-	
+
 }
 
 
@@ -1119,7 +1119,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 		if (theVcfData) {
 
-			// Set the current model's loaded and called variants based on the cached data.		
+			// Set the current model's loaded and called variants based on the cached data.
 			me.model.setLoadedVariants(theVcfData);
 			if (me.model.isBamLoaded()) {
 				me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
@@ -1128,8 +1128,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 					me.model.setCalledVariants(theFbData);
 					me.model.loadCalledTrioGenotypes();
 				 })
-				
-			}	
+
+			}
 
 
 			// The user has selected a region to zoom into or the data has come back for a selected gene that
@@ -1139,13 +1139,13 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
 				me.model.promiseGetVariantCount(theVcfData)
 				 .then(function(count) {
-			        me.cardSelector.find('#vcf-variant-count').text(count);	
+			        me.cardSelector.find('#vcf-variant-count').text(count);
 				 });
 
-				me.clearWarnings();		
+				me.clearWarnings();
 
 
-				// Show the proband's (cached) freebayes variants (loaded with inheritance) 
+				// Show the proband's (cached) freebayes variants (loaded with inheritance)
 				if (me.model.isBamLoaded()) {
 					me.model.promiseHasCalledVariants()
 					 .then(function(hasCalledVariants) {
@@ -1155,7 +1155,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 							me.model.promiseGetCalledVariantCount().then(function(count) {
 								me.cardSelector.find('#called-variant-count').text(count);
 							})
-			        	
+
 				        } else {
 				        	me.model.promiseVariantsHaveBeenCalled()
 				        	 .then(function(variantsHaveBeenCalled) {
@@ -1163,16 +1163,16 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						        	// If call variants has occurred but 0 variants returned.
 							        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
 									me.cardSelector.find('#called-variant-count').removeClass("hide");
-									me.cardSelector.find('#called-variant-count').text("0");	        		        	
+									me.cardSelector.find('#called-variant-count').text("0");
 				        	 	}
 
 				        	 })
-				        }	
+				        }
 
-						me.promiseFilterAndShowCalledVariants();	
+						me.promiseFilterAndShowCalledVariants();
 
 					 })
-				}	
+				}
 
 				me.populateRecFilters(theVcfData);
 				if (!isZoom) {
@@ -1187,7 +1187,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				 .then(function(filteredVcfData) {
 
 					me.cardSelector.find('#gene-box').css("visibility", "visible");
-					me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
+					me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);
 
 					// Now enable the filter controls that apply for the variants of this sample
 					filterCard.enableVariantFilters(true);
@@ -1199,8 +1199,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 			   	    }
 				 })
-				
-		
+
+
 			}
 
 		} else if (me.model.isVcfReadyToLoad()) {
@@ -1209,7 +1209,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 				me.cardSelector.find('.vcfloader').removeClass("hide");
 				var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
 				me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
-				me.cardSelector.find("#region-flag").addClass("hide");			
+				me.cardSelector.find("#region-flag").addClass("hide");
 			}
 
 
@@ -1221,28 +1221,28 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 					// When variants annotated with snpEff and VEP...
 
 					if (me.isViewable()) {
-						// show the 'Loading Clinvar' progress 
+						// show the 'Loading Clinvar' progress
 					 	me.cardSelector.find('.vcfloader').removeClass("hide");
 						me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-						me.cardSelector.find('#clinvar-warning').addClass("hide");		
+						me.cardSelector.find('#clinvar-warning').addClass("hide");
 
 						// We have variants, so show them now even though we still
 						// don't have clinvar annotations nor coverage
 						// Here we call this method again and since we
 						// have vcf data, the variant chart will be filled
-						//me._showVariants(regionStart ? regionStart : window.gene.start, 
+						//me._showVariants(regionStart ? regionStart : window.gene.start,
 						//				 regionEnd ? regionEnd : window.gene.end,
 						//				 onVcfData,
-						//				 onVariantsDisplayed);	
+						//				 onVariantsDisplayed);
 						filterCard.enableVariantFilters(true);
 
 						filterCard.autoSetFilters();
-							
+
 					}
 					//if (onVcfData) {
 					 //   onVcfData();
 				    //}
-					
+
 				}).then ( function(data) {
 					// After clinvar data retrieved...
 
@@ -1256,7 +1256,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 						me.cardSelector.find('#gene-box').css("visibility", "hidden");
 						me.cardSelector.find('.vcfloader').addClass("hide");
-					    
+
 
 						// At this point, the variants should be cached.  If they aren't,
 	 					// an error occurred
@@ -1267,12 +1267,12 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 					  			// Here we call this method again and since we
 								// have vcf data, the variant chart will be filled
-					  			me._showVariants(regionStart ? regionStart : window.gene.start, 
+					  			me._showVariants(regionStart ? regionStart : window.gene.start,
 												 regionEnd ? regionEnd : window.gene.end,
 												 onVariantsDisplayed,
 												 true);
 
-					  			// Enable the variant filters 
+					  			// Enable the variant filters
 					  			if (me.getRelationship() == 'proband') {
 							    	filterCard.enableClinvarFilters(data);
 							    }
@@ -1281,12 +1281,12 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 								if (me.isBamLoaded() && me.isViewable()) {
 									me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
 								} else {
-									me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
-								}	 				
-						   	    
+									me.cardSelector.find('#button-find-missing-variants').addClass("hide");
+								}
+
 								if (me.getRelationship() == 'proband') {
 									//genesCard.refreshCurrentGeneBadge(null, null, function() {
-									//	cacheHelper.showAnalyzeAllProgress();							
+									//	cacheHelper.showAnalyzeAllProgress();
 									//});
 								}
 							} else {
@@ -1294,12 +1294,12 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 									me.model.promiseCacheDangerSummary({}, window.gene.gene_name)
 									 .then(function() {
 										genesCard._geneBadgeLoading(window.gene.gene_name, false);
-										genesCard.setGeneBadgeWarning(window.gene.gene_name);									 	
+										genesCard.setGeneBadgeWarning(window.gene.gene_name);
 									 })
 								}
-							}						 	
+							}
 						 })
-	
+
 
 				    }
 
@@ -1310,7 +1310,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 		   	 		   genesCard.hideGeneBadgeLoading(window.gene.gene_name);
 					   genesCard.refreshCurrentGeneBadge(error);
 	   	    		}
-					
+
 					if (error && error == "missing reference") {
 						me._displayRefNotFoundWarning();
 					} else if (error && ($.type(error) === "string") && error.toLowerCase() == "no variants") {
@@ -1322,7 +1322,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						    me.cardSelector.find("#vcf-variant-count").text("");
 						    me.cardSelector.find('.vcfloader').addClass("hide");
 						    me.cardSelector.find('#error-warning #message').text(error);
-						    me.cardSelector.find('#error-warning').removeClass("hide");	
+						    me.cardSelector.find('#error-warning').removeClass("hide");
 
 						    if (getProbandVariantCard().isLoaded()) {
 							    $("#matrix-panel .loader").addClass("hide");
@@ -1339,15 +1339,15 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 						    me.cardSelector.find("#vcf-variant-count").text("");
 						    me.cardSelector.find('.vcfloader').addClass("hide");
 						    me.cardSelector.find('#error-warning #message').text(error);
-						    me.cardSelector.find('#error-warning').removeClass("hide");	
+						    me.cardSelector.find('#error-warning').removeClass("hide");
 						}
 					}
-					
+
 
 				});
 		} else {
 			genesCard._geneBadgeLoading(window.gene.gene_name, false);
-		}	 	
+		}
 
 	 })
 
@@ -1357,7 +1357,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
 
 VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd, bypassFeatureMatrix, showTransition) {
-	
+
 	if (bypassFeatureMatrix == null) {
 		bypassFeatureMatrix = false;
 	}
@@ -1370,18 +1370,18 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 		return;
 	}
 
-	$('#vcf-legend').css("display", "block");		
-	this.cardSelector.find('#vcf-chart-label').removeClass("hide");		
-	this.cardSelector.find('#vcf-name').removeClass("hide");		
-	this.cardSelector.find('#vcf-variants').css("display", "inline");	
+	$('#vcf-legend').css("display", "block");
+	this.cardSelector.find('#vcf-chart-label').removeClass("hide");
+	this.cardSelector.find('#vcf-name').removeClass("hide");
+	this.cardSelector.find('#vcf-variants').css("display", "inline");
 
 	this.vcfChart.regionStart(regionStart);
 	this.vcfChart.regionEnd(regionEnd);
-	
-	// Set the vertical layer count so that the height of the chart can be recalculated	     
+
+	// Set the vertical layer count so that the height of the chart can be recalculated
 	if (data.maxLevel == null) {
 		data.maxLevel = d3.max(data.features, function(d) { return d.level; });
-	}                           	
+	}
 	this.vcfChart.verticalLayers(data.maxLevel);
 	this.vcfChart.lowestWidth(data.featureWidth);
 
@@ -1395,7 +1395,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 	//}
 
 	// Load the chart with the new data
-	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);    
+	var selection = this.d3CardSelector.select("#vcf-variants").datum([dataWithoutFB]);
 	this.vcfChart.showTransition(showTransition);
     this.vcfChart(selection);
 
@@ -1410,7 +1410,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
 
 	if (this.getRelationship() == 'proband' && data.features.length > 0) {
 	    $('#filter-and-rank-card').removeClass("hide");
-	    $('#matrix-track').removeClass("hide");		
+	    $('#matrix-track').removeClass("hide");
 	}
 
    	this.d3CardSelector.select("#vcf-variants .x.axis .tick text").style("text-anchor", "start");
@@ -1436,7 +1436,7 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 	this.cardSelector.find('#no-ref-found-warning #message').text("Unable to find reference " + window.gene.chr + " in vcf header.");
 	this.cardSelector.find('#no-ref-found-warning').removeClass("hide");
 
-	//filterCard.clearFilters();	
+	//filterCard.clearFilters();
 }
 
 
@@ -1471,7 +1471,7 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 		// Show feature matrix
 		me._promiseFilterVariants()
 		 .then(function(filteredVcfData) {
-			window.matrixCard.fillFeatureMatrix(filteredVcfData);	 	
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);
 		 });
 	 })
 
@@ -1484,7 +1484,7 @@ VariantCard.prototype.sortFeatureMatrix = function() {
 	if (this.model.isVcfLoaded() ) {
 		me.promiseFilterAndShowLoadedVariants()
 		 .then(function(filteredVcfData) {
-			window.matrixCard.fillFeatureMatrix(filteredVcfData);		
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);
 		 })
 	}  else {
 	     this.promiseFilterAndShowCalledVariants()
@@ -1492,15 +1492,15 @@ VariantCard.prototype.sortFeatureMatrix = function() {
 			window.matrixCard.fillFeatureMatrix(filteredVcfData);
 	      });
 	}
-	
-	
+
+
 }
 
 
 
 VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEnd) {
 	var me = this;
-	
+
 	if (data) {
 		this.cardSelector.find('#fb-chart-label').removeClass("hide");
 		if (me.model.isVcfReadyToLoad()) {
@@ -1514,15 +1514,15 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 
 		this.fbChart.regionStart(regionStart);
 		this.fbChart.regionEnd(regionEnd);
-	
-		// Set the vertical layer count so that the height of the chart can be recalculated	    
+
+		// Set the vertical layer count so that the height of the chart can be recalculated
 		this.fbChart.verticalLayers(data.maxLevel);
 		this.fbChart.lowestWidth(data.featureWidth);
 
 		this.d3CardSelector.selectAll("#fb-variants").selectAll("svg").remove();
 
 		// Load the chart with the new data
-		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);    
+		var selection = this.d3CardSelector.select("#fb-variants").datum([data]);
 	    this.fbChart(selection);
 
 		this.cardSelector.find('.vcfloader').addClass("hide");
@@ -1534,9 +1534,9 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 		this.cardSelector.find('#fb-chart-label').addClass("hide");
 		this.cardSelector.find('#fb-separator').addClass("hide");
 		this.d3CardSelector.select('#fb-variants svg').remove();
-	}                      	
+	}
 
-	
+
 
 }
 
@@ -1546,7 +1546,7 @@ VariantCard.prototype.clearCalledVariants = function() {
 	me.cardSelector.find('#fb-chart-label').addClass("hide");
 	me.cardSelector.find('#fb-separator').addClass("hide");
 	me.d3CardSelector.select('#fb-variants svg').remove();
-	
+
 	// Clear out data
 	this.model.clearCalledVariants();
 }
@@ -1562,7 +1562,7 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 			$('#recall-card .' + this.getRelationship() + '.covloader').removeClass("hide");
 			$('#recall-card .' + this.getRelationship() + '.call-variants-count').addClass("hide");
 
-		}		
+		}
 	} else if (state == 'running') {
 		// After variants have been been called from alignments...
     	me.cardSelector.find('.fbloader').removeClass("hide");
@@ -1584,7 +1584,7 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(count + " variants called for " + me.getRelationship());
 		})
 	} else if (state == 'done') {
-		me.cardSelector.find('.fbloader').addClass("hide");			
+		me.cardSelector.find('.fbloader').addClass("hide");
 	} else if (state == 'error') {
 		me.cardSelector.find('.fbloader').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
@@ -1608,7 +1608,7 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) 
 		},
 		function(data) {
 			// After variants have been annotated
-			// Enable the variant filters based on the new union of 
+			// Enable the variant filters based on the new union of
 			// vcf variants + called variants
 			filterCard.enableVariantFilters(true);
 
@@ -1657,11 +1657,11 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) 
 
 			console.log(error);
 			me.showCallVariantsProgress('error');
-			
+
 		});
 
 
-} 
+}
 
 VariantCard.prototype.updateCalledVariantsWithInheritance = function() {
 	this.model.updateCalledVariantsWithInheritance();
@@ -1679,7 +1679,7 @@ VariantCard.prototype.getDefaultVariantColorClass = function() {
 VariantCard.prototype.setVariantColorClass = function(clazz) {
 	var me = this;
 	this.vcfChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);
-	this.fbChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);		
+	this.fbChart.clazz(me.getRelationship() == 'known-variants' ? filterCard.classifyByClinvar : clazz);
 }
 
 
@@ -1699,7 +1699,7 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
 
 						// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
 						// this by checking if the number filter flags exceed those that are hidden
-						if (me.cardSelector.find(".filter-flag").length > me.cardSelector.find(".filter-flag.hide").length 
+						if (me.cardSelector.find(".filter-flag").length > me.cardSelector.find(".filter-flag.hide").length
 							|| me.cardSelector.find("#region-flag").length > me.cardSelector.find("#region-flag.hide").length
 							|| me.cardSelector.find("#recfilter-flag").length > me.cardSelector.find("#recfilter-flag.hide").length) {
 							me.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
@@ -1710,8 +1710,8 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
 							me.cardSelector.find('#displayed-called-variant-count').addClass("hide");
 							me.cardSelector.find('#displayed-called-variant-count').text("");
 						}
-						me._fillFreebayesChart(filteredFBData, 
-										       regionStart ? regionStart : window.gene.start, 
+						me._fillFreebayesChart(filteredFBData,
+										       regionStart ? regionStart : window.gene.start,
 											   regionEnd ? regionEnd : window.gene.end);
 
 						resolve(filteredFBData);
@@ -1730,7 +1730,7 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
 		 });
 
 	});
-	
+
 
 }
 
@@ -1750,7 +1750,7 @@ VariantCard.prototype.promiseFilterAndShowLoadedVariants = function(theVcfData, 
 				 .then(function(count) {
 					me.cardSelector.find('#displayed-variant-count').text(count);
 				 })
-				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
+				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");
 				if (isLevelBasic) {
 					me.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
 				}
@@ -1758,12 +1758,12 @@ VariantCard.prototype.promiseFilterAndShowLoadedVariants = function(theVcfData, 
 				me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
 				me.cardSelector.find('#displayed-variant-count').addClass("hide");
 				me.cardSelector.find('#displayed-variant-count').text("");
-				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
+				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");
 				me.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
-			
+
 			}
-			me._fillVariantChart(filteredVcfData, regionStart, regionEnd, null, showTransition);	
-			resolve(filteredVcfData);		
+			me._fillVariantChart(filteredVcfData, regionStart, regionEnd, null, showTransition);
+			resolve(filteredVcfData);
 
 
 		 })
@@ -1784,7 +1784,7 @@ VariantCard.prototype.promiseFilterAndShowLoadedVariants = function(theVcfData, 
 			}
 		} else {
 			resolve(null);
-		}		
+		}
 	})
 
 
@@ -1799,7 +1799,7 @@ VariantCard.prototype._promiseFilterVariants = function(dataToFilter) {
 		if (data) {
 			var filterObject = filterCard.getFilterObject();
 			var filteredData = me.model.filterVariants(data, filterObject, window.gene.start, window.gene.end);
-			resolve(filteredData);			
+			resolve(filteredData);
 		} else {
 			resolve(null);
 		}
@@ -1817,7 +1817,7 @@ VariantCard.prototype._promiseFilterVariants = function(dataToFilter) {
 		}
 	})
 
-	
+
 
 }
 
@@ -1835,10 +1835,10 @@ VariantCard.prototype.populateRecFilters = function(theVcfData) {
 
 
 
-VariantCard.prototype.promiseCompareVariants = function(theVcfData, compareAttribute, 
+VariantCard.prototype.promiseCompareVariants = function(theVcfData, compareAttribute,
 	matchAttribute, matchFunction, noMatchFunction ) {
 
-	return this.model.promiseCompareVariants(theVcfData, compareAttribute, 
+	return this.model.promiseCompareVariants(theVcfData, compareAttribute,
 		matchAttribute, matchFunction, noMatchFunction);
 }
 
@@ -1860,7 +1860,7 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 			}
 
 		 })
-		
+
 	}
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
@@ -1871,7 +1871,7 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 	}
 	if (tooltip) {
 		if (tooltip.style("opacity") != 0) {
-			this._showTooltipImpl(tooltip, matchingVariant, this, false);		
+			this._showTooltipImpl(tooltip, matchingVariant, this, false);
 		}
 	}
 
@@ -1884,14 +1884,14 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	// show X for missing variant on vcf variant chart.
 	var matchingVariant = null;
 	var indicateMissingVariant = false;
-	this.model.promiseHasCalledVariants()	
+	this.model.promiseHasCalledVariants()
 	 .then(function(hasCalledVariants) {
 		if (me.fbChart != null && hasCalledVariants) {
 			var container = me.d3CardSelector.selectAll('#fb-variants > svg');
 			var lock = clickedVariant != null && me == sourceVariantCard;
-				
+
 			// Show the missing variant on the fbchart if we just have variants from those
-			// called from alignments (no vcf variants loaded)	
+			// called from alignments (no vcf variants loaded)
 			if (!me.model.isVcfLoaded()) {
 				indicateMissingVariant = true;
 			}
@@ -1901,7 +1901,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 
 			if (matchingVariant && sourceVariantCard) {
 				var tooltip = me.d3CardSelector.select("#fb-variants .tooltip");
-				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
+				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
 
 			}
 
@@ -1914,7 +1914,7 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 			// Only show the X for missing variant if we didn't already find the variant in
 			// the fb variants
 			var indicateMissingVariant = matchingVariant == null ? true : false;
-		
+
 			matchingVariant = me.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
 
 			if (matchingVariant && sourceVariantCard) {
@@ -1922,12 +1922,12 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
 
 			}
-			
+
 		}
 
-			
+
 	 })
-	
+
 }
 
 
@@ -1948,9 +1948,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 
 	var screenX = variant.screenX;
 	var screenY = variant.screenY;
-		
+
 	if (lock) {
-		matrixCard.unpin(true);		
+		matrixCard.unpin(true);
 		if (isLevelEdu) {
 			eduTourCheckVariant(variant);
 		}
@@ -1964,7 +1964,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 	if (lock  && !isLevelEdu && !isLevelBasic)  {
 		// Show tooltip before we have hgvs notations
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, true);
-		
+
 		var showTooltipExtraAnnot = function(annotatedVariants, callbackNotFound) {
 			var targetVariants = annotatedVariants.filter(function(v) {
 				return clickedVariant &&
@@ -2001,9 +2001,9 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
 				        	showTooltipExtraAnnot([refreshedVariant]);
 				        })
 				})
-  		  });		        
+  		  });
 
-				
+
 	} else {
 		me._showTooltipImpl(tooltip, variant, sourceVariantCard, lock);
 	}
@@ -2019,7 +2019,7 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 	if (lock) {
 		tooltip.style("pointer-events", "all");
 	} else {
-		tooltip.style("pointer-events", "none");          
+		tooltip.style("pointer-events", "none");
 	}
 
 	matrixCard.clearSelections();
@@ -2126,8 +2126,8 @@ VariantCard.prototype.promiseGetMaxAlleleCount = function() {
 				 	reject(msg);
 				 })
 			} else {
-				resolve(count);					
-			}				
+				resolve(count);
+			}
 		}
 
 	}
@@ -2146,7 +2146,7 @@ VariantCard.prototype.promiseGetMaxAlleleCount = function() {
 			 	theVcfData = data.fbData;
 			 	resolveIt(resolve, theVcfData);
 			 })
-		
+
 
 		}
 	})
@@ -2247,27 +2247,27 @@ VariantCard.prototype.unpin = function(saveClickedVariant, unpinMatrixTooltip) {
 
 	this._hideTooltip();
 	this.hideCoverageCircle();
-//	window.hideCircleRelatedVariants();	
+//	window.hideCircleRelatedVariants();
 	window.hideCoordinateFrame();
 
 	if (unpinMatrixTooltip) {
-		matrixCard.unpin();      		
+		matrixCard.unpin();
 	}
 }
 
 VariantCard.prototype._hideTooltip = function() {
 	var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
-	tooltip.transition()        
-           .duration(500)      
+	tooltip.transition()
+           .duration(500)
            .style("opacity", 0)
            .style("z-index", 0)
            .style("pointer-events", "none");
 	tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
-	tooltip.transition()        
-           .duration(500)      
+	tooltip.transition()
+           .duration(500)
            .style("opacity", 0)
            .style("z-index", 0)
-           .style("pointer-events", "none");   
+           .style("pointer-events", "none");
 
 }
 

@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	$.material.init();
 	$("#exhibit-video").on("ended", function() {
-		$('.exhibit-welcome').animateVideoDone('fadeOutRight');	
+		$('.exhibit-welcome').animateVideoDone('fadeOutRight');
 	});
 
 	// Encapsulate logic for animate.css into a jquery function
@@ -23,10 +23,10 @@ $(document).ready(function() {
 			var additionalClass = customClassName ? ' ' + customClassName : '';
 	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
 	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
-	            $(document).addClass("hide");	           
-	            //$(this).removeClass('animated ' + animationName);	
-				//hideVideo();   	
-				showCaseStudies();	
+	            $(document).addClass("hide");
+	            //$(this).removeClass('animated ' + animationName);
+				//hideVideo();
+				showCaseStudies();
         	});
 	    }
 	});
@@ -43,7 +43,7 @@ function showVideo() {
 	$('h1').addClass('hide');
 	$('h3').addClass('hide');
 	$('#thankyou').addClass('hide');
-	
+
 	playVideo();
 }
 function hideVideo() {
@@ -80,18 +80,18 @@ function showNewCaseStudy() {
 function showCaseStudies() {
 	var url = "exhibit-cases.html"
 	window.location.href = url;
-	
+
 }
 
 function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
     var hits = {};
-    for (var i = 0; i < sURLVariables.length; i++) 
-    {    	
-        var sParameterName = sURLVariables[i].split('=');        
+    for (var i = 0; i < sURLVariables.length; i++)
+    {
+        var sParameterName = sURLVariables[i].split('=');
         if (typeof sParam == 'string' || sParam instanceof String) {
-	        if (sParameterName[0] == sParam) 
+	        if (sParameterName[0] == sParam)
 	        {
 	            return sParameterName[1];
 	        }
