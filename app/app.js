@@ -290,6 +290,7 @@ function appendHubFileNamesToURL(res) {
 		updateUrl("name0", name.split(".")[0]);
 		updateUrl("sample0", name.split(".")[0]);
 		updateUrl("genes","RAI1,AIRE,MYLK2,PDGFB,PDHA1");
+		updateUrl("gene","RAI1");
 		updateUrl("build","GRCh37");
 	})
 }
