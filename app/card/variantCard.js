@@ -104,42 +104,49 @@ VariantCard.prototype.isBamLoaded = function() {
 	return this.model.isBamLoaded();
 }
 
-VariantCard.prototype.variantsHaveBeenCalled = function() {
-	return this.model.variantsHaveBeenCalled();
+VariantCard.prototype.promiseVariantsHaveBeenCalled = function() {
+	return this.model.promiseVariantsHaveBeenCalled();
 }
 
 VariantCard.prototype.getRelationship = function() {
 	return this.model.getRelationship();
 }
+ 
 
-VariantCard.prototype.promiseGetGeneCoverage = function(geneObject, transcript) {
+VariantCard.prototype.promiseSummarizeDanger = function(geneName, data, options, geneCoverageAll) {
 	var me = this;
 	return new Promise(function(resolve, reject) {
-		me.model.promiseGetGeneCoverage(geneObject, transcript).then(function() {
-			resolve(me);
-		});
-
+		var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);	
+		me.model.promiseCacheDangerSummary(dangerSummary, geneName)
+		 .then(function() {
+			resolve(dangerSummary);
+		 }, 
+		 function(error) {
+		 	reject(error);
+		 })		
 	})
 }
 
-VariantCard.prototype.summarizeDanger = function(geneName, data, options, geneCoverageAll) {
-	var dangerSummary = VariantModel.summarizeDanger(data, options, geneCoverageAll);
-	this.model.cacheDangerSummary(dangerSummary, geneName);
-	return dangerSummary;
+VariantCard.prototype.promiseSummarizeError = function(geneName, error) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		var dangerSummary = VariantModel.summarizeError(error);
+		me.model.promiseCacheDangerSummary(dangerSummary, geneName)
+		 .then(function() {
+			resolve(dangerSummary);
+		 },
+		 function(error) {
+		 	reject(error);
+		 })
+	})
 }
 
-VariantCard.prototype.summarizeError = function(geneName, error) {
-	var dangerSummary = VariantModel.summarizeError(error);
-	this.model.cacheDangerSummary(dangerSummary, geneName);
-	return dangerSummary;
+VariantCard.prototype.promiseGetDangerSummary = function(geneName) {
+	return this.model.promiseGetDangerSummary(geneName);
 }
 
-VariantCard.prototype.getDangerSummaryForGene = function(geneName) {
-	return this.model.getDangerSummaryForGene(geneName);
-}
-
-VariantCard.prototype.isCached = function(geneName, transcript) {
-	return this.model.isCached(geneName, transcript);
+VariantCard.prototype.promiseIsCached = function(geneName, transcript) {
+	return this.model.promiseIsCached(geneName, transcript);
 }
 
 VariantCard.prototype.hide = function() {
@@ -677,15 +684,6 @@ VariantCard.prototype.endVariantProgress = function() {
 }
 
 
-/*
- * Load variant data only (for unaffected sibs). 
- * no variant card display
- */
-VariantCard.prototype.loadVariantsOnly = function(callback) {
-	this.model.promiseGetVariantsOnly(window.gene, window.selectedTranscript).then( function(data) {
-		callback(data);
-	});
-}
 
 VariantCard.prototype.clearWarnings = function() {
 	this.cardSelector.find("#multiple-sample-warning").addClass("hide");
@@ -792,12 +790,6 @@ VariantCard.prototype.prepareToShowVariants = function() {
 	}	
 }
 
-VariantCard.prototype.setLoadState = function(theState) {
-	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData) {
-		this.model.setLoadState(theVcfData, theState);
-	}
-}
 
 VariantCard.prototype.onBrush = function(brush, callback) {
 	var me = this;
@@ -846,10 +838,12 @@ VariantCard.prototype.onBrush = function(brush, callback) {
 	
 	this._showVariants(regionStart, regionEnd, 
 		function() {
-			me.filterAndShowCalledVariants(regionStart, regionEnd);
-			if (callback) {
-				callback();
-			}
+			me.promiseFilterAndShowCalledVariants(regionStart, regionEnd)
+			 .then(function(data) {
+				if (callback) {
+					callback();
+				}			 	
+			 })
 		}, 
 		null, true);
 }
@@ -863,19 +857,26 @@ VariantCard.prototype.promiseLoadBamDepth = function() {
 			resolve(null);
 		}
 
-		var coverage = me.model.getBamDataForGene(window.gene);
-		if (coverage != null) {
-			genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-			resolve(coverage);
-		} else {
-			// If we have variant, get coverage for every variant
-			me.showBamProgress("Calculating coverage");
-			me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
-				me.endBamProgress();
+		me.model.promiseGetBamData(window.gene)
+		 .then(function(coverage) {
+			if (coverage != null) {
 				genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-				resolve(coverageData);
-			});
-		}					
+				resolve(coverage);
+			} else {
+				// If we have variant, get coverage for every variant
+				me.showBamProgress("Calculating coverage");
+				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {				
+					me.endBamProgress();
+					genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+					resolve(coverageData);
+				});
+			}					
+
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantCard.promiseLoadBamDepth(): " + error;
+		 	reject(msg);
+		 })
 	});
 
 }
@@ -931,38 +932,50 @@ VariantCard.prototype._showBamDepth = function(regionStart, regionEnd, maxDepth,
 		this.cardSelector.removeClass("hide");
 	}
 
-	var coverage = this.model.getBamDataForGene(window.gene);
-	var theVcfData = this.model.getVcfDataForGene(window.gene, selectedTranscript);
-	if (coverage != null) {
-		me.endBamProgress();
-		if (regionStart && regionEnd) {
-			var filteredData = me.model.filterBamDataByRegion(coverage, regionStart, regionEnd);
-			me._fillBamChart(filteredData, regionStart, regionEnd, maxDepth);
-		} else {
-			me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
-		}
-		
-		if (callbackDataLoaded) {
-	   	    callbackDataLoaded(me);
-   	    }
-	} else {
+	this.model.promiseGetBamData(window.gene)
+	 .then(function(coverage){
+		me.model.promiseGetVcfData(window.gene, selectedTranscript)
+		 .then(function(data) {
+		 	var theVcfData = data.vcfData;
+			if (coverage != null) {
+				me.endBamProgress();
+				if (regionStart && regionEnd) {
+					var filteredData = me.model.filterBamDataByRegion(coverage, regionStart, regionEnd);
+					me._fillBamChart(filteredData, regionStart, regionEnd, maxDepth);
+				} else {
+					me._fillBamChart(coverage, window.gene.start, window.gene.end, maxDepth);
+				}
+				
+				if (callbackDataLoaded) {
+			   	    callbackDataLoaded(me);
+		   	    }
+			} else {
 
-		// If we have variants, get coverage for every variant
-		me.showBamProgress("Calculating coverage");
+				// If we have variants, get coverage for every variant
+				me.showBamProgress("Calculating coverage");
 
-		
-		this.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
-			me.endBamProgress();
-			me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
+				
+				me.model.getBamDepth(window.gene, window.selectedTranscript, function(coverageData) {
+					me.endBamProgress();
+					me._fillBamChart(coverageData, window.gene.start, window.gene.end, maxDepth);
 
-			if (callbackDataLoaded) {
-		   	    callbackDataLoaded(me);
-	   	    }
+					if (callbackDataLoaded) {
+				   	    callbackDataLoaded(me);
+			   	    }
 
-		});
+				});
 
-	}
+			}
 
+		 })
+
+
+	 }, 
+	 function(error) {
+	 	me.endBamProgress();
+	 	console.log("A problem occurred in VariantCard._showBamDepth(): " + error);
+	 });
+	
 
 }
 
@@ -1044,22 +1057,40 @@ VariantCard.prototype.showFinalizedVariants = function() {
 
 
 
-VariantCard.prototype.getBookmarkedVariant = function(variantProxy, data, geneObject, transcriptObject) {
-	geneObject = geneObject ? geneObject : window.gene;
-	transcriptObject = transcriptObject ? transcriptObject: window.selectedTranscript;	
-	theVcfData = data != null ? data : this.model.getVcfDataForGene(geneObject, transcriptObject);
-	if (theVcfData == null) {
-		return null;
+VariantCard.prototype.promiseGetBookmarkedVariant = function(variantProxy, data, geneObject, transcriptObject) {
+	var me = this;
+
+	var resolveIt = function(resolve, theVcfData) {
+		if (theVcfData == null) {
+			resolve(null);
+		} else {
+			var theVariant = null;
+			theVcfData.features.forEach( function (d) {
+		       if (d.start == variantProxy.start 
+		          && d.ref == variantProxy.ref 
+		          && d.alt == variantProxy.alt) {
+		          theVariant = d;
+		       }
+		    });	
+		    resolve(theVariant);					
+		}
 	}
-	var theVariant = null;
-	theVcfData.features.forEach( function (d) {
-       if (d.start == variantProxy.start 
-          && d.ref == variantProxy.ref 
-          && d.alt == variantProxy.alt) {
-          theVariant = d;
-       }
-    });	
-    return theVariant;
+
+	return new Promise(function(resolve, reject) {
+		geneObject = geneObject ? geneObject : window.gene;
+		transcriptObject = transcriptObject ? transcriptObject: window.selectedTranscript;	
+		if (data != null) {
+			resolveIt(resolve, data);
+		} else {
+			me.model.promiseGetVcfData(geneObject, transcriptObject)
+			 .then(function(data) {
+			 	resolveIt(data.vcfData);
+			 })
+		}
+		
+
+	});
+	
 }
 
 
@@ -1082,207 +1113,244 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 	}
 
 
-	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData) {
+	this.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+	 .then(function(data) {
+	 	var theVcfData = data.vcfData;
 
-		// Set the current model's loaded and called variants based on the cached data.		
-		me.model.setLoadedVariants(theVcfData);
-		if (me.model.isBamLoaded()) {
-			var theFbData = me.model.getFbDataForGene(window.gene, window.selectedTranscript, true);
-			me.model.setCalledVariants(theFbData);
-			me.model.loadCalledTrioGenotypes();
-			
-		}	
+		if (theVcfData) {
 
-
-		// The user has selected a region to zoom into or the data has come back for a selected gene that
-		// has now been cached.  Filter the  variants based on the selected region
-		if (this.isViewable()) {
-			me.cardSelector.find('.vcfloader').addClass("hide");
-			me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-	        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount(theVcfData));	
-
-			me.clearWarnings();		
-
-
-			// Show the proband's (cached) freebayes variants (loaded with inheritance) 
+			// Set the current model's loaded and called variants based on the cached data.		
+			me.model.setLoadedVariants(theVcfData);
 			if (me.model.isBamLoaded()) {
-		        if (me.model.hasCalledVariants()) {
-			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());
-	        	
-		        } else if (me.model.variantsHaveBeenCalled()) {
-		        	// If call variants has occurred but 0 variants returned.
-			        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').removeClass("hide");
-					me.cardSelector.find('#called-variant-count').text("0");	        		        	
-		        }	
-
-				me.filterAndShowCalledVariants();	
+				me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
+				 .then(function(data) {
+				 	var theFbData = data.fbData;
+					me.model.setCalledVariants(theFbData);
+					me.model.loadCalledTrioGenotypes();
+				 })
+				
 			}	
 
-			me.populateRecFilters(theVcfData);
-			if (!isZoom) {
-				filterCard.autoSetFilters();
-			}
-			if (me.getRelationship() == 'proband') {
-				me.model.pruneIntronVariants(theVcfData);
-		    }
 
-		    // Filter variants runs filter and then fills the variant chart.
-			var filteredVcfData = this.filterAndShowLoadedVariants(theVcfData, showTransition);
-			
-			me.cardSelector.find('#gene-box').css("visibility", "visible");
-			me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
+			// The user has selected a region to zoom into or the data has come back for a selected gene that
+			// has now been cached.  Filter the  variants based on the selected region
+			if (me.isViewable()) {
+				me.cardSelector.find('.vcfloader').addClass("hide");
+				me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
+				me.model.promiseGetVariantCount(theVcfData)
+				 .then(function(count) {
+			        me.cardSelector.find('#vcf-variant-count').text(count);	
+				 });
 
-			// Now enable the filter controls that apply for the variants of this sample
-			filterCard.enableVariantFilters(true);
-	
-		}
-		if (onVariantsDisplayed) {
-	   	    onVariantsDisplayed();
-   	    }
-   	    if (me.getRelationship() == 'proband') {
-	   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-   	    }
-
-	} else if (this.model.isVcfReadyToLoad()) {
-
-		if (me.isViewable()) {
-			me.cardSelector.find('.vcfloader').removeClass("hide");
-			var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
-			me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
-			me.cardSelector.find("#region-flag").addClass("hide");			
-		}
+				me.clearWarnings();		
 
 
-		//  The user has entered a gene.  Get the annotated variants.
-		var theGene =  $.extend({}, window.gene);
-		var theTranscript = $.extend({}, window.selectedTranscript);
-		this.model.promiseGetVariants(theGene, theTranscript, regionStart, regionEnd,
-			function(data) {
-				// When variants annotated with snpEff and VEP...
+				// Show the proband's (cached) freebayes variants (loaded with inheritance) 
+				if (me.model.isBamLoaded()) {
+					me.model.promiseHasCalledVariants()
+					 .then(function(hasCalledVariants) {
+				        if (hasCalledVariants) {
+					        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+							me.cardSelector.find('#called-variant-count').removeClass("hide");
+							me.model.promiseGetCalledVariantCount().then(function(count) {
+								me.cardSelector.find('#called-variant-count').text(count);
+							})
+			        	
+				        } else {
+				        	me.model.promiseVariantsHaveBeenCalled()
+				        	 .then(function(variantsHaveBeenCalled) {
+				        	 	if (variantsHaveBeenCalled) {
+						        	// If call variants has occurred but 0 variants returned.
+							        me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+									me.cardSelector.find('#called-variant-count').removeClass("hide");
+									me.cardSelector.find('#called-variant-count').text("0");	        		        	
+				        	 	}
 
-				if (me.isViewable()) {
-					// show the 'Loading Clinvar' progress 
-				 	me.cardSelector.find('.vcfloader').removeClass("hide");
-					me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-					me.cardSelector.find('#clinvar-warning').addClass("hide");		
+				        	 })
+				        }	
 
-					// We have variants, so show them now even though we still
-					// don't have clinvar annotations nor coverage
-					// Here we call this method again and since we
-					// have vcf data, the variant chart will be filled
-					//me._showVariants(regionStart ? regionStart : window.gene.start, 
-					//				 regionEnd ? regionEnd : window.gene.end,
-					//				 onVcfData,
-					//				 onVariantsDisplayed);	
-					filterCard.enableVariantFilters(true);
+						me.promiseFilterAndShowCalledVariants();	
 
+					 })
+				}	
+
+				me.populateRecFilters(theVcfData);
+				if (!isZoom) {
 					filterCard.autoSetFilters();
-						
 				}
-				//if (onVcfData) {
-				 //   onVcfData();
-			    //}
-				
-			}).then ( function(data) {
-				// After clinvar data retrieved...
-
-			    if (me.isViewable()) {
-			    	// Show the variant count
-					me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-			        me.cardSelector.find('#vcf-variant-count').text(me.model.getVariantCount());
-
-					me.cardSelector.find('#gene-box').css("visibility", "hidden");
-					me.cardSelector.find('.vcfloader').addClass("hide");
-				    
-
-					// At this point, the variants should be cached.  If they aren't,
- 					// an error occurred
-					var theVcfData = me.model.getVcfDataForGene(window.gene, window.selectedTranscript);
- 					if (theVcfData) {
-
-			  			// Here we call this method again and since we
-						// have vcf data, the variant chart will be filled
-			  			me._showVariants(regionStart ? regionStart : window.gene.start, 
-										 regionEnd ? regionEnd : window.gene.end,
-										 onVariantsDisplayed,
-										 true);
-
-			  			// Enable the variant filters 
-			  			if (me.getRelationship() == 'proband') {
-					    	filterCard.enableClinvarFilters(data);
-					    }
-
-						// Show the 'Call from alignments' button if we a bam file/url was specified
-						if (me.isBamLoaded() && me.isViewable()) {
-							me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
-						} else {
-							me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
-						}	 				
-				   	    
-						if (me.getRelationship() == 'proband') {
-							//genesCard.refreshCurrentGeneBadge(null, null, function() {
-							//	cacheHelper.showAnalyzeAllProgress();							
-							//});
-						}
-					} else {
-						if (me.getRelationship() == 'proband') {
-							me.model.cacheDangerSummary({}, window.gene.gene_name);
-							genesCard._geneBadgeLoading(window.gene.gene_name, false);
-							genesCard.setGeneBadgeWarning(window.gene.gene_name);
-						}
-					}
-
+				if (me.getRelationship() == 'proband') {
+					me.model.pruneIntronVariants(theVcfData);
 			    }
 
-			}, function(error) {
-				me.cardSelector.find('.vcfloader').addClass("hide");
+			    // Filter variants runs filter and then fills the variant chart.
+				me.promiseFilterAndShowLoadedVariants(theVcfData, showTransition)
+				 .then(function(filteredVcfData) {
 
-				if (me.getRelationship() == 'proband') {
-	   	 		   genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-				   genesCard.refreshCurrentGeneBadge(error);
-   	    		}
+					me.cardSelector.find('#gene-box').css("visibility", "visible");
+					me.cardSelector.find('#gene-box').text('GENE ' + window.gene.gene_name);	
+
+					// Now enable the filter controls that apply for the variants of this sample
+					filterCard.enableVariantFilters(true);
+
+					if (onVariantsDisplayed) {
+				   	    onVariantsDisplayed();
+			   	    }
+			   	    if (me.getRelationship() == 'proband') {
+				   	    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+			   	    }
+				 })
 				
-				if (error && error == "missing reference") {
-					me._displayRefNotFoundWarning();
-				} else if (error && ($.type(error) === "string") && error.toLowerCase() == "no variants") {
+		
+			}
+
+		} else if (me.model.isVcfReadyToLoad()) {
+
+			if (me.isViewable()) {
+				me.cardSelector.find('.vcfloader').removeClass("hide");
+				var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
+				me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
+				me.cardSelector.find("#region-flag").addClass("hide");			
+			}
+
+
+			//  The user has entered a gene.  Get the annotated variants.
+			var theGene =  $.extend({}, window.gene);
+			var theTranscript = $.extend({}, window.selectedTranscript);
+			me.model.promiseGetVariants(theGene, theTranscript, regionStart, regionEnd,
+				function(data) {
+					// When variants annotated with snpEff and VEP...
 
 					if (me.isViewable()) {
-					   $('#matrix-track').addClass("hide");
-					    me.cardSelector.find("#vcf-track").addClass("hide");
-					    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-					    me.cardSelector.find("#vcf-variant-count").text("");
-					    me.cardSelector.find('.vcfloader').addClass("hide");
-					    me.cardSelector.find('#error-warning #message').text(error);
-					    me.cardSelector.find('#error-warning').removeClass("hide");	
+						// show the 'Loading Clinvar' progress 
+					 	me.cardSelector.find('.vcfloader').removeClass("hide");
+						me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
+						me.cardSelector.find('#clinvar-warning').addClass("hide");		
 
-					    if (getProbandVariantCard().isLoaded()) {
-						    $("#matrix-panel .loader").addClass("hide");
-							getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
-					    }
+						// We have variants, so show them now even though we still
+						// don't have clinvar annotations nor coverage
+						// Here we call this method again and since we
+						// have vcf data, the variant chart will be filled
+						//me._showVariants(regionStart ? regionStart : window.gene.start, 
+						//				 regionEnd ? regionEnd : window.gene.end,
+						//				 onVcfData,
+						//				 onVariantsDisplayed);	
+						filterCard.enableVariantFilters(true);
+
+						filterCard.autoSetFilters();
+							
 					}
+					//if (onVcfData) {
+					 //   onVcfData();
+				    //}
+					
+				}).then ( function(data) {
+					// After clinvar data retrieved...
 
-				} else {
-					console.log(error);
-					if (me.isViewable()) {
-					   $('#matrix-track').addClass("hide");
-					    me.cardSelector.find("#vcf-track").addClass("hide");
-					    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-					    me.cardSelector.find("#vcf-variant-count").text("");
-					    me.cardSelector.find('.vcfloader').addClass("hide");
-					    me.cardSelector.find('#error-warning #message').text(error);
-					    me.cardSelector.find('#error-warning').removeClass("hide");	
+				    if (me.isViewable()) {
+				    	// Show the variant count
+						me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
+						me.model.promiseGetVariantCount()
+						 .then(function(count) {
+					        me.cardSelector.find('#vcf-variant-count').text(count);
+						 })
+
+						me.cardSelector.find('#gene-box').css("visibility", "hidden");
+						me.cardSelector.find('.vcfloader').addClass("hide");
+					    
+
+						// At this point, the variants should be cached.  If they aren't,
+	 					// an error occurred
+						me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+						 .then(function(data) {
+						 	var theVcfData = data;
+	 						if (theVcfData) {
+
+					  			// Here we call this method again and since we
+								// have vcf data, the variant chart will be filled
+					  			me._showVariants(regionStart ? regionStart : window.gene.start, 
+												 regionEnd ? regionEnd : window.gene.end,
+												 onVariantsDisplayed,
+												 true);
+
+					  			// Enable the variant filters 
+					  			if (me.getRelationship() == 'proband') {
+							    	filterCard.enableClinvarFilters(data);
+							    }
+
+								// Show the 'Call from alignments' button if we a bam file/url was specified
+								if (me.isBamLoaded() && me.isViewable()) {
+									me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
+								} else {
+									me.cardSelector.find('#button-find-missing-variants').addClass("hide");						
+								}	 				
+						   	    
+								if (me.getRelationship() == 'proband') {
+									//genesCard.refreshCurrentGeneBadge(null, null, function() {
+									//	cacheHelper.showAnalyzeAllProgress();							
+									//});
+								}
+							} else {
+								if (me.getRelationship() == 'proband') {
+									me.model.promiseCacheDangerSummary({}, window.gene.gene_name)
+									 .then(function() {
+										genesCard._geneBadgeLoading(window.gene.gene_name, false);
+										genesCard.setGeneBadgeWarning(window.gene.gene_name);									 	
+									 })
+								}
+							}						 	
+						 })
+	
+
+				    }
+
+				}, function(error) {
+					me.cardSelector.find('.vcfloader').addClass("hide");
+
+					if (me.getRelationship() == 'proband') {
+		   	 		   genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+					   genesCard.refreshCurrentGeneBadge(error);
+	   	    		}
+					
+					if (error && error == "missing reference") {
+						me._displayRefNotFoundWarning();
+					} else if (error && ($.type(error) === "string") && error.toLowerCase() == "no variants") {
+
+						if (me.isViewable()) {
+						   $('#matrix-track').addClass("hide");
+						    me.cardSelector.find("#vcf-track").addClass("hide");
+						    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+						    me.cardSelector.find("#vcf-variant-count").text("");
+						    me.cardSelector.find('.vcfloader').addClass("hide");
+						    me.cardSelector.find('#error-warning #message').text(error);
+						    me.cardSelector.find('#error-warning').removeClass("hide");	
+
+						    if (getProbandVariantCard().isLoaded()) {
+							    $("#matrix-panel .loader").addClass("hide");
+								getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+						    }
+						}
+
+					} else {
+						console.log(error);
+						if (me.isViewable()) {
+						   $('#matrix-track').addClass("hide");
+						    me.cardSelector.find("#vcf-track").addClass("hide");
+						    me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+						    me.cardSelector.find("#vcf-variant-count").text("");
+						    me.cardSelector.find('.vcfloader').addClass("hide");
+						    me.cardSelector.find('#error-warning #message').text(error);
+						    me.cardSelector.find('#error-warning').removeClass("hide");	
+						}
 					}
-				}
-				
+					
 
-			});
-	} else {
-		genesCard._geneBadgeLoading(window.gene.gene_name, false);
-	}
+				});
+		} else {
+			genesCard._geneBadgeLoading(window.gene.gene_name, false);
+		}	 	
+
+	 })
+
 }
 
 
@@ -1376,39 +1444,56 @@ VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
 	var me = this;
 
 	// Don't show the feature matrix (rank card) if there are no variants for the proband
-	var theVcfData = this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+	this.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+	 .then(function(data) {
+	 	var theVcfData = data.vcfData;
 
-	// If only alignments provided, only show feature matrix if variants have been called.
-	if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
-		if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
-			$('#matrix-track').addClass("hide");
-			me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
- 	  		me.cardSelector.find("#vcf-variant-count").text("");
-			return;
+		// If only alignments provided, only show feature matrix if variants have been called.
+		if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
+			if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
+				$('#matrix-track').addClass("hide");
+				me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+	 	  		me.cardSelector.find("#vcf-variant-count").text("");
+				return;
+			}
 		}
-	}
 
 
-	$('#filter-and-rank-card').removeClass("hide");
-    $('#matrix-track').removeClass("hide");
-	if (firstTimeShowVariants) {
-		firstTimeShowVariants = false;
-	}
+		$('#filter-and-rank-card').removeClass("hide");
+	    $('#matrix-track').removeClass("hide");
+		if (firstTimeShowVariants) {
+			firstTimeShowVariants = false;
+		}
 
-	// Show called variants
-	this.filterAndShowCalledVariants();
+		// Show called variants
+		me.promiseFilterAndShowCalledVariants();
 
-	// Show feature matrix
-	window.matrixCard.fillFeatureMatrix(me._filterVariants());
+		// Show feature matrix
+		me._promiseFilterVariants()
+		 .then(function(filteredVcfData) {
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);	 	
+		 });
+	 })
+
+
 }
 
 VariantCard.prototype.sortFeatureMatrix = function() {
+	var me = this;
 
-	var filteredVcfData = this.model.isVcfLoaded() ? 
-	       this.filterAndShowLoadedVariants() 
-	     : this.filterAndShowCalledVariants();
+	if (this.model.isVcfLoaded() ) {
+		me.promiseFilterAndShowLoadedVariants()
+		 .then(function(filteredVcfData) {
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);		
+		 })
+	}  else {
+	     this.promiseFilterAndShowCalledVariants()
+	      .then(function(filteredVcfData) {
+			window.matrixCard.fillFeatureMatrix(filteredVcfData);
+	      });
+	}
 	
-	window.matrixCard.fillFeatureMatrix(filteredVcfData);
+	
 }
 
 
@@ -1488,12 +1573,16 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 		// Show the called variant count
 		me.cardSelector.find('#called-variant-count-label').removeClass("hide");
 		me.cardSelector.find('#called-variant-count').removeClass("hide");
-		me.cardSelector.find('#called-variant-count').text(me.model.getCalledVariantCount());
+		me.model.promiseGetCalledVariantCount().then(function(count) {
+			me.cardSelector.find('#called-variant-count').text(count);
+		})
 		me.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
 		me.cardSelector.find('#displayedcalled-variant-count').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.covloader').addClass("hide");
 		$('#recall-card .' + me.getRelationship() + '.call-variants-count').removeClass("hide");
-		$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(me.model.getCalledVariantCount() + " variants called for " + me.getRelationship());
+		me.model.promiseGetCalledVariantCount().then(function(count) {
+			$('#recall-card .' + me.getRelationship() + '.call-variants-count').text(count + " variants called for " + me.getRelationship());
+		})
 	} else if (state == 'done') {
 		me.cardSelector.find('.fbloader').addClass("hide");			
 	} else if (state == 'error') {
@@ -1549,14 +1638,19 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) 
 			}
 
 			// Enable inheritance filters
-			filterCard.enableInheritanceFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
+			me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	var theVcfData = data.vcfData;
+				filterCard.enableInheritanceFilters(theVcfData);
 
-			// Enable the clinvar filter
-			filterCard.enableClinvarFilters(me.model.getVcfDataForGene(window.gene, window.selectedTranscript));
+				// Enable the clinvar filter
+				filterCard.enableClinvarFilters(theVcfData);
 
-			if (callback) {
-				callback();
-			}
+				if (callback) {
+					callback();
+				}
+
+			 })
 
 
 		}, function(error) {
@@ -1589,91 +1683,147 @@ VariantCard.prototype.setVariantColorClass = function(clazz) {
 }
 
 
-VariantCard.prototype.filterAndShowCalledVariants = function(regionStart, regionEnd) {
+VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart, regionEnd) {
 	var me = this;
-	if (this.model.hasCalledVariants()) {
+	return new Promise(function(resolve, reject) {
+		me.model.promiseHasCalledVariants()
+		 .then(function(hasCalledVariants) {
+		 	if (hasCalledVariants) {
+				me.cardSelector.find('.fbloader').addClass("hide");
 
-		me.cardSelector.find('.fbloader').addClass("hide");
-		var filteredFBData = this._filterVariants(this.model.getFbDataForGene(window.gene, window.selectedTranscript), this.fbChart);
+				me.model.promiseGetFbData(window.gene, window.selectedTranscript)
+				 .then(function(data) {
+				 	var theFbData = data.fbData;
+					me._promiseFilterVariants(theFbData, me.fbChart)
+					 .then(function(filteredFBData) {
 
+						// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
+						// this by checking if the number filter flags exceed those that are hidden
+						if (me.cardSelector.find(".filter-flag").length > me.cardSelector.find(".filter-flag.hide").length 
+							|| me.cardSelector.find("#region-flag").length > me.cardSelector.find("#region-flag.hide").length
+							|| me.cardSelector.find("#recfilter-flag").length > me.cardSelector.find("#recfilter-flag.hide").length) {
+							me.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
+							me.cardSelector.find('#displayed-called-variant-count').removeClass("hide");
+							me.cardSelector.find('#displayed-called-variant-count').text(filteredFBData.features.length);
+						} else {
+							me.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
+							me.cardSelector.find('#displayed-called-variant-count').addClass("hide");
+							me.cardSelector.find('#displayed-called-variant-count').text("");
+						}
+						me._fillFreebayesChart(filteredFBData, 
+										       regionStart ? regionStart : window.gene.start, 
+											   regionEnd ? regionEnd : window.gene.end);
 
-		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
-		// this by checking if the number filter flags exceed those that are hidden
-		if (this.cardSelector.find(".filter-flag").length > this.cardSelector.find(".filter-flag.hide").length 
-			|| this.cardSelector.find("#region-flag").length > this.cardSelector.find("#region-flag.hide").length
-			|| this.cardSelector.find("#recfilter-flag").length > this.cardSelector.find("#recfilter-flag.hide").length) {
-			this.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').removeClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').text(filteredFBData.features.length);
-		} else {
-			this.cardSelector.find('#displayed-called-variant-count-label').addClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').addClass("hide");
-			this.cardSelector.find('#displayed-called-variant-count').text("");
-		}
-		me._fillFreebayesChart(filteredFBData, 
-						       regionStart ? regionStart : window.gene.start, 
-							   regionEnd ? regionEnd : window.gene.end);
+						resolve(filteredFBData);
 
-		return filteredFBData;
-	}  else {
-		return null;
-	}
-}
+					 })
 
-
-VariantCard.prototype.filterAndShowLoadedVariants = function(theVcfData, showTransition) {
-	if (this.model.isVcfLoaded()) {
-		var data = theVcfData ? theVcfData : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-		var filteredVcfData = this._filterVariants(data, this.vcfChart);
-
-		// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
-		// this by checking if the number filter flags exceed those that are hidden
-		if (filterCard.hasFilters() || filterCard.hasCardSpecificFilters(this.getRelationship()) ) {
-			this.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
-			this.cardSelector.find('#displayed-variant-count').removeClass("hide");
-			this.cardSelector.find('#displayed-variant-count').text(this.model.getVariantCount(filteredVcfData));
-			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
-			if (isLevelBasic) {
-				this.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+				 })
+			}  else {
+				resolve(null);
 			}
-		
-		} else {
-			this.cardSelector.find('#displayed-variant-count-label').addClass("hide");
-			this.cardSelector.find('#displayed-variant-count').addClass("hide");
-			this.cardSelector.find('#displayed-variant-count').text("");
-			this.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
-			this.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
-		
-		}
+		 },
+		 function(error) {
+		 	var msg = "VariantCard.promiseFilterAndShowCalledVariants(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 });
 
+	});
+	
 
-		this._fillVariantChart(filteredVcfData, regionStart, regionEnd, null, showTransition);	
-		return filteredVcfData;
-	} else {
-		return null;
-	}
 }
 
 
-VariantCard.prototype._filterVariants = function(dataToFilter) {
+VariantCard.prototype.promiseFilterAndShowLoadedVariants = function(theVcfData, showTransition) {
 	var me = this;
 
-	var data = dataToFilter ? dataToFilter : this.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (data == null || data.features == null) {
-		return;
-	}
-	
-	// Filter variants
-	var filterObject = filterCard.getFilterObject();
-	var filteredData = this.model.filterVariants(data, filterObject, window.gene.start, window.gene.end);
+	var resolveIt = function(resolve, theVcfData) {
+		me._promiseFilterVariants(theVcfData, me.vcfChart)
+		 .then(function(filteredVcfData) {
+			// Only show the 'displayed variant' count if a variant filter is turned on.  Test for
+			// this by checking if the number filter flags exceed those that are hidden
+			if (filterCard.hasFilters() || filterCard.hasCardSpecificFilters(me.getRelationship()) ) {
+				me.cardSelector.find('#displayed-variant-count-label').removeClass("hide");
+				me.cardSelector.find('#displayed-variant-count').removeClass("hide");
+				me.model.promiseGetVariantCount(filteredVcfData)
+				 .then(function(count) {
+					me.cardSelector.find('#displayed-variant-count').text(count);
+				 })
+				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "visible");	
+				if (isLevelBasic) {
+					me.cardSelector.find('#displayed-variant-count-label-basic').removeClass("hide");
+				}
+			} else {
+				me.cardSelector.find('#displayed-variant-count-label').addClass("hide");
+				me.cardSelector.find('#displayed-variant-count').addClass("hide");
+				me.cardSelector.find('#displayed-variant-count').text("");
+				me.cardSelector.find('#displayed-variant-count-label-simple').css("visibility", "hidden");	
+				me.cardSelector.find('#displayed-variant-count-label-basic').addClass("hide");
+			
+			}
+			me._fillVariantChart(filteredVcfData, regionStart, regionEnd, null, showTransition);	
+			resolve(filteredVcfData);		
 
-	return filteredData;
+
+		 })
+
+	}
+
+
+	return new Promise(function(resolve, reject) {
+		if (me.model.isVcfLoaded()) {
+			if (theVcfData) {
+				resolveIt(resolve, theVcfData);
+			} else {
+				me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+				 .then(function(data) {
+				 	resolveIt(resolve, data.vcfData);
+				 });
+
+			}
+		} else {
+			resolve(null);
+		}		
+	})
+
 
 }
 
 
-VariantCard.prototype.determineMaxAlleleCount = function(vcfData) {
-	return this.model.determineMaxAlleleCount(vcfData);
+VariantCard.prototype._promiseFilterVariants = function(dataToFilter) {
+	var me = this;
+
+	var resolveIt = function(resolve, data) {
+		// Filter variants
+		if (data) {
+			var filterObject = filterCard.getFilterObject();
+			var filteredData = me.model.filterVariants(data, filterObject, window.gene.start, window.gene.end);
+			resolve(filteredData);			
+		} else {
+			resolve(null);
+		}
+	}
+
+
+	return new Promise(function(resolve, reject) {
+		if (dataToFilter) {
+			resolveIt(resolve, dataToFilter);
+		} else {
+			me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	resolveIt(resolve, data.vcfData);
+			 })
+		}
+	})
+
+	
+
+}
+
+
+VariantCard.prototype.promiseDetermineMaxAlleleCount = function(vcfData) {
+	return this.model.promiseDetermineMaxAlleleCount(vcfData);
 }
 
 VariantCard.prototype.populateEffectFilters = function() {
@@ -1698,12 +1848,18 @@ VariantCard.prototype.adjustTooltip = function(variant) {
 	// show X for missing variant on vcf variant chart.
 	var matchingVariant = null;
 	var tooltip = null;
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
-		if (matchingVariant) {
-			tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
-		}
+	if (this.fbChart != null) {
+		this.model.promiseHasCalledVariants()
+		 .then(function(isTrue) {
+		 	if (isTrue) {
+				var container = this.d3CardSelector.selectAll('#fb-variants > svg');
+				matchingVariant = this.fbChart.showCircle()(variant, container, false, true);
+				if (matchingVariant) {
+					tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
+				}
+			}
+
+		 })
 		
 	}
 	if (this.vcfChart != null) {
@@ -1728,43 +1884,49 @@ VariantCard.prototype.showVariantCircle = function(variant, sourceVariantCard) {
 	// show X for missing variant on vcf variant chart.
 	var matchingVariant = null;
 	var indicateMissingVariant = false;
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		var lock = clickedVariant != null && this == sourceVariantCard;
+	this.model.promiseHasCalledVariants()	
+	 .then(function(hasCalledVariants) {
+		if (me.fbChart != null && hasCalledVariants) {
+			var container = me.d3CardSelector.selectAll('#fb-variants > svg');
+			var lock = clickedVariant != null && me == sourceVariantCard;
+				
+			// Show the missing variant on the fbchart if we just have variants from those
+			// called from alignments (no vcf variants loaded)	
+			if (!me.model.isVcfLoaded()) {
+				indicateMissingVariant = true;
+			}
+
+			matchingVariant = me.fbChart.showCircle()(variant, container, indicateMissingVariant, lock);
+
+
+			if (matchingVariant && sourceVariantCard) {
+				var tooltip = me.d3CardSelector.select("#fb-variants .tooltip");
+				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
+
+			}
+
+		}
+
+		if (me.vcfChart != null  && !matchingVariant) {
+			var container = me.d3CardSelector.selectAll('#vcf-variants > svg');;
+			var lock = clickedVariant != null && me == sourceVariantCard;
+
+			// Only show the X for missing variant if we didn't already find the variant in
+			// the fb variants
+			var indicateMissingVariant = matchingVariant == null ? true : false;
+		
+			matchingVariant = me.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
+
+			if (matchingVariant && sourceVariantCard) {
+				var tooltip = me.d3CardSelector.select("#vcf-variants .tooltip");
+				me.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
+
+			}
 			
-		// Show the missing variant on the fbchart if we just have variants from those
-		// called from alignments (no vcf variants loaded)	
-		if (!me.model.isVcfLoaded()) {
-			indicateMissingVariant = true;
 		}
 
-		matchingVariant = this.fbChart.showCircle()(variant, container, indicateMissingVariant, lock);
-
-
-		if (matchingVariant && sourceVariantCard) {
-			var tooltip = this.d3CardSelector.select("#fb-variants .tooltip");
-			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);		
-
-		}
-		
-	}
-	if (this.vcfChart != null  && !matchingVariant) {
-		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');;
-		var lock = clickedVariant != null && this == sourceVariantCard;
-
-		// Only show the X for missing variant if we didn't already find the variant in
-		// the fb variants
-		var indicateMissingVariant = matchingVariant == null ? true : false;
-	
-		matchingVariant = this.vcfChart.showCircle()(variant, container, indicateMissingVariant, lock);
-
-		if (matchingVariant && sourceVariantCard) {
-			var tooltip = this.d3CardSelector.select("#vcf-variants .tooltip");
-			this.showTooltip(tooltip, matchingVariant, sourceVariantCard, lock);
-
-		}
-		
-	}
+			
+	 })
 	
 }
 
@@ -1883,60 +2045,112 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
 
 VariantCard.prototype.hideVariantCircle = function(variant) {
+	var me = this;
 	if (this.vcfChart != null) {
 		var container = this.d3CardSelector.selectAll('#vcf-variants > svg');
 		var parentContainer = this.d3CardSelector.selectAll('#vcf-variants');
 		this.vcfChart.hideCircle()(container, parentContainer);
 	}
-	if (this.fbChart != null && this.model.hasCalledVariants()) {
-		var container = this.d3CardSelector.selectAll('#fb-variants > svg');
-		var parentContainer = this.d3CardSelector.selectAll('#fb-variants');
-		this.fbChart.hideCircle()(container, parentContainer);
+	if (this.fbChart != null) {
+		this.model.promiseHasCalledVariants()
+		 .then(function(isTrue) {
+		 	if (isTrue) {
+				var container = me.d3CardSelector.selectAll('#fb-variants > svg');
+				var parentContainer = me.d3CardSelector.selectAll('#fb-variants');
+				me.fbChart.hideCircle()(container, parentContainer);
+
+		 	}
+		 })
 	}
 }
 
 VariantCard.prototype.showCoverageCircle = function(variant, sourceVariantCard) {
-	if (this.model.getBamDataForGene(window.gene) != null) {
-		var bamDepth = null;
-		if (sourceVariantCard == this && variant.bamDepth != null && variant.bamDepth != '') {
-			bamDepth = variant.bamDepth;
-		} else {
-			var matchingVariant = this.model.getMatchingVariant(variant);
-			if (matchingVariant != null) {
-				bamDepth = matchingVariant.bamDepth;
-				// If samtools mpileup didn't return coverage for this position, use the variant's depth
-				// field.
-				if (bamDepth == null || bamDepth == '') {
-					bamDepth = matchingVariant.genotypeDepth;
-				}
+	var me = this;
+	this.model.promiseGetBamData(window.gene)
+ 	 .then(function(coverage) {
+		 if (coverage != null) {
+			var bamDepth = null;
+			if (sourceVariantCard == me && variant.bamDepth != null && variant.bamDepth != '') {
+				bamDepth = variant.bamDepth;
+			} else {
+				me.model.promiseGetMatchingVariant(variant)
+				 .then(function(matchingVariant) {
+					if (matchingVariant != null) {
+						bamDepth = matchingVariant.bamDepth;
+						// If samtools mpileup didn't return coverage for this position, use the variant's depth
+						// field.
+						if (bamDepth == null || bamDepth == '') {
+							bamDepth = matchingVariant.genotypeDepth;
+						}
+					}
+
+				 })
 			}
-		}
 
-		this.bamDepthChart.showCircle()(variant.start, bamDepth);
+			me.bamDepthChart.showCircle()(variant.start, bamDepth);
+	    }
 
+ 	 },
+ 	 function(error) {
 
-    }
+ 	 });
 }
 
 VariantCard.prototype.hideCoverageCircle = function() {
-	if (this.model.getBamDataForGene(window.gene) != null){
-		this.bamDepthChart.hideCircle()();
-	}	
+	var me = this;
+	me.model.promiseGetBamData(window.gene)
+	 .then(function(coverage) {
+	 	if (coverage) {
+	 		me.bamDepthChart.hideCircle()();
+	 	}
+
+	 })
 }
 
-VariantCard.prototype.getMaxAlleleCount = function() {
-	var theVcfData = this.model.isVcfLoaded() 
-				      ? this.model.getVcfDataForGene(window.gene, window.selectedTranscript)
-				      : this.model.getFbDataForGene(window.gene, window.selectedTranscript)
-	if (theVcfData == null) {
-		return null;
+VariantCard.prototype.promiseGetMaxAlleleCount = function() {
+	var me = this;
+
+	var resolveIt = function(resolve, theVcfData) {
+		if (theVcfData == null) {
+			resolve(null);
+		} else {
+			var count = theVcfData.maxAlleleCount;
+			if (!count) {
+				me.determineMaxAlleleCount(theVcfData)
+				 .then(function() {
+					resolve(theVcfData.maxAlleleCount);
+				 },
+				 function(error) {
+				 	var msg = "A problem occurred in VariantModel.promiseGetMaxAlleleCount(): " + error;
+				 	console.log(msg);
+				 	reject(msg);
+				 })
+			} else {
+				resolve(count);					
+			}				
+		}
+
 	}
-	var count = theVcfData.maxAlleleCount;
-	if (!count) {
-		this.determineMaxAlleleCount(theVcfData);
-		count = theVcfData.maxAlleleCount;
-	}
-	return count;
+
+	return new Promise(function(resolve, reject) {
+		var theVcfData = null;
+		if (me.model.isVcfLoaded()) {
+			me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	var theVcfData = data.vcfData;
+			 	resolveIt(resolve, theVcfData);
+			 })
+		} else {
+			me.model.promiseGetFbData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	theVcfData = data.fbData;
+			 	resolveIt(resolve, theVcfData);
+			 })
+		
+
+		}
+	})
+
 }
 
 

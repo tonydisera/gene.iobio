@@ -207,31 +207,32 @@
                 <span class="cache-size" id="cache-size"></span>
                  <button id="clear-coverage-cache" onclick="cacheHelper.clearAll();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                </div>
-               <div id="other-cache-panel" style="margin-top:50px">
-                 <a  id="other-cache-detail-link" style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-cache-detail" aria-expanded="false">
+               <div id="other-sessions-cache-panel" style="margin-top:50px">
+                 <a  id="other-sessions-cache-detail-link" style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-sessions-cache-detail" aria-expanded="false">
                   Other gene.iobio sessions...
                  </a>
-                 <div id="other-cache-detail" class="collapse">
-                  <div id="cache-alert2" class="hide alert alert-warning" style="margin-top:20px">
+                 <div id="other-sessions-cache-detail" class="collapse">
+                  <div id="other-sessions-cache-alert" class="hide alert alert-warning" style="margin-top:20px">
                     Another session of gene.iobio is using the browser's cache.  By clearing out the cache
                     highlighted below, you will be able to analyze more genes.
                   </div>   
                   <span class="cache-label" >All data from other sessions</span>
-                  <span class="cache-size" id="other-cache-size"></span>
-                   <button id="clear-other-cache" onclick="cacheHelper.clearOther();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                  <span class="cache-size" id="other-sessions-cache-size"></span>
+                   <button id="clear-other-sessions-cache" onclick="cacheHelper.clearOther();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                  <div id="other-sessions-cache-info" style="margin-left:10px;"></div>
                  </div>
               </div>
-              <div id="other-app-cache-panel" style="margin-top:50px">
-                <a  id="other-app-cache-detail-link" style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-app-cache-detail" aria-expanded="false" >
+              <div id="other-use-cache-panel" style="margin-top:50px">
+                <a  id="other-use-cache-detail-link" style="font-size:14px;margin-top:30px" data-toggle="collapse" href="#other-use-cache-detail" aria-expanded="false" >
                   Other browser apps ...
                  </a>
-                 <div id="other-app-cache-detail" class="collapse">
-                  <div id="cache-alert1" class="hide alert alert-danger" style="margin-top:20px" >
+                 <div id="other-use-cache-detail" class="collapse">
+                  <div id="other-use-cache-alert" class="hide alert alert-danger" style="margin-top:20px" >
                     Other browser apps are consuming the browser's cache.  In order to analyze genes, please clear out the cache highlighted below.
                   </div>     
                   <span class="cache-label" >Data from other web apps</span>
-                  <span class="cache-size" id="other-app-cache-size"></span>
-                   <button id="clear-other-app-cache" onclick="cacheHelper.clearOtherApp();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
+                  <span class="cache-size" id="other-use-cache-size"></span>
+                   <button id="clear-other-use-cache" onclick="cacheHelper.clearOtherApp();" class="icon-button-sm btn btn-default btn-raised">Clear</button>
                  </div>
               </div>
       </div>

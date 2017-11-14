@@ -29,6 +29,8 @@ function VariantModel() {
 	this.lastBamAlertify = null;
 
 	this.debugMe = false;
+
+
 }
 
 
@@ -36,13 +38,35 @@ VariantModel.prototype.getSampleIdentifier = function(theSampleName) {
 	var id = this.relationship + "&&" + this.sampleName + "&&" + theSampleName;
 }
 
-VariantModel.prototype.setLoadState = function(theVcfData, taskName) {
-	if (theVcfData != null) {
-		if (theVcfData.loadState == null) {
-			theVcfData.loadState = {};
+VariantModel.prototype.promiseSetLoadState = function(theVcfData, taskName) {
+	var me = this;
+
+	var resolveIt = function(resolve, theVcfData) {
+		if (theVcfData != null) {
+			if (theVcfData.loadState == null) {
+				theVcfData.loadState = {};
+			}
+			theVcfData.loadState[taskName] = true;
 		}
-		theVcfData.loadState[taskName] = true;
+		resolve();
 	}
+
+	return new Promise(function(resolve, reject) {
+		if (theVcfData != null) {
+			resolveIt(resolve, theVcfData);
+		} else {
+			me.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	resolveIt(resolve, data.vcfData);
+			 },
+			 function(error) {
+			 	var msg = "A problem occurred in VariantModel.promiseSetLoadState(): " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 })
+
+		}
+	})
 }
 
 VariantModel.prototype.getAnnotators = function() {
@@ -84,42 +108,141 @@ VariantModel.prototype.isInheritanceLoaded = function() {
 	return (this.vcfData != null && this.vcfData.loadState != null && this.vcfData.loadState['inheritance']);	
 }
 
-VariantModel.prototype.getVcfDataForGene = function(geneObject, selectedTranscript) {
+VariantModel.prototype.promiseGetVcfData = function(geneObject, selectedTranscript, whenEmptyUseFbData=true) {
 	var me = this;
-	var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
-
-	// If the vcf data is null, see if there are called variants in the cache.  If so,
-	// copy the called variants into the vcf data.
-	if (theVcfData == null && me.isAlignmentsOnly()) {
-		var theFbData = me.getFbDataForGene(geneObject, selectedTranscript);
-		// If no variants are loaded, create a dummy vcfData with 0 features
-		if (theFbData && theFbData.features) {
-			theVcfData = $.extend({}, theFbData);
-			theVcfData.features = [];
-			me.setLoadState(theVcfData, 'clinvar');
-			me.setLoadState(theVcfData, 'coverage');
-			me.setLoadState(theVcfData, 'inheritance');
-			me.addCalledVariantsToVcfData(theVcfData, theFbData);			
+	var dataKind = CacheHelper.VCF_DATA;
+	return new Promise(function(resolve, reject) {
+		if (geneObject == null) {
+			reject("Empty geneObject in VariantModel.promiseGetVcfData()");
 		}
-	}
-	return theVcfData;
+
+		// If only alignments have specified, but not variant files, we will need to use the
+		// getBamRefName function instead of the getVcfRefName function.
+		var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
+		if (theGetRefNameFunction == null) {
+			theGetRefNameFunction = me._stripRefName;
+		}
+		if (theGetRefNameFunction == null) {
+			var msg = "No function defined to parse ref name from file";
+			console.log(msg);
+			reject(msg);
+		}
+
+		var theVcfData = null;
+
+		if (me[dataKind] != null && me[dataKind].features && me[dataKind].features.length > 0) {
+			if (theGetRefNameFunction(geneObject.chr) == me[dataKind].ref &&
+				geneObject.start == me[dataKind].start &&
+				geneObject.end == me[dataKind].end &&
+				geneObject.strand == me[dataKind].strand) {
+				theVcfData = me[dataKind];
+				resolve({model: me, vcfData: theVcfData});
+			}		
+		} 
+
+		if (theVcfData == null) {
+			// Find vcf data in cache
+			me._promiseGetData(dataKind, geneObject.gene_name, selectedTranscript)
+			 .then(function(data) {
+				if (data != null && data != '') {
+					me[dataKind] = data;
+					theVcfData = data;
+					resolve({model: me, vcfData: theVcfData});
+				} else {
+					// If the vcf data is null, see if there are called variants in the cache.  If so,
+					// copy the called variants into the vcf data.
+					if (whenEmptyUseFbData && me.isAlignmentsOnly()) {
+						me.promiseGetFbData(CacheHelper.FB_DATA, geneObject, selectedTranscript)
+						 .then(function(theFbData) {
+							// If no variants are loaded, create a dummy vcfData with 0 features
+							if (theFbData && theFbData.features) {
+								theVcfData = $.extend({}, theFbData);
+								theVcfData.features = [];
+								me.promiseSetLoadState(theVcfData, 'clinvar')
+								 .then(function() {
+									return me.promiseSetLoadState(theVcfData, 'coverage');
+								 })
+								 .then(function() {
+								 	return me.promiseSetLoadState(theVcfData, 'inheritance');
+								 })
+								 .then(function() {							 	
+									me.addCalledVariantsToVcfData(theVcfData, theFbData);			
+								 })
+								
+								
+							}
+							resolve({model: me, vcfData: theVcfData});
+
+						 },
+						 function(error) {
+						 	var msg = "Problem occurred in VariantModel.promiseGetVcfData: " + error;
+						 	console.log(msg);
+						 	reject(error);
+						 });
+					} else {
+						resolve({model: me, vcfData: theVcfData});
+					}			
+
+				}
+
+			 })
+		} 	
+		
+
+
+	});
 }
 
-VariantModel.prototype.getFbDataForGene = function(geneObject, selectedTranscript, reconstiteFromVcfData=false) {
-	var me = this;
-	var theFbData =  me._getDataForGene("fbData", geneObject, selectedTranscript);
 
-	if (reconstiteFromVcfData) {
-		// Reconstitute called variants from vcf data that contains called variants
-		if (theFbData == null || theFbData.features == null) {
-			var theVcfData = me._getDataForGene("vcfData", geneObject, selectedTranscript);
-			var dangerSummary = me.getDangerSummaryForGene(geneObject.gene_name);
-			if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
-				theFbData = me.reconstituteFbData(theVcfData);
+VariantModel.prototype.promiseGetFbData = function(geneObject, selectedTranscript, reconstiteFromVcfData=false) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		me._promiseGetData(CacheHelper.FB_DATA, geneObject.gene_name, selectedTranscript)
+		 .then(function(theFbData) {
+			if (reconstiteFromVcfData) {
+				// Reconstitute called variants from vcf data that contains called variants
+				if (theFbData == null || theFbData.features == null) {
+					me.promiseGetVcfData(geneObject, selectedTranscript, false)
+					 .then(function(data) {
+					 	var theVcfData = data.vcfData;
+						var dangerSummary = me.promiseGetDangerSummary(geneObject.gene_name)
+						 .then(function(dangerSummary) {
+							if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
+								theFbData = me.reconstituteFbData(theVcfData);
+								resolve({fbData: theFbData, model: me});
+							} else {
+								resolve({fbData: theFbData, model: me});
+							}
+						 }, 
+						 function(error) {
+							var msg = "An error occurred in VariantModel.promiseGetFbData: " + error;				 	
+						 	console.log(msg);
+						 	reject(msg);
+						 })
+
+					 },
+					 function(error) {
+							var msg = "An error occurred in VariantModel.promiseGetFbData: " + error;				 	
+						 	console.log(msg);
+						 	reject(msg);
+					 });
+				} else {
+					resolve({fbData: theFbData, model: me});
+				}
+			} else {
+				resolve({fbData: theFbData, model: me});
+
 			}
-		} 
-	}
-	return theFbData;
+
+		 }, 
+		 function(error) {
+		 	var msg = "Problem in VariantModel.promiseGetFbData(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 })
+
+	})
+
 
 }
 
@@ -189,27 +312,38 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
 	var me = this;
 
 	return new Promise( function(resolve, reject) {
-		var cachedGeneCoverage = me.getGeneCoverageForGene(geneObject, transcript);
-		if (cachedGeneCoverage) {
-			resolve(cachedGeneCoverage)
+		if (transcript.features == null || transcript.features.length == 0) {
+			resolve({model: me, gene: geneObject, transcript: transcript, 'geneCoverage': []});
 		} else {
-			me.bam.getGeneCoverage(geneObject, 
-				transcript,
-				[me.bam],	
-				function(theData, trRefName, theGeneObject, theTranscript) {
-					var geneCoverageObjects = me._parseGeneCoverage(theData);
-					if (geneCoverageObjects.length > 0) {
-						me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
-						me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
-						resolve(geneCoverageObjects)
-					} else {
-						console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
-						resolve([]);
-					}
-				}	
-			);
-		}
+			me.promiseGetCachedGeneCoverage(geneObject, transcript)
+			 .then( function(cachedGeneCoverage) {		 	
+				if (cachedGeneCoverage) {
+					resolve({model: me, 'geneCoverage': cachedGeneCoverage})
+				} else {
+					me.bam.getGeneCoverage(geneObject, 
+						transcript,
+						[me.bam],	
+						function(theData, trRefName, theGeneObject, theTranscript) {
+							var geneCoverageObjects = me._parseGeneCoverage(theData);
+							if (geneCoverageObjects.length > 0) {
+								me._setGeneCoverageExonNumbers(transcript, geneCoverageObjects);
+								me.setGeneCoverageForGene(geneCoverageObjects, theGeneObject, theTranscript);
+								resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': geneCoverageObjects});
+							} else {
+								console.log("Cannot get gene coverage for gene " + theGeneObject.gene_name);
+								resolve({model: me, gene: theGeneObject, transcript: theTranscript, 'geneCoverage': []});
+							}
+						}	
+					);
+				}
 
+			 },
+			 function(error) {
+			 	reject(error);
+			 });
+		
+		}
+	
 	});
 }
 
@@ -267,109 +401,102 @@ VariantModel.prototype._parseGeneCoverage = function(theData) {
 	return geneCoverageObjects;
 }
 
-VariantModel.prototype.getGeneCoverageForGene = function(geneObject, selectedTranscript) {
-	var geneCoverage = this._getCachedData("geneCoverage", geneObject.gene_name, selectedTranscript);
-	return geneCoverage;
+VariantModel.prototype.promiseGetCachedGeneCoverage = function(geneObject, selectedTranscript) {
+	return this._promiseGetData(CacheHelper.GENE_COVERAGE_DATA, geneObject.gene_name, selectedTranscript);
 }
 
 VariantModel.prototype.setGeneCoverageForGene = function(geneCoverage, geneObject, transcript) {
 	geneObject = geneObject ? geneObject : window.gene;
 	transcript = transcript ? transcript : window.selectedTranscript;
-	this._cacheData(geneCoverage, "geneCoverage", geneObject.gene_name, transcript);
+	this._promiseCacheData(geneCoverage, CacheHelper.GENE_COVERAGE_DATA, geneObject.gene_name, transcript);
 }
 
 
-VariantModel.prototype._getDataForGene = function(dataKind, geneObject, selectedTranscript) {
+
+VariantModel.prototype.promiseGetBamData = function(geneObject) {
 	var me = this;
-	var data = null;
+	return new Promise(function(resolve, reject) {
 
-	if (geneObject == null) {
-		return null;
-	}
+		var data = null;
 
-	// If only alignments have specified, but not variant files, we will need to use the
-	// getBamRefName function instead of the getVcfRefName function.
-	var theGetRefNameFunction = me.getVcfRefName != null ? me.getVcfRefName : me.getBamRefName;
-
-	if (theGetRefNameFunction == null) {
-		theGetRefNameFunction = me._stripRefName;
-	}
-
-	if (theGetRefNameFunction) {
-		if (me[dataKind] != null && me[dataKind].features && me[dataKind].features.length > 0) {
-			if (theGetRefNameFunction(geneObject.chr) == me[dataKind].ref &&
-				geneObject.start == me[dataKind].start &&
-				geneObject.end == me[dataKind].end &&
-				geneObject.strand == me[dataKind].strand) {
-				data = me[dataKind];
+		if (geneObject == null) {
+			reject("Error VariantModel.promiseGetBamData(): geneObject is null");
+		}
+		
+		if (me.bamData != null) {
+			if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
+				geneObject.start == me.bamData.start &&
+				geneObject.end == me.bamData.end) {
+				data = me.bamData;
+				resolve(data.coverage);
 			}		
 		} 
-
 		if (data == null) {
 			// Find in cache
-			data = this._getCachedData(dataKind, geneObject.gene_name, selectedTranscript);
-			if (data != null && data != '') {
-				me[dataKind] = data;
-			}
-		} 		
-	} else {
-		console.log("No function defined to parse ref name from file");
-	}
-	return data;
+			me._promiseGetData(CacheHelper.BAM_DATA, geneObject.gene_name, null)
+			 .then(function(data) {
+				if (data != null && data != '') {
+					me.bamData = data;
+				}
+				resolve( data ? data.coverage : null);
+			 }, 
+			 function(error) {
+			 	var msg = "An error occurred in VariantModel.promiseGetBamData(): " + error;
+			 	reject(msg);
+			 })
+		} 
+
+	})
 }
 
-VariantModel.prototype.getBamDataForGene = function(geneObject) {
+
+VariantModel.prototype.promiseGetDangerSummary = function(geneName) {
+	return this._promiseGetData(CacheHelper.DANGER_SUMMARY_DATA, geneName, null);
+}
+
+VariantModel.prototype.promiseGetVariantCount = function(data) {
 	var me = this;
-	var data = null;
 
-	if (geneObject == null) {
-		return null;
-	}
-	
-	if (me.bamData != null) {
-		if (me.getBamRefName(geneObject.chr) == me.bamData.ref &&
-			geneObject.start == me.bamData.start &&
-			geneObject.end == me.bamData.end) {
-			data = me.bamData;
-		}		
-	} 
+	var resolveIt = function(resolve, theVcfData) {
+		var loadedVariantCount = 0;
+		if (theVcfData && theVcfData.features) {
+			theVcfData.features.forEach(function(variant) {
+				if (variant.fbCalled == 'Y') {
 
-	if (data == null) {
-		// Find in cache
-		data = this._getCachedData("bamData", geneObject.gene_name, null);
-		if (data != null && data != '') {
-			me.bamData = data;
+				} else if (variant.zygosity && variant.zygosity.toLowerCase() == "homref") {
+
+				} else {
+					loadedVariantCount++;
+				}
+			});
 		}
-	} 
-	return data ? data.coverage : null;
-}
+		resolve(loadedVariantCount);		
 
-VariantModel.prototype.getDangerSummaryForGene = function(geneName) {
-	var me = this;
-	var	dangerSummary = this._getCachedData("dangerSummary", geneName, null);
-	return dangerSummary;
-}
-
-VariantModel.prototype.getVariantCount = function(data) {
-	var theVcfData = data != null ? data : this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	var loadedVariantCount = 0;
-	if (theVcfData && theVcfData.features) {
-		theVcfData.features.forEach(function(variant) {
-			if (variant.fbCalled == 'Y') {
-
-			} else if (variant.zygosity && variant.zygosity.toLowerCase() == "homref") {
-
-			} else {
-				loadedVariantCount++;
-			}
-		});
 	}
-	return loadedVariantCount;
+	return new Promise(function(resolve, reject) {
+		var theVcfData = null;
+		if (data != null && data.features != null) {
+			resolveIt(resolve, data);
+		} else {
+			me.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(theData) {
+			 	theVcfData = theData.vcfData;
+			 	resolveIt(resolve, theData.vcfData);
+			 }, 
+			 function(error) {
+			 	var msg = "Problem in VariantModel.promiseGetVariantCount(): " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 })
+		}
+	})
+
 }
 
-VariantModel.summarizeDanger = function(theVcfData, options = {}, geneCoverageAll) {
+VariantModel._summarizeDanger = function(geneName, theVcfData, options = {}, geneCoverageAll) {
 
 	var dangerCounts = $().extend({}, options);
+	dangerCounts.geneName = geneName;
 	VariantModel.summarizeDangerForGeneCoverage(dangerCounts, geneCoverageAll);
 
 	if (theVcfData == null ) {
@@ -574,10 +701,7 @@ VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverag
 			}
 		}
 
-	} else if (geneCoverageAll) {
-		console.log("no geneCoverage to summarize danger");
-		showStackTrace(new Error());
-	}
+	} 
 
 	// When we are just showing gene badges for low coverage and not reporting on status of
 	// filtered variants, clear out the all of the danger summary object related to variants
@@ -635,38 +759,81 @@ VariantModel.prototype.setLoadedVariants = function(theVcfData) {
 VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 	this.fbData = theFbData;
 	if (cache) {
-		this._cacheData(theFbData, 'fbData', window.gene.gene_name, window.selectedTranscript);
+		this._promiseCacheData(theFbData, CacheHelper.FB_DATA, window.gene.gene_name, window.selectedTranscript);
 	}
 }
 
-VariantModel.prototype.getCalledVariantCount = function() {
+VariantModel.prototype.promiseGetCalledVariantCount = function() {
 	var me = this;
-	var theFbData = me.getFbDataForGene(window.gene, window.selectedTranscript);
-	if (theFbData && theFbData.features ) {
-		return theFbData.features.filter(function(d) {
-			// Filter homozygous reference for proband only
-			if (d.zygosity && d.zygosity.toLowerCase() == 'homref') {
-				return false;
+	return new Promise(function(resolve, reject) {
+		me.promiseGetFbData(window.gene, window.selectedTranscript)
+		 .then(function(data) {
+		 	var theFbData = data.fbData;
+			if (theFbData && theFbData.features ) {
+				var count = theFbData.features
+				 .filter(function(d) {
+					// Filter homozygous reference for proband only
+					if (d.zygosity && d.zygosity.toLowerCase() == 'homref') {
+						return false;
+					}
+					return true;
+				 }).length;
+				 resolve(count);
+			} else {
+				resolve(0);
 			}
-			return true;
-	  }).length;
-	}
-	return 0;
+
+		 },
+		 function(error) {
+		 	var msg = "Problem in VariantModel.prototype.getCalledVariantCount(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 });		
+	})
+
 }
 
 
-VariantModel.prototype.hasCalledVariants = function() {
+VariantModel.prototype.promiseHasCalledVariants = function() {
 	var me = this;
-	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript, true);
-	return theFbData != null && theFbData.features != null && theFbData.features.length > 0;
+	return new Promise(function(resolve,reject) {
+		if (me.fbData != null ) {
+			resolve(me.fbData != null && me.fbData.features != null && me.fbData.features.length > 0);			
+		} else {
+			me.promiseGetFbData(window.gene, window.selectedTranscript, true)
+			 .then(function(data) {
+			 	resolve(data.fbData != null && data.fbData.features != null && data.fbData.features.length > 0);
+			 },
+			 function(error) {
+			 	var msg = "Problem in VariantModel.promiseHasCalledVariants(): " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 })		
+		} 
+
+	})
 }
 
 
 
-VariantModel.prototype.variantsHaveBeenCalled = function() {
+VariantModel.prototype.promiseVariantsHaveBeenCalled = function() {
 	var me = this;
-	var theFbData = me.fbData != null ? me.fbData : me.getFbDataForGene(window.gene, window.selectedTranscript, true);
-	return theFbData != null;
+	return new Promise(function(resolve, reject) {
+		if (me.fbData) {
+			resolve(true);
+		} else {
+			me.promiseGetFbData(window.gene, window.selectedTranscript, true)
+			 .then(function(data) {
+			 	resolve(data.fbData != null);
+			 },
+			 function(error) {
+			 	var msg = "Problem in VariantModel.promiseVariantsHaveBeenCalled(): " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 });
+		}		
+	})
+
 }
 
 
@@ -850,7 +1017,6 @@ VariantModel.prototype.promiseVcfFilesSelected = function(event) {
 		);
 
 	});
-
 }
 
 VariantModel.prototype.clearVcf = function(cardIndex) {
@@ -990,21 +1156,33 @@ VariantModel.prototype._stripRefName = function(refName) {
 }
 
 
-VariantModel.prototype.getMatchingVariant = function(variant) {
-	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	var matchingVariant = null;
-	if (theVcfData && theVcfData.features) {
-		theVcfData.features.forEach(function(v) {
-			if (v.start == variant.start 
-          && v.end == variant.end 
-          && v.ref == variant.ref 
-          && v.alt == variant.alt 
-          && v.type.toLowerCase() == variant.type.toLowerCase()) {
-	      matchingVariant = v;
-	    }
-		});
-	}
-	return matchingVariant;
+VariantModel.prototype.promiseGetMatchingVariant = function(variant) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		var theVcfData = me.promiseGetVcfData(window.gene, window.selectedTranscript)
+		 .then(function(data) {
+		 	var theVcfData = data.vcfData;
+			var matchingVariant = null;
+			if (theVcfData && theVcfData.features) {
+				theVcfData.features.forEach(function(v) {
+					if (v.start == variant.start 
+		          && v.end == variant.end 
+		          && v.ref == variant.ref 
+		          && v.alt == variant.alt 
+		          && v.type.toLowerCase() == variant.type.toLowerCase()) {
+			      matchingVariant = v;
+			    }
+				});
+			}
+			resolve(matchingVariant);
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantModel.promiseGetMatchingVariant(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 })
+
+	});
 }
 
 /*
@@ -1031,78 +1209,95 @@ VariantModel.prototype.getBamDepth = function(gene, selectedTranscript, callback
 		return;
 	}
 
-
-	// A gene has been selected.  Read the bam file to obtain
-	// the read converage.
-	var refName = this.getBamRefName(gene.chr);
-	var theVcfData = this.getVcfDataForGene(gene, selectedTranscript);	
-
-
-	var regions = [];
-	if (theVcfData != null) {
-		me.flagDupStartPositions(theVcfData.features);
-		if (theVcfData) {
-			theVcfData.features.forEach( function(variant) {
-				if (!variant.dup) {
-					regions.push({name: refName, start: variant.start - 1, end: variant.start });
-				}
-			});
-		}
-
-	}
-
-	// Get the coverage data for the gene region
-	// First the gene vcf data has been cached, just return
-	// it.  (No need to retrieve the variants from the iobio service.)
-	var data = me._getCachedData("bamData", gene.gene_name);
-	if (data != null && data != '') {
-		me.bamData = data;
-
+	var performCallbackForCachedData = function(regions, theVcfData, coverageData) {
 		if (regions.length > 0) {
-			me._refreshVariantsWithCoverage(theVcfData, data.coverage, function() {				
+			me._refreshVariantsWithCoverage(theVcfData, coverageData, function() {				
 				if (callbackDataLoaded) {
-			   	    callbackDataLoaded(data.coverage);
+			   	    callbackDataLoaded(coverageData);
 		   	    }
 			});				
 		} else {
 			if (callbackDataLoaded) {
-		   	    callbackDataLoaded(data.coverage);
+		   	    callbackDataLoaded(coverageData);
 	   	    }
 		}
+	}
 
-	} else {
-		me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 2000, useServerCache,
-	 	  function(coverageForRegion, coverageForPoints) {
-	 	  	if (coverageForRegion != null) {
-				me.bamData = {gene: gene.gene_name,
-					          ref: refName, 
-					          start: gene.start, 
-					          end: gene.end, 
-					          coverage: coverageForRegion};
-
-				// Use browser cache for storage coverage data if app is not relying on
-				// server-side cache
-				if (!useServerCache) {
-					me._cacheData(me.bamData, "bamData", gene.gene_name);	 	  		
-				}
-	 	  	}
-
-			if (regions.length > 0) {
-				me._refreshVariantsWithCoverage(theVcfData, coverageForPoints, function() {				
-					if (callbackDataLoaded) {
-				   	    callbackDataLoaded(coverageForRegion);
-			   	    }
-				});				
-			} else {
+	var performCallback = function(regions, theVcfData, coverageForRegion, coverageForPoints) {
+		if (regions.length > 0) {
+			me._refreshVariantsWithCoverage(theVcfData, coverageForPoints, function() {				
 				if (callbackDataLoaded) {
-			   	    callbackDataLoaded(coverageForRegion, "bamData");
+			   	    callbackDataLoaded(coverageForRegion);
 		   	    }
-			}
-		});
+			});				
+		} else {
+			if (callbackDataLoaded) {
+		   	    callbackDataLoaded(coverageForRegion, CacheHelper.BAM_DATA);
+	   	    }
+		}		
 	}
 
 
+	// A gene has been selected.  Read the bam file to obtain
+	// the read converage.
+	var refName = this.getBamRefName(gene.chr);
+	this.promiseGetVcfData(gene, selectedTranscript)
+	 .then(function(data) {
+	 	var theVcfData = data.vcfData;
+		var regions = [];
+		// We we have variants, get the positions for each variant.  This will
+		// be provided for the service to get coverage data so that specific
+		// base coverage is also returned.
+		if (theVcfData != null) {
+			me.flagDupStartPositions(theVcfData.features);
+			if (theVcfData) {
+				theVcfData.features.forEach( function(variant) {
+					if (!variant.dup) {
+						regions.push({name: refName, start: variant.start - 1, end: variant.start });
+					}
+				});
+			}
+		}
+		// Get the coverage data for the gene region
+		// First the gene vcf data has been cached, just return
+		// it.  (No need to retrieve the variants from the iobio service.)
+		me._promiseGetData(CacheHelper.BAM_DATA, gene.gene_name)
+		 .then(function(data) {
+			if (data != null && data != '') {
+				me.bamData = data;
 
+				performCallbackForCachedData(regions, theVcfData, data.coverage);
+
+			} else {
+				me.bam.getCoverageForRegion(refName, gene.start, gene.end, regions, 2000, useServerCache,
+			 	  function(coverageForRegion, coverageForPoints) {
+			 	  	if (coverageForRegion != null) {
+						me.bamData = {gene: gene.gene_name,
+							          ref: refName, 
+							          start: gene.start, 
+							          end: gene.end, 
+							          coverage: coverageForRegion};
+
+						// Use browser cache for storage coverage data if app is not relying on
+						// server-side cache
+						if (!useServerCache) {
+							me._promiseCacheData(me.bamData, CacheHelper.BAM_DATA, gene.gene_name) 
+							 .then(function() {
+								performCallback(regions, theVcfData, coverageForRegion, coverageForPoints);
+							 })	 	  		
+						} else {
+							performCallback(regions, theVcfData, coverageForRegion, coverageForPoints);
+						}
+			 	  	} else {
+			 	  		performCallback(regions, theVcfData, coverageForRegion, coverageForPoints);
+			 	  	}
+					
+				});
+			}
+
+		 })		
+
+	 })
 }
 
 
@@ -1239,42 +1434,51 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
 				    				reject('Cannot find vcf record for variant ' + theGene.gene_name + " " + variant.start + " " + variant.ref + "->" + variant.alt);
 				    			}
 				    		} else {
-				    			var cachedVcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
-				    			if (cachedVcfData) {
-						    		var theVariants = cachedVcfData.features.filter(function(d) {
-						    			if (d.start == v.start &&
-						    				d.alt == v.alt &&
-						    				d.ref == v.ref) {
-						    				return true;
-						    			} else {
-						    				return false;
-						    			}
-						    		});
-						    		if (theVariants && theVariants.length > 0) {
-							    		var theVariant = theVariants[0];
-					
-										// set the hgvs and rsid on the existing variant
-							    		theVariant.extraAnnot = true;
-							    		theVariant.vepHGVSc = v.vepHGVSc;
-							    		theVariant.vepHGVSp = v.vepHGVSp;
-							    		theVariant.vepVariationIds = v.vepVariationIds;
+				    			me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
+				    			 .then(function(cachedVcfData) {
+					    			if (cachedVcfData) {
+							    		var theVariants = cachedVcfData.features.filter(function(d) {
+							    			if (d.start == v.start &&
+							    				d.alt == v.alt &&
+							    				d.ref == v.ref) {
+							    				return true;
+							    			} else {
+							    				return false;
+							    			}
+							    		});
+							    		if (theVariants && theVariants.length > 0) {
+								    		var theVariant = theVariants[0];
+						
+											// set the hgvs and rsid on the existing variant
+								    		theVariant.extraAnnot = true;
+								    		theVariant.vepHGVSc = v.vepHGVSc;
+								    		theVariant.vepHGVSp = v.vepHGVSp;
+								    		theVariant.vepVariationIds = v.vepVariationIds;
 
-								    	// re-cache the data
-									    me._cacheData(cachedVcfData, "vcfData", theGene.gene_name, theTranscript);	
+									    	// re-cache the data
+										    me._promiseCacheData(cachedVcfData, CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
+										     .then(function() {
+										    	// return the annotated variant
+												resolve(theVariant);
+										     }, function(error) {
+										     	var msg = "Problem caching data in VariantModel.promiseGetVariantExtraAnnotations(): " + error;
+										     	console.log(msg);
+										     	reject(msg);
+										     });
 
-								    	// return the annotated variant
-										resolve(theVariant);
-						    		} else {
-					    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+							    		} else {
+						    				var msg = "Cannot find corresponding variant to update HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v .alt;				
+							    			console.log(msg);
+							    			reject(msg);
+							    		}			    		
+					    			} else {
+					    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
 						    			console.log(msg);
 						    			reject(msg);
-						    		}			    		
-				    			} else {
-				    				var msg = "Unable to update gene vcfData cache with updated HGVS notation for variant " + v.chrom + " " + v.start + " " + v.ref + "->" + v.alt;				
-					    			console.log(msg);
-					    			reject(msg);
 
-				    			}
+					    			}
+
+				    			 })
 
 				    		}			    			
 			    		} else {
@@ -1304,14 +1508,21 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 
 	return new Promise( function(resolve, reject) {
 
-		me._promiseVcfRefName(theGeneObject.chr).then( function() {
-			var trRefName = me.getVcfRefName(theGeneObject.chr);
+		var trRefName = null;
+
+		me._promiseVcfRefName(theGeneObject.chr)
+		 .then( function() {
+			trRefName = me.getVcfRefName(theGeneObject.chr);
 
 			// Get the coords for variants of high or moder impact
-			var theVcfData = me._getCachedData("vcfData", theGeneObject.gene_name, theTranscript);	
+			return me._promiseGetData(CacheHelper.VCF_DATA, theGeneObject.gene_name, theTranscript)
+		 })
+		 .then( function(theVcfData) {
 
 			var regions   = theVcfData.features.filter(function(variant) {
-				if (variant.fbCalled != 'Y' && variant.extraAnnot) {
+				if (variant.fbCalled == 'Y')  {
+					return false;
+				} else if (variant.extraAnnot) {
 					return false;
 				} else {
 					return (variant.vepImpact['HIGH'] || variant.vepImpact['MODERATE']);
@@ -1343,10 +1554,16 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 			    	if (annotVcfData != null && annotVcfData.features != null && annotVcfData.features.length > 0) {
 			    		// refresh the variants with the variant ids
 			    		me._refreshVariantsWithVariantIds(theVcfData, annotVcfData);
-					    me._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
-					    me.theVcfData = theVcfData;	
-
-					    resolve(theVcfData.features);
+					    me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theGeneObject.gene_name, theTranscript)
+					     .then(function() {
+						    me.theVcfData = theVcfData;	
+						    resolve(theVcfData.features);
+					     }, 
+					     function(error) {
+					     	var msg = "Problem caching data in VariantModel.promiseGetImpactfulVariantIds(): " + error;
+					     	console.log(msg);
+					     	reject(msg);
+					     })
 			    	} else {
 			    		var msg = "Empty results returned from VariantModel.promiseGetImpactfulVariantIds() for gene " + theGeneObject.gene_name;
 			    		console.log(msg);
@@ -1362,91 +1579,14 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 				resolve(alreadyAnnotVariants);
 			}
 
-		});
-
-
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantModel.promiseGetImpactfulVariantIds(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 })
 
 			
-	});
-
-}
-VariantModel.prototype.promiseGetVariantsOnly = function(theGene, theTranscript) {
-	var me = this;
-
-	return new Promise( function(resolve, reject) {
-
-		// First the gene vcf data has been cached, just return
-		// it.  (No need to retrieve the variants from the iobio service.)
-		var vcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
-		if (vcfData != null && vcfData != '') {
-			me.vcfData = vcfData;
-	    	
-			resolve(me.vcfData);
-		} else {	
-			me._promiseVcfRefName(theGene.chr).then( function() {		
-
-				var sampleNames = me.sampleName;
-				if (sampleNames != null && sampleNames != "") {
-					if (me.relationship != 'proband') {
-						sampleNames += "," + getProbandVariantCard().getSampleName();
-					}			
-				}
-
-
-				me.vcf.promiseGetVariants(
-				   me.getVcfRefName(theGene.chr), 
-				   theGene,
-			       theTranscript,
-			       null,   // regions
-			       false,  // is multi-sample
-			       me._getSamplesToRetrieve(),
-			       filterCard.annotationScheme.toLowerCase(),
-			       matrixCard.clinvarMap,
-			       window.geneSource == 'refseq' ? true : false
-			    ).then( function(data) {
-			    	var annotatedRecs = data[0];
-			    	var data = data[1];	
-
-			    	if (data != null && data.features != null) {
-				    	data.name = me.name;
-				    	data.relationship = me.relationship;    	
-
-				    	// Associate the correct gene with the data
-				    	var theGeneObject = null;
-				    	for( var key in window.geneObjects) {
-				    		var go = geneObjects[key];
-				    		if (me.getVcfRefName(go.chr) == data.ref &&
-				    			go.start == data.start &&
-				    			go.end == data.end &&
-				    			go.strand == data.strand) {
-				    			theGeneObject = go;
-				    			data.gene = theGeneObject;
-				    		}
-				    	}
-				    	if (theGeneObject) {
-
-					    	// Cache the data if variants were retreived.  If no variants, don't
-					    	// cache so we can retry to make sure there wasn't a problem accessing
-					    	// variants.
-					    	if (data.features.length > 0) {
-						    	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-					    	}
-					    	me.vcfData = data;		    	
-							resolve(me.vcfData);
-
-				    	} else {
-				    		console("ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end);
-				    		reject();
-				    	}
-			    	} else {
-			    		reject("No variants");
-			    	}
-
-
-			    	resolve(me.vcfData);
-				});		
-			});				
-		}
 	});
 
 }
@@ -1458,83 +1598,94 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
 		// First the gene vcf data has been cached, just return
 		// it.  (No need to retrieve the variants from the iobio service.)
-		var vcfData = me._getCachedData("vcfData", theGene.gene_name, theTranscript);
-		if (vcfData != null && vcfData != '') {
-			me.vcfData = vcfData;
-			me._populateEffectFilters(me.vcfData.features);
-			me._populateRecFilters(me.vcfData.features);
+		me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
+		 .then(function(vcfData) {
+			if (vcfData != null && vcfData != '') {
+				me.vcfData = vcfData;
+				me._populateEffectFilters(me.vcfData.features);
+				me._populateRecFilters(me.vcfData.features);
 
-			// Flag any bookmarked variants
-			if (me.getRelationship() == 'proband') {
-			    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+				// Flag any bookmarked variants
+				if (me.getRelationship() == 'proband') {
+				    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+				}
+
+
+			    // Invoke callback now that we have annotated variants
+		    	if (onVcfData) {
+		    		onVcfData();
+		    	}
+		    	
+				resolve(me.vcfData);
+			} else {
+				// We don't have the variants for the gene in cache, 
+				// so call the iobio services to retreive the variants for the gene region 
+				// and annotate them.
+				me._promiseVcfRefName(theGene.chr).then( function() {
+					me._promiseGetAndAnnotateVariants(
+						me.getVcfRefName(theGene.chr),
+						theGene,
+				        theTranscript,
+				        global_getVariantIdsForGene,
+				        false,   // parseMultipleSamples
+				        onVcfData)
+					.then( function(data) {
+				    	
+				    	// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var geneObject = geneObjects[key];
+				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+				    			geneObject.start == data.start &&
+				    			geneObject.end == data.end &&
+				    			geneObject.strand == data.strand) {
+				    			theGeneObject = geneObject;
+				    			data.gene = theGeneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+
+				    		// Flag any bookmarked variants
+				    		if (me.getRelationship() == 'proband') {
+						    	bookmarkCard.determineVariantBookmarks(data, theGeneObject, theTranscript);
+						    }
+
+					    	// Cache the data (if there are variants)
+					    	if (data && data.features) {
+						    	me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript)
+						    	 .then(function() {
+							    	me.vcfData = data;		
+									resolve(me.vcfData);
+						    	 },
+						    	 function(error) {
+						    	 	var msg = "A problem occurred when caching data in VariantModel.promiseGetVariants(): " + error + ". Unable to cache annotated variants for gene " + data.gene.gene_name;
+						    	 	console.log(msg);
+						    		reject(msg);
+
+						    	 });
+					    	}
+
+				    	} else {
+				    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+				    		console.log(error);
+				    		reject(error);
+				    	}
+
+				    }, function(error) {
+				    	reject(error);
+				    });
+				}, function(error) {
+					reject("missing reference")
+				});
+
 			}
 
-
-		    // Invoke callback now that we have annotated variants
-	    	if (onVcfData) {
-	    		onVcfData();
-	    	}
-	    	
-			resolve(me.vcfData);
-		} else {
-			// We don't have the variants for the gene in cache, 
-			// so call the iobio services to retreive the variants for the gene region 
-			// and annotate them.
-			me._promiseVcfRefName(theGene.chr).then( function() {
-				me._promiseGetAndAnnotateVariants(
-					me.getVcfRefName(theGene.chr),
-					theGene,
-			        theTranscript,
-			        global_getVariantIdsForGene,
-			        false,   // parseMultipleSamples
-			        onVcfData)
-				.then( function(data) {
-			    	
-			    	// Associate the correct gene with the data
-			    	var theGeneObject = null;
-			    	for( var key in window.geneObjects) {
-			    		var geneObject = geneObjects[key];
-			    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-			    			geneObject.start == data.start &&
-			    			geneObject.end == data.end &&
-			    			geneObject.strand == data.strand) {
-			    			theGeneObject = geneObject;
-			    			data.gene = theGeneObject;
-			    		}
-			    	}
-			    	if (theGeneObject) {
-
-			    		// Flag any bookmarked variants
-			    		if (me.getRelationship() == 'proband') {
-					    	bookmarkCard.determineVariantBookmarks(data, theGeneObject, theTranscript);
-					    }
-
-				    	// Cache the data (if there are variants)
-				    	if (data && data.features) {
-					    	if (!me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript)) {
-					    		reject("Unable to cache annotated variants for gene " + data.gene.gene_name);
-					    	};	
-				    	}
-				    	me.vcfData = data;		
-
-						resolve(me.vcfData);
-
-			    	} else {
-			    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-			    		console.log(error);
-			    		reject(error);
-			    	}
-
-			    }, function(error) {
-			    	reject(error);
-			    });
-			}, function(error) {
-				reject("missing reference")
-			});
-
-		}
-
-
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantModel.promiseGetVariants() " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 })
 
 	});
 
@@ -1548,138 +1699,174 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 		// First the gene vcf data has been cached, just return
 		// it.  (No need to retrieve the variants from the iobio service.)
 		resultMap = {};
+		var promises = [];
 		variantCards.forEach(function(vc) {
-			var vcfData = vc.model._getCachedData("vcfData", theGene.gene_name, theTranscript);
-			if (vcfData != null && vcfData != '') {
-				resultMap[vc.getRelationship()] = vcfData;
+			var p = vc.model._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
+			 .then(function(vcfData) {
+				if (vcfData != null && vcfData != '') {
+					resultMap[vc.getRelationship()] = vcfData;
 
-				vc.model.vcfData = vcfData;
-				me._populateEffectFilters(me.vcfData.features);
-				me._populateRecFilters(me.vcfData.features);
-				if (me.getRelationship() == 'proband') {
-				    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+					vc.model.vcfData = vcfData;
+					me._populateEffectFilters(me.vcfData.features);
+					me._populateRecFilters(me.vcfData.features);
+					if (me.getRelationship() == 'proband') {
+					    bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
+					}
 				}
-			}
+			 })
+			 promises.push(p);
 		})
-		if (Object.keys(resultMap).length == variantCards.length) {
-			resolve(resultMap);
-		} else {
+
+		Promise.all(promises).then(function() {
+			if (Object.keys(resultMap).length == variantCards.length) {
+				resolve(resultMap);
+			} else {
 
 
-			// Place any called variants back in the cache (for proband).  This is necessary, because 
-			// the mother and father vcf data will not be cached?
-			var theFbData = getProbandVariantCard().model.getFbDataForGene(theGene, theTranscript, true);
-			if (theFbData && theFbData.features) {
-				getProbandVariantCard().model._cacheData(theFbData, "fbData", theGene.gene_name, theTranscript);
-			}
+				// Place any called variants back in the cache (for proband).  This is necessary, because 
+				// the mother and father vcf data will not be cached?
+				getProbandVariantCard().model.promiseGetFbData(theGene, theTranscript, true)
+				 .then(function(data) {
+				 	var theFbData = data.fbData;
 
-			// We don't have the variants for the gene in cache, 
-			// so call the iobio services to retreive the variants for the gene region 
-			// and annotate them.
-			me._promiseVcfRefName(theGene.chr).then( function() {
-				var refName = me.getVcfRefName(theGene.chr);
-				me._promiseGetAndAnnotateVariants(
-					refName,
-					theGene,
-			        theTranscript,
-			        global_getVariantIdsForGene,
-			        true // parseMultipleSamples
-			        )
-				.then( function(results) {
-
-					if (results && results.length > 0) {
-						var data = results[0];
-				    	
-				    	// Associate the correct gene with the data
-				    	var theGeneObject = null;
-				    	for( var key in window.geneObjects) {
-				    		var geneObject = geneObjects[key];
-				    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
-				    			geneObject.start == data.start &&
-				    			geneObject.end == data.end &&
-				    			geneObject.strand == data.strand) {
-				    			theGeneObject = geneObject;
-				    		}
-				    	}
-				    	if (theGeneObject) {
-
-				    		var resultMap = {};
-				    		var idx = 0;
-				    		var variantCards = getRelevantVariantCards();
-
-				    		var postProcessNextVariantCard = function(idx, callback) {
-
-				    			if (idx == variantCards.length) {
-				    				if (callback) {
-				    					callback();
-				    				}
-				    				return;
-				    			} else {
-					    			var vc          = variantCards[idx];
-					    			var theVcfData  = results[idx];
-					    			if (theVcfData == null) {
-					    				if (callback) {
-					    					callback();
-					    				}
-					    				return;
-					    			}
-					    			
-					    			theVcfData.gene = theGeneObject;
-					    			resultMap[vc.getRelationship()] = theVcfData;
-
-					    			// Perform post-annotation processing for each variant card's model
-								    vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData)
-								      .then(function() {
-							    		// Flag any bookmarked variants
-							    		if (vc.getRelationship() == 'proband') {
-									    	bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
-
-											me._populateEffectFilters(theVcfData.features);
-											me._populateRecFilters(theVcfData.features);
-										    filterCard.displayDataGeneratedFilters();
-									    }
-
-								    	// Cache the data (if there are variants)
-								    	if (theVcfData && theVcfData.features) {
-									    	if (!vc.model._cacheData(theVcfData, "vcfData", theVcfData.gene.gene_name, theVcfData.transcript)) {
-									    		reject("Unable to cache annotated variants for gene " + theVcfData.gene.gene_name);
-									    	};	
-								    	}
-
-								    	//  Store the data and process next variant card
-								    	vc.model.vcfData = theVcfData;		
-								    	idx++;
-								    	postProcessNextVariantCard(idx, callback);
-								      })
-				    			}
-				    		}
-
-				    		postProcessNextVariantCard(idx, function() {
-
-				    			resolve(resultMap);
-				    		});
-
-
-				    	} else {
-				    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-				    		console.log(error);
-				    		reject(error);
-				    	}						
+				 	var promise = null;
+					if (theFbData && theFbData.features) {
+						promise = getProbandVariantCard().model._promiseCacheData(theFbData, CacheHelper.FB_DATA, theGene.gene_name, theTranscript)						
 					} else {
-			    		var error = "ERROR - empty vcf results for " + theGene.gene_name;;
-			    		console.log(error);
-			    		reject(error);
+						promise = new Promise(function(resolve, reject) {
+							resolve();
+						})
 					}
 
+					// We don't have the variants for the gene in cache, 
+					// so call the iobio services to retreive the variants for the gene region 
+					// and annotate them.
+					promise.then(function() {
+						me._promiseVcfRefName(theGene.chr).then( function() {
+							var refName = me.getVcfRefName(theGene.chr);
+							me._promiseGetAndAnnotateVariants(
+								refName,
+								theGene,
+						        theTranscript,
+						        global_getVariantIdsForGene,
+						        true // parseMultipleSamples
+						        )
+							.then( function(results) {
 
-			    }, function(error) {
-			    	reject(error);
-			    });
-			}, function(error) {
-				reject("missing reference")
-			});
+								if (results && results.length > 0) {
+									var data = results[0];
+							    	
+							    	// Associate the correct gene with the data
+							    	var theGeneObject = null;
+							    	for( var key in window.geneObjects) {
+							    		var geneObject = geneObjects[key];
+							    		if (me.getVcfRefName(geneObject.chr) == data.ref &&
+							    			geneObject.start == data.start &&
+							    			geneObject.end == data.end &&
+							    			geneObject.strand == data.strand) {
+							    			theGeneObject = geneObject;
+							    		}
+							    	}
+							    	if (theGeneObject) {
 
-		}
+							    		var resultMap = {};
+							    		var idx = 0;
+							    		var variantCards = getRelevantVariantCards();
+
+							    		var postProcessNextVariantCard = function(idx, callback) {
+
+							    			if (idx == variantCards.length) {
+							    				if (callback) {
+							    					callback();
+							    				}
+							    				return;
+							    			} else {
+								    			var vc          = variantCards[idx];
+								    			var theVcfData  = results[idx];
+								    			if (theVcfData == null) {
+								    				if (callback) {
+								    					callback();
+								    				}
+								    				return;
+								    			}
+								    			
+								    			theVcfData.gene = theGeneObject;
+								    			resultMap[vc.getRelationship()] = theVcfData;
+
+								    			// Perform post-annotation processing for each variant card's model
+											    vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData)
+											      .then(function() {
+										    		// Flag any bookmarked variants
+										    		if (vc.getRelationship() == 'proband') {
+												    	bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
+
+														me._populateEffectFilters(theVcfData.features);
+														me._populateRecFilters(theVcfData.features);
+													    filterCard.displayDataGeneratedFilters();
+												    }
+
+											    	// Cache the data (if there are variants)
+											    	var promise = null;
+											    	if (theVcfData && theVcfData.features) {
+												    	promise = vc.model._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theVcfData.gene.gene_name, theVcfData.transcript);
+											    	} else {
+											    		promise = new Promise(function(resolve, reject) {
+											    			resolve()
+											    		});
+											    	}
+
+											    	//  Store the data and process next variant card
+											    	promise.then(function() {
+												    	vc.model.vcfData = theVcfData;		
+												    	idx++;
+												    	postProcessNextVariantCard(idx, callback);
+
+											    	},
+											    	function(error) {
+											    		var msg = "A problem occurred while caching data in VariantModel.promiseGetVariantsMultipleSamples(): " + error + ". Unable to cache annotated variants for gene " + theVcfData.gene.gene_name;
+											    		console.log(msg);
+											    		reject(msg);
+											    	})
+											      })
+							    			}
+							    		}
+
+							    		postProcessNextVariantCard(idx, function() {
+
+							    			resolve(resultMap);
+							    		});
+
+
+							    	} else {
+							    		var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+							    		console.log(error);
+							    		reject(error);
+							    	}						
+								} else {
+						    		var error = "ERROR - empty vcf results for " + theGene.gene_name;;
+						    		console.log(error);
+						    		reject(error);
+								}
+
+
+						    }, function(error) {
+						    	reject(error);
+						    });
+						}, 
+						function(error) {
+							reject("missing reference")
+						});						
+					})
+
+
+				 },
+				 function(error) {
+
+				 });
+
+			}			
+		});
+	
 
 
 
@@ -1688,21 +1875,44 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
 }
 
 
-VariantModel.prototype.postInheritanceParsing = function(theVcfData, theGene, theTranscript, affectedInfo, callback) {
+VariantModel.prototype.postInheritanceParsing = function(data, theGene, theTranscript, affectedInfo, callback) {
 	var me = this;
-	var theVcfData = theVcfData ? theVcfData : me._getCachedData("vcfData", theGene.gene_name, theTranscript);	
 
-	me._determineAffectedStatus(theVcfData, affectedInfo);
 
-	me._cacheData(theVcfData, "vcfData", theGene.gene_name, theTranscript);	
-
-	// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
-	// at this point
-	me.vcfData = null;
-
-	if (callback) {
-		callback(theVcfData);		
+	var promise = null;
+	if (data != null) {		
+		promise = new Promise(function(resolve, reject) {
+			resolve(data);
+		})
+	} else {
+		promise = me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript);		 
 	}
+
+	var theVcfData = null;
+
+	promise.then(function(data) {
+		theVcfData = data;
+		me._determineAffectedStatus(theVcfData, affectedInfo);
+		return me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theGene.gene_name, theTranscript);	
+	}).then(function() {
+		// For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
+		// at this point
+		me.vcfData = null;
+
+		if (callback) {
+			callback(theVcfData);		
+		}
+
+	}, 
+	function(error) {
+		var msg = "An error occurred in VariantModel.postInheritanceParsing(): " + error;
+		console.log(msg);
+		if (callback) {
+			callback(null);
+		}
+	})
+
+
 }
 
 
@@ -1907,17 +2117,41 @@ VariantModel._determineAffectedStatusForVariant = function(variant, affectedStat
 }
 
 
-VariantModel.prototype.isCached = function(geneName, transcript) {
-	var key = this._getCacheKey("vcfData", geneName.toUpperCase(), transcript);
-	var data = localStorage.getItem(key);
-	return data != null && data != "";
+VariantModel.prototype.promiseIsCached = function(geneName, transcript) {
+	var me = this;
+
+	return new Promise(function(resolve, reject) {
+		var key = me._getCacheKey(CacheHelper.VCF_DATA, geneName.toUpperCase(), transcript);
+		cacheHelper.promiseGetData(key)
+		 .then(function(data) {
+			resolve(data != null && data != "");
+		 },
+		 function(error) {
+		 	reject(error);
+		 })
+
+	})
 }
 
-VariantModel.prototype.isCachedAndInheritanceDetermined = function(geneObject, transcript, checkForCalledVariants) {
-	var theVcfData = this._getCachedData("vcfData", geneObject.gene_name, transcript);
-	var theFbData  = this.getFbDataForGene(geneObject, transcript, true);
-	var vcfDataCached = theVcfData && theVcfData.loadState != null && (dataCard.mode == 'single' || theVcfData.loadState['inheritance']);
-	return vcfDataCached && (!checkForCalledVariants || (theFbData && theFbData.features));
+VariantModel.prototype.promiseIsCachedAndInheritanceDetermined = function(geneObject, transcript, checkForCalledVariants) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		me._promiseGetData(CacheHelper.VCF_DATA, geneObject.gene_name, transcript)
+		 .then(function(theVcfData) {
+			me.promiseGetFbData(geneObject, transcript, true)
+			 .then(function(data) {
+				var theFbData = data.fbData;
+				var vcfDataCached = theVcfData && theVcfData.loadState != null && (dataCard.mode == 'single' || theVcfData.loadState['inheritance']);
+				resolve(vcfDataCached && (!checkForCalledVariants || (theFbData && theFbData.features)));
+			 })
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in VariantModel.promiseIsCachedAndInheritanceDetermined(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 });
+
+	})
 }
 
 
@@ -1927,60 +2161,70 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
 	return new Promise( function(resolve, reject) {
 
 		// Is the data already cached?  If so, we are done
-		var vcfData = me._getCachedData("vcfData", geneObject.gene_name, transcript);
-		if (vcfData != null && vcfData != '') {	
-			// Do we already have the variants cached?  If so, just return that data.		
-			resolve(vcfData);
-		} else {
-			// We don't have the variants for the gene in cache, 
-			// so call the iobio services to retreive the variants for the gene region 
-			// and annotate them.
-			me._promiseVcfRefName(ref).then( function() {
-				me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript, false)
-				.then( function(data) {
-					// Associate the correct gene with the data
-			    	var theGeneObject = null;
-			    	for( var key in window.geneObjects) {
-			    		var go = geneObjects[key];
-			    		if (me.getVcfRefName(go.chr) == data.ref &&
-			    			go.start == data.start &&
-			    			go.end == data.end &&
-			    			go.strand == data.strand) {
-			    			theGeneObject = go;
-			    			data.gene = theGeneObject;
-			    		}
-			    	}
-			    	if (theGeneObject) {
-			    		me._populateEffectFilters(data.features);
-						me._populateRecFilters(data.features);
+		me._promiseGetData(CacheHelper.VCF_DATA, geneObject.gene_name, transcript)
+		 .then(function(vcfData) {
+			if (vcfData != null && vcfData != '') {	
+				// Do we already have the variants cached?  If so, just return that data.		
+				resolve(vcfData);
+			} else {
+				// We don't have the variants for the gene in cache, 
+				// so call the iobio services to retreive the variants for the gene region 
+				// and annotate them.
+				me._promiseVcfRefName(ref).then( function() {
+					me._promiseGetAndAnnotateVariants(me.getVcfRefName(ref), geneObject, transcript, false)
+					.then( function(data) {
+						// Associate the correct gene with the data
+				    	var theGeneObject = null;
+				    	for( var key in window.geneObjects) {
+				    		var go = geneObjects[key];
+				    		if (me.getVcfRefName(go.chr) == data.ref &&
+				    			go.start == data.start &&
+				    			go.end == data.end &&
+				    			go.strand == data.strand) {
+				    			theGeneObject = go;
+				    			data.gene = theGeneObject;
+				    		}
+				    	}
+				    	if (theGeneObject) {
+				    		me._populateEffectFilters(data.features);
+							me._populateRecFilters(data.features);
 
-			    		// Flag any bookmarked variants
-					    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
+				    		// Flag any bookmarked variants
+						    bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
 
-					    // Refresh the VEP consequence filters and the rec filters that
-					    // show in the Filter panel
-					    filterCard.displayDataGeneratedFilters();
+						    // Refresh the VEP consequence filters and the rec filters that
+						    // show in the Filter panel
+						    filterCard.displayDataGeneratedFilters();
 
-				    	// Cache the data
-					   	me._cacheData(data, "vcfData", data.gene.gene_name, data.transcript);	
-						resolve(data);				    	
-				    } else {
-				    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
-				    }
-			    	
+					    	// Cache the data
+						   	me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript)
+						   	 .then(function() {
+								resolve(data);				    	
+						   	 }, 
+						   	 function(error) {
+						   	 	var msg = "A problem occurred during caching data in VariantModel.promiseCacheVariants(): " + error;
+						   	 	console.log(msg);
+						   	 	reject({isValid: false, message: msg});
+						   	 });
+					    } else {
+					    	reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
+					    }
+				    	
 
-			    }, function(error) {
-			    });
-			}, function(error) {
-				var isValid = false;
-				// for caching, treat missing chrX as a normal case.
-				if (ref != null && ref.toUpperCase().indexOf("X")) {
-					isValid = true;
-				}
+				    }, function(error) {
+				    });
+				}, function(error) {
+					var isValid = false;
+					// for caching, treat missing chrX as a normal case.
+					if (ref != null && ref.toUpperCase().indexOf("X")) {
+						isValid = true;
+					}
 
-				reject({isValid: isValid, message: "missing reference"});
-			});
-		}
+					reject({isValid: isValid, message: "missing reference"});
+				});
+			}		 	
+		 })
+
 
 	});
 
@@ -1999,91 +2243,16 @@ VariantModel.prototype._getCacheKey = function(dataKind, geneName, transcript) {
 	);	
 
 }
-VariantModel.prototype.cacheDangerSummary = function(dangerSummary, geneName) {
-	this._cacheData(dangerSummary, "dangerSummary", geneName);
+VariantModel.prototype.promiseCacheDangerSummary = function(dangerSummary, geneName) {
+	return this._promiseCacheData(dangerSummary, CacheHelper.DANGER_SUMMARY_DATA, geneName);
 }
 
 VariantModel.prototype.clearCacheItem = function(dataKind, geneName, transcript) {
 	var me = this;
-	cacheHelper.clearCacheItem(me._getCacheKey(dataKind, geneName, transcript));
+	var key = me._getCacheKey(dataKind, geneName, transcript);
+	cacheHelper.promiseRemoveCacheItem(dataKind, key);
 }
 
-VariantModel.prototype._cacheData = function(data, dataKind, geneName, transcript) {
-	var me = this;
-	geneName = geneName.toUpperCase();
-
-	if (localStorage) {
-		var success = true;
-		var dataString = JSON.stringify(data);
-
-    	stringCompress = new StringCompress();
-
-    	var dataStringCompressed = null;
-    	try {
-			dataStringCompressed = LZString.compressToUTF16(dataString);
-    	} catch (e) {    		
-	   		success = false;
-	   		console.log("an error occurred when compressing vcf data for key " + e + " " + me._getCacheKey(dataKind, geneName, transcript));
-    		alertify.set('notifier','position', 'top-right');
-	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);
-    	}
-
-    	if (success) {
-	    	try {
-	    		if (me.debugMe) {
-		    		console.log("caching "  + dataKind + ' ' + me.relationship + ' ' + geneName + " = " + dataString.length + '->' + dataStringCompressed.length);
-	    		}
-		      	localStorage.setItem(me._getCacheKey(dataKind, geneName, transcript), dataStringCompressed);
-
-	    	} catch(error) {
-	    		success = false;
-		      	CacheHelper.showError(me._getCacheKey(dataKind, geneName, transcript), error);
-		      	genesCard.hideGeneBadgeLoading(geneName);
-	    	}    		
-    	}
-
-    	if (!success) {
-	   		genesCard.hideGeneBadgeLoading(geneName);
-	   		genesCard.clearGeneGlyphs(geneName);
-	   		genesCard.setGeneBadgeError(geneName);    		
-    	}
-
-    	
-      	return success;
-    } else {
-   		genesCard.hideGeneBadgeLoading(geneName);
-   		genesCard.clearGeneGlyphs(geneName);
-   		genesCard.setGeneBadgeError(geneName);    		
-
-    	return false;
-    }
-}
-
-VariantModel.prototype._getCachedData = function(dataKind, geneName, transcript) {
-	var me = this;
-
-	geneName = geneName.toUpperCase();
-
-	var data = null;
-	if (localStorage) {
-      	var dataCompressed = localStorage.getItem(this._getCacheKey(dataKind, geneName, transcript));
-      	if (dataCompressed != null && dataCompressed != "") {
-			var dataString = null;
-			var start = Date.now();
-			try {
-				//dataString = stringCdompress.inflate(dataCompressed);
-				 dataString = LZString.decompressFromUTF16(dataCompressed);
-	 			 data =  JSON.parse(dataString); 
-	 			 if (me.debugMe) {     		
-				 	console.log("time to decompress cache " + dataKind + " = " + (Date.now() - start));
-				 }
-			} catch(e) {
-				console.log("an error occurred when uncompressing vcf data for key " + me._getCacheKey(dataKind, geneName, transcript));
-			}
-      	} 
-	} 
-	return data;
-}
 
 VariantModel.prototype.pruneIntronVariants = function(data) {
 	if (data.features.length > 500) {
@@ -2186,17 +2355,22 @@ VariantModel.prototype._promiseGetAndAnnotateVariants = function(ref, geneObject
 			} else {
 				var theVcfData = results;
 				if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-					me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData).then(function() {
-						me.setLoadState(theVcfData, 'clinvar');
+					me._promisePostAnnotateProcessing(ref, geneObject, transcript, theVcfData, onVcfData)
+					 .then(function() {
+						return me.promiseSetLoadState(theVcfData, 'clinvar');
+					 })
+					 .then(function() {
 						resolve(theVcfData);
-					}, function(error) {
-						console.log("An error occurred when performing postAnnotateProcessing");
-						reject("_promiseGetAndAnnotateVariants(): " + error);
-					})
+					 }, 
+					 function(error) {
+						var msg = "An error ocurrred in VariantModel._promiseGetAndAnnotateVariants(): " + error;
+						console.log(msg);
+						reject(msg);
+					 })
 				} else if (theVcfData.features.length == 0) {
 			    	resolve(theVcfData);		
 				} else {
-					reject("_promiseGetAndAnnotateVariants() No variants");
+					reject("VariantModel._promiseGetAndAnnotateVariants(): No variants");
 				}
 			}
 
@@ -2267,62 +2441,89 @@ VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject
 }
 
 
-VariantModel.prototype.determineMaxAlleleCount = function(vcfData) {
-	var theVcfData = null;
-	if (vcfData) {
-		theVcfData = vcfData;
-	} else {
-		theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	}
-	if (theVcfData == null || theVcfData.features == null) {
-		return;
-	}
+VariantModel.prototype.promiseDetermineMaxAlleleCount = function(vcfData) {
+	var me = this;
 
-	var maxAlleleCount = 0;
-	var setMaxAlleleCount = function(depth) {
-		if (depth) {
-			if ((+depth) > maxAlleleCount) {
-				maxAlleleCount = +depth;
-			}
+	var resolveIt = function(resolve, theVcfData) {
+		if (theVcfData == null || theVcfData.features == null) {
+			resolve(0);
 		}
-	};
 
-	if (theVcfData.features.length > 0) {
-		theVcfData.features.forEach(function(variant) {
-			for (var key in variant.genotypes) {
-				var gt = variant.genotypes[key];
-				if (gt.hasOwnProperty('genotypeDepth')) {
-					setMaxAlleleCount(gt.genotypeDepth)
+		var maxAlleleCount = 0;
+		var setMaxAlleleCount = function(depth) {
+			if (depth) {
+				if ((+depth) > maxAlleleCount) {
+					maxAlleleCount = +depth;
 				}
 			}
-		});
-		theVcfData.maxAlleleCount = maxAlleleCount;
-	} else if (dataCard.mode == 'trio') {
-		// If the gene doesn't have any variants for the proband, determine the
-		// max allele count by iterating through the mom and data variant
-		// cards to examine these features.
-		window.variantCards.forEach(function(variantCard) {
-			if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
-				var data = variantCard.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-				if (data && data.features) {
-					data.features.forEach(function(theVariant) {
-						setMaxAlleleCount(theVariant.genotypeDepth);
-					});
+		};
 
+		if (theVcfData.features.length > 0) {
+			theVcfData.features.forEach(function(variant) {
+				for (var key in variant.genotypes) {
+					var gt = variant.genotypes[key];
+					if (gt.hasOwnProperty('genotypeDepth')) {
+						setMaxAlleleCount(gt.genotypeDepth)
+					}
 				}
-			}
-		});
-		theVcfData.maxAlleleCount = maxAlleleCount;
+			});
+			theVcfData.maxAlleleCount = maxAlleleCount;
+		} else if (dataCard.mode == 'trio') {
+			// If the gene doesn't have any variants for the proband, determine the
+			// max allele count by iterating through the mom and data variant
+			// cards to examine these features.
+			var promises = [];
+			window.variantCards.forEach(function(variantCard) {
+				if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
+					var p = variantCard.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+					 .then(function(data) {
+					 	var theVcfData = data.vcfData;
+						if (theVcfData && theVcfData.features) {
+							theVcfData.features.forEach(function(theVariant) {
+								setMaxAlleleCount(theVariant.genotypeDepth);
+							});
+
+						}
+
+					 })
+					 promises.push(p);
+				}
+			});
+			Promise.all(promises).then(function() {
+				theVcfData.maxAlleleCount = maxAlleleCount;
+			})
+		}
+		resolve();
+		
 	}
-	return theVcfData;
+	return new Promise(function(resolve, reject) {
+		if (vcfData) {
+			resolveIt(resolve, vcfData)
+		} else {
+			me.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+			 	resolveIt(resolve, data.vcfData);
+			 },
+			 function(error) {
+			 	var msg = "Problem occurred in VariantModel.promiseDetermineMaxAlleleCount: " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 })
+		}
 
+	});
+	
 }
 
 VariantModel.prototype.populateEffectFilters = function() {
-	var theVcfData = this.getVcfDataForGene(window.gene, window.selectedTranscript);
-	if (theVcfData && theVcfData.features) {
-		this._populateEffectFilters(theVcfData.features);
-	}
+	var me = this;
+	this.promiseGetVcfData(window.gene, window.selectedTranscript)
+	 .then(function(data) {
+	 	var theVcfData = data.vcfData;
+		if (theVcfData && theVcfData.features) {
+			me._populateEffectFilters(theVcfData.features);
+		}
+	 })
 }
 
 VariantModel.prototype._populateEffectFilters  = function(variants) {
@@ -2676,21 +2877,31 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
 
 VariantModel.prototype.clearCalledVariants = function() {
 	var me = this;
-	this._cacheData(null, "fbData", window.gene.gene_name, window.selectedTranscript);
-
-	if (this.relationship == 'proband') {
-		var theVcfData = this._getCachedData("vcfData",  window.gene.gene_name, window.selectedTranscript);
-		if (theVcfData && theVcfData.features && theVcfData.features.length > 0) {
-			var loadedVariantsOnly = theVcfData.features.filter(function(variant) {
-				return !variant.fbCalled || variant.fbCalled != 'Y';
-			})
-			if (loadedVariantsOnly.length < theVcfData.features.length ) {
-				theVcfData.features = loadedVariantsOnly;
-				this._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
-				me.vcfData = theVcfData;
-			}			
+	this._promiseCacheData(null, CacheHelper.FB_DATA, window.gene.gene_name, window.selectedTranscript)
+	 .then(function() {
+		if (me.relationship == 'proband') {
+			me._promiseGetData(CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
+			 .then(function(theVcfData) {
+				if (theVcfData && theVcfData.features && theVcfData.features.length > 0) {
+					var loadedVariantsOnly = theVcfData.features.filter(function(variant) {
+						return !variant.fbCalled || variant.fbCalled != 'Y';
+					})
+					if (loadedVariantsOnly.length < theVcfData.features.length ) {
+						theVcfData.features = loadedVariantsOnly;
+						me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
+						 .then(function() {
+							me.vcfData = theVcfData;
+						 })
+					}			
+				}		 	
+			 })
 		}
-	}
+	 }, 
+	 function(error) {
+
+	 })
+
+	
 }
 
 
@@ -2757,57 +2968,84 @@ VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData
 				// Re-cache the vcf data and fb data now that the called variants have been merged,
 				// inheritance has been determined, and newly called variants have 
 				// been annotated with clinvar
-				me._cacheData(theVcfData, "vcfData", window.gene.gene_name, window.selectedTranscript);
-				me._cacheData(theFbData, "fbData", window.gene.gene_name, window.selectedTranscript);
+				me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
+				 .then(function() {
+					return me._promiseCacheData(theFbData, CacheHelper.FB_DATA, window.gene.gene_name, window.selectedTranscript);
+				 })
+				 .then(function() {
+		    		callback(theFbData);
+				 },
+				 function(error) {
+				 	console.log("An error occurred when caching data in VariantModel.processFreebayesVariants(): " + error);
+				 	callback(null);
+				 })
 
 
-	    		callback(theFbData);
 	    	}
 	    });
 
 
 }
 
-VariantModel.prototype.processCachedFreebayesVariants = function(geneObject, theTranscript, callback) {
+VariantModel.prototype.promiseProcessCachedFreebayesVariants = function(geneObject, theTranscript) {
 	var me = this;
 
-	var theVcfData = me.getVcfDataForGene(geneObject, theTranscript);
-	var theFbData = me.getFbDataForGene(geneObject, theTranscript);
+	return new Promise(function(resolve, reject) {
+
+		var theVcfData = null;
+		var theFbData = null;
+
+		me.promiseGetVcfData(geneObject, theTranscript)
+		 .then(function(data) {
+		 	theVcfData = data.vcfData;
+		 })
+		 .then(function() {
+			return me.promiseGetFbData(geneObject, theTranscript)
+			 .then(function(data) {
+
+				theFbData = data.fbData;
+		    	theFbData.features.forEach( function(feature) {
+			   		feature.fbCalled = 'Y';
+			   	});
+
+				// Filter the freebayes variants to only keep the ones
+				// not present in the vcf variant set.
+				me._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
+
+			});
+		 })
+		 .then(function() {
+			// Now get the clinvar data		 
+			// ADD CODE HERE!!! to check to see if the fbData already has the clinvar annotations.  If so,
+			// bypass getting clinvar records and just perform code inside callback   	
+			var refreshDataFunction = isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs : me._refreshVariantsWithClinvarEutils;
+			me.vcf.promiseGetClinvarRecords(theFbData, me._stripRefName(geneObject.chr), geneObject, refreshDataFunction.bind(me, theFbData))
+			 .then( function() {
+	    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
+				theFbData.features.forEach(function (fbVariant) {
+					if (fbVariant.source) {
+						fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+						fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+						fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+						fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+						fbVariant.source.clinvar                     = fbVariant.clinvar;
+						fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+						fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
+					}					
+				});	 
+				resolve({'fbData': theFbData, 'vcfData': theVcfData, 'geneObject': geneObject, 'transcript': theTranscript});
+			 });	 	
+
+
+		 },
+		 function(error) {
+		 	var msg = "An error occurred in VariantMode.processCachedFreebayesVariants(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 });
+	})
 	
-    theFbData.features.forEach( function(feature) {
-   		feature.fbCalled = 'Y';
-   	});
-
-	// Filter the freebayes variants to only keep the ones
-	// not present in the vcf variant set.
-	me._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
-
 	
-	// Now get the clinvar data		 
-	// ADD CODE HERE!!! to check to see if the fbData already has the clinvar annotations.  If so,
-	// bypass getting clinvar records and just perform code inside callback   	
-	me.vcf.promiseGetClinvarRecords(
-	    		theFbData, 
-	    		me._stripRefName(geneObject.chr), geneObject, 
-	    		isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
-	    ).then( function() {
-
-    		// We need to refresh the fb variants in vcfData with the latest clinvar annotations
-			theFbData.features.forEach(function (fbVariant) {
-				if (fbVariant.source) {
-					fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
-					fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
-					fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
-					fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
-					fbVariant.source.clinvar                     = fbVariant.clinvar;
-					fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
-					fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
-				}					
-			});	 
-	    	if (callback) {
-	    		callback(theFbData, theVcfData, geneObject, theTranscript);
-	    	}
-	    });
 
 
 }
@@ -2870,9 +3108,6 @@ VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData,
 				
 			
 		});	
-		// Re-Cache the freebayes variants for proband now that we have mother/father genotype
-		// and allele counts.							
-		//me._cacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript);
 
 
 
@@ -2890,26 +3125,34 @@ VariantModel.prototype._prepareVcfAndFbData = function(theFbData, theVcfData) {
 		// If no variants are loaded, create a dummy vcfData with 0 features
 		theVcfData = $.extend({}, theFbData);
 		theVcfData.features = [];
-		me.setLoadState(theVcfData, 'clinvar');
-		me.setLoadState(theVcfData, 'coverage');
-		me.setLoadState(theVcfData, 'inheritance');
+		me.promiseSetLoadState(theVcfData, 'clinvar')
+		 .then(function() {
+			return me.promiseSetLoadState(theVcfData, 'coverage');
+		 })
+		 .then(function() {
+		 	return me.promiseSetLoadState(theVcfData, 'inheritance');
+		 })
+		 .then(function() {							 	
+			return me.addCalledVariantsToVcfData(theVcfData, theFbData);			
+		 })
+		 .then(function() {
+			// Flag the variants as called by Freebayes and add unique to vcf
+			// set
+			theVcfData.features = theVcfData.features.filter( function(feature) {
+		   		return feature.fbCalled == null;
+		   	});
+
+			// This may not be the first time we call freebayes, so to
+			// avoid duplicate variants, get rid of the ones
+			// we added last round.					
+			theVcfData.features = theVcfData.features.filter( function(d) {
+				return d.consensus != 'unique2';
+			});	
+		 },
+		 function(error) {
+		 	console.log("A problem occurred in VariantModel._prepareVcfAndFbData(): " + error);
+		 })
 	}
-
-
-	// Flag the variants as called by Freebayes and add unique to vcf
-	// set
-	theVcfData.features = theVcfData.features.filter( function(feature) {
-   		return feature.fbCalled == null;
-   	});
-
-	// This may not be the first time we call freebayes, so to
-	// avoid duplicate variants, get rid of the ones
-	// we added last round.					
-	theVcfData.features = theVcfData.features.filter( function(d) {
-		return d.consensus != 'unique2';
-	});	
-
-
 }
 
 VariantModel.prototype.isAlignmentsOnly = function() {
@@ -2919,13 +3162,21 @@ VariantModel.prototype.isAlignmentsOnly = function() {
 /* 
  * No variants are loaded, create a dummy vcfData with 0 features
  */
-VariantModel.prototype.cacheDummyVcfDataAlignmentsOnly = function(theFbData, theGeneObject, theTranscript) {
-	theVcfData = $.extend({}, theFbData);
-	theVcfData.features = [];
-	theVcfData.loadState = {clinvar: true, coverage: true, inheritance: true};
+VariantModel.prototype.promiseCacheDummyVcfDataAlignmentsOnly = function(theFbData, theGeneObject, theTranscript) {
+	return new Promise(function(resolve, reject) {
+		theVcfData = $.extend({}, theFbData);
+		theVcfData.features = [];
+		theVcfData.loadState = {clinvar: true, coverage: true, inheritance: true};
 
-	this._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript);
-	return theVcfData;
+		me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theGeneObject.gene_name, theTranscript)
+		 .then(function() {
+			resolve(theVcfData);
+		 }, 
+		 function(error) {
+		 	reject(error);
+		 })
+
+	})
 }
 
 
@@ -3384,6 +3635,56 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
 
 
 }
+
+
+
+
+VariantModel.prototype._promiseGetData = function(dataKind, geneName, transcript) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+
+		if (geneName == null) {
+			var msg = "VariantModel._promiseGetData(): empty gene name";
+			console.log(msg);
+			reject(msg);
+		} else {
+			var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript)
+			cacheHelper.promiseGetData(key)
+			 .then(function(data) {
+			 	resolve(data);
+			 },
+			 function(error) {
+			 	var msg = "An error occurred in VariantModel._promiseGetData(): " + error;
+			 	console.log(msg);
+			 	reject(msg);
+			 })
+		}
+	})
+}
+
+VariantModel.prototype._promiseCacheData = function(data, dataKind, geneName, transcript) {
+	var me = this;
+	return new Promise(function(resolve, reject) {
+		var key = me._getCacheKey(dataKind, geneName.toUpperCase(), transcript);
+		cacheHelper.promiseCacheData(key, data)
+		 .then(function() {
+		 	resolve();
+		 },
+		 function(error) {
+		 	CacheHelper.showError(key, error);
+		    genesCard.hideGeneBadgeLoading(geneName);
+	   		genesCard.clearGeneGlyphs(geneName);
+	   		genesCard.setGeneBadgeError(geneName);    
+	   		alertify.set('notifier','position', 'top-right');
+	   		alertify.error("Error occurred when compressing analyzed data before caching.", 15);		
+		 	reject(error);
+		 })
+	})
+}
+
+
+
+
 
 /*
 *  Evaluate the highest impacts for a variant across all transcripts.

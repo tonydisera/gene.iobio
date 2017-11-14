@@ -1,74 +1,147 @@
 function CacheIndexStore() {
 	this.db = null;
-	this.version = 1;
+	this.version = 3;
 	this.app = "gene.iobio";
-	this.objectStores = {'vcfData': null, 'fbData' : null, 'dangerSummary': null, 'geneCoverage': null};
+	this.objectStores = {'vcfData': null, 'fbData' : null, 'dangerSummary': null, 'geneCoverage': null, 'bamData': null};
 }
 
-CacheIndexStore.prototype.init = function(callback) {
+CacheIndexStore.prototype.promiseInit = function(callback) {
 	var me = this;
-	window.indexedStore = {};
 
+	return new Promise(function(resolve, reject) {
+		window.indexedStore = {};
 
-	// attempt to open the database
-	var open = indexedDB.open(me.app, version);
+		// attempt to open the database
+		var open = indexedDB.open(me.app, me.version);
 
-	// upgrade/create the database if needed
-	open.onupgradeneeded = function(event) {
-		me.db = open.result;
+		// upgrade/create the database if needed
+		open.onupgradeneeded = function(event) {
+			me.db = open.result;
+			console.log('CacheIndexStore: upgraded needed..');
+			me.promiseCreateObjectStores(event)
+			 .then(function() {
+				resolve();
+			 })
+		};
+
+		open.onsuccess = function(ev) {
+			// assign the database for access outside
+			me.db = open.result;			
+			resolve();
+		};
+
+		open.onerror = function(event) {
+			var msg = "Error in CacheIndexStore.promiseInit():  " + event.target.errorCode;
+	    	console.log(msg);
+	    	reject(msg);
+		};
+
+	})
+
+}
+
+CacheIndexStore.prototype.promiseCreateObjectStores = function(event) {
+	var me = this;
+
+	return new Promise(function(resolve, reject) {
+		var existingNames = me.db.objectStoreNames;
+		var promises = [];
+
 		for (var dataKind in me.objectStores) {
-		  var store = me.db.createObjectStore(dataKind, {keyPath: "id"});
-		  var index = store.createIndex("geneIndex", "gene", {unique: false});
-		}
-	};
+			if (!existingNames.contains(dataKind)) {
+				var store = me.db.createObjectStore(dataKind, {keyPath: "id"});
+				var index = store.createIndex("geneIndex", "gene", {unique: false});
 
-	open.onsuccess = function(ev) {
-		// assign the database for access outside
-		me.db = open.result;
-		if (callback) {
-			callback();
+				var transaction = event.target.transaction;
+				var p = new Promise(function(resolve, reject) {
+		        	transaction.oncomplete = function(event) {    
+		                // Now store is available to be populated
+		                resolve();
+		            }				
+		            transaction.onerror = function(event) {
+						var msg = "Error in CacheIndexStore.promiseCreateObjectStores():  " + event.target.errorCode;
+				    	console.log(msg);
+				    	reject(msg);
+	    			};				
+				})
+				promises.push(p);
+			}
 		}
-	};
+		Promise.all(promises).then(function() {
+			resolve();
+		}, 
+		function(error) {
+			reject(error);
+		})
+
+	})
+	
 }
 
-CacheIndexStore.prototype.setData = function(dataKind, key, gene, data, callback) {
+CacheIndexStore.prototype.promiseSetData = function(dataKind, gene, key, data) {
 	var me = this;
 
-	var tx        = me.db.transaction(dataKind, "readwrite");
-    var store     = tx.objectStore(dataKind);
-	tx.oncomplete = callback;	
-    
-	store.put({id: key, gene: gene, data: data});
-}
+	return new Promise(function(resolve, reject) {
+		var tx        = me.db.transaction(dataKind, "readwrite");
+	    var store     = tx.objectStore(dataKind);
 
-CacheIndexStore.prototype.getData = function(dataKind, key, callback) {
-	var me = this;
-
- 	var tx        = me.db.transaction(dataKind, "readonly");
-    var store     = tx.objectStore(dataKind);
-    
-    var getData = store.get(key);
-
-    getData.onsuccess = function() {
-    	if (callback) {
-    		callback(getData.result);
-    	}
-    };
-
-}
-
-CacheIndexStore.prototype.removeData = function(dataKind, key, callback) {
-	var me = this;
-
- 	var tx        = me.db.transaction(dataKind, "readonly");
-    var store     = tx.objectStore(dataKind);
-    var delData   = store.delete(key);
-
-	delData.onsuccess = function(event) {
-		if (callback) {
-			callback(true);
+		tx.oncomplete = function() {
+			resolve();
+		} 	
+		tx.onerror = function(event) {
+			var msg = "Error in CacheIndexStore.promiseSetData():  " + event.target.errorCode;
+	    	console.log(msg);
+	    	reject(msg);
 		}
-	}
+	    
+		store.put({id: key, gene: gene, data: data});		
+	})
+
+
+}
+
+CacheIndexStore.prototype.promiseGetData = function(dataKind, key) {
+	var me = this;
+
+
+	return new Promise(function(resolve, reject) {
+	 	var tx        = me.db.transaction(dataKind, "readonly");
+	    var store     = tx.objectStore(dataKind);
+	    
+	    var getData = store.get(key);
+
+	    getData.onsuccess = function() {
+	    	resolve(getData.result && getData.result.hasOwnProperty("data") ? getData.result.data : null);
+	    };
+
+	    getData.onerror = function(event) {
+	    	var msg = "Error in CacheIndexStore.promiseGetData():  " + event.target.errorCode + ". " + dataKind;
+	    	console.log(msg);
+	    	reject(msg);
+	    }
+
+	})
+
+
+}
+
+CacheIndexStore.prototype.promiseRemoveData = function(dataKind, key) {
+	var me = this;
+
+	return new Promise(function(resolve, reject) {
+	 	var tx        = me.db.transaction(dataKind, "readwrite");
+	    var store     = tx.objectStore(dataKind);
+	    var delData   = store.delete(key);
+
+		delData.onsuccess = function(event) {
+			resolve();
+		}
+		delData.onerror = function(event) {
+	    	var msg = "Error in CacheIndexStore.promiseRemoveData():  " + event.target.errorCode + ". " + dataKind;
+	    	console.log(msg);
+	    	reject(msg);
+	    }		
+	});
 
 }
 
@@ -107,28 +180,44 @@ CacheIndexStore.prototype.getKeys = function(dataKind, callback) {
     };
 }
 
-CacheIndexStore.prototype.getAllKeys = function(callback) {
+CacheIndexStore.prototype.promiseGetAllKeys = function() {
 	var me = this;
-	var allKeys = [];
-	var count = 0;
 
-	for (var dataKind in me.objectStores) {
-		var tx         = me.db.transaction(dataKind, "readonly");
-	    var store      = tx.objectStore(dataKind);
+ 	return new Promise(function(resolve, reject) {
 
-		var getKeys = store.getAllKeys();
+ 		if (me.hasOwnProperty('db') && me.db) {
+			var allKeys = [];
+			var count = 0;
 
+			for (var dataKind in me.objectStores) {
+				var tx         = me.db.transaction(dataKind, "readonly");
+			    var store      = tx.objectStore(dataKind);
 
-	    getKeys.onsuccess = function() {
-	    	allKeys = allKeys.concat(keys);
-	    	count++;
-	    	if (count == Object.keys(me.objectStores).length) {
-		    	if (callback) {
-		    		callback(getKeys.result);
-		    	}
-	    	}
-	    };
-	}
+				var getKeys = store.getAllKeys();
+				getKeys.onerror = function(event) {
+					var msg = "Error in CacheIndexStore.promiseGetAllKeys():  " + event.target.errorCode + ". " + dataKind;
+			    	console.log(msg);
+			    	reject(msg);				
+				}
+
+			    getKeys.onsuccess = function(event) {
+					if (event.target.result != null) {
+						event.target.result.forEach(function(key) {
+							allKeys.push(key);
+						})
+					}
+				    count++;
+			    	if (count == Object.keys(me.objectStores).length) {
+			    		resolve(allKeys);
+			    	}
+			    };
+			}		
+
+ 		} else {
+ 			resolve([]);
+ 		}
+	})
+
 }
 
 CacheIndexStore.prototype.showContents = function(dataKind, callback) {

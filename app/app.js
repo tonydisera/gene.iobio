@@ -131,7 +131,6 @@ var variantCards = [];
 
 // variant cards for unaffected and affected sibs
 var variantCardsSibs = {'affected': [], 'unaffected': []};
-var variantCardsSibsTransient = [];
 
 var fulfilledTrioPromise = false;
 
@@ -173,84 +172,47 @@ $(document).ready(function(){
 		alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
 	}
 
-	// Compile handlebar templates, when all are loaded
-	// call init();
-	var promises = [];
-	promises.push(promiseLoadTemplate('templates/welcomePanelTemplate.hbs').then(function(compiledTemplate) {
-		welcomePanelTemplate = compiledTemplate;
-		welcomePanel.init();
+	alertify.defaults.glossary.title = "";
+	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
+	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
-	}));
-	promises.push(promiseLoadTemplate('templates/dataCardEntryTemplate.hbs').then(function(compiledTemplate) {
-		dataCardEntryTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/filterSlidebarTemplate.hbs').then(function(compiledTemplate) {
-	//promises.push(promiseLoadTemplate('templates/filterCancerTemplate.hbs').then(function(compiledTemplate) {
-		filterCardTemplateHTML = compiledTemplate();
-	}));
-	promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
-		variantCardTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/geneBadgeTemplate.hbs').then(function(compiledTemplate) {
-		geneBadgeTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/genesCardTemplate.hbs').then(function(compiledTemplate) {
-		genesCardTemplateHTML = compiledTemplate();
-	}));
-	promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
-		bookmarkTemplateHTML = compiledTemplate();
-	}));
-	promises.push(promiseLoadTemplate('templates/knownVariantsNavTemplate.hbs').then(function(compiledTemplate) {
-		knownVariantsNavTemplateHTML = compiledTemplate();
-	}));
-	promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
-		recallTemplateHTML = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/eduTourCardTemplate.hbs').then(function(compiledTemplate) {
-		eduTourTemplateHTML = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
-		iconbarTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
-		tourTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
-		introTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/legendBasicTemplate.hbs').then(function(compiledTemplate) {
-		legendBasicTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/legendTemplate.hbs').then(function(compiledTemplate) {
-		legendTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
-		svgGlyphsTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/navbarTemplate.hbs').then(function(compiledTemplate) {
-		navbarTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/modalsTemplate.hbs').then(function(compiledTemplate) {
-		modalsTemplate = compiledTemplate;
-	}));
-	promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
-		filterAffectedTemplate = compiledTemplate;
-	}));
-	Promise.all(promises).then(function() {
-		// Initialize genomeBuild helper
+	// Initialize material bootstrap
+    $.material.init();
+
+    addCloseListeners();
+
+    detectWindowResize();
+
+    // Load handlebar templates
+	promiseLoadTemplates()
+	 .then(function() {
+
+	 	// Now init genome builder helper
 		genomeBuildHelper = new GenomeBuildHelper();
-		genomeBuildHelper.promiseInit({DEFAULT_BUILD: null}).then(function() {
+		return genomeBuildHelper.promiseInit({DEFAULT_BUILD: null})
+		 .then(function() {
 			var buildName = genomeBuildHelper.getCurrentBuildName();
 			$('#build-link').text(buildName && buildName.length > 0 ? buildName : "");
-			init();
-		});
-	});
+		 });
+	 })
+	 .then(function() {
+	 	// now init cache
+	 	return promiseInitCache();
+	 })
+	 .then(function() {
+	 	// now perform init()
+		init();
+
+	 },
+	 function(error) {
+	 	alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
+	 })
 
 
 });
 
 function initHub() {
-	var api = "http://localhost:3000/apiv1"; // Update hub URL
+	var api = window.location.protocol + "//" + window.location.hostname+ ":3000/apiv1";
 
 	// Parse params
 	var params = {};
@@ -294,6 +256,85 @@ function appendHubFileNamesToURL(res) {
 	})
 }
 
+
+function promiseLoadTemplates()  {
+	return new Promise(function(resolve, reject) {
+		var promises = [];
+		promises.push(promiseLoadTemplate('templates/welcomePanelTemplate.hbs').then(function(compiledTemplate) {
+			welcomePanelTemplate = compiledTemplate;
+			welcomePanel.init();
+
+		}));
+		promises.push(promiseLoadTemplate('templates/dataCardEntryTemplate.hbs').then(function(compiledTemplate) {
+			dataCardEntryTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/filterSlidebarTemplate.hbs').then(function(compiledTemplate) {
+		//promises.push(promiseLoadTemplate('templates/filterCancerTemplate.hbs').then(function(compiledTemplate) {
+			filterCardTemplateHTML = compiledTemplate();
+		}));
+		promises.push(promiseLoadTemplate('templates/variantCardTemplate.hbs').then(function(compiledTemplate) {
+			variantCardTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/geneBadgeTemplate.hbs').then(function(compiledTemplate) {
+			geneBadgeTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/genesCardTemplate.hbs').then(function(compiledTemplate) {
+			genesCardTemplateHTML = compiledTemplate();
+		}));
+		promises.push(promiseLoadTemplate('templates/bookmarkCardTemplate.hbs').then(function(compiledTemplate) {
+			bookmarkTemplateHTML = compiledTemplate();
+		}));
+		promises.push(promiseLoadTemplate('templates/knownVariantsNavTemplate.hbs').then(function(compiledTemplate) {
+			knownVariantsNavTemplateHTML = compiledTemplate();
+		}));
+		promises.push(promiseLoadTemplate('templates/recallCardTemplate.hbs').then(function(compiledTemplate) {
+			recallTemplateHTML = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/eduTourCardTemplate.hbs').then(function(compiledTemplate) {
+			eduTourTemplateHTML = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/iconbarTemplate.hbs').then(function(compiledTemplate) {
+			iconbarTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/tourTemplate.hbs').then(function(compiledTemplate) {
+			tourTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/introTemplate.hbs').then(function(compiledTemplate) {
+			introTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/legendBasicTemplate.hbs').then(function(compiledTemplate) {
+			legendBasicTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/legendTemplate.hbs').then(function(compiledTemplate) {
+			legendTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/svgGlyphsTemplate.hbs').then(function(compiledTemplate) {
+			svgGlyphsTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/navbarTemplate.hbs').then(function(compiledTemplate) {
+			navbarTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/modalsTemplate.hbs').then(function(compiledTemplate) {
+			modalsTemplate = compiledTemplate;
+		}));
+		promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
+			filterAffectedTemplate = compiledTemplate;
+		}));
+
+
+		Promise.all(promises).then(function() {
+			resolve();
+		},
+		function(error) {
+			reject(error);
+		});
+
+
+	})
+
+
+}
+
 function promiseLoadTemplate(templateName) {
 	return new Promise( function(resolve, reject) {
 		$.get(templateName, function (data) {
@@ -326,6 +367,38 @@ function determineStyle() {
 }
 
 
+function promiseInitCache() {
+
+	return new Promise(function(resolve, reject) {
+		var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
+		cacheHelper = new CacheHelper(loaderDisplay);
+		cacheHelper.promiseInit()
+		 .then(function() {
+			cacheHelper.isolateSession();
+			resolve();
+		 },
+		 function(error) {
+		 	var msg = "A problem occurred in promiseInitCache(): " + error;
+		 	console.log(msg);
+		 	reject(msg);
+		 })
+	})
+
+}
+
+function addCloseListeners() {
+
+	if (!isLevelEdu && !isMygene2) {
+		window.onbeforeunload = function (event) {
+		    launchTimestampToClear = cacheHelper.launchTimestamp;
+	    	return "Are you sure you want to exit gene.iobio?";
+		};
+	}
+	window.onunload = function () {
+		cacheHelper.cleanupCacheOnClose();
+	};
+}
+
 
 function init() {
 	var me = this;
@@ -334,338 +407,321 @@ function init() {
 
 	$("[data-toggle=tooltip]").tooltip();
 
-	detectWindowResize();
-
-	var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
-	cacheHelper = new CacheHelper(loaderDisplay);
-
-	if (!isLevelEdu && !isMygene2) {
-		window.onbeforeunload = function (event) {
-		    launchTimestampToClear = cacheHelper.launchTimestamp;
-		    return "Are you sure you want to exit gene.iobio?";
-		};
-	}
-	window.onunload = function () {
-    	cacheHelper.clearCache(launchTimestampToClear);
-	};
 
 
-	cacheHelper.isolateSession();
-
-	if (allowFreebayesSettings) {
-		$('#show-fb-settings').removeClass("hide");
-	}
 
 
-	// If we are using the gene.iobio education tour edition, automatically load
-	// exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
-	if (isLevelEdu && !getUrlParameter("tour")) {
-		var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
-		window.location.assign(exhibitUrl);
-		return;
-	}
-
-
-	if (isMygene2) {
-		$('#intro').append(introTemplate());
-		if (isLevelBasic) {
-			$('#intro-link').addClass("hide");
-			$('#intro-text').removeClass("hide");
+	cacheHelper.promiseCheckCacheSize()
+	 .then(function() {
+		if (allowFreebayesSettings) {
+			$('#show-fb-settings').removeClass("hide");
 		}
 
-	}
+
+		// If we are using the gene.iobio education tour edition, automatically load
+		// exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
+		if (isLevelEdu && !getUrlParameter("tour")) {
+			var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
+			window.location.assign(exhibitUrl);
+			return;
+		}
 
 
-	if (!isLevelEdu) {
-		$('body').prepend(navbarTemplate());
-	}
-
-
-
-	alertify.defaults.glossary.title = "";
-	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
-	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
-
-	$('#modals-placeholder').append(modalsTemplate());
-	$('#tour-placeholder').append(tourTemplate());
-	$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
-
-	// Set version number on About menu and the Version dialog
-	$('.version-number').text(version);
-
-
-	// Clear the local cache
- 	cacheHelper.clearCache();
-
-
-	$('#nav-edu-tour').append(eduTourTemplateHTML);
-	eduTourNumber = getUrlParameter("tour");
-	if (eduTourNumber == null || eduTourNumber == "") {
-		eduTourNumber = "0";
-	}
-	if (eduTourNumber && eduTourNumber != '') {
-		$('#edu-tour-' + eduTourNumber).removeClass("hide");
-	}
-
-
-    // Slide out panels
-    $(iconbarTemplate()).insertBefore("#slider-left");
-	$('#slider-left-content').append(filterCardTemplateHTML);
-	$('#slider-left-content').append(genesCardTemplateHTML);
-	$('#slider-left-content').append(bookmarkTemplateHTML);
-	$('#slider-left-content').append(recallTemplateHTML);
-	$('#close-slide-left').click(function() {
-		closeSlideLeft();
-	});
-
-	initializeTours();
-
-    // Encapsulate logic for animate.css into a jquery function
-    $.fn.extend({
-    animateIt: function (animationName, customClassName) {
-    		$(this).removeClass("hide");
-    		var additionalClass = customClassName ? ' ' + customClassName : '';
-	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-	        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
-	            $(this).removeClass('animated ' + animationName);
-	        });
-	    }
-	});
-	$.fn.extend({
-    animateSplash: function (animationName) {
-    		$(this).removeClass("hide");
-	        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-	        $(this).addClass('animated ' + animationName).one(animationEnd, function() {
-	            $(this).removeClass('animated ' + animationName);
-	            //$('.twitter-typeahead').animateIt('tada', 'animate-delayed');
-	        });
-	    }
-	});
-
-
-	// For 'show variants' card
-	//$('#select-color-scheme').selectize()
-	//$('#select-intron-display').selectize()
-
-
-
-	// Initialize data card
-	dataCard = new DataCard();
-	dataCard.init();
-
-
-	// Init known variants nav
-	initKnownVariantsNav();
-
-
-	// Create transcript chart
-	transcriptChart = geneD3()
-	    .width($('#container').innerWidth())
-	    .widthPercent("100%")
-	    .heightPercent("100%")
-	    .margin({top: isLevelBasic || isLevelEdu ? 0 : 20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
-	    .showXAxis(true)
-	    .showBrush(true)
-	    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
-	    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
-	    .showLabel(false)
-		.featureClass( function(d,i) {
-		    return d.feature_type.toLowerCase();
-		})
-		.on("d3brush", function(brush) {
-	    	hideCoordinateFrame();
-	    	if (!brush.empty()) {
-	    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
-				regionStart = d3.round(brush.extent()[0]);
-				regionEnd   = d3.round(brush.extent()[1]);
-				if (!selectedTranscript) {
-					selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
-					getCodingRegions(selectedTranscript);
-			    	markCodingRegions(window.gene, window.selectedTranscript);
-				}
-			} else {
-	    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
-				regionStart = window.gene.start;
-				regionEnd   = window.gene.end;
+		if (isMygene2) {
+			$('#intro').append(introTemplate());
+			if (isLevelBasic) {
+				$('#intro-link').addClass("hide");
+				$('#intro-text').removeClass("hide");
 			}
 
+		}
 
-			var cardCount = 0;
-		    showKnownVariantsCounts();
 
-			getRelevantVariantCards().forEach(function(variantCard) {
-		    	variantCard.onBrush(brush, function() {
+		if (!isLevelEdu) {
+			$('body').prepend(navbarTemplate());
+		}
 
-					cardCount++;
-					// Wait until all variant cards have finished with onBrush,
-					// then fill feature matrix and circle variants.
-					if (cardCount == getRelevantVariantCards().length) {
-						getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
-			    		if (clickedVariant && clickedVariantCard) {
-							clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
-							window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
-							showCoordinateFrame(clickedVariant.screenX)
-						}
+
+
+		$('#modals-placeholder').append(modalsTemplate());
+		$('#tour-placeholder').append(tourTemplate());
+		$('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
+
+		// Set version number on About menu and the Version dialog
+		$('.version-number').text(version);
+
+
+		// Clear the local cache
+	 	cacheHelper.clearCache();
+
+
+		$('#nav-edu-tour').append(eduTourTemplateHTML);
+		eduTourNumber = getUrlParameter("tour");
+		if (eduTourNumber == null || eduTourNumber == "") {
+			eduTourNumber = "0";
+		}
+		if (eduTourNumber && eduTourNumber != '') {
+			$('#edu-tour-' + eduTourNumber).removeClass("hide");
+		}
+
+
+	    // Slide out panels
+	    $(iconbarTemplate()).insertBefore("#slider-left");
+		$('#slider-left-content').append(filterCardTemplateHTML);
+		$('#slider-left-content').append(genesCardTemplateHTML);
+		$('#slider-left-content').append(bookmarkTemplateHTML);
+		$('#slider-left-content').append(recallTemplateHTML);
+		$('#close-slide-left').click(function() {
+			closeSlideLeft();
+		});
+
+		initializeTours();
+
+	    // Encapsulate logic for animate.css into a jquery function
+	    $.fn.extend({
+	    animateIt: function (animationName, customClassName) {
+	    		$(this).removeClass("hide");
+	    		var additionalClass = customClassName ? ' ' + customClassName : '';
+		        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+		        $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
+		            $(this).removeClass('animated ' + animationName);
+		        });
+		    }
+		});
+		$.fn.extend({
+	    animateSplash: function (animationName) {
+	    		$(this).removeClass("hide");
+		        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+		        $(this).addClass('animated ' + animationName).one(animationEnd, function() {
+		            $(this).removeClass('animated ' + animationName);
+		            //$('.twitter-typeahead').animateIt('tada', 'animate-delayed');
+		        });
+		    }
+		});
+
+
+
+
+		// Initialize data card
+		dataCard = new DataCard();
+		dataCard.init();
+
+
+		// Init known variants nav
+		initKnownVariantsNav();
+
+
+		// Create transcript chart
+		transcriptChart = geneD3()
+		    .width($('#container').innerWidth())
+		    .widthPercent("100%")
+		    .heightPercent("100%")
+		    .margin({top: isLevelBasic || isLevelEdu ? 0 : 20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
+		    .showXAxis(true)
+		    .showBrush(true)
+		    .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
+		    .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
+		    .showLabel(false)
+			.featureClass( function(d,i) {
+			    return d.feature_type.toLowerCase();
+			})
+			.on("d3brush", function(brush) {
+		    	hideCoordinateFrame();
+		    	if (!brush.empty()) {
+		    		$('#zoom-hint').text('To zoom out, click outside bounding box.');
+					regionStart = d3.round(brush.extent()[0]);
+					regionEnd   = d3.round(brush.extent()[1]);
+					if (!selectedTranscript) {
+						selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
+						getCodingRegions(selectedTranscript);
+				    	promiseMarkCodingRegions(window.gene, window.selectedTranscript);
 					}
-		    	});
+				} else {
+		    		$('#zoom-hint').text('To zoom into region, drag over gene model.');
+					regionStart = window.gene.start;
+					regionEnd   = window.gene.end;
+				}
 
+
+				var cardCount = 0;
+			    showKnownVariantsCounts();
+
+				getRelevantVariantCards().forEach(function(variantCard) {
+			    	variantCard.onBrush(brush, function() {
+
+						cardCount++;
+						// Wait until all variant cards have finished with onBrush,
+						// then fill feature matrix and circle variants.
+						if (cardCount == getRelevantVariantCards().length) {
+							getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+				    		if (clickedVariant && clickedVariantCard) {
+								clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
+								window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
+								showCoordinateFrame(clickedVariant.screenX)
+							}
+						}
+			    	});
+
+			    });
+
+
+
+			})
+			.on("d3featuretooltip", function(featureObject, feature, tooltip) {
+			    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
+			    			tooltip.transition()
+				                   .duration(200)
+				                   .style("opacity", .9);
+					        tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))
+					               .style("left", coord.x  + "px")
+					               .style("text-align", 'left')
+					               .style("top", coord.y + "px");
+			 });
+
+	    transcriptMenuChart = geneD3()
+		    .width(600)
+		    .margin({top: 5, right: 5, bottom: 5, left: 200})
+			.widthPercent("100%")
+		    .heightPercent("100%")
+		    .showXAxis(false)
+		    .showBrush(false)
+		    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
+		    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 10)
+		    .showLabel(true);
+
+
+
+		knownVariantsAreaChart = stackedAreaChartD3()
+			.widthPercent("100%")
+			.heightPercent("100%")
+	  	    .width($('#container').innerWidth())
+			.height(50)
+			.showXAxis(false)
+			.xTickCount(0)
+			.yTickCount(3)
+			.xValue( function(d, i) { return d.point })
+			.categories(['unknown', 'other', 'benign', 'path'])
+		    .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
+
+		knownVariantsBarChart = stackedBarChartD3()
+			.widthPercent("100%")
+			.heightPercent("100%")
+	  	    .width($('#container').innerWidth())
+			.height(50)
+			.showXAxis(false)
+			.xTickCount(0)
+			.yTickCount(3)
+			.xValue( function(d, i) { return d.point })
+			.xValueStart( function(d, i) { return d.start })
+			.xValueEnd( function(d, i) { return d.end })
+			.barWidthMin(4)
+			.barHeightMin(3)
+			.categories(['unknown', 'other', 'benign', 'path'])
+		    .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+		    .tooltipText( function(d,i) {
+		    	return showKnownVariantsTooltip(d);
 		    });
+		toggleKnownVariantsChart('bar');
 
 
 
-		})
-		.on("d3featuretooltip", function(featureObject, feature, tooltip) {
-		    			var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
-		    			tooltip.transition()
-			                   .duration(200)
-			                   .style("opacity", .9);
-				        tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))
-				               .style("left", coord.x  + "px")
-				               .style("text-align", 'left')
-				               .style("top", coord.y + "px");
-		 });
+	   	// Initialize variant tooltip
+		variantTooltip = new VariantTooltip();
 
-    transcriptMenuChart = geneD3()
-	    .width(600)
-	    .margin({top: 5, right: 5, bottom: 5, left: 200})
-		.widthPercent("100%")
-	    .heightPercent("100%")
-	    .showXAxis(false)
-	    .showBrush(false)
-	    .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
-	    .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 10)
-	    .showLabel(true);
+		// Initialize genes card
+		genesCard = new GenesCard();
+		genesCard.init();
 
 
+		// Initialize Matrix card
+		matrixCard = new MatrixCard();
+		matrixCard.init();
+		// Set the tooltip generator now that we have a variant card instance
+		matrixCard.setTooltipGenerator(variantTooltip.formatContent);
 
-	knownVariantsAreaChart = stackedAreaChartD3()
-		.widthPercent("100%")
-		.heightPercent("100%")
-  	    .width($('#container').innerWidth())
-		.height(50)
-		.showXAxis(false)
-		.xTickCount(0)
-		.yTickCount(3)
-		.xValue( function(d, i) { return d.point })
-		.categories(['unknown', 'other', 'benign', 'path'])
-	    .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
+		// Initialize the Filter card
+		filterCard = new FilterCard();
+		filterCard.init();
 
-	knownVariantsBarChart = stackedBarChartD3()
-		.widthPercent("100%")
-		.heightPercent("100%")
-  	    .width($('#container').innerWidth())
-		.height(50)
-		.showXAxis(false)
-		.xTickCount(0)
-		.yTickCount(3)
-		.xValue( function(d, i) { return d.point })
-		.xValueStart( function(d, i) { return d.start })
-		.xValueEnd( function(d, i) { return d.end })
-		.barWidthMin(4)
-		.barHeightMin(3)
-		.categories(['unknown', 'other', 'benign', 'path'])
-	    .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
-	    .tooltipText( function(d,i) {
-	    	return showKnownVariantsTooltip(d);
-	    });
-	toggleKnownVariantsChart('bar');
-
-	// Initialize material bootstrap
-    $.material.init();
-
-   	// Initialize variant tooltip
-	variantTooltip = new VariantTooltip();
-
-	// Initialize genes card
-	genesCard = new GenesCard();
-	genesCard.init();
+		// Initialize the bookmark card
+		bookmarkCard = new BookmarkCard();
+		bookmarkCard.init();
 
 
-	// Initialize Matrix card
-	matrixCard = new MatrixCard();
-	matrixCard.init();
-	// Set the tooltip generator now that we have a variant card instance
-	matrixCard.setTooltipGenerator(variantTooltip.formatContent);
+		// Initialize the legend content
+		$('#legend-track #legend-placeholder').html(legendTemplate());
 
-	// Initialize the Filter card
-	filterCard = new FilterCard();
-	filterCard.init();
+		// Initialize transcript view buttons
+		initTranscriptControls();
 
-	// Initialize the bookmark card
-	bookmarkCard = new BookmarkCard();
-	bookmarkCard.init();
-
-
-	// Initialize the legend content
-	$('#legend-track #legend-placeholder').html(legendTemplate());
-
-	// Initialize transcript view buttons
-	initTranscriptControls();
-
-	// endsWith implementation
-	if (typeof String.prototype.endsWith !== 'function') {
-	    String.prototype.endsWith = function(suffix) {
-	        return this.indexOf(suffix, this.length - suffix.length) !== -1;
-	    };
-	}
-
-
-	$('.sidebar-button.selected').removeClass("selected");
-
-
-	$('#select-gene-source').selectize({});
-	$('#select-gene-source')[0].selectize.on('change', function(value) {
-		geneSource = value.toLowerCase().split(" transcript")[0];
-		// When the user picks a different gene source from the dropdown,
-		// this becomes the 'new' site gene source
-		siteGeneSource = geneSource;
-		geneToLatestTranscript = {};
-		getRelevantVariantCards().forEach(function(vc) {
-			// When switching from gencode->refseq or vice/versa,
-			// the VEP tokens will be formatted in a different order,
-			// so make sure we clear out the token indices
-			vc.model.vcf.clearVepInfoFields();
-		})
-		if (window.gene) {
-			genesCard.selectGene(window.gene.gene_name);
+		// endsWith implementation
+		if (typeof String.prototype.endsWith !== 'function') {
+		    String.prototype.endsWith = function(suffix) {
+		        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+		    };
 		}
-	});
 
 
-	// Set up the gene search widget
-	loadGeneWidgets( function(success) {
-		if (success) {
-			loadGeneFromUrl();
+		$('.sidebar-button.selected').removeClass("selected");
+
+
+		$('#select-gene-source').selectize({});
+		$('#select-gene-source')[0].selectize.on('change', function(value) {
+			geneSource = value.toLowerCase().split(" transcript")[0];
+			// When the user picks a different gene source from the dropdown,
+			// this becomes the 'new' site gene source
+			siteGeneSource = geneSource;
+			geneToLatestTranscript = {};
+			getRelevantVariantCards().forEach(function(vc) {
+				// When switching from gencode->refseq or vice/versa,
+				// the VEP tokens will be formatted in a different order,
+				// so make sure we clear out the token indices
+				vc.model.vcf.clearVepInfoFields();
+			})
+			if (window.gene) {
+				genesCard.selectGene(window.gene.gene_name);
+			}
+		});
+
+
+		// Set up the gene search widget
+		loadGeneWidgets( function(success) {
+			if (success) {
+				loadGeneFromUrl();
+			}
+		});
+		getGeneBloodhoundElement().focus();
+
+		if (isLevelBasic) {
+			$('#select-gene').selectize(
+				{
+					create: false,
+					valueField: 'value',
+			    	labelField: 'value',
+			    	searchField: ['value'],
+			    	maxOptions: 5000
+		    	}
+			);
+			addGeneDropdownListener();
 		}
-	});
-	getGeneBloodhoundElement().focus();
 
-	if (isLevelBasic) {
-		$('#select-gene').selectize(
-			{
-				create: false,
-				valueField: 'value',
-		    	labelField: 'value',
-		    	searchField: ['value'],
-		    	maxOptions: 5000
-	    	}
-		);
-		addGeneDropdownListener();
-	}
+		// In cases where timeout=true, restart app after n seconds of inactivity
+		// (e.g. no mouse move, button click, etc.).
+		if (hasTimeout) {
+			checkForInactivity();
+		}
 
-	// In cases where timeout=true, restart app after n seconds of inactivity
-	// (e.g. no mouse move, button click, etc.).
-	if (hasTimeout) {
-		checkForInactivity();
-	}
+		if (feedbackEmails != undefined && feedbackEmails != "") {
+			$('#feedback-link').removeClass("hide");
+			$('#feedback-link').on('click', showFeedback);
+		    $('#report-feedback-button').on('click', emailFeedback);
+		}
 
-	if (feedbackEmails != undefined && feedbackEmails != "") {
-		$('#feedback-link').removeClass("hide");
-		$('#feedback-link').on('click', showFeedback);
-	    $('#report-feedback-button').on('click', emailFeedback);
-	}
+	 })
 
-	cacheHelper.checkCacheSize();
+
+
+
 
 }
 
@@ -713,7 +769,7 @@ function initKnownVariantsNav() {
 				filterCard.setCardSpecificFilter('known-variants', filterName, true);
 			})
 		}
-		getVariantCard('known-variants').filterAndShowLoadedVariants();
+		getVariantCard('known-variants').promiseFilterAndShowLoadedVariants();
 	})
 
 	var variantCard = getVariantCard('known-variants');
@@ -1780,11 +1836,13 @@ function onCloseTranscriptMenuEvent() {
 }
 
 function selectCurrentTranscript() {
-	markCodingRegions(window.gene, window.selectedTranscript);
-	geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-	d3.selectAll("#gene-viz .transcript rect").remove();
- 	getCodingRegions(window.selectedTranscript);
- 	loadTracksForGene();
+	promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+		.then(function() {
+			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+			d3.selectAll("#gene-viz .transcript rect").remove();
+		 	getCodingRegions(window.selectedTranscript);
+		 	loadTracksForGene();
+		})
 }
 
 function getCanonicalTranscript(theGeneObject) {
@@ -1952,7 +2010,10 @@ function getCodingRegions(transcript) {
 	return [];
 }
 
-function markCodingRegions(geneObject, transcript) {
+
+
+function promiseMarkCodingRegions(geneObject, transcript) {
+	var exonPromises = [];
 	transcript.features.forEach(function(feature) {
 		if (!feature.hasOwnProperty("danger")) {
 			feature.danger = {proband: false, mother: false, father: false};
@@ -1960,29 +2021,38 @@ function markCodingRegions(geneObject, transcript) {
 		if (!feature.hasOwnProperty("geneCoverage")) {
 			feature.geneCoverage = {proband: false, mother: false, father: false};
 		}
+
+
 		getRelevantVariantCards().forEach(function(vc) {
-			var geneCoverage = vc.model.getGeneCoverageForGene(geneObject, transcript);
-			if (geneCoverage) {
-				var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
-					return feature.start == gc.start && feature.end == gc.end;
-				});
-				if (matchingFeatureCoverage.length > 0) {
-					var gc = matchingFeatureCoverage[0];
-					feature.geneCoverage[vc.getRelationship()] = gc;
-					feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
-				} else {
-					feature.danger[vc.getRelationship()]  = false;
-				}
-			} else {
-				feature.danger[vc.getRelationship()] = false;
-			}
+			var promise = vc.model.promiseGetCachedGeneCoverage(geneObject, transcript)
+			 .then(function(geneCoverage) {
+					if (geneCoverage) {
+						var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
+							return feature.start == gc.start && feature.end == gc.end;
+						});
+						if (matchingFeatureCoverage.length > 0) {
+							var gc = matchingFeatureCoverage[0];
+							feature.geneCoverage[vc.getRelationship()] = gc;
+							feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
+						} else {
+							feature.danger[vc.getRelationship()]  = false;
+						}
+					} else {
+						feature.danger[vc.getRelationship()] = false;
+					}
 
+			 })
+			exonPromises.push(promise);
 		})
-
 	})
 
-	var exonCount = 0;
-	var exonNumber = 1;
+	return Promise.all(exonPromises).then(function() {
+		var sortedExons = _getSortedExonsForTranscript(transcript);
+		_setTranscriptExonNumbers(transcript, sortedExons);
+	});
+}
+
+function _getSortedExonsForTranscript(transcript) {
 	var sortedExons = transcript
 		.features.filter(function(feature) {
 			return feature.feature_type.toUpperCase() == 'EXON';
@@ -2003,16 +2073,23 @@ function markCodingRegions(geneObject, transcript) {
 			return compare * strandMultiplier;
 
 		})
+
+	var exonCount = 0;
 	sortedExons.forEach(function(exon) {
 		exonCount++
 	})
 
+	var exonNumber = 1;
 	sortedExons.forEach(function(exon) {
 		exon.exon_number = exonNumber + "/" + exonCount;
 		exonNumber++;
 	})
+	return sortedExons;
+}
 
-	// Now set the exon number on each UTR and CDS within the corresponding exon
+
+function _setTranscriptExonNumbers(transcript, sortedExons) {
+	// Set the exon number on each UTR and CDS within the corresponding exon
 	transcript.features.forEach(function(feature) {
 		if (feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR') {
 			sortedExons.forEach(function(exon) {
@@ -2023,7 +2100,6 @@ function markCodingRegions(geneObject, transcript) {
 		}
 	})
 }
-
 function hasDataSources() {
 	var hasDataSource = false;
 	variantCards.forEach( function(variantCard) {
@@ -2626,15 +2702,25 @@ function loadTracksForGene(bypassVariantCards, callback) {
 }
 
 
-function hasCachedCalledVariants(geneObject, transcript) {
+function promiseHasCachedCalledVariants(geneObject, transcript) {
 	var cachedCount =  0;
-	getRelevantVariantCards().forEach(function(vc) {
-		var theFbData = vc.model.getFbDataForGene(geneObject, transcript);
-		if (theFbData) {
-			cachedCount ++;
-		}
-	});
-	return cachedCount == getRelevantVariantCards().length;
+	var promises = [];
+	return new Promise(function(resolve, reject) {
+		getRelevantVariantCards().forEach(function(vc) {
+			var p = vc.model.promiseGetFbData(geneObject, transcript)
+			 .then(function(data) {
+				if (data.fbData) {
+					cachedCount ++;
+				}
+
+			 })
+			promises.push(p);
+		});
+		Promise.all(promises).then(function() {
+			resolve(cachedCount == getRelevantVariantCards().length);
+		})
+
+	})
 }
 
 function isAlignmentsOnly(callback) {
@@ -2661,11 +2747,25 @@ function samplesInSingleVcf() {
 }
 
 
-function hasCalledVariants() {
-	var cards = getRelevantVariantCards().filter(function(vc) {
-		return vc.model.hasCalledVariants();
+function promiseHasCalledVariants() {
+	var promises = [];
+	var count = 0;
+
+	return new Promise(function(resolve, reject) {
+		getRelevantVariantCards().forEach(function(vc) {
+			var promise = vc.model.promiseHasCalledVariants().then(function(hasCalledVariants) {
+				if (hasCalledVariants) {
+					count++;
+				}
+			})
+			promises.push(promise);
+		});
+
+		Promise.all(promises).then(function() {
+			resolve(count == getRelevantVariantCards().length);
+		})
 	});
-	return cards.length == getRelevantVariantCards().length;
+
 }
 
 function showNavVariantLinks() {
@@ -2707,11 +2807,11 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 		// so that the coverage scales across all samples.
 		var variantPromises = [];
 
+		promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
+	    	return promiseMarkCodingRegions(window.gene, window.selectedTranscript);
 
+		}).then(function() {
 
-		promiseGetGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
-
-	    	markCodingRegions(window.gene, window.selectedTranscript);
 			geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
@@ -2964,9 +3064,11 @@ function showTranscripts(regionStart, regionEnd) {
 		if (!selectedTranscript) {
 			selectedTranscript = getCanonicalTranscript();
 		}
-    	markCodingRegions(window.gene, window.selectedTranscript);
-		geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-		getCodingRegions(window.selectedTranscript);
+    	promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+    		.then(function() {
+				geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+				getCodingRegions(window.selectedTranscript);
+    		});
 	}
 
 
@@ -3126,30 +3228,46 @@ function jointCallVariantsImpl(checkCache, callback) {
 		var vc = getRelevantVariantCards()[sampleIndex];
 		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
 		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
-	                .then(function(data) {
-	                	var theFbData = data[1];
-	                	var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
+         .then(function(data) {
+        	var theFbData = data[1];
+        	vc.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+        	 .then(function(data) {
+        	 	var theVcfData = data.vcfData;
 
-	                	if (vc.model.isAlignmentsOnly() && theVcfData == null) {
-							theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
-	                	} else {
-	                		if (theVcfData.loadState == null) {
-	                			theVcfData.loadState = {};
-	                		}
-	                		theVcfData.loadState['called'] = true;
-	                		theVcfData.loadState['clinvar'] = true;
-	                	}
+        	 	var promise = null;
+	        	if (data.model.isAlignmentsOnly() && theVcfData == null) {
+					promise = data.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript)
+	        	} else {
+	        		promise = new Promise(function(resolve, reject) {
+		        		if (theVcfData.loadState == null) {
+		        			theVcfData.loadState = {};
+		        		}
+		        		theVcfData.loadState['called'] = true;
+		        		theVcfData.loadState['clinvar'] = true;
+		        		resolve();
+	        		})
+	        	}
 
 
-					    // Get the unique freebayes variants and set up the allele counts
-					    vc.model.processFreebayesVariants(theFbData, theVcfData, function() {
-							vc.model.fbData = theFbData;
-							vc.model.vcfData = theVcfData;
-							sampleIndex++;
-							parseNextCalledVariants(afterParseCallback);
-					    });
-
+			    // Get the unique freebayes variants and set up the allele counts
+			    promise.then(function() {
+				    data.model.processFreebayesVariants(theFbData, theVcfData, function() {
+						data.model.fbData = theFbData;
+						data.model.vcfData = theVcfData;
+						sampleIndex++;
+						parseNextCalledVariants(afterParseCallback);
 				    });
+			    },
+			    function(error) {
+			    	var msg = "A problem occurred in jointCallVariantsImpl(): " + error;
+			    	console.log(msg);
+			    	parseNextCalledVariants(afterParseCallback);
+			    });
+
+        	 })
+
+
+	     });
 	}
 
 	var processFbTrio = function(callback) {
@@ -3192,59 +3310,101 @@ function jointCallVariantsImpl(checkCache, callback) {
 		});
 	}
 
-	if (checkCache && hasCachedCalledVariants(window.gene, window.selectedTranscript)) {
-		showCallingProgress();
-		getRelevantVariantCards().forEach(function(vc) {
-			theFbData = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
-			theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-			if (theVcfData == null) {
-				theVcfData = {features: []};
-			}
+	promiseHasCachedCalledVariants(window.gene, window.selectedTranscript)
+	 .then(function(hasCalledVariants) {
 
-			// When only alignments provided, only the called variants were cached as "fbData".
-			// So initialize the vcfData to 0 features.
-			if (theFbData && theFbData.features.length > 0 && theVcfData.features.length == 0) {
-				theVcfData = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
-			}
+		if (checkCache && hasCalledVariants) {
+			showCallingProgress();
+			var promises = [];
 
-			vc.model.vcfData = theVcfData;
-			vc.model.fbData = theFbData;
-		})
+			getRelevantVariantCards().forEach(function(vc) {
+				var p = new Promise(function(resolve, reject) {
 
-		processFbTrio(callback);
+					var theFbData;
+					var theVcfData;
+					var theModel;
 
-	} else {
-		var bams = [];
-		getRelevantVariantCards().forEach(function(vc) {
-			if (vc.getRelationship() != 'known-variants') {
-				vc.clearCalledVariants();
-				bams.push(vc.model.bam);
-			}
-		});
 
-		showCallingProgress();
+					vc.model.promiseGetFbData(window.gene, window.selectedTranscript)
+					 .then(function(data) {
+					 	theFbData = data.fbData;
+					 	theModel = data.model;
+					 	return the.promiseGetVcfData(window.gene, window.selectedTranscript);
+					 })
+					 .then(function(data) {
+					 	theVcfData = data.vcfData;
+						if (theVcfData == null) {
+							theVcfData = {features: []};
+						}
 
-		getProbandVariantCard().model.bam.freebayesJointCall(
-			window.gene,
-			window.selectedTranscript,
-			bams,
-			window.geneSource == 'refseq' ? true : false,
-			fbSettings.arguments,
-			global_vepAF, // vep af
-			function(theData, trRefName) {
+						// When only alignments provided, only the called variants were cached as "fbData".
+						// So initialize the vcfData to 0 features.
+						var promise = null;
+						if (theFbData && theFbData.features.length > 0 && theVcfData.features.length == 0) {
+							promise = theModel.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript);
+						} else {
+							promise = new Promise(function(resolve, reject) {
+								resolve();
+							})
+						}
 
-				translatedRefName = trRefName;
-				jointVcfRecs = 	theData.split("\n");
+						promise.then(function() {
+							theModel.vcfData = theVcfData;
+							theModel.fbData  = theFbData;
 
-				parseNextCalledVariants(function() {
+							resolve();
 
-					processFbTrio(callback);
+						})
 
+					 },
+					 function(error) {
+					 	var msg = "A problem occurred in jointCallVariantsImpl(): " + error;
+					 	console.log(msg);
+					 	reject(msg);
+					 })
 				});
-			}
-		);
+				promises.push(p);
+			})
+			Promise.all(promises).then(function() {
+				processFbTrio(callback);
+			})
 
-	}
+
+		} else {
+			var bams = [];
+			getRelevantVariantCards().forEach(function(vc) {
+				if (vc.getRelationship() != 'known-variants') {
+					vc.clearCalledVariants();
+					bams.push(vc.model.bam);
+				}
+			});
+
+			showCallingProgress();
+
+			getProbandVariantCard().model.bam.freebayesJointCall(
+				window.gene,
+				window.selectedTranscript,
+				bams,
+				window.geneSource == 'refseq' ? true : false,
+				fbSettings.arguments,
+				global_vepAF, // vep af
+				function(theData, trRefName) {
+
+					translatedRefName = trRefName;
+					jointVcfRecs = 	theData.split("\n");
+
+					parseNextCalledVariants(function() {
+
+						processFbTrio(callback);
+
+					});
+				}
+			);
+
+		}
+	 })
+
+
 }
 
 
@@ -3294,15 +3454,25 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 						theFbData.maxLevel = pileupObject.maxLevel + 1;
 						theFbData.featureWidth = pileupObject.featureWidth;
 
-						vc.model._cacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript);
-						// When only alignments provided, only the called variants were cached as "fbData".
-						// So initialize the vcfData to 0 features.
-						if (vc.model.isAlignmentsOnly()) {
-							vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
-						}
+						vc.model._promiseCacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript)
+						 .then(function() {
+							// When only alignments provided, only the called variants were cached as "fbData".
+							// So initialize the vcfData to 0 features.
+							var promise = null;
+							if (vc.model.isAlignmentsOnly()) {
+								promise = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
+							} else {
+								promise = new Promise(function(resolve, reject) {
+									resolve();
+								});
+							}
 
-						sampleIndex++;
-						parseNextCalledVariants(theGeneObject, theTranscript, afterParseCallback);
+							promise.then(function() {
+								sampleIndex++;
+								parseNextCalledVariants(theGeneObject, theTranscript, afterParseCallback);
+							})
+
+						 })
 				    });
 	}
 
@@ -3377,42 +3547,38 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
 
 }
 
-function promiseGetGeneCoverage(geneObject, transcript, showProgress=false) {
-	return new Promise(function(resolve,reject) {
+
+function promiseGetCachedGeneCoverage(geneObject, transcript, showProgress = false) {
+
+	return new Promise(function(resolve, reject) {
+		var geneCoverageAll = {gene: geneObject, transcript: transcript, geneCoverage: {}};
 
 		var promises = [];
-
 		getRelevantVariantCards().forEach(function(vc) {
 			if (vc.isBamLoaded()) {
 				if (showProgress) {
 					vc.showBamProgress("Analyzing coverage in coding regions");
 				}
-				var promise = vc.promiseGetGeneCoverage(geneObject, transcript).then(function(theVariantCard) {
+				var promise = vc.model.promiseGetGeneCoverage(geneObject, transcript)
+				 .then(function(data) {
+				 	var gc = data.geneCoverage;
+					geneCoverageAll.geneCoverage[data.model.getRelationship()] = gc;
 					if (showProgress) {
-						theVariantCard.endBamProgress();
+						getVariantCard(data.model.getRelationship()).endBamProgress();
 					}
-				})
+				 },
+				 function(error) {
+				 	reject(error);
+				 })
 				promises.push(promise);
 			}
-		});
-
-		Promise.all(promises).then(function() {
-			var geneCoverageAll = getCachedGeneCoverage(geneObject, transcript);
-
-			resolve(geneCoverageAll);
 
 		})
-
-	});
-}
-
-function getCachedGeneCoverage(geneObject, transcript) {
-	var geneCoverageAll = {};
-	getRelevantVariantCards().forEach(function(vc) {
-		var gc = vc.model.getGeneCoverageForGene(geneObject, transcript);
-		geneCoverageAll[vc.getRelationship()] = gc;
+		Promise.all(promises).then(function() {
+			resolve(geneCoverageAll);
+		})
 	})
-	return geneCoverageAll;
+
 }
 
 
@@ -3520,31 +3686,34 @@ function promiseDetermineInheritance(promise) {
 
 			probandVariantCard.populateEffectFilters();
 
-			probandVariantCard.determineMaxAlleleCount();
+			probandVariantCard.promiseDetermineMaxAlleleCount()
+			 .then(function() {
+				// Enable inheritance filters
+				filterCard.enableInheritanceFilters(theVcfData);
 
-			// Enable inheritance filters
-			filterCard.enableInheritanceFilters(theVcfData);
 
+				$('#filter-and-rank-card').removeClass("hide");
+		 		$('#matrix-track').removeClass("hide");
 
-			$('#filter-and-rank-card').removeClass("hide");
-	 		$('#matrix-track').removeClass("hide");
+				$("#matrix-panel .loader").removeClass("hide");
+				$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
+				$("#feature-matrix-note").addClass("hide");
 
-			$("#matrix-panel .loader").removeClass("hide");
-			$("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
-			$("#feature-matrix-note").addClass("hide");
+				getProbandVariantCard().model.postInheritanceParsing(theVcfData, window.gene, window.selectedTranscript, getAffectedInfo(), function() {
+					$("#matrix-panel .loader").addClass("hide");
+				    $("#matrix-panel .loader .loader-label").text("Ranking variants");
+					$("#feature-matrix-note").removeClass("hide");
 
-			getProbandVariantCard().model.postInheritanceParsing(theVcfData, window.gene, window.selectedTranscript, getAffectedInfo(), function() {
-				$("#matrix-panel .loader").addClass("hide");
-			    $("#matrix-panel .loader .loader-label").text("Ranking variants");
-				$("#feature-matrix-note").removeClass("hide");
+					genesCard.refreshCurrentGeneBadge(null, null, function() {
+						cacheHelper.showAnalyzeAllProgress();
+					});
 
-				genesCard.refreshCurrentGeneBadge(null, null, function() {
-					cacheHelper.showAnalyzeAllProgress();
+					resolve();
+
 				});
 
-				resolve();
+			 })
 
-			});
 
 		}
 
@@ -3554,74 +3723,108 @@ function promiseDetermineInheritance(promise) {
 
 				var trioVcfData = {proband: null, mother: null, father: null};
 				var trioFbData  = {proband: null, mother: null, father: null};
+
+				var thePromises = [];
 				getRelevantVariantCards().forEach(function(vc) {
-					var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-					var theFbData = vc.model.getFbDataForGene(window.gene, window.selectedTranscript);
-					if (theVcfData == null) {
-						theVcfData = {features: []};
+					var p = new Promise(function(resolve, reject) {
+						var theFbData = null;
+						var theVcfData = null;
+						var theModel = null;
+
+						vc.model.promiseGetFbData(window.gene, window.selectedTranscript)
+					     .then(function(data) {
+					 		theFbData = data.fbData;
+					 		theModel = data.model;
+							return theModel.promiseGetVcfData(window.gene, window.selectedTranscript);
+						 })
+						 .then(function(data) {
+						 	theVcfData = data.vcfData;
+							if (theVcfData == null) {
+								theVcfData = {features: []};
+							}
+
+							if (theFbData && theFbData.features.length > 0) {
+								theVcfData = theModel.addCalledVariantsToVcfData(theVcfData, theFbData);
+							}
+
+							trioVcfData[theModel.getRelationship()] = theVcfData;
+							trioFbData[theModel.getRelationship()] = theFbData;
+							data.model.vcfData = theVcfData;
+							data.model.fbData  = theFbData;
+
+							resolve();
+						 },
+						 function(error) {
+						 	var msg = "A problem occurred in promiseDetermineInheritance(): " + error;
+						 	console.log(msg);
+						 	reject(msg);
+						 });
+
+					 })
+
+					thePromises.push(p);
+				})
+
+				Promise.all(thePromises).then(function() {
+					if (dataCard.mode == 'trio' && (trioVcfData.proband == null || trioVcfData.mother == null || trioVcfData.father == null)) {
+						genesCard.clearGeneGlyphs(window.gene.gene_name);
+						genesCard.setGeneBadgeError(window.gene.gene_name);
+						reject("Unable to determine inheritance for gene " + window.gene.gene_name + " because full trio data for gene is not available");
+					} else if (dataCard.mode == 'trio') {
+
+
+
+						$('#filter-and-rank-card').removeClass("hide");
+					 	$('#matrix-track').removeClass("hide");
+
+						$("#matrix-panel .loader").removeClass("hide");
+						$("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
+						$("#feature-matrix-note").addClass("hide");
+
+						// we need to compare the proband variants to mother and father variants to determine
+						// the inheritance mode.  After this completes, we are ready to show the
+						// feature matrix.
+						// We only pass in the affected info if we need to sync up genotypes because samples
+						// where in separate vcf files
+						var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
+						var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
+						trioModel.compareVariantsToMotherFather(function() {
+							getRelevantVariantCards().forEach(function(vc) {
+								if (trioVcfData[vc.getRelationship()]) {
+									vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], window.selectedTranscript);
+								}
+							})
+							postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
+						});
+
+					} else {
+						probandVariantCard.model.performAdditionalParsing(trioVcfData.proband, window.selectedTranscript);
+
+						probandVariantCard.promiseDetermineMaxAlleleCount()
+						 .then(function() {
+							probandVariantCard.populateEffectFilters();
+
+							//mat $("#matrix-panel .loader").addClass("hide");
+							$("#feature-matrix-note").removeClass("hide");
+
+							probandVariantCard.model._promiseCacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript)
+							 .then(function() {
+								genesCard.refreshCurrentGeneBadge(null, trioVcfData.proband, function() {
+									resolve();
+								});
+							 },
+							 function(error) {
+							 	reject(error);
+							 })
+
+
+
+						 })
+
 					}
-
-
-					if (theFbData && theFbData.features.length > 0) {
-						theVcfData = vc.model.addCalledVariantsToVcfData(theVcfData, theFbData);
-					}
-
-					trioVcfData[vc.getRelationship()] = theVcfData;
-					trioFbData[vc.getRelationship()] = theFbData;
-
-					vc.model.vcfData = theVcfData;
-					vc.model.fbData  = theFbData;
 
 				})
 
-				if (dataCard.mode == 'trio' && (trioVcfData.proband == null || trioVcfData.mother == null || trioVcfData.father == null)) {
-					genesCard.clearGeneGlyphs(window.gene.gene_name);
-					genesCard.setGeneBadgeError(window.gene.gene_name);
-					reject("Unable to determine inheritance for gene " + window.gene.gene_name + " because full trio data for gene is not available");
-				} else if (dataCard.mode == 'trio') {
-
-
-
-					$('#filter-and-rank-card').removeClass("hide");
-				 	$('#matrix-track').removeClass("hide");
-
-					$("#matrix-panel .loader").removeClass("hide");
-					$("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
-					$("#feature-matrix-note").addClass("hide");
-
-					// we need to compare the proband variants to mother and father variants to determine
-					// the inheritance mode.  After this completes, we are ready to show the
-					// feature matrix.
-					// We only pass in the affected info if we need to sync up genotypes because samples
-					// where in separate vcf files
-					var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
-					var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
-					trioModel.compareVariantsToMotherFather(function() {
-						getRelevantVariantCards().forEach(function(vc) {
-							if (trioVcfData[vc.getRelationship()]) {
-								vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], window.selectedTranscript);
-							}
-						})
-						postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
-					});
-
-				} else {
-					probandVariantCard.model.performAdditionalParsing(trioVcfData.proband, window.selectedTranscript);
-
-					probandVariantCard.determineMaxAlleleCount();
-
-					probandVariantCard.populateEffectFilters();
-
-					//mat $("#matrix-panel .loader").addClass("hide");
-					$("#feature-matrix-note").removeClass("hide");
-
-					probandVariantCard.model._cacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript);
-
-					genesCard.refreshCurrentGeneBadge(null, trioVcfData.proband, function() {
-						resolve();
-					});
-
-				}
 			}
 
 
@@ -3642,31 +3845,40 @@ function promiseDetermineInheritance(promise) {
 function promiseFullTrio() {
 	return new Promise( function(resolve, reject) {
 		var loaded = {};
+		var promises = [];
 		variantCards.forEach(function(vc) {
-			var theVcfData = vc.model.getVcfDataForGene(window.gene, window.selectedTranscript);
-			if (theVcfData) {
-				loaded[vc.getRelationship()] = vc;
-			}
+			var p =	vc.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+			 .then(function(data) {
+				if (data.vcfData) {
+					loaded[data.model.getRelationship()] = getVariantCard(data.model.getRelationship());
+				}
+
+			 })
+			 promises.push(p);
 		});
 
+		Promise.all(promises).then(function() {
 
-		var uaSibsLoaded = true;
+			var uaSibsLoaded = true;
 
-		if (dataCard.mode == 'trio' && loaded.proband != null
-		    && loaded.mother  != null && loaded.father != null
-		    && uaSibsLoaded) {
-			resolve(loaded.proband);
-		} else if (dataCard.mode == 'single' && loaded.proband != null) {
-			// Not sure if this is still needed for filter slide bar ?????
-			var windowWidth = $(window).width();
-		    var filterPanelWidth = $('#filter-track').width();
+			if (dataCard.mode == 'trio' && loaded.proband != null
+			    && loaded.mother  != null && loaded.father != null
+			    && uaSibsLoaded) {
+				resolve(loaded.proband);
+			} else if (dataCard.mode == 'single' && loaded.proband != null) {
+				// Not sure if this is still needed for filter slide bar ?????
+				var windowWidth = $(window).width();
+			    var filterPanelWidth = $('#filter-track').width();
 
-			resolve(loaded.proband);
-		} else if (isAlignmentsOnly()) {
-			resolve(getProbandVariantCard());
-		} else {
-			reject();
-		}
+				resolve(loaded.proband);
+			} else if (isAlignmentsOnly()) {
+				resolve(getProbandVariantCard());
+			} else {
+				reject();
+			}
+
+		})
+
 	});
 
 }
@@ -3674,67 +3886,34 @@ function promiseFullTrio() {
 function promiseFullTrioCalledVariants() {
 	return new Promise( function(resolve, reject) {
 		var loaded = {};
+		var promises = [];
 		variantCards.forEach(function(vc) {
-			if (vc.isLoaded() && vc.variantsHaveBeenCalled()) {
-				loaded[vc.getRelationship()] = vc;
+			if (vc.isLoaded()) {
+				var promise = vc.promiseVariantsHaveBeenCalled()
+				 .then(function(variantsHaveBeenCalled) {
+					if (variantsHaveBeenCalled) {
+						loaded[vc.getRelationship()] = vc;
+					}
+				 })
+				 promises.push(promise);
 			}
 		});
+		Promise.all(promises).then(function() {
+			if (dataCard.mode == 'trio' && loaded.proband != null
+			    && loaded.mother  != null && loaded.father != null) {
+				resolve(loaded.proband);
+			} else if (dataCard.mode == 'single' && loaded.proband != null) {
+				resolve(loaded.proband);
+			} else {
+				reject();
+			}
 
-		if (dataCard.mode == 'trio' && loaded.proband != null
-		    && loaded.mother  != null && loaded.father != null) {
-			resolve(loaded.proband);
-		} else if (dataCard.mode == 'single' && loaded.proband != null) {
-			resolve(loaded.proband);
-		} else {
-			reject();
-		}
-	});
-
-}
-
-
-function determineSibStatusSingle(trioModel, onStatusUpdated) {
-	var me = this;
-	// Now compare the unaffected sibs to the variant to flag variants
-	// common to unaffected sibs + proband
-	variantCardsSibsTransient = [];
-	me.variantCardsSibs['unaffected'].forEach( function(vc) {
-		variantCardsSibsTransient.push(vc);
-	})
-	var sibsData = [];
-	nextLoadSib(trioModel, 'unaffected', sibsData, function() {
-
-		// Now compare the affected sibs to the variant to flag variants
-		// common to unaffected sibs + proband
-		variantCardsSibsTransient = [];
-		me.variantCardsSibs['affected'].forEach( function(vc) {
-			variantCardsSibsTransient.push(vc);
 		})
-		sibsData = [];
-		sibsData.length = 0;
-
-		nextLoadSib(trioModel, 'affected', sibsData, function() {
-		 	onStatusUpdated();
-		});
-
 
 	});
 
 }
 
-function nextLoadSib(trioModel, affectedStatus, sibsData, onStatusUpdated) {
-	if (variantCardsSibsTransient.length > 0) {
-		variantCard = variantCardsSibsTransient.shift();
-
-		variantCard.loadVariantsOnly( function(vcfData) {
-			sibsData.push(vcfData)
-			nextLoadSib(trioModel, affectedStatus, sibsData, onStatusUpdated);
-		});
-	} else {
-		var sibsCount = window.variantCardsSibs[affectedStatus].length;
-		trioModel.determineSibsStatus(sibsData, affectedStatus, sibsCount, onStatusUpdated);
-	}
-}
 
 function isDataLoaded() {
 	var hasData = false;
@@ -3896,12 +4075,14 @@ function filterVariantsImpl() {
 
 			variantCard.unpin();
 			if (window.gene) {
-				variantCard.filterAndShowLoadedVariants();
-  				variantCard.filterAndShowCalledVariants();
+				variantCard.promiseFilterAndShowLoadedVariants()
+				 .then(function() {
+	  				variantCard.promiseFilterAndShowCalledVariants();
+	  				if (variantCard.getRelationship() == 'proband') {
+			  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
+	  				}
+				 })
 
-  				if (variantCard.getRelationship() == 'proband') {
-		  			variantCard.fillFeatureMatrix(regionStart, regionEnd);
-  				}
   			}
 		}
 
@@ -4419,5 +4600,27 @@ function decodeUrl(url) {
     return decodeURIComponent(url)
   else
     return url;
+}
+
+
+function formatDate(d) {
+	var padMinutes = function(n) {
+	    return String("00" + n).slice(-2);
+	}
+	var formatHours = function(h) {
+		if (+h > 12) {
+			return +h - 12;
+		} else {
+			return h;
+		}
+	}
+	var getAmPm = function(h) {
+		if (+h > 12) {
+			return 'pm';
+		} else {
+			return 'am';
+		}
+	}
+ 	return d.getMonth() + "-" + d.getDay() + "-" + d.getFullYear() + " " + formatHours(d.getHours()) + ":" + padMinutes(d.getMinutes()) + " " + getAmPm(d.getHours());
 }
 
