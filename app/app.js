@@ -212,7 +212,9 @@ $(document).ready(function(){
 });
 
 function initHub() {
-	var api = window.location.protocol + "//" + window.location.hostname+ ":3000/apiv1";
+  // Try to get the referring url.  If none, try using this host and port 3000
+	var api = document.referrer != "" ? document.referrer + "apiv1" :
+    window.location.protocol + "//" + window.location.hostname+ ":3000/apiv1";
 
 	// Parse params
 	var params = {};
