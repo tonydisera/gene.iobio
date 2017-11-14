@@ -799,6 +799,9 @@ var Bam = Class.extend({
     var regionStart = geneObject.start;
     var regionEnd   = geneObject.end; 
 
+   
+
+
       
     this.transformRefName(refName, function(trRefName){
 
@@ -879,6 +882,7 @@ var Bam = Class.extend({
 
         
         var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: useSSL});
+//        var cmd = new iobio.cmd(IOBIO.samtoolsOnDemand, ["mpileup", "-"], {ssl: useSSL});
         
         
         var geneCoverageData = "";
@@ -903,6 +907,7 @@ var Bam = Class.extend({
 
 
     });
+
 
    },
 

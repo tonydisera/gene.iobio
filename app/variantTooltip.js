@@ -1,12 +1,13 @@
 function VariantTooltip() {
 	this.examinedVariant = null;
-	this.WIDTH_LOCK         = 680;
-	this.WIDTH_EXTRA_WIDE   = 840;
-	this.WIDTH_HOVER        = 360;
-	this.WIDTH_SIMPLE       = 280;
-	this.WIDTH_SIMPLE_WIDER = 500;
+	this.WIDTH_LOCK             = 680;
+	this.WIDTH_EXTRA_WIDE       = 840;
+	this.WIDTH_HOVER            = 360;
+	this.WIDTH_SIMPLE           = 280;
+	this.WIDTH_SIMPLE_WIDER     = 500;
 	this.WIDTH_ALLELE_COUNT_BAR = 160;
 	this.WIDTH_ALLELE_COUNT_ROW = 300;
+	this.HEIGHT_SCROLLABLE_AREA = 200;
 	this.VALUE_EMPTY        = "-";
 	this.AFFECTED_GLYPH =   "<i class='material-icons tooltip-affected-symbol'>spellcheck</i>";
 
@@ -784,7 +785,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 			+ me._tooltipMainHeaderRow(bookmarkBadge + (geneObject ? geneObject.gene_name : ""), variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
 			+ calledVariantRow
 			+ inheritanceModeRow
-			+ '<div id="tooltip-body" class="row" style="max-height:205px;overflow-y:scroll">' 
+			+ '<div id="tooltip-body" class="row" style="max-height:' + me.HEIGHT_SCROLLABLE_AREA +  'px;overflow-y:scroll">' 
 				+ leftDiv
 				+ rightDiv
 				+ otherDiv
@@ -1126,12 +1127,17 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
 			var barContainer = row.append("div")
 		                          .attr("class", rel + "-alt-count tooltip-allele-count-bar")
 			if (genotype) {
-				me._appendAlleleCountSVG(barContainer, 
-					genotype.altCount, 
-					genotype.refCount, 
-					genotype.genotypeDepth, 
-					null,
-					barWidth);
+				getProbandVariantCard().promiseGetMaxAlleleCount()
+				 .then(function(maxAlleleCount) {
+					me._appendAlleleCountSVG(barContainer, 
+						genotype.altCount, 
+						genotype.refCount, 
+						genotype.genotypeDepth, 
+						null,
+						barWidth,
+						maxAlleleCount);
+
+				 });
 			}
 		}
 
@@ -1209,7 +1215,7 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
 }
 
 VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAltCount, 
-	genotypeRefCount, genotypeDepth, bamDepth, barWidth) {
+	genotypeRefCount, genotypeDepth, bamDepth, barWidth, maxAlleleCount) {
 	var me = this;
 
 	var MAX_BAR_WIDTH = barWidth ? barWidth : me.ALLELE_COUNT_BAR_WIDTH;
@@ -1224,8 +1230,10 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	    return;
 	}
 
+
+
 	if (genotypeAltCount == null || genotypeAltCount.indexOf(",") >= 0) {
-		BAR_WIDTH = d3.round(MAX_BAR_WIDTH * (genotypeDepth / getProbandVariantCard().getMaxAlleleCount()));
+		BAR_WIDTH = d3.round(MAX_BAR_WIDTH * (genotypeDepth / maxAlleleCount));
 		container.select("svg").remove();
 		var svg = container
 	            .append("svg")
@@ -1258,7 +1266,7 @@ VariantTooltip.prototype._appendAlleleCountSVG = function(container, genotypeAlt
 	var otherCount = totalCount - (+genotypeRefCount + +genotypeAltCount);
 
 	// proportion the widths of alt, other (for multi-allelic), and ref
-	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / getProbandVariantCard().getMaxAlleleCount()));
+	BAR_WIDTH      = d3.round((MAX_BAR_WIDTH) * (totalCount / maxAlleleCount));
 	if (BAR_WIDTH < 10) {
 		BAR_WIDTH = 10;
 	}
