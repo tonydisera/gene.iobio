@@ -3231,7 +3231,7 @@ function jointCallVariantsImpl(checkCache, callback) {
 		var vc = getRelevantVariantCards()[sampleIndex];
 		var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
 		vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, window.gene, window.selectedTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
-				 .then(function(data) {
+		 .then(function(data) {
 					var theFbData = data[1];
 					vc.model.promiseGetVcfData(window.gene, window.selectedTranscript)
 					 .then(function(data) {
@@ -3239,7 +3239,11 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 						var promise = null;
 						if (data.model.isAlignmentsOnly() && theVcfData == null) {
-					promise = data.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript)
+							promise = data.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, window.gene, window.selectedTranscript)
+							 .then(function(data) {
+							 		theVcfData = data;
+							 		resolve();
+							 })
 						} else {
 							promise = new Promise(function(resolve, reject) {
 								if (theVcfData.loadState == null) {
@@ -3252,25 +3256,25 @@ function jointCallVariantsImpl(checkCache, callback) {
 						}
 
 
-					// Get the unique freebayes variants and set up the allele counts
-					promise.then(function() {
-						data.model.processFreebayesVariants(theFbData, theVcfData, function() {
-						data.model.fbData = theFbData;
-						data.model.vcfData = theVcfData;
-						sampleIndex++;
-						parseNextCalledVariants(afterParseCallback);
+						// Get the unique freebayes variants and set up the allele counts
+						promise.then(function() {
+							data.model.processFreebayesVariants(theFbData, theVcfData, function() {
+							data.model.fbData = theFbData;
+							data.model.vcfData = theVcfData;
+							sampleIndex++;
+							parseNextCalledVariants(afterParseCallback);
+							});
+						},
+						function(error) {
+							var msg = "A problem occurred in jointCallVariantsImpl(): " + error;
+							console.log(msg);
+							parseNextCalledVariants(afterParseCallback);
 						});
-					},
-					function(error) {
-						var msg = "A problem occurred in jointCallVariantsImpl(): " + error;
-						console.log(msg);
-						parseNextCalledVariants(afterParseCallback);
-					});
 
 					 })
 
 
-			 });
+		 });
 	}
 
 	var processFbTrio = function(callback) {
