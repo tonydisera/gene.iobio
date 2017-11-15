@@ -201,6 +201,8 @@ $(document).ready(function(){
 	 })
 	 .then(function() {
 	 		// cache is initialized
+	 		showWelcomePanel();
+
 	 },
 	 function(error) {
 		alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
@@ -1487,7 +1489,6 @@ function loadGeneFromUrl() {
 		}
 
 
-		showWelcomePanel();
 	}
 
 
