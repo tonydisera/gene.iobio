@@ -696,6 +696,7 @@ function init() {
 		// Set up the gene search widget
 		loadGeneWidgets( function(success) {
 			if (success) {
+				showGeneControls();
 				loadGeneFromUrl();
 			}
 		});
@@ -732,6 +733,12 @@ function init() {
 
 
 
+}
+
+function showGeneControls() {
+	$('#main-nav-links').removeClass("hide");
+	$('#welcome-area #load-demo-data').removeClass("disabled");
+	$('#welcome-area #take-app-tour').removeClass("disabled");
 }
 
 function showGeneSummary(theGeneName) {
