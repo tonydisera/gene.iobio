@@ -177,11 +177,11 @@ $(document).ready(function(){
 	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
 	// Initialize material bootstrap
-		$.material.init();
+	$.material.init();
 
-		addCloseListeners();
+	addCloseListeners();
 
-		detectWindowResize();
+	detectWindowResize();
 
 		// Load handlebar templates
 	promiseLoadTemplates()
@@ -200,9 +200,7 @@ $(document).ready(function(){
 		return promiseInitCache();
 	 })
 	 .then(function() {
-		// now perform init()
-		init();
-
+	 		// cache is initialized
 	 },
 	 function(error) {
 		alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
@@ -210,6 +208,12 @@ $(document).ready(function(){
 
 
 });
+
+$(window).load(function() {
+	// Window is loaded.  Now we perform init().  We hold off
+	// on doing this to delay longer running loading of genes.json.
+	init();
+})
 
 function initHub() {
   // Try to get the referring url.  If none, try using this host and port 3000
