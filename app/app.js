@@ -728,11 +728,6 @@ function init() {
 		}
 
 	 })
-
-
-
-
-
 }
 
 function showGeneControls() {

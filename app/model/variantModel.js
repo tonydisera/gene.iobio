@@ -2447,53 +2447,59 @@ VariantModel.prototype.promiseDetermineMaxAlleleCount = function(vcfData) {
 	var resolveIt = function(resolve, theVcfData) {
 		if (theVcfData == null || theVcfData.features == null) {
 			resolve(0);
-		}
-
-		var maxAlleleCount = 0;
-		var setMaxAlleleCount = function(depth) {
-			if (depth) {
-				if ((+depth) > maxAlleleCount) {
-					maxAlleleCount = +depth;
-				}
-			}
-		};
-
-		if (theVcfData.features.length > 0) {
-			theVcfData.features.forEach(function(variant) {
-				for (var key in variant.genotypes) {
-					var gt = variant.genotypes[key];
-					if (gt.hasOwnProperty('genotypeDepth')) {
-						setMaxAlleleCount(gt.genotypeDepth)
+		} else {
+			var maxAlleleCount = 0;
+			var setMaxAlleleCount = function(depth) {
+				if (depth) {
+					if ((+depth) > maxAlleleCount) {
+						maxAlleleCount = +depth;
 					}
 				}
-			});
-			theVcfData.maxAlleleCount = maxAlleleCount;
-		} else if (dataCard.mode == 'trio') {
-			// If the gene doesn't have any variants for the proband, determine the
-			// max allele count by iterating through the mom and data variant
-			// cards to examine these features.
-			var promises = [];
-			window.variantCards.forEach(function(variantCard) {
-				if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
-					var p = variantCard.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-					 .then(function(data) {
-					 	var theVcfData = data.vcfData;
-						if (theVcfData && theVcfData.features) {
-							theVcfData.features.forEach(function(theVariant) {
-								setMaxAlleleCount(theVariant.genotypeDepth);
-							});
+			};
 
+			if (theVcfData.features.length > 0) {
+				theVcfData.features.forEach(function(variant) {
+					for (var key in variant.genotypes) {
+						var gt = variant.genotypes[key];
+						if (gt.hasOwnProperty('genotypeDepth')) {
+							setMaxAlleleCount(gt.genotypeDepth)
 						}
-
-					 })
-					 promises.push(p);
-				}
-			});
-			Promise.all(promises).then(function() {
+					}
+				});
 				theVcfData.maxAlleleCount = maxAlleleCount;
-			})
+			}
+
+			if (dataCard.mode == 'trio') {
+				// If the gene doesn't have any variants for the proband, determine the
+				// max allele count by iterating through the mom and data variant
+				// cards to examine these features.
+				var promises = [];
+				window.variantCards.forEach(function(variantCard) {
+					if (variantCard.getRelationship() == 'mother' || variantCard.getRelationship() == 'father') {
+						var p = variantCard.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+						 .then(function(data) {
+						 	var theVcfData = data.vcfData;
+							if (theVcfData && theVcfData.features) {
+								theVcfData.features.forEach(function(theVariant) {
+									setMaxAlleleCount(theVariant.genotypeDepth);
+								});
+
+							}
+
+						 })
+						 promises.push(p);
+					}
+				});
+				Promise.all(promises).then(function() {
+					theVcfData.maxAlleleCount = maxAlleleCount;
+					resolve(maxAlleleCount);
+				})
+			} else {
+				resolve(maxAlleleCount);
+			}
+
 		}
-		resolve();
+
 
 	}
 	return new Promise(function(resolve, reject) {
