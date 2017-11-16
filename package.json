@@ -40,5 +40,8 @@
     "phantomjs-prebuilt": "^2.1.12",
     "selenium-standalone": "5.7.1",
     "yargs": "^5.0.0"
+  },
+  "dependencies": {
+    "sass": "^1.0.0-beta.3"
   }
 }

@@ -1849,6 +1849,8 @@ inputinput:-moz-placeholder {
             z-index: 200; }
         #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-getting-started {
           background-image: url("../../assets/images/blue-green-background.png"); }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-intro {
+          background-image: url("../../assets/images/blue-green-background.png"); }
 
 #screencast-panel {
   text-align: center;
