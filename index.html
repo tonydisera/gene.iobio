@@ -4,21 +4,22 @@
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <head>
 	<title>gene.iobio</title>
-  
+
 
 	<!-- libraries -->
-  <script src="assets/js/jquery.1.11.1.min.js"></script> 
-	<script src="assets/js/handlebars-v2.0.0.min.js"></script>	
-	<script src="assets/js/typeahead.bundle.min.js"></script>	
-  
-  <script src="assets/js/bootstrap.min.js"></script>	
+	<script src="https://www.youtube.com/iframe_api"></script>
+  <script src="assets/js/jquery.1.11.1.min.js"></script>
+	<script src="assets/js/handlebars-v2.0.0.min.js"></script>
+	<script src="assets/js/typeahead.bundle.min.js"></script>
 
-	<script src="assets/js/d3.min.js"></script>	
+  <script src="assets/js/bootstrap.min.js"></script>
 
-  <script src="assets/js/colorbrewer.v1.min.js"></script> 
+	<script src="assets/js/d3.min.js"></script>
+
+  <script src="assets/js/colorbrewer.v1.min.js"></script>
 
   <script type="text/javascript" src="assets/js/jquery.bootpag.min.js"></script>
-  
+
   <script type="text/javascript" charset="utf-8" src="assets/js/edge.6.0.0.min.js"></script>
 
   <!-- Promise polyfill for PhantomJS testing -->
@@ -30,14 +31,14 @@
   <script src="assets/js/ripples.js"></script>
 
   <!-- alertify -->
-  <script src="assets/js/alertify.min.js"></script> 
+  <script src="assets/js/alertify.min.js"></script>
 
 
   <!-- selectize dropdown (type-ahead) -->
-  <script src="assets/js/selectize.js"></script> 
+  <script src="assets/js/selectize.js"></script>
 
 
-  
+
   <!-- LZW compression for UTF-16 encoded strings -->
   <script language="javascript" src="assets/js/lz-string.min.js"></script>
 
@@ -55,7 +56,7 @@
   <script src="assets/js/pako_deflate.min.js"></script>
   <script src="assets/js/jsbgzf.js"></script>
   <script src="assets/js/js-bv-sampling.js"></script>
-  <script src="assets/js/js-local-vcf.js"></script> 
+  <script src="assets/js/js-local-vcf.js"></script>
   <script src="assets/js/js-bv-common.js"></script>
   <script src="assets/js/js-local-bam.js"></script>
 
@@ -102,7 +103,7 @@
   <!-- animiate -->
   <link rel="stylesheet" href="assets/css/animate.css"/>
 
- 
+
 
   <link href="assets/css/bootstrap-material-design.css" rel="stylesheet">
   <link href="assets/css/ripples.min.css" rel="stylesheet">
@@ -118,10 +119,10 @@
   <link rel="stylesheet" href="assets/css/alertify.default.min.css" />
 
   <!-- page guide stylesheet -->
-  <link rel="stylesheet" href="assets/css/pageguide.css"> 
-  
-  <link rel="stylesheet" href="assets/css/customcheckbox.css"> 
-  
+  <link rel="stylesheet" href="assets/css/pageguide.css">
+
+  <link rel="stylesheet" href="assets/css/customcheckbox.css">
+
   <!-- site stylesheets -->
   <link rel="stylesheet" href="assets/css/gene.d3.css" />
   <link rel="stylesheet" id="site-stylesheet" href="assets/css/site.css" />
@@ -133,7 +134,7 @@
 
 <body>
   <div id="matrix-tooltip" class="tooltip" style="opacity:0"></div>
-  
+
   <div id="legend-tooltip" class="tooltip" style="opacity:0"></div>
 
   <div id="bookmark-gene-tooltip" class="tooltip" style="opacity:0"></div>
@@ -151,7 +152,7 @@
   </div>
 
   <div id="slider-left" class="hide fade-in shadow-z-2">
-     
+
 
     <div class="navbar navbar-default level-basic level-edu">
       <div class="container-fluid">
@@ -160,7 +161,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-          </button>     
+          </button>
         </div>
         <div class="navbar-collapse collapse navbar-responsive-collapse" >
           <ul class="nav ">
@@ -169,40 +170,40 @@
              <a href="javascript:void(0)" id="clear-filters-link" class="hide"
                onclick="filterCard.clearFilters();filterVariants()">
                   Clear all
-              </a>              
+              </a>
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')" style="pointer-events:none;margin-left:-30px">
-                <span class="material-icons">tune</span> 
+                <span class="material-icons">tune</span>
                 Filter
               </a>
             </li>
             <li id="examine-tab" class="hide">
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Examine')">
-                <span class="material-icons">remove_red_eye</span> 
+                <span class="material-icons">remove_red_eye</span>
                 Inspect
               </a>
             </li>
             <li id="phenolyzer-tab" class="hide">
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Phenolyzer')">
-              <span class="material-icons">explore</span>  
+              <span class="material-icons">explore</span>
                 Genes
               </a>
-            </li> 
+            </li>
             <li id="bookmarks-tab" class="hide">
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
-                <span class="material-icons">bookmark</span> 
+                <span class="material-icons">bookmark</span>
                 Bookmarks
               </a>
-            </li> 
+            </li>
             <li id="recall-tab" class="hide">
               <a href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Recall')">
-                <span class="material-icons">dialpad</span> 
+                <span class="material-icons">dialpad</span>
                 Call Variants
               </a>
-            </li>        
+            </li>
           </ul>
         </div>
       </div>
-    </div>    
+    </div>
 
     <div id="slider-left-content" class="shadow-z-2">
     </div>
@@ -221,12 +222,12 @@
       <span class="card-label" style="margin-right:20px;margin-bottom:4px">Filters</span>
       <button id="clear-filters-button" class="btn btn-raised btn-default" onclick="filterCard.clearFilters();filterVariants()">
          Clear filter
-      </button>      
+      </button>
       <div id="filter-summary-loader" class="loader hide level-edu level-basic">
         <span class="loader-label"></span>
         <img src="assets/images/wheel.gif">
-      </div> 
-           
+      </div>
+
     </div>
 
     <div id="genes-control-track" class="hide app-panel level-basic shadow-z-2">
@@ -238,7 +239,7 @@
 
             <div>
 
-              <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">                  
+              <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
                 Analyze all genes
               </button>
 
@@ -265,20 +266,20 @@
 
 
                   <div id="analyzed-progress-bar" >
-                    
+
 
                     <div >
                       <span class='progress-bar-label'>Loaded</span>
 
                       <div id="analyze-all-progress" class="analysis-progress-bar">
-                        <div class="text">0 analyzed</div>   
-                        <div style="float:left;margin-top:-17px;width:100%">                 
+                        <div class="text">0 analyzed</div>
+                        <div style="float:left;margin-top:-17px;width:100%">
                           <div id="analyzed-bar" class="bar" width="0%" >
                             <div id="passed-filter-bar" class="bar" width="0%"></div>
                             <div id="not-passed-filter-bar" class="bar" width="0%"></div>
                           </div>
-                      
-                          <div id="not-analyzed-bar" class="bar" width="100%">                      
+
+                          <div id="not-analyzed-bar" class="bar" width="100%">
                           </div>
                         </div>
 
@@ -290,14 +291,14 @@
                       <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
 
                       <div id="call-all-progress" class="analysis-progress-bar">
-                        <div class="text" >0 analyzed</div>   
-                        <div style="float:left;margin-top:-17px;width:100%">                 
+                        <div class="text" >0 analyzed</div>
+                        <div style="float:left;margin-top:-17px;width:100%">
                           <div id="analyzed-bar" class="bar" width="0%" >
                             <div id="passed-filter-bar" class="bar" width="0%"></div>
                             <div id="not-passed-filter-bar" class="bar" width="0%"></div>
                           </div>
-                      
-                          <div id="not-analyzed-bar"class="bar" width="100%">                      
+
+                          <div id="not-analyzed-bar"class="bar" width="100%">
                           </div>
                         </div>
 
@@ -308,12 +309,12 @@
                   </div>
 
 
-                  <div id="total-genes-label"></div>                
+                  <div id="total-genes-label"></div>
 
-                
+
               </div>
 
-              <div id="manage-genes-box">               
+              <div id="manage-genes-box">
                 <div id="manage-genes-dropdown" class="level-edu level-basic" >
                   <div class="btn-toolbar">
                     <div class="btn-group" style="display:inline;margin-bottom:0px">
@@ -322,7 +323,7 @@
                           Manage genes
                           <span style="margin-left:6px" class="caret"></span>
                       </button>
-                       
+
                       <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
                         <li style="margin-bottom: 10px">
                             <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
@@ -336,7 +337,7 @@
                                 Remove all genes
                            </a>
                         </li>
-                       
+
                         <li id="edit-list-li">
                            <div >Edit gene list</div>
                            <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
@@ -348,7 +349,7 @@
                               </div>
                           </div>
                         </li>
-                        
+
                       </ul>
                     </div>
                   </div>
@@ -362,33 +363,33 @@
                     </select>
                 </div>
               </div>
-              
+
             </div>
 
             <div id="gene-badge-container" class="level-basic" style="clear:both;">
               <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
               <div id="gene-page-control" class="hide level-edu level-basic">
                 <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-                
+
                 <div id="gene-page-selection" class="level-basic"></div>
 
                 <div id="gene-paging-links" class="hide">
-                  <a href="javascript:void(0)" id="view-50-genes" 
+                  <a href="javascript:void(0)" id="view-50-genes"
                      class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
                         View 40
                   </a>
-                  <a href="javascript:void(0)" id="view-all-genes" 
+                  <a href="javascript:void(0)" id="view-all-genes"
                      class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
                     | all
                   </a>
                 </div>
-              </div>                
+              </div>
             </div>
           </div>
 
-      </div>          
+      </div>
     </div>
-    
+
     <div id="nav-section" class="fixed app-panel level-edu hide">
 
 
@@ -401,7 +402,7 @@
 
       <div id="transcript-card" class="hide" >
 
-                
+
 
 
 
@@ -412,10 +413,10 @@
 
 
               <div id="select-gene-box"  class="level-basic hide">
-                <select id="select-gene" class=""  data-placeholder="Choose a gene...">                  
+                <select id="select-gene" class=""  data-placeholder="Choose a gene...">
                 </select>
-              </div>     
-              <div id="gene-summary" class="level-basic hide">              
+              </div>
+              <div id="gene-summary" class="level-basic hide">
               </div>
 
               <div style="text-align:center;display:inline-block">
@@ -431,19 +432,19 @@
                 <div id="gene-source-box" class="level-edu level-basic" style="width:130px;display:inline-block;margin-left: 20px;vertical-align:top">
                   <select id="select-gene-source" class="fullview" data-placeholder="">
                         <option value="Gencode Transcript">Gencode Transcript</option>
-                        <option value="RefSeq Transcript">RefSeq Transcript</option>                   
-                   </select>        
+                        <option value="RefSeq Transcript">RefSeq Transcript</option>
+                   </select>
                 </div>
-                
-                <div class="level-edu level-basic fullview" style="margin-top:-10px;display:inline-block"> 
-                  <div class="btn-toolbar fullview" 
+
+                <div class="level-edu level-basic fullview" style="margin-top:-10px;display:inline-block">
+                  <div class="btn-toolbar fullview"
                      style="display: inline-block;margin-left: 5px;padding-top: 0px; ">
                       <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
-                          <button id="transcript-dropdown-button" type="button"  
+                          <button id="transcript-dropdown-button" type="button"
                           style="width:150px;padding-top:2px;padding-bottom:1px"
-                          class="btn btn-raised btn-default dropdown-toggle icon-button-sm" 
+                          class="btn btn-raised btn-default dropdown-toggle icon-button-sm"
                           data-toggle="dropdown" aria-expanded="false" >
-                            Choose Transcript 
+                            Choose Transcript
                             <span class="caret" style="margin-left:4px;"></span>
                           </button>
                           <ul id="transcript-menu" class="dropdown-menu" role="menu" style="right: 0;left: initial;min-width: 610px">
@@ -451,7 +452,7 @@
                             </li>
                           </ul>
                       </div>
-                  </div> 
+                  </div>
                 </div>
 
               </div>
@@ -472,35 +473,35 @@
           <div id="non-protein-coding" class="level-edu level-basic"  style="clear: both;padding-bottom: 0px;display: block;">
               <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
                 Enter a gene name
-              </div>   
+              </div>
               <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
                 Pseudogene
-              </div>   
-              <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">   
-              </div>                  
-              <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">   
-              </div>                  
-          </div>  
+              </div>
+              <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">
+              </div>
+              <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">
+              </div>
+          </div>
 
 
 
           <div id="transcript-panel" class="level-edu fullview" >
-            <div id="gene-track" class="track hide">  
+            <div id="gene-track" class="track hide">
 
                 <div id="top-coordinate-frame" class="hide">
                   <svg height="23" width="28">
                       <g  transform="translate(0,0)">
                         <rect class="coordinate-arrow" x="9" y="1" width="10" height="8">
                         </rect>
-                      </g>                    
+                      </g>
                       <g transform="translate(24,23),rotate(180)">
                         <polygon class="coordinate-arrow" points="0,14 10,0 20,14" x="0" y="0">
                         </polygon>
                       </g>
-                  </svg>        
-                </div>         
+                  </svg>
+                </div>
                 <div id="gene-viz" class="track-chart">
-                </div>               
+                </div>
             </div>
             <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
                 To zoom into region, drag over gene model.
@@ -510,17 +511,17 @@
         </div>
       </div>
 
-    </div>  
+    </div>
 
     <div id="welcome-panel-placeholder">
     </div>
-     
+
 
     <div id="track-section" class="push app-panel" style="display:flex;margin-top:5px;">
 
         <div id="matrix-track" style="width:100%;overflow-x:auto" class="track shadow-z-2 hide">
 
-            
+
             <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
               <div class="card-label level-edu level-basic" style="float:left">Ranked Variants</div>
               <a id="show-legend" class="level-edu level-basic"  onclick="showLegend()" href="javascript:void(0)">
@@ -532,9 +533,9 @@
 
             <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
 
-            <div id="zero-variants" class="warning level-edu hide">              
+            <div id="zero-variants" class="warning level-edu hide">
             </div>
-    
+
             <div id="matrix-panel"  style="clear:both;min-height:30px"
               class="fullview" aria-expanded="true">
                 <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
@@ -552,7 +553,7 @@
               </a>
 
               <div id="feature-matrix-note" class="hide" >
-                
+
                 <div style="display:inline-block">
                   <svg style="height: 10px;width:108px">
                     <g transform="translate(8,6)">
@@ -571,9 +572,9 @@
                   </div>
 
                 </div>
-                
 
-              </div> 
+
+              </div>
             </div>
         </div>
 
@@ -596,17 +597,17 @@
       <div id="known-variants-nav-area">
       </div>
       <div id="known-variants-chart" class="stacked-bar-chart track hide">
-      </div>        
+      </div>
       <div id="known-variants-cards">
       </div>
     </div>
-    
-    
+
+
     <div id="proband-variant-card" class="app-panel" >
     </div>
 
 
-    
+
 
     <div id="other-variant-cards" class="app-panel">
     </div>
@@ -623,11 +624,11 @@
   </div>
 
 
-  <div id="animation-container-1" class="tour-animation-container hide " 
+  <div id="animation-container-1" class="tour-animation-container hide "
       style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
         <div id="Stage"  class="EDGE-462912531 tour-animation"></div>
   </div>
-  <div id="animation-container-2" class="tour-animation-container hide " 
+  <div id="animation-container-2" class="tour-animation-container hide "
       style="z-index:9999;position: absolute;bottom:0px;margin-bottom:110px;vertical-align:middle;width:100%">
         <div id="Stage" class="EDGE-30904779 tour-animation"></div>
   </div>
@@ -645,16 +646,16 @@
     <div class="modal-button-container" style="text-align: center;margin-top: 20px;">
       <button class="screencasts" style="margin-left:5px;" onclick="$('#tourWelcome').removeClass('open');showSidebar('Help');" class="tlypageguide_ignore">Learn more</button>
       <button  style="margin-left:10px" onclick="$('#tourWelcome').removeClass('open');showDataDialog()" class="tlypageguide_ignore">Add your data</button>
-            
+
     </div>
   </div>
 
-   
+
   <div id="tour-placeholder" class="hide">
   <div>
 
 
- 
+
 
   <div id="footer" class="footer text-center" >
     <div class="poweredbyheader">gene.iobio is powered by</div>
@@ -674,9 +675,9 @@
         <a class="poweredby" href="http://exac.broadinstitute.org/" target="_poweredby">ExAC</a>
         <a class="poweredby" href="http://www.1000genomes.org/home" target="_poweredby">1000G</a>
         <span class="icon-credit" >
-            <a  id="icon-credit" href="javascript:void(0)" onclick="$('#freepik-info').toggleClass('hide')">Freepik icons...</a> 
+            <a  id="icon-credit" href="javascript:void(0)" onclick="$('#freepik-info').toggleClass('hide')">Freepik icons...</a>
             <span id="freepik-info" class="hide" >
-              <a  href="http://www.freepik.com" title="Freepik"  >Freepik icons</a> 
+              <a  href="http://www.freepik.com" title="Freepik"  >Freepik icons</a>
               from <a   href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
             </span>
         </span>
@@ -686,7 +687,7 @@
   </div>
 
 
-    
+
 </body>
 
 <div id="svg-glyphs-placeholder">
@@ -697,10 +698,10 @@
 
 
 <script>
-    var div = d3.select("body").append("div")   
-        .attr("class", "tooltip")               
+    var div = d3.select("body").append("div")
+        .attr("class", "tooltip")
         .style("opacity", 0);
-</script>    
+</script>
 
 <!-- All global variables that are configurable -->
 
@@ -718,14 +719,14 @@
 <script src="app/vcf.iobio.js"></script>
 
 <script src="app/model/geneBadgeLoaderDisplay.js"></script>
-<script src="app/model/cacheHelper.js"></script>  
-<script src="app/model/stringCompress.js"></script>  
-<script src="app/model/variantModel.js"></script>  
-<script src="app/model/variantTrioModel.js"></script>  
-<script src="app/model/genomeBuildHelper.js"></script>  
-<script src="app/model/variantExporter.js"></script>  
-<script src="app/model/variantImporter.js"></script>  
-<script src="app/model/genericAnnotation.js"></script>  
+<script src="app/model/cacheHelper.js"></script>
+<script src="app/model/stringCompress.js"></script>
+<script src="app/model/variantModel.js"></script>
+<script src="app/model/variantTrioModel.js"></script>
+<script src="app/model/genomeBuildHelper.js"></script>
+<script src="app/model/variantExporter.js"></script>
+<script src="app/model/variantImporter.js"></script>
+<script src="app/model/genericAnnotation.js"></script>
 
 <script src="app/legend.js"></script>
 <script src="app/variantTooltip.js"></script>
@@ -736,12 +737,12 @@
 <script src="app/card/filterCard.js"></script>
 <script src="app/card/genesCard.js"></script>
 <script src="app/card/bookmarkCard.js"></script>
-<script src="app/card/variantCard.js"></script>  
+<script src="app/card/variantCard.js"></script>
 
-<script src="app/timeout.js"></script>  
-<script src="app/eduTour.js"></script>  
+<script src="app/timeout.js"></script>
+<script src="app/eduTour.js"></script>
 
-<script src="app/app.js"></script>	
+<script src="app/app.js"></script>
 
 
 <script>
