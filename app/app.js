@@ -11,6 +11,9 @@ var gene_engine = new Bloodhound({
 	limit: 200
 });
 
+// the video (embedded youtube) that is currently playing
+var videoPlayer = null;
+
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
@@ -216,6 +219,9 @@ $(window).load(function() {
 	// on doing this to delay longer running loading of genes.json.
 	init();
 })
+
+function onYouTubeIframeAPIReady() {
+}
 
 function initHub() {
   // Try to get the referring url.  If none, try using this host and port 3000

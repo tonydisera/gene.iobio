@@ -1847,8 +1847,6 @@ inputinput:-moz-placeholder {
             left: 80px;
             cuursor: pointer;
             z-index: 200; }
-        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-getting-started {
-          background-image: url("../../assets/images/blue-green-background.png"); }
         #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-intro {
           background-image: url("../../assets/images/blue-green-background.png"); }
 
@@ -1857,7 +1855,7 @@ inputinput:-moz-placeholder {
   margin-top: 50px;
   overflow: visible; }
   #screencast-panel .video-container {
-    height: 550px;
+    height: 430px;
     width: 680px;
     background-color: white;
     margin-left: auto;
