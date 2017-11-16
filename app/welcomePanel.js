@@ -1,31 +1,40 @@
 function WelcomePanel() {
-	
+
 	this.videoStyle = "position:absolute;width:100%;height:100%;left:0";
 
+
+
 	this.videoConfigs = {
+		'screencast-intro': {
+			src: "https://www.youtube.com/embed/ormbcpKfJ6w?autoplay=1&rel=0&ecver=2&start=0",
+			width: 480,
+			height: 369,
+			frameborder: "0",
+			allowfullscreen: ""
+		},
 		'screencast-getting-started': {
-			src: "https://www.youtube.com/embed/5g5wT1xDCfY?rel=0&ecver=2",
+			src: "https://www.youtube.com/embed/5g5wT1xDCfY?autoplay=1&rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
 			allowfullscreen: ""
 		},
 		'screencast-coverage-analysis': {
-			src: "https://www.youtube.com/embed/4VG1au5txn0?rel=0&ecver=2",
+			src: "https://www.youtube.com/embed/4VG1au5txn0?autoplay=1&rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
 			allowfullscreen: ""
 		},
 		'screencast-saving-analysis': {
-			src: "https://www.youtube.com/embed/JlXoBlWvniE?rel=0&ecver=2",
+			src: "https://www.youtube.com/embed/JlXoBlWvniE?autoplay=1&rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
 			allowfullscreen: ""
 		},
 		'screencast-multi-gene-analysis': {
-			src: "https://www.youtube.com/embed/QiJ7wuN8LYQ?rel=0&ecver=2",
+			src: "https://www.youtube.com/embed/QiJ7wuN8LYQ?autoplay=1&rel=0&ecver=2",
 			width: 480,
 			height: 369,
 			frameborder: "0",
@@ -46,7 +55,7 @@ WelcomePanel.prototype.playVideo = function(videoName) {
 
 	// Load the video if the iframe doesn't exist
 	if (videoContainer.find("iframe").length == 0) {
-		var iframe = $("<iframe/>", 
+		var iframe = $("<iframe/>",
 		{
 			"class":           "screencast-video",
 			"src":             config.src,
@@ -75,5 +84,12 @@ WelcomePanel.prototype.stopVideo = function(videoName) {
 	var videoContainer = $('#' + videoName);
 	$('#welcome-area').removeClass('hide');
 	$('#screencast-panel').addClass('hide');
-	videoContainer.find('.screencast-video').stop();
+
+	// TODO - Should be able to stop video AND audio.
+	// Until this is figured out, just deleting iframe
+	// instead as a workaround.
+	//videoContainer.find('.screencast-video').stop();
+	videoContainer.find("iframe").remove();
+
+
 }
