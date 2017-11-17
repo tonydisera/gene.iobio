@@ -224,9 +224,8 @@ function onYouTubeIframeAPIReady() {
 }
 
 function initHub() {
-  // Try to get the referring url.  If none, try using this host and port 3000
-	var api = document.referrer != "" ? document.referrer + "apiv1" :
-    window.location.protocol + "//" + window.location.hostname+ ":3000/apiv1";
+    // Hub api URL
+	var api =  "https://staging.frameshift.io/apiv1";
 
 	// Parse params
 	var params = {};
