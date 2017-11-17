@@ -334,7 +334,8 @@ var Bam = Class.extend({
 				var success = null;
 				var cmd = new iobio.cmd(
 						samtools,
-						args
+						args,
+						{ssl: useSSL}
 				);
 				var rawHeader = "";
 				cmd.on('data', function(data) {
