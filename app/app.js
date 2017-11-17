@@ -167,17 +167,21 @@ var widthFactors = [
 
 $(document).ready(function(){
 
-	initHub();
 
-	determineStyle();
+  alertify.defaults.glossary.title = "";
+  alertify.defaults.theme.ok = 'btn btn-default btn-raised';
+  alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
 
-	if (detectIE() != false) {
-		alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
-	}
+  determineStyle();
 
-	alertify.defaults.glossary.title = "";
-	alertify.defaults.theme.ok = 'btn btn-default btn-raised';
-	alertify.defaults.theme.cancel = 'btn btn-default btn-raised';
+  if (detectIE() != false) {
+    alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
+    alertify.alert("Warning. Gene.iobio has not been tested and verified on Internet Explorer.  Use the Google Chrome browser for the best performance of gene.iobio.");
+  } else if (!isChrome()) {
+    alertify.alert("Use the Google Chrome browser for the best performance of gene.iobio.");
+  }
+
+  initHub();
 
 	// Initialize material bootstrap
 	$.material.init();
@@ -1290,6 +1294,27 @@ function closeSlideLeft() {
 		$('#slider-left').trigger("close");
 	});
 
+function isChrome() {
+  var isChromium = window.chrome,
+    winNav = window.navigator,
+    vendorName = winNav.vendor,
+    isOpera = winNav.userAgent.indexOf("OPR") > -1,
+    isIEedge = winNav.userAgent.indexOf("Edge") > -1,
+    isIOSChrome = winNav.userAgent.match("CriOS");
+
+  if (isIOSChrome) {
+    return true;
+  } else if (
+    isChromium !== null &&
+    typeof isChromium !== "undefined" &&
+    vendorName === "Google Inc." &&
+    isOpera === false &&
+    isIEedge === false
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
