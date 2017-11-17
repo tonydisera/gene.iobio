@@ -727,7 +727,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
 		}
 	}
 
-	me._onGeneBadgeUpdate();
+	me._onGeneBadgeUpdate(true);
 
 	cacheHelper.showAnalyzeAllProgress(refreshStandardFilterCounts);
 
@@ -796,7 +796,7 @@ GenesCard.prototype.ACMGGenes = function(geneNameToSelect) {
 		me.selectGene(geneNames[0]);
 	}
 
-	me._onGeneBadgeUpdate();
+	me._onGeneBadgeUpdate(true);
 
 	cacheHelper.showAnalyzeAllProgress();
 
@@ -1125,7 +1125,7 @@ GenesCard.prototype.refreshBookmarkedGenes = function(bookmarkedGenes) {
 	me.copyPasteGenes();
 }
 
-GenesCard.prototype._onGeneBadgeUpdate = function() {
+GenesCard.prototype._onGeneBadgeUpdate = function(updateUrlParm=false) {
 	var me = this;
 
 	// Only show the gene badges if there is at least one gene in the list
@@ -1136,7 +1136,9 @@ GenesCard.prototype._onGeneBadgeUpdate = function() {
 	}
 
 	// Update the url with the gene list
-	updateUrl('genes', geneNames.join(","));
+	if (updateUrlParm) {
+		updateUrl('genes', geneNames.join(","));
+	}
 
 }
 
@@ -1316,7 +1318,7 @@ GenesCard.prototype._clearGenesImpl = function() {
 	window.selectedTranscript = null;
 	me._hideCurrentGene();
 
-	me._onGeneBadgeUpdate();
+	me._onGeneBadgeUpdate(true);
 	me._initPaging(geneNames);
 //	readjustCards();
 
@@ -1336,6 +1338,7 @@ GenesCard.prototype.removeGeneBadge = function(badgeElement) {
 		function (e) {
 			// ok
 			me.removeGeneBadgeImpl(badgeElement);
+			me._onGeneBadgeUpdate(true);
 		},
 		function() {
 			// cancel
@@ -1378,6 +1381,7 @@ GenesCard.prototype.addGene = function(geneName) {
 	}
 	
 	me.addGeneBadge(geneName);
+	me._onGeneBadgeUpdate(true);
 	me.pageToGene(geneName);
 
 
