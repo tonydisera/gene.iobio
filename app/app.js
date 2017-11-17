@@ -1293,6 +1293,7 @@ function closeSlideLeft() {
     readjustCards();
     $('#slider-left').trigger("close");
   });
+}
 
 function isChrome() {
   var isChromium = window.chrome,
@@ -4667,4 +4668,3 @@ function formatDate(d) {
   }
   return d.getMonth() + "-" + d.getDay() + "-" + d.getFullYear() + " " + formatHours(d.getHours()) + ":" + padMinutes(d.getMinutes()) + " " + getAmPm(d.getHours());
 }
-
