@@ -80,10 +80,10 @@ var eduTourShowPhenolyzer   = [true, false];
 var EDU_TOUR_VARIANT_SIZE   = 16;
 
 var levelEduImpact = {
-	HIGH:      'Harmful',
-	MODERATE:  'Probably harmful',
-	MODIFIER:  'Probably benign',
-	LOW:       'Benign'
+  HIGH:      'Harmful',
+  MODERATE:  'Probably harmful',
+  MODIFIER:  'Probably benign',
+  LOW:       'Benign'
 }
 
 //

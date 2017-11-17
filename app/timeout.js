@@ -1,6 +1,6 @@
 
 function checkForInactivity() {
- 	//Increment the idle time counter every second.
+  //Increment the idle time counter every second.
     var idleInterval = setInterval(timerIncrement, IDLE_INTERVAL);
 
     //Zero the idle timer on mouse movement.
@@ -14,9 +14,9 @@ function checkForInactivity() {
 }
 
 function timerIncrement() {
-	if (idlePrompting) {
-		return;
-	}
+  if (idlePrompting) {
+    return;
+  }
     // If we are on the exhibit welcome page, no need for timeout
     if (location.pathname.indexOf("exhibit.html") >= 0) {
         idleTime = 0;
@@ -47,34 +47,34 @@ function timerIncrement() {
 
     idleTime = idleTime + 1;
     if (idleTime > MAX_IDLE ) {
-    	idlePrompting = true;
-    	// If the user hasn't pressed continue in the next x seconds, restart the app.
-		setTimeout(restartApp, IDLE_RESTART);  //
+      idlePrompting = true;
+      // If the user hasn't pressed continue in the next x seconds, restart the app.
+    setTimeout(restartApp, IDLE_RESTART);  //
 
 
-    	//alertify.set({ buttonReverse: true });
-    	alertify.defaults.glossary.ok = "Yes, I want to continue.";
-		alertify.alert("Warning",
-			"This app will restart in 10 seconds unless there is activity. Do you want to continue?",
-			function () {
-				// okay
-				idleTime = 0;
-			    idlePrompting = false;
-			}
-		 );
+      //alertify.set({ buttonReverse: true });
+      alertify.defaults.glossary.ok = "Yes, I want to continue.";
+    alertify.alert("Warning",
+      "This app will restart in 10 seconds unless there is activity. Do you want to continue?",
+      function () {
+        // okay
+        idleTime = 0;
+          idlePrompting = false;
+      }
+     );
 
 
     }
 }
 
 function restartApp() {
-	if (idleTime > MAX_IDLE) {
-		//window.location.reload();
-		startOver();
-	}
+  if (idleTime > MAX_IDLE) {
+    //window.location.reload();
+    startOver();
+  }
 }
 
 function startOver() {
 
-	window.location.href = EXHIBIT_URL;
+  window.location.href = EXHIBIT_URL;
 }

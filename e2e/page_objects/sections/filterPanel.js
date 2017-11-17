@@ -37,7 +37,7 @@ var filter = {
 
 
 module.exports = {
-	selector: '#slider-left #filter-track',
+  selector: '#slider-left #filter-track',
 
   commands: [{
     clickPASSFilter: function() {

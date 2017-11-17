@@ -10,11 +10,11 @@ module.exports = {
 
   commands: [{
     expectTitleEquals: function(text) {
-  		this.expect.element('@title').text.to.equal(text);
-  	},
-  	expectHGVScEquals: function(text) {
-  		this.expect.element('@HGVSc').text.to.equal(text);
-  	},
+      this.expect.element('@title').text.to.equal(text);
+    },
+    expectHGVScEquals: function(text) {
+      this.expect.element('@HGVSc').text.to.equal(text);
+    },
     expectHGVSpEquals: function(text) {
       this.expect.element('@HGVSp').text.to.equal(text);
     },
@@ -112,7 +112,7 @@ module.exports = {
   }],
   elements: {
     title: { selector: "//div[contains(@class, 'tooltip-title') and contains(@class, 'ref-alt')]", locateStrategy: 'xpath' },
-  	HGVSc: { selector: '//div[@class="tooltip-header" and text()="HGVSc"]/following-sibling::div', locateStrategy: 'xpath' },
+    HGVSc: { selector: '//div[@class="tooltip-header" and text()="HGVSc"]/following-sibling::div', locateStrategy: 'xpath' },
     HGVSp: { selector: '//div[@class="tooltip-header" and text()="HGVSp"]/following-sibling::div', locateStrategy: 'xpath' },
     bookmarkLink:  {selector: '#bookmarkLink', locateStrategy: 'css selector'},
     removeBookmarkLink:  {selector: '#remove-bookmark-link', locateStrategy: 'css selector'},
