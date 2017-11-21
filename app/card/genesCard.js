@@ -849,87 +849,98 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 
 }
 
-GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
-	var me = this;
-
-	if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0) {
-		alertify.confirm("",
-			"There are " + window.geneNames.length  + " genes already listed.  Do you want to keep these genes?",
-			function (e) {
-				// user clicked "keep genes"
-		        me._getPhenolyzerGenesAdvancedImpl(url);
-				alertify.defaults.glossary.ok = 'OK';
-				alertify.defaults.glossary.cancel = 'Cancel';
-			},
-			function() {
-				// user clicked 'remove genes'.
-		        me._clearGenesImpl();
-		        me._getPhenolyzerGenesAdvancedImpl(url);
-				alertify.defaults.glossary.ok = 'OK';
-				alertify.defaults.glossary.cancel = 'Cancel';
-			}
-
-		).set('labels', {ok:'Keep genes', cancel:'Remove genes'});   				
-	} else {
-		me._getPhenolyzerGenesAdvancedImpl(url);
-	}
-
-
-}
-
-
 /*
 *  This method will utilize Yi's cool caching and queueing mechanisms
 *  for Phenolyzer, built on Amazon's distributed hash tables (Dynamo)
 *  and Message queuing service.
 */
-GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
-	var me = this;
+GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
+  var me = this;
 
-	$.ajax({
-		    url: url,
-		    type: "GET",
-		    dataType: "json",
-		    success: function( data ) {
-			 	if (data == "") {
-					me.showGenesSlideLeft();
-					$('.phenolyzer.loader').addClass("hide");
-					$("#phenolyzer-timeout-message").removeClass("hide");
-			 	} else if (data.record == 'queued') {
-			 		$('.phenolyzer.loader .loader-label').text("Phenolyzer job queued...")
-			 		setTimeout(function() {
-	     			  me._getPhenolyzerGenesAdvanced(url);
-	     			}, 5000);
-			 	} else if (data.record == 'pending') {
-			 		$('.phenolyzer.loader .loader-label').text("Running Phenolyzer...")
-			 		setTimeout(function() {
-	     			  me._getPhenolyzerGenesAdvanced(url);
-	     			}, 5000);
-			 	} else {
-			 		me.showGenesSlideLeft();
-					$('.phenolyzer.loader').addClass("hide");
-					$('#phenolyzer-heading').removeClass("hide");
+  $('#phenolyzer-no-results-message').addClass("hide");
 
-					var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-					me._parsePhenolyzerData(data.record, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
+  $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function( data ) {
+        if (data == "") {
+          me.showGenesSlideLeft();
+          $('.phenolyzer.loader').addClass("hide");
+          $("#phenolyzer-timeout-message").removeClass("hide");
+        } else if (data.record == 'queued') {
+          $('.phenolyzer.loader .loader-label').text("Phenolyzer job queued...")
+          setTimeout(function() {
+              me._getPhenolyzerGenesAdvanced(url);
+            }, 5000);
+        } else if (data.record == 'pending') {
+          $('.phenolyzer.loader .loader-label').text("Running Phenolyzer...")
+          setTimeout(function() {
+              me._getPhenolyzerGenesAdvanced(url);
+            }, 5000);
+        } else {
+          $('.phenolyzer.loader').addClass("hide");
+          $('#phenolyzer-heading').removeClass("hide");
 
-					me.showGenesSlideLeft();
+          var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+          me._parsePhenolyzerData(data.record, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
 
-					me.refreshSelectedPhenolyzerGenes();
-			 	}
+          me._phenolyzerPromptKeepGenes(function() {
+            me.showGenesSlideLeft();
 
-		    },
-		    fail: function() {
-		    	closeSlideLeft();
-				$('.phenolyzer.loader').addClass("hide");
-				alert("An error occurred in Phenolyzer iobio services. " + thrownError);
-		    }
+            me.showGenesSlideLeft();
+
+            me.refreshSelectedPhenolyzerGenes();
+
+          })
+        }
+
+        },
+        fail: function() {
+          closeSlideLeft();
+          $('.phenolyzer.loader').addClass("hide");
+          alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+        }
 
 
 
-	});
+  });
 
-	$('#get-genes-dropdown .btn-group').removeClass('open');
+  $('#get-genes-dropdown .btn-group').removeClass('open');
+
+}
+
+
+GenesCard.prototype._phenolyzerPromptKeepGenes = function(callback) {
+  var me = this;
+
+  var selectedPhenoGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
+
+  if (phenolyzerGenes.length == 0) {
+    $('#phenolyzer-no-results-message').removeClass("hide");
+    $('.phenolyzer.loader').addClass("hide");
+  } else if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0 && phenolyzerGenes.length > 0 && selectedPhenoGenes.length > 0) {
+    alertify.confirm("",
+      "Do you want to replace or add to genes?",
+      function (e) {
+        // user wants to replace genes
+        me._clearGenesImpl();
+        alertify.defaults.glossary.ok = 'OK';
+        alertify.defaults.glossary.cancel = 'Cancel';
+        callback();
+      },
+      function() {
+        // user wants to keep genes
+        alertify.defaults.glossary.ok = 'OK';
+        alertify.defaults.glossary.cancel = 'Cancel';
+        callback();
+      }
+
+    ).set('labels', {ok:'Replace', cancel:'Add'});
+  } else {
+    callback();
+  }
+
 
 }
 
