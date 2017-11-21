@@ -902,33 +902,7 @@ GenesCard.prototype.getPhenolyzerGenes = function(phenotype) {
 
 }
 
-GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
-  var me = this;
 
-  if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0) {
-    alertify.confirm("",
-      "There are " + window.geneNames.length  + " genes already listed.  Do you want to keep these genes?",
-      function (e) {
-        // user clicked "keep genes"
-            me._getPhenolyzerGenesAdvancedImpl(url);
-        alertify.defaults.glossary.ok = 'OK';
-        alertify.defaults.glossary.cancel = 'Cancel';
-      },
-      function() {
-        // user clicked 'remove genes'.
-            me._clearGenesImpl();
-            me._getPhenolyzerGenesAdvancedImpl(url);
-        alertify.defaults.glossary.ok = 'OK';
-        alertify.defaults.glossary.cancel = 'Cancel';
-      }
-
-    ).set('labels', {ok:'Keep genes', cancel:'Remove genes'});
-  } else {
-    me._getPhenolyzerGenesAdvancedImpl(url);
-  }
-
-
-}
 
 
 /*
@@ -936,8 +910,10 @@ GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
 *  for Phenolyzer, built on Amazon's distributed hash tables (Dynamo)
 *  and Message queuing service.
 */
-GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
+GenesCard.prototype._getPhenolyzerGenesAdvanced = function(url) {
   var me = this;
+
+  $('#phenolyzer-no-results-message').addClass("hide");
 
   $.ajax({
         url: url,
@@ -959,23 +935,27 @@ GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
               me._getPhenolyzerGenesAdvanced(url);
             }, 5000);
         } else {
-          me.showGenesSlideLeft();
           $('.phenolyzer.loader').addClass("hide");
           $('#phenolyzer-heading').removeClass("hide");
 
           var selectedEnd   = +$('#phenolyzer-select-range-end').val();
           me._parsePhenolyzerData(data.record, selectedEnd, me.NUMBER_PHENOLYZER_GENES);
 
-          me.showGenesSlideLeft();
+          me._phenolyzerPromptKeepGenes(function() {
+            me.showGenesSlideLeft();
 
-          me.refreshSelectedPhenolyzerGenes();
+            me.showGenesSlideLeft();
+
+            me.refreshSelectedPhenolyzerGenes();
+
+          })
         }
 
         },
         fail: function() {
           closeSlideLeft();
-        $('.phenolyzer.loader').addClass("hide");
-        alert("An error occurred in Phenolyzer iobio services. " + thrownError);
+          $('.phenolyzer.loader').addClass("hide");
+          alert("An error occurred in Phenolyzer iobio services. " + thrownError);
         }
 
 
@@ -986,6 +966,39 @@ GenesCard.prototype._getPhenolyzerGenesAdvancedImpl = function(url) {
 
 }
 
+
+GenesCard.prototype._phenolyzerPromptKeepGenes = function(callback) {
+  var me = this;
+
+  var selectedPhenoGenes = phenolyzerGenes.filter( function(phenGene) { return phenGene.selected == true});
+
+  if (phenolyzerGenes.length == 0) {
+    $('#phenolyzer-no-results-message').removeClass("hide");
+    $('.phenolyzer.loader').addClass("hide");
+  } else if (!isLevelEdu && !isLevelBasic && window.geneNames.length > 0 && phenolyzerGenes.length > 0 && selectedPhenoGenes.length > 0) {
+    alertify.confirm("",
+      "Do you want to replace or add to genes?",
+      function (e) {
+        // user wants to replace genes
+        me._clearGenesImpl();
+        alertify.defaults.glossary.ok = 'OK';
+        alertify.defaults.glossary.cancel = 'Cancel';
+        callback();
+      },
+      function() {
+        // user wants to keep genes
+        alertify.defaults.glossary.ok = 'OK';
+        alertify.defaults.glossary.cancel = 'Cancel';
+        callback();
+      }
+
+    ).set('labels', {ok:'Replace', cancel:'Add'});
+  } else {
+    callback();
+  }
+
+
+}
 
 /*
 *
@@ -1007,14 +1020,14 @@ GenesCard.prototype._getPhenolyzerGenesExhibit = function(searchTerms) {
         dataType: "text",
         success: function(data) {
           me.showGenesSlideLeft();
-      $('.phenolyzer.loader').addClass("hide");
-      $('#phenolyzer-heading').removeClass("hide");
+          $('.phenolyzer.loader').addClass("hide");
+          $('#phenolyzer-heading').removeClass("hide");
 
-      var selectedEnd   = +$('#phenolyzer-select-range-end').val();
-      me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES_OFFLINE);
+          var selectedEnd   = +$('#phenolyzer-select-range-end').val();
+          me._parsePhenolyzerData(data, selectedEnd, me.NUMBER_PHENOLYZER_GENES_OFFLINE);
 
-      me.showGenesSlideLeft();
-      me.refreshSelectedPhenolyzerGenes();
+          me.showGenesSlideLeft();
+          me.refreshSelectedPhenolyzerGenes();
        },
        error: function(error) {
         // We didn't find the phenolyzer cached data for the phenotype search term,
