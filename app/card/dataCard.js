@@ -296,7 +296,7 @@ DataCard.prototype.loadMygene2Data = function() {
         },
         success: function(res) {
           vcfUrl = mygene2DataEndpoint + res.token + "/" + res.fileUpload.name;
-          me._loadMygene2Proband(response);
+          me._loadMygene2Proband(vcfUrl);
         },
         error: function( xhr, status, errorThrown ) {
           console.log( "Error: " + errorThrown );
@@ -323,7 +323,7 @@ DataCard.prototype._loadMygene2Proband = function(probandUrl) {
   if (isLevelBasic) {
     window.showSidebar("Phenolyzer");
   }
-  if (vcfFilePath != null) {
+  if (probandUrl != null) {
 
     // If the genome build was specified, load the endpoint variant file
     if (genomeBuildHelper.getCurrentBuild()) {

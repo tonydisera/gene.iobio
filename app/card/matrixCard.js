@@ -1300,16 +1300,17 @@ MatrixCard.prototype.showTextSymbol = function (selection, options) {
                  .attr("transform", translate)
                  .append("text")
                  .attr("class", function(d,i) {
-                  if (selection.datum().clickFunction) {
-                    return "clickable";
-                  } else {
-                    return "";
-                  }
-               })
+                    if (selection.datum().clickFunction) {
+                      return "clickable";
+                    } else {
+                      return "";
+                    }
+                 })
                  .attr("x", 0)
                  .attr("y", isLevelBasic ? 14 : 11)
                  .attr("dy", "0em")
-                 .text(selection.datum().value);
+                 .text(selection.datum().value)
+
   MatrixCard.wrap(text, options.cellSize, 3);
 };
 
@@ -1526,6 +1527,17 @@ MatrixCard.prototype.clickClinvar = function(variant, cell) {
   if (variant.clinVarUid != null && variant.clinVarUid != '') {
     var url = 'http://www.ncbi.nlm.nih.gov/clinvar/variation/' + variant.clinVarUid;
     window.open(url);
+  } else if (variant.clinVarAccession != null && Object.keys(variant.clinVarAccession).length > 0) {
+    if (variant.clinVarClinicalSignificance && cell.value && variant.clinVarClinicalSignificance[cell.value]) {
+      var index = variant.clinVarClinicalSignificance[cell.value];
+      for (var accession in variant.clinVarAccession) {
+        var idx = variant.clinVarAccession[accession];
+        if (idx == index) {
+          var url = 'http://www.ncbi.nlm.nih.gov/clinvar/' + accession;
+          window.open(url);
+        }
+      }
+    }
   }
 }
 
