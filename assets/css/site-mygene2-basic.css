@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   margin-top: -5px; }
@@ -26,6 +27,26 @@ body {
     .navbar .navbar-nav .dropdown-submenu.pull-left > .dropdown-menu {
       left: -100%;
       margin-left: 10px; }
+    .navbar .navbar-nav .navbar-button {
+      padding-left: 8px;
+      padding-right: 8px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      margin-top: 13px;
+      margin-left: 5px;
+      font-size: 14px;
+      background-color: rgba(255, 255, 255, 0.15) !important;
+      line-height: 22px; }
+      .navbar .navbar-nav .navbar-button .material-icons {
+        font-size: 15px;
+        float: left;
+        vertical-align: bottom;
+        padding-right: 3px;
+        padding-top: 3px;
+        color: white; }
+      .navbar .navbar-nav .navbar-button .button-label {
+        font-size: 14px;
+        color: white; }
   .navbar .navbar-brand {
     height: 50px;
     margin-top: -6px;
@@ -186,7 +207,7 @@ h5 {
 
 .form-group .radio label {
   font-size: 14px;
-  line-height: 16px;
+  line-height: 16px m;
   color: #717171; }
 .form-group .radio input[type=radio]:checked ~ .check {
   background-color: #5d809d; }
@@ -196,6 +217,16 @@ h5 {
 .form-group.is-focused .radio label {
   color: #717171; }
   .form-group.is-focused .radio label:hover {
+    color: #717171; }
+
+.modal-label {
+  font-size: 13px;
+  color: #717171; }
+
+.modal-button {
+  font-size: 14px;
+  color: #717171 !important; }
+  .modal-button .material-icons {
     color: #717171; }
 
 .form-control,
@@ -220,6 +251,12 @@ h5 {
   outline-offset: 4px !important;
   outline-width: 2px !important; }
 
+.attention-warning {
+  outline-color: #03a9f4 !important;
+  outline-style: solid !important;
+  outline-offset: 4px !important;
+  outline-width: 2px !important; }
+
 .navbar-nav .attention {
   outline-offset: -6px;
   outline-width: 6px; }
@@ -238,6 +275,23 @@ h5 {
   border-radius: 0 !important;
   border: none !important;
   color: #717171; }
+
+.selectize-control.multi .selectize-input:after {
+  content: "";
+  font-family: "Glyphicons Halflings";
+  line-height: 2;
+  display: block;
+  position: absolute;
+  top: 20%;
+  right: 4px;
+  background-color: white;
+  font-size: 9px;
+  cursor: pointer; }
+
+.selectize-control.multi .selectize-input.dropdown-active:after {
+  content: "";
+  font-family: "Glyphicons Halflings";
+  background-color: white; }
 
 #gene-source-box .selectize-input {
   padding-top: 5px;
@@ -390,6 +444,9 @@ i.material-icons {
   .alert.alert-info {
     background-color: transparent;
     color: #717171; }
+  .alert.alert-warning {
+    background-color: #03a9f4;
+    color: rgba(255, 255, 255, 0.84); }
 
 .alert-dismissable .close, .alert-dismissible .close {
   position: relative;
@@ -830,85 +887,6 @@ a.btn {
   padding-top: 5px;
   width: 100%; }
 
-#welcome-area {
-  text-align: center;
-  margin-top: 100px;
-  display: flex;
-  justify-content: space-around; }
-  #welcome-area #welcome-panel {
-    background-color: white;
-    padding-bottom: 15px;
-    padding-top: 15px;
-    padding-left: 10px;
-    padding-right: 10px; }
-    #welcome-area #welcome-panel #welcome-label {
-      color: #5d809d;
-      font-size: 20px; }
-    #welcome-area #welcome-panel button {
-      color: #5d809d;
-      font-size: 17px !important;
-      margin-left: 7px;
-      margin-right: 7px; }
-    #welcome-area #welcome-panel #welcome-panel-content {
-      width: 820px; }
-      #welcome-area #welcome-panel #welcome-panel-content .description-paragraph {
-        text-align: left;
-        margin-left: 0px;
-        margin-right: 30px;
-        margin-top: 20px;
-        color: #717171;
-        font-size: 18px;
-        width: 25%; }
-        #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li {
-          padding-bottom: 10px; }
-          #welcome-area #welcome-panel #welcome-panel-content .description-paragraph li li {
-            padding-bottom: 4px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-heading {
-        font-size: 18px;
-        color: #5d809d;
-        margin-top: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-panel {
-        width: 75%;
-        margin-top: 15px; }
-      #welcome-area #welcome-panel #welcome-panel-content #video-thumbprint-content {
-        display: flex;
-        flex-wrap: wrap;
-        margin-top: 10px; }
-      #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well {
-        position: relative;
-        width: 170px;
-        height: 140px;
-        text-align: center;
-        margin-left: 15px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-title {
-          margin-top: 10px;
-          margin-left: 10px;
-          margin-right: 10px;
-          color: #5d809d;
-          font-size: 16px;
-          line-height: 17px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
-          width: 150px;
-          height: 100px;
-          margin-top: 5px;
-          margin-left: 10px;
-          background-color: grey;
-          background-size: cover; }
-          #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint #play-button {
-            cursor: pointer;
-            opacity: 0.5;
-            color: rgba(70, 70, 70, 0.9);
-            font-size: 90px;
-            position: absolute;
-            top: 15px;
-            left: 40px; }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-multigene-analysis {
-          background-image: url("../../assets/images/thumbprint-multigene.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-saving-analysis {
-          background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
-        #welcome-area #welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
-          background-image: url("../../assets/images/thumbprint-coverage.png"); }
-
 .icon {
   width: 30px;
   height: 30px;
@@ -1167,8 +1145,8 @@ section {
   border: none;
   position: relative;
   pointer-events: none;
-  top: 10px;
-  margin-top: -10px;
+  top: 0px;
+  margin-top: 0px;
   height: 23px;
   visibility: visible;
   width: 26px; }
@@ -1196,6 +1174,39 @@ section {
   .variant-card #bam-track .loader {
     margin-top: 0px !important;
     margin-bottom: 5px !important; }
+  .variant-card #coverage-problem-alert {
+    width: 230px;
+    text-align: center;
+    background-color: #857caf;
+    color: white;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    min-height: 10px;
+    height: 25px;
+    float: none;
+    display: inline-block;
+    margin-left: -300px;
+    margin-right: 10px;
+    margin-bottom: 0px; }
+    .variant-card #coverage-problem-alert svg {
+      display: inline-block;
+      float: none; }
+    .variant-card #coverage-problem-alert span {
+      display: inline-block;
+      vertical-align: top;
+      padding-top: 2px;
+      padding-left: 2px; }
+    .variant-card #coverage-problem-alert button {
+      display: inline-block;
+      color: white !important;
+      padding-top: 1px;
+      padding-bottom: 1px;
+      padding-left: 10px;
+      padding-right: 10px;
+      float: right;
+      margin-top: 2px;
+      font-size: 13px;
+      background-color: rgba(255, 255, 255, 0.31) !important; }
 
 .stats-box {
   display: flex;
@@ -1258,9 +1269,15 @@ header {
   margin-bottom: 20px;
   font-size: 18px; }
 
-#matrix-track g.bookmark, #examine-card g.bookmark, #gene-badge-button g.bookmark, .tooltip g.bookmark {
+#matrix-track g.bookmark, #examine-card g.bookmark, .tooltip g.bookmark {
   fill: #3773A7;
   opacity: 0.7; }
+
+#gene-badge-button g.bookmark {
+  fill: transparent;
+  stroke: #3773A7;
+  stroke-width: 3px;
+  opacity: 1; }
 
 .arrow_box {
   position: relative;
@@ -1311,8 +1328,8 @@ header {
     pointer-events: none; }
   #bam-depth .region {
     stroke-width: 1px;
-    stroke: rgba(218, 165, 0, 0.5);
-    fill: rgba(218, 165, 0, 0.5); }
+    stroke: rgba(133, 124, 175, 0.5);
+    fill: rgba(133, 124, 175, 0.5); }
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray;
@@ -1417,6 +1434,9 @@ header {
 
 #bam-depth .y.axis line {
   stroke-width: 0.5px; }
+
+#gene-viz {
+  margin-top: -25px; }
 
 #gene-viz .axis line, #gene-viz .axis path {
   fill: none;
@@ -1671,6 +1691,192 @@ inputinput:-moz-placeholder {
   width: 200px;
   display: inline-block; }
 
+::-webkit-file-upload-button {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  font-family: "Quattrocento Sans", sans-serif;
+  color: #717171;
+  border: none;
+  border-radius: 2px;
+  position: relative;
+  padding: 8px 8px;
+  margin: 1px 1px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  will-change: box-shadow, transform;
+  -webkit-transition: -webkit-box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -o-transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: 0;
+  cursor: pointer;
+  text-decoration: none;
+  background: transparent; }
+
+#welcome-area {
+  text-align: center;
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  align-items: center; }
+  #welcome-area .welcome-panel {
+    background-color: white;
+    padding-bottom: 15px;
+    padding-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 20px;
+    width: 850px; }
+    #welcome-area .welcome-panel #welcome-label {
+      color: #5d809d;
+      font-size: 20px; }
+    #welcome-area .welcome-panel #what-is-new-link {
+      font-size: 18px; }
+    #welcome-area .welcome-panel #helpful-articles-link {
+      font-size: 18px; }
+    #welcome-area .welcome-panel button {
+      color: #5d809d;
+      font-size: 17px !important;
+      margin-left: 7px;
+      margin-right: 7px; }
+    #welcome-area .welcome-panel #welcome-panel-content {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px; }
+      #welcome-area .welcome-panel #welcome-panel-content i.material-icons {
+        font-size: 20px;
+        vertical-align: middle;
+        display: inline-block;
+        padding-top: 2px;
+        float: left; }
+      #welcome-area .welcome-panel #welcome-panel-content span.bullet-item {
+        display: inline-block;
+        float: left;
+        word-wrap: break-word;
+        width: 260px;
+        margin-left: 5px;
+        margin-bottom: 15px; }
+      #welcome-area .welcome-panel #welcome-panel-content .description-paragraph {
+        text-align: left;
+        margin-top: 50px;
+        color: #717171;
+        font-size: 18px;
+        margin-right: 0px;
+        margin-left: 100px; }
+        #welcome-area .welcome-panel #welcome-panel-content .description-paragraph li {
+          padding-bottom: 10px; }
+          #welcome-area .welcome-panel #welcome-panel-content .description-paragraph li li {
+            padding-bottom: 4px; }
+      #welcome-area .welcome-panel #welcome-panel-content #video-thumbprint-heading {
+        font-size: 18px;
+        color: #717171;
+        margin-top: 10px;
+        margin-bottom: 3px; }
+      #welcome-area .welcome-panel #welcome-panel-content #video-thumbprint-panel {
+        margin-top: 5px;
+        margin-bottom: 10px; }
+      #welcome-area .welcome-panel #welcome-panel-content #video-thumbprint-content {
+        display: flex;
+        flex-wrap: wrap; }
+      #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well {
+        position: relative;
+        width: 170px;
+        height: 140px;
+        text-align: center;
+        margin-left: 0px; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well .video-title {
+          margin-top: 10px;
+          margin-left: 10px;
+          margin-right: 10px;
+          color: #5d809d;
+          font-size: 16px;
+          line-height: 17px; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint {
+          width: 150px;
+          height: 100px;
+          margin-top: 5px;
+          margin-left: 10px;
+          background-color: grey;
+          background-size: cover; }
+          #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well .video-thumbprint #play-button {
+            cursor: pointer;
+            opacity: 0.5;
+            color: rgba(70, 70, 70, 0.9);
+            font-size: 90px;
+            position: absolute;
+            top: 15px;
+            left: 40px; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-multigene-analysis {
+          background-image: url("../../assets/images/thumbprint-multigene.png"); }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-saving-analysis {
+          background-image: url("../../assets/images/thumbprint-bookmarks.png"); }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well #welcome-screencast-panel-coverage-analysis {
+          background-image: url("../../assets/images/thumbprint-coverage.png"); }
+      #welcome-area .welcome-panel #welcome-panel-content #video-thumbprint-heading-large {
+        font-size: 21px;
+        color: white;
+        position: relative;
+        top: 95px;
+        z-index: 1;
+        cursor: default; }
+      #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large {
+        position: relative;
+        width: 250px;
+        height: 160px;
+        text-align: center;
+        margin-left: 0px; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-title {
+          margin-top: 10px;
+          margin-left: 10px;
+          margin-right: 10px;
+          color: white;
+          font-size: 16px;
+          line-height: 17px; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large {
+          width: 250px;
+          height: 160px;
+          background-color: grey;
+          background-size: cover; }
+          #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large .video-thumbprint-large #play-button {
+            cursor: pointer;
+            opacity: 0.4;
+            color: white;
+            font-size: 90px;
+            position: absolute;
+            top: 35px;
+            left: 80px;
+            cuursor: pointer;
+            z-index: 200; }
+        #welcome-area .welcome-panel #welcome-panel-content .video-thumbprint-well-large #welcome-screencast-panel-intro {
+          background-image: url("../../assets/images/blue-green-background.png"); }
+
+#screencast-panel {
+  text-align: center;
+  margin-top: 50px;
+  overflow: visible; }
+  #screencast-panel .video-container {
+    height: 430px;
+    width: 680px;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto; }
+    #screencast-panel .video-container h4 {
+      font-size: 21px;
+      padding-top: 10px;
+      margin-right: 50px; }
+    #screencast-panel .video-container .video-stop-button {
+      float: left;
+      margin-left: 10px;
+      padding-left: 0;
+      margin-top: 5px;
+      margin-bottom: 0px; }
+      #screencast-panel .video-container .video-stop-button i.material-icons {
+        text-align: left; }
+    #screencast-panel .video-container .iframe-placeholder {
+      position: relative;
+      height: 0;
+      padding-bottom: 75%; }
+
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
   color: #5d809d !important; }
@@ -1767,7 +1973,7 @@ inputinput:-moz-placeholder {
   background-color: #636161; }
 
 #slider-left-content {
-  height: 100%;
+  height: calc(100% - (37px + 55px));
   width: 352px;
   background-color: white;
   overflow-y: scroll;
@@ -1948,7 +2154,7 @@ inputinput:-moz-placeholder {
   margin-right: 70px;
   color: #717171; }
   #coverage-thresholds.attention {
-    outline-color: #daa500;
+    outline-color: #857caf;
     outline-offset: 0px; }
   #coverage-thresholds .coverage-threshold {
     margin-left: 8px;
@@ -2045,17 +2251,24 @@ inputinput:-moz-placeholder {
         height: 20px;
         padding-top: 2px; }
       #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count {
-        background-color: rgba(18, 127, 170, 0.65); }
+        background-color: rgba(18, 127, 170, 0.65);
+        cursor: pointer; }
         #filter-track #standard-filter-panel .standard-filter-count #loaded-variant-count.none {
           background-color: #e8e6e6; }
       #filter-track #standard-filter-panel .standard-filter-count #called-variant-count {
-        background-color: #b4c688; }
+        background-color: #b4c688;
+        cursor: pointer; }
         #filter-track #standard-filter-panel .standard-filter-count #called-variant-count.none {
           background-color: #e8e6e6; }
-      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-warning {
-        color: #d97b7b;
-        font-size: 22px;
-        vertical-align: bottom;
+      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-loaded-warning {
+        font-weight: bold;
+        color: #b32f2f;
+        font-size: 17px;
+        cursor: pointer; }
+      #filter-track #standard-filter-panel .standard-filter-count #unanalyzed-called-warning {
+        font-weight: bold;
+        color: #b32f2f;
+        font-size: 17px;
         cursor: pointer; }
   #filter-track .checkbox label {
     font-size: 12px;
@@ -2106,8 +2319,8 @@ inputinput:-moz-placeholder {
   color: #ad494a; }
 
 #thumbs-grey-symbol {
-  fill: #8b8b8b;
-  color: #8b8b8b; }
+  fill: #b6b6b6;
+  color: #b6b6b6; }
 
 .variant.homref {
   opacity: 0 !important;
@@ -2134,6 +2347,34 @@ inputinput:-moz-placeholder {
 .impact_NOIMPACT, .impact_none, .effect_none {
   fill: #FAF5BE;
   stroke: #807D7D; }
+
+.colorby_clinvar_path {
+  fill: #ad494A;
+  color: #ad494A; }
+
+.colorby_clinvar_lpath {
+  fill: #FB7737;
+  color: #FB7737; }
+
+.colorby_clinvar_uc {
+  fill: #e7ba52;
+  color: #e7ba52; }
+
+.colorby_clinvar_cd {
+  fill: #6fb6b4;
+  color: #6fb6b4; }
+
+.colorby_clinvar_other {
+  fill: #bdbdbd;
+  color: #bdbdbd; }
+
+.colorby_clinvar_benign {
+  fill: #9cc231;
+  color: #9cc231; }
+
+.colorby_clinvar_lbenign {
+  fill: #b5cf6b;
+  color: #b5cf6b; }
 
 #feature-matrix .impact_HIGH {
   pointer-events: none; }
@@ -2246,25 +2487,21 @@ inputinput:-moz-placeholder {
   cursor: pointer;
   font-weight: bold;
   fill: #3586c0;
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  outline: solid 2px #969696; }
 
 .tooltip-zygosity:hover {
-  outline: solid 2px #969696;
-  outline-offset: -2px; }
+  outline: solid 2px #969696; }
 
 .impact.current:hover, .vepImpact.current:hover, .highestImpactVep.current:hover, .effect.current:hover, .vepConsequence.current:hover, .tooltip-zygosity.current:hover, .regulatory.current:hover, .polyphen.current:hover, .sift.current:hover, .type.current:hover, .afexaclevels.current:hover, .af1000glevels.current:hover, .inheritance.current:hover, .clinvar.current:hover, .uasibs.current:hover, .recfilter.current:hover {
   font-weight: bold;
   cursor: pointer;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  outline: solid 2px #3586c0; }
   .impact.current:hover.not-equal, .vepImpact.current:hover.not-equal, .highestImpactVep.current:hover.not-equal, .effect.current:hover.not-equal, .vepConsequence.current:hover.not-equal, .tooltip-zygosity.current:hover.not-equal, .regulatory.current:hover.not-equal, .polyphen.current:hover.not-equal, .sift.current:hover.not-equal, .type.current:hover.not-equal, .afexaclevels.current:hover.not-equal, .af1000glevels.current:hover.not-equal, .inheritance.current:hover.not-equal, .clinvar.current:hover.not-equal, .uasibs.current:hover.not-equal, .recfilter.current:hover.not-equal {
     outline: none; }
 
 .current {
   font-weight: bold;
-  outline: solid 2px #3586c0;
-  outline-offset: -2px; }
+  outline: solid 2px #3586c0; }
   .current.not-equal {
     background-image: linear-gradient(transparent 7px, #3586c0 7px, #3586c0 9px, transparent 9px);
     border: none;
@@ -2494,9 +2731,9 @@ inputinput:-moz-placeholder {
   font-size: 11px;
   line-height: normal; }
   #bam-depth .tooltip .danger {
-    color: #daa500; }
+    color: #aab2ff; }
   #bam-depth .tooltip a.danger {
-    color: #daa500 !important; }
+    color: #aab2ff !important; }
   #bam-depth .tooltip #exon-tooltip-close {
     float: right;
     color: white !important;
@@ -2507,9 +2744,9 @@ inputinput:-moz-placeholder {
     float: left; }
 
 #zoom-region-chart .tooltip .danger {
-  color: #daa500; }
+  color: #aab2ff; }
 #zoom-region-chart .tooltip a.danger {
-  color: #daa500 !important; }
+  color: #aab2ff !important; }
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
@@ -2518,6 +2755,9 @@ inputinput:-moz-placeholder {
 #zoom-region-chart .tooltip #exon-tooltip-title {
   display: inline-block;
   float: left; }
+
+#matrix-tooltip {
+  position: fixed; }
 
 .tooltip-title {
   font-size: 12px;
@@ -2551,9 +2791,13 @@ inputinput:-moz-placeholder {
 
 .tooltip-value {
   overflow-wrap: break-word;
-  float: right;
+  float: left;
   width: 220px;
-  margin-right: 5px; }
+  margin-right: 0px;
+  margin-left: 10px; }
+
+.tooltip-clinvar-link {
+  padding-top: 1px; }
 
 .tooltip-header {
   overflow-wrap: break-all;
@@ -2595,9 +2839,6 @@ inputinput:-moz-placeholder {
 .ped-zygosity {
   width: 75px;
   float: left; }
-
-.tooltip-row.ped-info {
-  padding-bottom: 5px; }
 
 .tooltip-zygosity {
   float: left;
@@ -2659,6 +2900,21 @@ inputinput:-moz-placeholder {
 
 .tooltip .row {
   line-height: 12px !important; }
+
+.tooltip .tooltip-button {
+  padding: 0px 8px 0px 6px;
+  font-size: 14px;
+  color: white !important;
+  background-color: rgba(93, 128, 157, 0.85) !important;
+  margin-top: 1px;
+  margin-bottom: 1px; }
+  .tooltip .tooltip-button i {
+    font-size: 16px;
+    color: white; }
+.tooltip #tooltip-scroll-up {
+  background-color: #4797dd !important; }
+.tooltip #tooltip-scroll-down {
+  background-color: #4797dd !important; }
 
 .tooltip {
   position: absolute;
@@ -2809,7 +3065,7 @@ text.ref-count {
   border-top-color: rgba(0, 0, 0, 0.2);
   bottom: -10px;
   content: "";
-  right: 328px; }
+  right: 343px; }
 .tooltip-wide.arrow-down-center:after {
   position: absolute;
   display: inline-block;
@@ -2818,7 +3074,12 @@ text.ref-count {
   border-right: 9px solid transparent;
   bottom: -8px;
   content: "";
-  right: 330px; }
+  right: 345px; }
+
+.tooltip-extra-wide.arrow-down-center:before {
+  right: 448px; }
+.tooltip-extra-wide.arrow-down-center:after {
+  right: 450px; }
 
 .tooltip.black-arrow-left:after {
   position: absolute;
@@ -2850,7 +3111,9 @@ text.ref-count {
   padding-top: 0px; }
 
 .tooltip.tooltip-wide {
-  width: 650px !important; }
+  width: 680px !important; }
+  .tooltip.tooltip-wide.tooltip-extra-wide {
+    width: 1000px !important; }
 
 .tooltip-wide {
   font-size: 13px; }
@@ -2858,12 +3121,12 @@ text.ref-count {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {
     clear: both;
-    padding-bottom: 3px; }
+    padding-bottom: 6px; }
     .tooltip-wide .tooltip-row.ped-info {
-      padding-bottom: 6px; }
+      padding-bottom: 0px; }
   .tooltip-wide .tooltip-footer {
     margin-top: 0px !important;
-    padding-top: 0px !important;
+    padding-top: 10px !important;
     padding-bottom: 2px; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
@@ -2877,31 +3140,49 @@ text.ref-count {
   .tooltip-wide .tooltip-left-column {
     float: left;
     padding-top: 5px;
-    padding-bottom: 0px; }
+    padding-bottom: 0px;
+    margin-left: 10px; }
     .tooltip-wide .tooltip-left-column .tooltip-row {
-      width: 330px;
+      width: 360px;
       overflow: auto; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-header {
-        width: 90px; }
+        width: 115px; }
       .tooltip-wide .tooltip-left-column .tooltip-row .tooltip-value {
-        width: 220px; }
+        width: 230px; }
   .tooltip-wide .tooltip-right-column {
-    float: right;
+    float: left;
     padding-top: 5px;
     padding-bottom: 0px; }
     .tooltip-wide .tooltip-right-column .tooltip-row {
       width: 300px;
       overflow: auto; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-header {
-        width: 110px; }
+        width: 112px; }
       .tooltip-wide .tooltip-right-column .tooltip-row .tooltip-value {
-        width: 150px; }
+        width: 178px; }
+  .tooltip-wide .tooltip-info-column {
+    float: left;
+    padding-top: 5px;
+    padding-bottom: 0px;
+    width: 299px; }
+    .tooltip-wide .tooltip-info-column .tooltip-row {
+      width: 299px;
+      overflow: auto; }
+      .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-header {
+        width: 80px;
+        word-wrap: break-word; }
+      .tooltip-wide .tooltip-info-column .tooltip-row .tooltip-value {
+        width: 200px; }
   .tooltip-wide a {
     font-size: 13px !important; }
     .tooltip-wide a:hover, .tooltip-wide a:focus {
       font-size: 13px !important; }
-  .tooltip-wide a:hover, .tooltip-wide a:focus {
-    font-size: 13px !important; }
+  .tooltip-wide .highest-impact-badge span {
+    font-size: 11px !important; }
+  .tooltip-wide .highest-impact-badge a {
+    font-size: 11px !important; }
+    .tooltip-wide .highest-impact-badge a:hover, .tooltip-wide .highest-impact-badge a:focus {
+      font-size: 11px !important; }
   .tooltip-wide .tooltip-footer {
     clear: both; }
     .tooltip-wide .tooltip-footer a {
@@ -2912,6 +3193,12 @@ text.ref-count {
       font-size: 14px !important; }
   .tooltip-wide .row {
     line-height: 13px !important; }
+  .tooltip-wide .tooltip-clinvar-link {
+    padding-top: 0px; }
+
+.tooltip-extra-wide .row {
+  margin-left: -5px;
+  margin-right: -5px; }
 
 #examine-card .tooltip-allele-count-bar {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
@@ -2976,17 +3263,10 @@ text.ref-count {
   margin-right: 5px;
   word-break: break-all; }
   #bookmark-card a.current {
-    line-height: 12px;
-    padding-bottom: 2px;
-    padding-top: 6px !important;
-    margin-top: 1px;
-    margin-bottom: 1px;
-    margin-right: 5px;
-    border: solid thin #3586c0;
-    font-weight: normal;
-    padding-right: 0px;
-    padding-left: 0px;
-    margin-left: 0px; }
+    outline-style: solid;
+    outline-color: #3586c0;
+    outline-width: 1px;
+    font-weight: normal; }
   #bookmark-card a #import-help-icon {
     color: #5d809d !important;
     margin-left: 2px; }
@@ -3005,19 +3285,28 @@ text.ref-count {
     font-style: italic;
     padding-left: 6px;
     display: inline-block;
-    margin-top: -2px; }
+    vertical-align: top; }
   #bookmark-card .bookmark .bookmark-info-glyph {
     display: inline-block;
     font-size: 14px;
-    margin-top: -5px;
-    margin-left: -1px;
-    margin-right: 5px;
-    color: #909090;
-    font-size: 15px;
-    cursor: pointer; }
+    margin-left: 0px;
+    margin-right: 9px;
+    color: #ababab;
+    font-size: 14px;
+    cursor: pointer;
+    vertical-align: top;
+    margin-top: -2px; }
+  #bookmark-card .bookmark .bookmark-number {
+    margin-right: 7px;
+    font-size: 12px;
+    line-height: 12px;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 1px; }
   #bookmark-card .bookmark .variant-symbols {
     display: inline-block;
-    width: 60px;
+    width: 70px;
+    vertical-align: top;
     margin-top: -2px; }
   #bookmark-card .bookmark .variant-label {
     display: inline-block; }
@@ -3026,20 +3315,31 @@ text.ref-count {
       width: 97px;
       line-height: 12px;
       vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .coord:hover {
+        text-decoration: underline !important; }
+    #bookmark-card .bookmark .variant-label .hgvs {
+      margin-left: 3px;
+      display: inline-block;
+      width: 70px;
+      line-height: 12px;
+      vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .hgvs:hover {
+        text-decoration: underline !important; }
+    #bookmark-card .bookmark .variant-label .vep-consequence {
+      display: inline-block;
+      width: 97px;
+      line-height: 12px;
+      vertical-align: top; }
+      #bookmark-card .bookmark .variant-label .vep-consequence:hover {
+        text-decoration: underline !important; }
     #bookmark-card .bookmark .variant-label .rsid {
       display: inline-block;
       margin-left: 3px;
       width: 70px;
       line-height: 12px;
       vertical-align: top; }
-    #bookmark-card .bookmark .variant-label .hgvs {
-      margin-left: 3px;
-      display: inline-block;
-      width: 67px;
-      line-height: 12px;
-      vertical-align: top; }
-    #bookmark-card .bookmark .variant-label:hover {
-      text-decoration: underline !important; }
+      #bookmark-card .bookmark .variant-label .rsid:hover {
+        text-decoration: underline !important; }
 #bookmark-card div.bookmark-box {
   clear: both; }
 #bookmark-card div.bookmark-gene {
@@ -3067,7 +3367,10 @@ text.ref-count {
   cursor: pointer;
   float: right;
   display: inline-block;
-  margin-top: -2px; }
+  vertical-align: top;
+  margin-top: -2px;
+  margin-left: 5px;
+  margin-right: 5px; }
 #bookmark-card .phenotypes-container {
   overflow-x: hidden; }
 #bookmark-card .phenotypes {
@@ -3136,18 +3439,18 @@ text.ref-count {
   font-size: 12px; }
 
 #zoom-region-chart.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(133, 124, 175, 0.85);
+  stroke: #555da5; }
 #zoom-region-chart.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(133, 124, 175, 0.85);
+  stroke: #555da5; }
 
 #gene-viz.ibo-gene .cds.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(133, 124, 175, 0.85);
+  stroke: #555da5; }
 #gene-viz.ibo-gene .utr.danger {
-  fill: rgba(175, 79, 79, 0.81);
-  stroke: #af4f4f; }
+  fill: rgba(133, 124, 175, 0.85);
+  stroke: #555da5; }
 
 #genes-panel {
   margin-bottom: 5px;
@@ -3266,6 +3569,10 @@ text.ref-count {
   color: #717171 !important;
   font-size: 12px; }
 
+textarea#genes-to-copy {
+  width: 325px;
+  height: 280px; }
+
 #edit-list-li {
   color: #717171 !important;
   font-size: 13px;
@@ -3379,8 +3686,8 @@ text.ref-count {
   margin-top: -1px;
   margin-left: 0px;
   float: left;
-  color: #daa500;
-  fill: #daa500;
+  color: #857caf;
+  fill: #857caf;
   display: none; }
   #gene-badge-coverage-problem.dropdown-item {
     display: inline-block;
@@ -3388,7 +3695,7 @@ text.ref-count {
     margin-top: 1px; }
 
 .coverage-problem-glyph {
-  fill: #daa500; }
+  fill: #857caf; }
 
 #gene-badge-harmful-variant {
   font-size: 15px;
@@ -3402,6 +3709,33 @@ text.ref-count {
     margin-right: 3px;
     margin-top: 1px; }
 
+.gene-badge-harmful-variant {
+  font-size: 15px;
+  margin-top: -1px;
+  margin-left: 2px;
+  float: left; }
+
+.harmful1-variant {
+  fill: #9d2024; }
+
+.harmful2-variant {
+  fill: #d84d4d; }
+
+.harmful3-variant {
+  fill: #ef9754; }
+
+#gene-badge-harmful1-variant {
+  display: none;
+  fill: #9d2024; }
+
+#gene-badge-harmful2-variant {
+  display: none;
+  fill: #d84d4d; }
+
+#gene-badge-harmful3-variant {
+  display: none;
+  fill: #ef9754; }
+
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
 #gene-badge.visited #gene-badge-name {
@@ -3413,6 +3747,12 @@ text.ref-count {
 #gene-badge.has-coverage-problem #gene-badge-coverage-problem {
   display: inline-block; }
 #gene-badge.has-harmful-variant #gene-badge-harmful-variant {
+  display: inline-block; }
+#gene-badge.has-harmful1-variant #gene-badge-harmful1-variant {
+  display: inline-block; }
+#gene-badge.has-harmful2-variant #gene-badge-harmful2-variant {
+  display: inline-block; }
+#gene-badge.has-harmful3-variant #gene-badge-harmful3-variant {
   display: inline-block; }
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
@@ -3497,7 +3837,7 @@ text.ref-count {
     max-height: 150px;
     overflow-y: auto; }
   #gene-badge-container.page-control {
-    text-align: left; }
+    text-align: center; }
   #gene-badge-container #gene-badge a {
     color: #717171 !important; }
     #gene-badge-container #gene-badge a:hover {
@@ -3527,9 +3867,9 @@ text.ref-count {
 #gene-page-control {
   margin-top: 0px;
   margin-bottom: 5px;
-  text-align: right;
-  float: right;
-  display: inline-block; }
+  text-align: center;
+  float: none;
+  display: block; }
   #gene-page-control #gene-paging-links {
     display: inline-block;
     margin-right: 20px;
@@ -3883,7 +4223,8 @@ text.ref-count {
     stroke: #969696 !important;
     stroke-width: 1.5px !important;
     opacity: 1;
-    pointer-events: none; }
+    pointer-events: none;
+    outline-offset: -2px; }
 #feature-matrix .col.active rect.colbox {
   stroke: #969696;
   stroke-width: 1px;
@@ -3939,6 +4280,14 @@ text.ref-count {
   margin-top: 40px;
   margin-bottom: 40px; }
 
+.legend-help-link {
+  font-size: 12px;
+  display: inline-block;
+  vertical-align: top; }
+
+.legend-help {
+  font-size: 11px; }
+
 .legend-symbol {
   stroke: #000 !important;
   stroke-width: 1.5px !important;
@@ -3989,48 +4338,187 @@ text.ref-count {
   font-size: 14px;
   fill: #717171; }
 
-#show-known-variants-cb-area {
+#known-variants-nav-area {
   display: inline-block;
-  float: left;
-  margin-left: 20px;
-  margin-top: -4px;
-  margin-bottom: 0px; }
+  padding-top: 0px;
+  float: left; }
+  #known-variants-nav-area #known-variants-nav-radio-buttons {
+    display: inline-block;
+    margin-top: 2px;
+    padding-top: 0px;
+    float: left;
+    margin-right: 15px; }
+    #known-variants-nav-area #known-variants-nav-radio-buttons .radio label {
+      font-size: 13px;
+      color: #717171;
+      padding-top: 1px; }
+  #known-variants-nav-area #known-variants-nav-chart-type {
+    margin-left: 10px;
+    margin-top: 0px;
+    float: left; }
+    #known-variants-nav-area #known-variants-nav-chart-type .tooltip {
+      background-color: initial;
+      border: none;
+      box-shadow: none; }
+    #known-variants-nav-area #known-variants-nav-chart-type .chart-label {
+      vertical-align: top;
+      display: inline-block;
+      margin-top: 4px;
+      margin-right: 10px; }
+    #known-variants-nav-area #known-variants-nav-chart-type .loader {
+      margin-left: 10px;
+      display: inline-block;
+      margin-top: 2px;
+      margin-bottom: 0px; }
+      #known-variants-nav-area #known-variants-nav-chart-type .loader .loader-label {
+        font-size: 12px; }
+    #known-variants-nav-area #known-variants-nav-chart-type .chart-type {
+      margin: 0;
+      padding: 2px;
+      vertical-align: top;
+      cursor: pointer; }
+      #known-variants-nav-area #known-variants-nav-chart-type .chart-type.selected {
+        font-weight: bold;
+        border: solid 0.5px #3586c0;
+        border-radius: 4px;
+        padding: 1px; }
+      #known-variants-nav-area #known-variants-nav-chart-type .chart-type .material-icons {
+        font-size: 17px; }
+  #known-variants-nav-area text {
+    color: #717171;
+    fill: #717171;
+    font-size: 12px; }
+  #known-variants-nav-area svg.known-variants-clinvar {
+    margin-right: 10px; }
+  #known-variants-nav-area svg.known-variants-clinvar:hover {
+    cursor: pointer;
+    font-weight: bold;
+    fill: #3586c0;
+    outline: solid 2px #969696; }
+  #known-variants-nav-area svg.known-variants-clinvar.current:hover {
+    font-weight: bold;
+    cursor: pointer;
+    outline: solid 2px #3586c0; }
+
+#select-known-variants-filter-box {
+  min-width: 200px;
+  max-width: 500px;
+  display: inline-block;
+  margin-left: 10px;
+  float: left; }
+  #select-known-variants-filter-box .selectize-input input {
+    width: 120px !important; }
+    #select-known-variants-filter-box .selectize-input input::-webkit-input-placeholder {
+      font-size: 12px !important; }
+    #select-known-variants-filter-box .selectize-input input::-moz-placeholder {
+      font-size: 12px !important; }
+    #select-known-variants-filter-box .selectize-input inputinput:-moz-placeholder {
+      font-size: 12px !important; }
+  #select-known-variants-filter-box .selectize-input.has-items input {
+    width: 4px !important; }
+  #select-known-variants-filter-box .selectize-control.multi .selectize-input.has-items {
+    padding: 3px 8px 0px; }
+
+#transcript-card #known-variants-nav {
+  margin-left: 10px;
+  text-align: left;
+  display: inline-block;
+  vertical-align: top; }
+#transcript-card #known-variants-chart {
+  margin-left: 0px; }
+#transcript-card #known-variants-display-label {
+  font-size: 13px;
+  color: #717171;
+  display: inline-block;
+  vertical-align: top;
+  padding-top: 4px;
+  margin-left: 10px;
+  margin-right: 4px; }
+
+#known-variants-all-card {
+  min-height: 35px; }
+  #known-variants-all-card #known-variants-nav-area {
+    display: inline-block;
+    padding-top: 0px; }
+  #known-variants-all-card .track {
+    background-color: transparent !important; }
+  #known-variants-all-card .track-expand {
+    background-color: transparent !important; }
+  #known-variants-all-card #known-variants-chart {
+    margin-bottom: -8px; }
+  #known-variants-all-card #known-variants-cards {
+    margin-left: -10px;
+    margin-right: -10px;
+    margin-bottom: 5px; }
+    #known-variants-all-card #known-variants-cards .badge-label {
+      font-size: 12px; }
+    #known-variants-all-card #known-variants-cards #variant-badges {
+      margin-left: 20px !important; }
+    #known-variants-all-card #known-variants-cards .variant-card {
+      margin-top: -3px;
+      box-shadow: none;
+      margin-bottom: -10px;
+      min-height: initial; }
+      #known-variants-all-card #known-variants-cards .variant-card #variant-heading {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #minimize-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #expand-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #shrink-button {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card #bam-track {
+        display: none !important; }
+      #known-variants-all-card #known-variants-cards .variant-card .tooltip #bookmarkLink {
+        display: none !important; }
+
+#transcript-card #show-known-variants-cb-area {
+  margin-left: 10px !important;
+  float: none !important; }
+#transcript-card #show-known-variants-card-cb-area {
+  float: none !important;
+  margin-left: 20px !important;
+  display: inline-block !important; }
+#transcript-card #known-variants-nav-area {
+  display: inline-block;
+  padding-top: 6px; }
+#transcript-card #known-variants-chart {
+  margin-bottom: -20px !important; }
+#transcript-card #known-variants-cards {
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-top: -30px; }
+  #transcript-card #known-variants-cards .badge-label {
+    font-size: 12px; }
+  #transcript-card #known-variants-cards #variant-badges {
+    float: right !important;
+    margin-top: -6px !important; }
+  #transcript-card #known-variants-cards .variant-card {
+    box-shadow: none;
+    margin-bottom: -25px; }
+    #transcript-card #known-variants-cards .variant-card #variant-heading {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #zoom-region-chart {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #bam-track {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #minimize-button {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #expand-button {
+      display: none !important; }
+    #transcript-card #known-variants-cards .variant-card #shrink-button {
+      display: none !important; }
+
+#known-variants-cards #vcf-chart-label {
+  display: none !important; }
+#known-variants-cards #variant-heading {
+  min-width: initial;
+  max-width: initial; }
 
 #known-variants-chart {
   padding: 0px;
   margin-top: 0px;
   margin-bottom: 0px; }
-  #known-variants-chart #known-variants-nav {
-    text-align: left;
-    margin-bottom: 2px; }
-    #known-variants-chart #known-variants-nav .tooltip {
-      background-color: initial;
-      border: none;
-      box-shadow: none; }
-    #known-variants-chart #known-variants-nav .chart-label {
-      vertical-align: top;
-      display: inline-block;
-      margin-top: 4px;
-      margin-right: 10px; }
-    #known-variants-chart #known-variants-nav .loader {
-      margin-left: 10px;
-      display: inline-block;
-      margin-top: 2px;
-      margin-bottom: 0px; }
-      #known-variants-chart #known-variants-nav .loader .loader-label {
-        font-size: 12px; }
-    #known-variants-chart #known-variants-nav .chart-type {
-      margin: 0;
-      padding: 2px;
-      vertical-align: top;
-      cursor: pointer; }
-      #known-variants-chart #known-variants-nav .chart-type.selected {
-        font-weight: bold;
-        border: solid 0.5px #3586c0;
-        border-radius: 4px;
-        padding: 1px; }
-      #known-variants-chart #known-variants-nav .chart-type .material-icons {
-        font-size: 17px; }
   #known-variants-chart svg {
     vertical-align: bottom; }
     #known-variants-chart svg .axis text {
@@ -4767,5 +5255,8 @@ button {
 @media screen and (max-width: 767px) {
   .collapse.in .or {
     display: none !important; } }
+@media screen and (max-height: 510px) {
+  textarea#genes-to-copy {
+    height: 150px; } }
 
 /*# sourceMappingURL=site-mygene2-basic.css.map */
