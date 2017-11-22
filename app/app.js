@@ -210,8 +210,13 @@ $(document).ready(function(){
      return cacheHelper.promiseCheckCacheSize();
    })
    .then(function() {
+      // Clear the local cache
+      cacheHelper.clearCache();
+
       // cache is initialized
       showWelcomePanel();
+
+      init();
    },
    function(error) {
     alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
@@ -223,7 +228,6 @@ $(document).ready(function(){
 $(window).load(function() {
   // Window is loaded.  Now we perform init().  We hold off
   // on doing this to delay longer running loading of genes.json.
-  init();
 })
 
 function onYouTubeIframeAPIReady() {
@@ -465,8 +469,6 @@ function init() {
   $('.version-number').text(version);
 
 
-  // Clear the local cache
-  cacheHelper.clearCache();
 
 
   $('#nav-edu-tour').append(eduTourTemplateHTML);
