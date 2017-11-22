@@ -34,40 +34,48 @@ CacheHelper.prototype.isolateSession = function() {
 CacheHelper.prototype.promiseCheckCacheSize = function() {
   var me = this;
 
+  var clearCacheAndResolve = function(resolve, reject, counts) {
+      if (counts.otherSessions > 0) {
+        me._promiseClearCache(null, true, false)
+         .then(function() {
+          resolve();
+         },
+         function(error) {
+          reject(error);
+         })
+      }
+      if (counts.otherUse > 0) {
+        me._promiseClearCache(null, false, true)
+         .then(function() {
+          resolve();
+         },
+         function(error) {
+          reject(error);
+         })
+      }
+  }
+
   return new Promise(function(resolve, reject) {
     me.promiseGetCacheSize(false)
      .then(function(counts) {
 
       if (counts.otherSessions > 0 || counts.otherUse > 0) {
-        alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
-            if (e) {
-            // user clicked "ok", clear the cache for other, and other app
-            if (counts.otherSessions > 0) {
-              me._promiseClearCache(null, true, false)
-               .then(function() {
-                resolve();
-               },
-               function(error) {
-                reject(error);
-               })
-            }
-            if (counts.otherUse > 0) {
-              me._promiseClearCache(null, false, true)
-               .then(function() {
-                resolve();
-               },
-               function(error) {
-                reject(error);
-               })
-            }
+        if (isLevelEdu || (isMygene2 && isLevelBasic)) {
+          clearCacheAndResolve(resolve, reject, counts);
+        } else {
+          alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
+              if (e) {
+                // user clicked "ok", clear the cache for other, and other app
+                clearCacheAndResolve(resolve, reject, counts);
+              }
+          }, function() {
+            // user clicked cancel
+            me.openDialog();
+            resolve();
+          })
+          .set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});
 
-            }
-        }, function() {
-          // user clicked cancel
-          me.openDialog();
-          resolve();
-        })
-        .set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});       ;
+        }
       } else {
         resolve();
       }

@@ -207,9 +207,11 @@ $(document).ready(function(){
     return promiseInitCache();
    })
    .then(function() {
+     return cacheHelper.promiseCheckCacheSize();
+   })
+   .then(function() {
       // cache is initialized
       showWelcomePanel();
-
    },
    function(error) {
     alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
@@ -425,318 +427,311 @@ function init() {
 
   $("[data-toggle=tooltip]").tooltip();
 
+  if (allowFreebayesSettings) {
+    $('#show-fb-settings').removeClass("hide");
+  }
 
 
+  // If we are using the gene.iobio education tour edition, automatically load
+  // exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
+  if (isLevelEdu && !getUrlParameter("tour")) {
+    var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
+    window.location.assign(exhibitUrl);
+    return;
+  }
 
 
-  cacheHelper.promiseCheckCacheSize()
-   .then(function() {
-    if (allowFreebayesSettings) {
-      $('#show-fb-settings').removeClass("hide");
+  if (isMygene2) {
+    $('#intro').append(introTemplate());
+    if (isLevelBasic) {
+      $('#intro-link').addClass("hide");
+      $('#intro-text').removeClass("hide");
     }
 
-
-    // If we are using the gene.iobio education tour edition, automatically load
-    // exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
-    if (isLevelEdu && !getUrlParameter("tour")) {
-      var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
-      window.location.assign(exhibitUrl);
-      return;
-    }
+  }
 
 
-    if (isMygene2) {
-      $('#intro').append(introTemplate());
-      if (isLevelBasic) {
-        $('#intro-link').addClass("hide");
-        $('#intro-text').removeClass("hide");
+  if (!isLevelEdu) {
+    $('body').prepend(navbarTemplate());
+  }
+
+
+
+  $('#modals-placeholder').append(modalsTemplate());
+  $('#tour-placeholder').append(tourTemplate());
+  $('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
+
+  // Set version number on About menu and the Version dialog
+  $('.version-number').text(version);
+
+
+  // Clear the local cache
+  cacheHelper.clearCache();
+
+
+  $('#nav-edu-tour').append(eduTourTemplateHTML);
+  eduTourNumber = getUrlParameter("tour");
+  if (eduTourNumber == null || eduTourNumber == "") {
+    eduTourNumber = "0";
+  }
+  if (eduTourNumber && eduTourNumber != '') {
+    $('#edu-tour-' + eduTourNumber).removeClass("hide");
+  }
+
+
+    // Slide out panels
+    $(iconbarTemplate()).insertBefore("#slider-left");
+  $('#slider-left-content').append(filterCardTemplateHTML);
+  $('#slider-left-content').append(genesCardTemplateHTML);
+  $('#slider-left-content').append(bookmarkTemplateHTML);
+  $('#slider-left-content').append(recallTemplateHTML);
+  $('#close-slide-left').click(function() {
+    closeSlideLeft();
+  });
+
+  initializeTours();
+
+    // Encapsulate logic for animate.css into a jquery function
+    $.fn.extend({
+    animateIt: function (animationName, customClassName) {
+        $(this).removeClass("hide");
+        var additionalClass = customClassName ? ' ' + customClassName : '';
+          var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+          $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
+              $(this).removeClass('animated ' + animationName);
+          });
+      }
+  });
+  $.fn.extend({
+    animateSplash: function (animationName) {
+        $(this).removeClass("hide");
+          var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+          $(this).addClass('animated ' + animationName).one(animationEnd, function() {
+              $(this).removeClass('animated ' + animationName);
+              //$('.twitter-typeahead').animateIt('tada', 'animate-delayed');
+          });
+      }
+  });
+
+
+
+
+  // Initialize data card
+  dataCard = new DataCard();
+  dataCard.init();
+
+
+  // Init known variants nav
+  initKnownVariantsNav();
+
+
+  // Create transcript chart
+  transcriptChart = geneD3()
+      .width($('#container').innerWidth())
+      .widthPercent("100%")
+      .heightPercent("100%")
+      .margin({top: isLevelBasic || isLevelEdu ? 0 : 20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
+      .showXAxis(true)
+      .showBrush(true)
+      .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
+      .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
+      .showLabel(false)
+    .featureClass( function(d,i) {
+        return d.feature_type.toLowerCase();
+    })
+    .on("d3brush", function(brush) {
+        hideCoordinateFrame();
+        if (!brush.empty()) {
+          $('#zoom-hint').text('To zoom out, click outside bounding box.');
+        regionStart = d3.round(brush.extent()[0]);
+        regionEnd   = d3.round(brush.extent()[1]);
+        if (!selectedTranscript) {
+          selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
+          getCodingRegions(selectedTranscript);
+            promiseMarkCodingRegions(window.gene, window.selectedTranscript);
+        }
+      } else {
+          $('#zoom-hint').text('To zoom into region, drag over gene model.');
+        regionStart = window.gene.start;
+        regionEnd   = window.gene.end;
       }
 
-    }
 
+      var cardCount = 0;
+        showKnownVariantsCounts();
 
-    if (!isLevelEdu) {
-      $('body').prepend(navbarTemplate());
-    }
+      getRelevantVariantCards().forEach(function(variantCard) {
+          variantCard.onBrush(brush, function() {
 
-
-
-    $('#modals-placeholder').append(modalsTemplate());
-    $('#tour-placeholder').append(tourTemplate());
-    $('#svg-glyphs-placeholder').append(svgGlyphsTemplate());
-
-    // Set version number on About menu and the Version dialog
-    $('.version-number').text(version);
-
-
-    // Clear the local cache
-    cacheHelper.clearCache();
-
-
-    $('#nav-edu-tour').append(eduTourTemplateHTML);
-    eduTourNumber = getUrlParameter("tour");
-    if (eduTourNumber == null || eduTourNumber == "") {
-      eduTourNumber = "0";
-    }
-    if (eduTourNumber && eduTourNumber != '') {
-      $('#edu-tour-' + eduTourNumber).removeClass("hide");
-    }
-
-
-      // Slide out panels
-      $(iconbarTemplate()).insertBefore("#slider-left");
-    $('#slider-left-content').append(filterCardTemplateHTML);
-    $('#slider-left-content').append(genesCardTemplateHTML);
-    $('#slider-left-content').append(bookmarkTemplateHTML);
-    $('#slider-left-content').append(recallTemplateHTML);
-    $('#close-slide-left').click(function() {
-      closeSlideLeft();
-    });
-
-    initializeTours();
-
-      // Encapsulate logic for animate.css into a jquery function
-      $.fn.extend({
-      animateIt: function (animationName, customClassName) {
-          $(this).removeClass("hide");
-          var additionalClass = customClassName ? ' ' + customClassName : '';
-            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            $(this).addClass('animated ' + animationName + additionalClass).one(animationEnd, function() {
-                $(this).removeClass('animated ' + animationName);
-            });
-        }
-    });
-    $.fn.extend({
-      animateSplash: function (animationName) {
-          $(this).removeClass("hide");
-            var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            $(this).addClass('animated ' + animationName).one(animationEnd, function() {
-                $(this).removeClass('animated ' + animationName);
-                //$('.twitter-typeahead').animateIt('tada', 'animate-delayed');
-            });
-        }
-    });
-
-
-
-
-    // Initialize data card
-    dataCard = new DataCard();
-    dataCard.init();
-
-
-    // Init known variants nav
-    initKnownVariantsNav();
-
-
-    // Create transcript chart
-    transcriptChart = geneD3()
-        .width($('#container').innerWidth())
-        .widthPercent("100%")
-        .heightPercent("100%")
-        .margin({top: isLevelBasic || isLevelEdu ? 0 : 20, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 18, left: isLevelBasic || isLevelEdu ? 9 : 4})
-        .showXAxis(true)
-        .showBrush(true)
-        .trackHeight(isLevelEdu || isLevelBasic ? 32 : 22)
-        .cdsHeight(isLevelEdu  || isLevelBasic  ? 24 : 18)
-        .showLabel(false)
-      .featureClass( function(d,i) {
-          return d.feature_type.toLowerCase();
-      })
-      .on("d3brush", function(brush) {
-          hideCoordinateFrame();
-          if (!brush.empty()) {
-            $('#zoom-hint').text('To zoom out, click outside bounding box.');
-          regionStart = d3.round(brush.extent()[0]);
-          regionEnd   = d3.round(brush.extent()[1]);
-          if (!selectedTranscript) {
-            selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
-            getCodingRegions(selectedTranscript);
-              promiseMarkCodingRegions(window.gene, window.selectedTranscript);
-          }
-        } else {
-            $('#zoom-hint').text('To zoom into region, drag over gene model.');
-          regionStart = window.gene.start;
-          regionEnd   = window.gene.end;
-        }
-
-
-        var cardCount = 0;
-          showKnownVariantsCounts();
-
-        getRelevantVariantCards().forEach(function(variantCard) {
-            variantCard.onBrush(brush, function() {
-
-            cardCount++;
-            // Wait until all variant cards have finished with onBrush,
-            // then fill feature matrix and circle variants.
-            if (cardCount == getRelevantVariantCards().length) {
-              getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
-                if (clickedVariant && clickedVariantCard) {
-                clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
-                window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
-                showCoordinateFrame(clickedVariant.screenX)
-              }
+          cardCount++;
+          // Wait until all variant cards have finished with onBrush,
+          // then fill feature matrix and circle variants.
+          if (cardCount == getRelevantVariantCards().length) {
+            getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+              if (clickedVariant && clickedVariantCard) {
+              clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
+              window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
+              showCoordinateFrame(clickedVariant.screenX)
             }
-            });
-
+          }
           });
 
-
-
-      })
-      .on("d3featuretooltip", function(featureObject, feature, tooltip) {
-                var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
-                tooltip.transition()
-                           .duration(200)
-                           .style("opacity", .9);
-                  tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))
-                         .style("left", coord.x  + "px")
-                         .style("text-align", 'left')
-                         .style("top", coord.y + "px");
-       });
-
-      transcriptMenuChart = geneD3()
-        .width(600)
-        .margin({top: 5, right: 5, bottom: 5, left: 200})
-      .widthPercent("100%")
-        .heightPercent("100%")
-        .showXAxis(false)
-        .showBrush(false)
-        .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
-        .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 10)
-        .showLabel(true);
-
-
-
-    knownVariantsAreaChart = stackedAreaChartD3()
-      .widthPercent("100%")
-      .heightPercent("100%")
-          .width($('#container').innerWidth())
-      .height(50)
-      .showXAxis(false)
-      .xTickCount(0)
-      .yTickCount(3)
-      .xValue( function(d, i) { return d.point })
-      .categories(['unknown', 'other', 'benign', 'path'])
-        .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
-
-    knownVariantsBarChart = stackedBarChartD3()
-      .widthPercent("100%")
-      .heightPercent("100%")
-          .width($('#container').innerWidth())
-      .height(50)
-      .showXAxis(false)
-      .xTickCount(0)
-      .yTickCount(3)
-      .xValue( function(d, i) { return d.point })
-      .xValueStart( function(d, i) { return d.start })
-      .xValueEnd( function(d, i) { return d.end })
-      .barWidthMin(4)
-      .barHeightMin(3)
-      .categories(['unknown', 'other', 'benign', 'path'])
-        .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
-        .tooltipText( function(d,i) {
-          return showKnownVariantsTooltip(d);
         });
-    toggleKnownVariantsChart('bar');
 
 
 
-      // Initialize variant tooltip
-    variantTooltip = new VariantTooltip();
+    })
+    .on("d3featuretooltip", function(featureObject, feature, tooltip) {
+              var coord = getTooltipCoordinates(featureObject.node(), tooltip, false);
+              tooltip.transition()
+                         .duration(200)
+                         .style("opacity", .9);
+                tooltip.html(feature.feature_type + ': ' + addCommas(feature.start) + ' - ' + addCommas(feature.end))
+                       .style("left", coord.x  + "px")
+                       .style("text-align", 'left')
+                       .style("top", coord.y + "px");
+     });
 
-    // Initialize genes card
-    genesCard = new GenesCard();
-    genesCard.init();
+    transcriptMenuChart = geneD3()
+      .width(600)
+      .margin({top: 5, right: 5, bottom: 5, left: 200})
+    .widthPercent("100%")
+      .heightPercent("100%")
+      .showXAxis(false)
+      .showBrush(false)
+      .trackHeight(isLevelEdu || isLevelBasic  ? 36 : 20)
+      .cdsHeight(isLevelEdu || isLevelBasic ? 24 : 10)
+      .showLabel(true);
 
 
-    // Initialize Matrix card
-    matrixCard = new MatrixCard();
-    matrixCard.init();
-    // Set the tooltip generator now that we have a variant card instance
-    matrixCard.setTooltipGenerator(variantTooltip.formatContent);
 
-    // Initialize the Filter card
-    filterCard = new FilterCard();
-    filterCard.init();
+  knownVariantsAreaChart = stackedAreaChartD3()
+    .widthPercent("100%")
+    .heightPercent("100%")
+        .width($('#container').innerWidth())
+    .height(50)
+    .showXAxis(false)
+    .xTickCount(0)
+    .yTickCount(3)
+    .xValue( function(d, i) { return d.point })
+    .categories(['unknown', 'other', 'benign', 'path'])
+      .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
 
-    // Initialize the bookmark card
-    bookmarkCard = new BookmarkCard();
-    bookmarkCard.init();
+  knownVariantsBarChart = stackedBarChartD3()
+    .widthPercent("100%")
+    .heightPercent("100%")
+        .width($('#container').innerWidth())
+    .height(50)
+    .showXAxis(false)
+    .xTickCount(0)
+    .yTickCount(3)
+    .xValue( function(d, i) { return d.point })
+    .xValueStart( function(d, i) { return d.start })
+    .xValueEnd( function(d, i) { return d.end })
+    .barWidthMin(4)
+    .barHeightMin(3)
+    .categories(['unknown', 'other', 'benign', 'path'])
+      .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
+      .tooltipText( function(d,i) {
+        return showKnownVariantsTooltip(d);
+      });
+  toggleKnownVariantsChart('bar');
 
 
-    // Initialize the legend content
-    $('#legend-track #legend-placeholder').html(legendTemplate());
 
-    // Initialize transcript view buttons
-    initTranscriptControls();
+    // Initialize variant tooltip
+  variantTooltip = new VariantTooltip();
 
-    // endsWith implementation
-    if (typeof String.prototype.endsWith !== 'function') {
-        String.prototype.endsWith = function(suffix) {
-            return this.indexOf(suffix, this.length - suffix.length) !== -1;
-        };
+  // Initialize genes card
+  genesCard = new GenesCard();
+  genesCard.init();
+
+
+  // Initialize Matrix card
+  matrixCard = new MatrixCard();
+  matrixCard.init();
+  // Set the tooltip generator now that we have a variant card instance
+  matrixCard.setTooltipGenerator(variantTooltip.formatContent);
+
+  // Initialize the Filter card
+  filterCard = new FilterCard();
+  filterCard.init();
+
+  // Initialize the bookmark card
+  bookmarkCard = new BookmarkCard();
+  bookmarkCard.init();
+
+
+  // Initialize the legend content
+  $('#legend-track #legend-placeholder').html(legendTemplate());
+
+  // Initialize transcript view buttons
+  initTranscriptControls();
+
+  // endsWith implementation
+  if (typeof String.prototype.endsWith !== 'function') {
+      String.prototype.endsWith = function(suffix) {
+          return this.indexOf(suffix, this.length - suffix.length) !== -1;
+      };
+  }
+
+
+  $('.sidebar-button.selected').removeClass("selected");
+
+
+  $('#select-gene-source').selectize({});
+  $('#select-gene-source')[0].selectize.on('change', function(value) {
+    geneSource = value.toLowerCase().split(" transcript")[0];
+    // When the user picks a different gene source from the dropdown,
+    // this becomes the 'new' site gene source
+    siteGeneSource = geneSource;
+    geneToLatestTranscript = {};
+    getRelevantVariantCards().forEach(function(vc) {
+      // When switching from gencode->refseq or vice/versa,
+      // the VEP tokens will be formatted in a different order,
+      // so make sure we clear out the token indices
+      vc.model.vcf.clearVepInfoFields();
+    })
+    if (window.gene) {
+      genesCard.selectGene(window.gene.gene_name);
     }
+  });
 
 
-    $('.sidebar-button.selected').removeClass("selected");
-
-
-    $('#select-gene-source').selectize({});
-    $('#select-gene-source')[0].selectize.on('change', function(value) {
-      geneSource = value.toLowerCase().split(" transcript")[0];
-      // When the user picks a different gene source from the dropdown,
-      // this becomes the 'new' site gene source
-      siteGeneSource = geneSource;
-      geneToLatestTranscript = {};
-      getRelevantVariantCards().forEach(function(vc) {
-        // When switching from gencode->refseq or vice/versa,
-        // the VEP tokens will be formatted in a different order,
-        // so make sure we clear out the token indices
-        vc.model.vcf.clearVepInfoFields();
-      })
-      if (window.gene) {
-        genesCard.selectGene(window.gene.gene_name);
-      }
-    });
-
-
-    // Set up the gene search widget
-    loadGeneWidgets( function(success) {
-      if (success) {
-        showGeneControls();
-        loadGeneFromUrl();
-      }
-    });
-    getGeneBloodhoundElement().focus();
-
-    if (isLevelBasic) {
-      $('#select-gene').selectize(
-        {
-          create: false,
-          valueField: 'value',
-            labelField: 'value',
-            searchField: ['value'],
-            maxOptions: 5000
-          }
-      );
-      addGeneDropdownListener();
+  // Set up the gene search widget
+  loadGeneWidgets( function(success) {
+    if (success) {
+      showGeneControls();
+      loadGeneFromUrl();
     }
+  });
+  getGeneBloodhoundElement().focus();
 
-    // In cases where timeout=true, restart app after n seconds of inactivity
-    // (e.g. no mouse move, button click, etc.).
-    if (hasTimeout) {
-      checkForInactivity();
-    }
+  if (isLevelBasic) {
+    $('#select-gene').selectize(
+      {
+        create: false,
+        valueField: 'value',
+          labelField: 'value',
+          searchField: ['value'],
+          maxOptions: 5000
+        }
+    );
+    addGeneDropdownListener();
+  }
 
-    if (feedbackEmails != undefined && feedbackEmails != "") {
-      $('#feedback-link').removeClass("hide");
-      $('#feedback-link').on('click', showFeedback);
-        $('#report-feedback-button').on('click', emailFeedback);
-    }
+  // In cases where timeout=true, restart app after n seconds of inactivity
+  // (e.g. no mouse move, button click, etc.).
+  if (hasTimeout) {
+    checkForInactivity();
+  }
 
-   })
+  if (feedbackEmails != undefined && feedbackEmails != "") {
+    $('#feedback-link').removeClass("hide");
+    $('#feedback-link').on('click', showFeedback);
+      $('#report-feedback-button').on('click', emailFeedback);
+  }
+
 }
 
 function showGeneControls() {
