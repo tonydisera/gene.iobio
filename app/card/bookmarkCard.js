@@ -272,27 +272,31 @@ BookmarkCard.prototype._flagBookmarksForGene = function(variantCard, geneObject,
 BookmarkCard.prototype.promiseResolveBookmarkedVariant = function(key, bookmarkEntry, geneObject, theTranscript) {
   var me = this;
 
-  if (bookmarkEntry.hasOwnProperty("isProxy") && bookmarkEntry.isProxy) {
-    getProbandVariantCard().promiseGetBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript)
-     .then(function(variant) {
-      var variant = null;
-      if (variant) {
-        variant.isBookmark = "Y";
-        variant.isProxy = false;
-        variant.chrom = bookmarkEntry.chrom;
-        me.bookmarkedVariants[key] = variant;
-        bookmarkEntry = variant;
-      } else {
-        variant = bookmarkEntry;
-        variant.isBookmark = "Y";
-        variant.isProxy = false;
-      }
+  return new Promise(function(resolve, reject) {
+    if (bookmarkEntry.hasOwnProperty("isProxy") && bookmarkEntry.isProxy) {
+      getProbandVariantCard().promiseGetBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript)
+       .then(function(variant) {
+        var variant = null;
+        if (variant) {
+          variant.isBookmark = "Y";
+          variant.isProxy = false;
+          variant.chrom = bookmarkEntry.chrom;
+          me.bookmarkedVariants[key] = variant;
+          bookmarkEntry = variant;
+        } else {
+          variant = bookmarkEntry;
+          variant.isBookmark = "Y";
+          variant.isProxy = false;
+        }
 
-      resolve(variant);
-     })
-  } else {
-    resolve(null);
-  }
+        resolve(variant);
+       })
+    } else {
+      resolve(null);
+    }
+
+  })
+
 
 }
 
@@ -1315,7 +1319,8 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
   var promises = []
   importRecords.forEach( function(ir) {
     if (!ir.transcript || ir.transcript == '') {
-      var promise = promiseGetCachedGeneModel(ir.gene, true).then( function(theGeneObject) {
+      var promise = promiseGetCachedGeneModel(ir.gene, true)
+      .then( function(theGeneObject) {
         if (theGeneObject) {
           window.geneObjects[theGeneObject.gene_name] = theGeneObject;
         } else {
