@@ -19,7 +19,8 @@ var useSSL                = true;
 var useServerCache        = false;
 
 // MyGene2 deployment variables;
-var mygene2Endpoint       = "";
+var mygene2TokenEndpoint       = "";
+var mygene2DataEndpoint       = "";
 var mygene2XAuthToken     = "";
 
 
