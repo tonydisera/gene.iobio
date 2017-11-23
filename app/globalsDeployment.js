@@ -2,7 +2,7 @@
     with for a local deployment.  This entire .js can be replaced or modified to suit the
     specific iobio deployment environment.
 */
-var version               = "2.6";
+var version               = "2.5.1";
 
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
@@ -19,9 +19,8 @@ var useSSL                = true;
 var useServerCache        = false;
 
 // MyGene2 deployment variables;
-var mygene2TokenEndpoint   = "https://mygene2-dev.gs.washington.edu/MyGene2/api/external/geneiobio/";
-var mygene2DataEndpoint    = "https://mygene2-dev.gs.washington.edu/MyGene2/api/geneiobio/data/";
-var mygene2XAuthToken      = "110b4c27-aa3c-4efe-9c07-75f3b7df10ae";
+var mygene2Endpoint       = "";
+var mygene2XAuthToken     = "";
 
 
 // Get clinvar annotations from 'eutils' or 'vcf'
