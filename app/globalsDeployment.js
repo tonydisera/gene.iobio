@@ -18,11 +18,7 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var useSSL                = true;
 var useServerCache        = false;
 
-// MyGene2 deployment variables;
-var mygene2TokenEndpoint       = "";
-var mygene2DataEndpoint       = "";
-var mygene2XAuthToken     = "";
-
+var global_siteConfigUrl  = "https://s3.amazonaws.com/gene.iobio.site.config/site-config.json";
 
 // Get clinvar annotations from 'eutils' or 'vcf'
 var clinvarSource        = "vcf";

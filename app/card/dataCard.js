@@ -265,15 +265,28 @@ DataCard.prototype.loadDemoData = function() {
 DataCard.prototype.loadMygene2Data = function() {
   var me = this;
 
-  var missingVariables = "";
-  if (mygene2TokenEndpoint == "") {
-    missingVariables += "mygene2TokenEndpoint ";
+  var validationMsg = "";
+  if (siteConfig == null || Object.keys(siteConfig).length == 0 || !siteConfig.hasOwnProperty('mygene2')) {
+    validationMsg += "<br>&nbsp;&nbsp;Site configuration is missing for mygene2. "
+  } else {
+    if (siteConfig.mygene2.tokenEndpoint == "") {
+      validationMsg += "<br>&nbsp;&nbsp;Missing site configuration field 'tokenEndpoint'. ";
+    }
+    if (siteConfig.mygene2.xAuthToken == "") {
+      validationMsg += "<br>&nbsp;&nbsp;Missing site configuration field 'xAuthToken'. ";
+    }
   }
-  if (mygene2XAuthToken == "") {
-    missingVariables += "mygene2XAuthToken ";
+  var fileId = getUrlParameter("fileId");
+  if (fileId == null || fileId == "") {
+    validationMsg += "<br>&nbsp;&nbsp;Missing request parameter 'fileId'."
   }
-  if (missingVariables.length > 0) {
-    alertify.confirm("Cannot load data files until the following variables are initialized in globalDeployments.js: " + missingVariables + ".",
+
+  if (!genomeBuildHelper.getCurrentBuild()) {
+    validationMsg += "<br>&nbsp;&nbsp;Missing request parameter 'build'.";
+  }
+
+  if (validationMsg.length > 0) {
+    alertify.confirm("Cannot load data due to the following errors: " + validationMsg,
      function(){
      },
      function(){
@@ -281,7 +294,7 @@ DataCard.prototype.loadMygene2Data = function() {
      }).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
   } else {
 
-    var endpointUrl = mygene2TokenEndpoint + "token/" + getUrlParameter("fileId");
+    var endpointUrl = siteConfig.mygene2.tokenEndpoint + "token/" + fileId;
 
     $.ajax({
         type: 'get',
@@ -292,10 +305,10 @@ DataCard.prototype.loadMygene2Data = function() {
             withCredentials: true
         },
         headers: {
-            'X-Auth-Token': mygene2XAuthToken
+            'X-Auth-Token': siteConfig.mygene2.xAuthToken
         },
         success: function(res) {
-          vcfUrl = mygene2DataEndpoint + res.token + "/" + res.fileUpload.name;
+          vcfUrl = siteConfig.mygene2.dataEndpoint + res.token + "/" + res.fileUpload.name;
           me._loadMygene2Proband(vcfUrl);
         },
         error: function( xhr, status, errorThrown ) {
@@ -311,6 +324,8 @@ DataCard.prototype.loadMygene2Data = function() {
            }).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
         }
     });
+
+
 
   }
 

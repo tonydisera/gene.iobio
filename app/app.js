@@ -14,6 +14,8 @@ var gene_engine = new Bloodhound({
 // the video (embedded youtube) that is currently playing
 var videoPlayer = null;
 
+var siteConfig = {};
+
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
@@ -210,8 +212,13 @@ $(document).ready(function(){
      return cacheHelper.promiseCheckCacheSize();
    })
    .then(function() {
+     return promiseLoadSiteConfig();
+   })
+   .then(function() {
       // Clear the local cache
       cacheHelper.clearCache();
+
+
 
       // cache is initialized
       showWelcomePanel();
@@ -265,6 +272,30 @@ function initHub() {
       }
     }).then(appendHubFileNamesToURL);
   }
+}
+
+function promiseLoadSiteConfig() {
+
+  return new Promise(function(resolve, reject) {
+
+    $.ajax({
+        url: global_siteConfigUrl,
+        type: "GET",
+        crossDomain: true,
+        dataType: "json",
+        success: function( res ) {
+          siteConfig = res;
+          resolve();
+        },
+        error: function( xhr, status, errorThrown ) {
+          console.log( "Error: " + errorThrown );
+          console.log( "Status: " + status );
+          console.log( xhr );
+          reject("Error " + errorThrown + " occurred in promiseLoadSiteConfig() when attempting get siteConfig.json ");
+        }
+    });
+
+  })
 }
 
 // Get sample name, gene(?), build(?) from ajax call and then only call this for each file?
