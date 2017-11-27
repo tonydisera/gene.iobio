@@ -18,6 +18,7 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var useSSL                = true;
 var useServerCache        = false;
 
+// site configurations
 var global_siteConfigUrl  = "https://s3.amazonaws.com/gene.iobio.site.config/site-config.json";
 
 // Get clinvar annotations from 'eutils' or 'vcf'
