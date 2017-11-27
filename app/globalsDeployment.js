@@ -19,10 +19,10 @@ var useSSL                = true;
 var useServerCache        = false;
 
 // site configurations
-var global_siteConfigUrl  = "https://s3.amazonaws.com/gene.iobio.site.config/site-config.json";
+var global_siteConfigUrl  =  "https://s3.amazonaws.com/gene.iobio.site.config/site-config.json";
 
 // Get clinvar annotations from 'eutils' or 'vcf'
-var clinvarSource        = "vcf";
+var clinvarSource         = "vcf";
 
 // Allow freebayes runtime args to be set by user
 var allowFreebayesSettings  = false;
