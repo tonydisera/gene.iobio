@@ -227,15 +227,15 @@ describe('genomeBuildHelper', function() {
   describe('#getBuildFromBamHeader', function() {
 
     it('get the build info from the bam header', function() {
-      var bamHeader = "@HD  VN:1.3  SO:coordinate\n"
-              + "@SQ  SN:1  LN:249250621\n"
-              + "@SQ  SN:2  LN:243199373\n"
-              + "@SQ  SN:3  LN:198022430\n"
-              + "@SQ  SN:4  LN:191154276\n"
-              + "@SQ  SN:5  LN:180915260\n"
-              + "@SQ  SN:6  LN:171115067\n"
-              + "@SQ  SN:X  LN:155270560\n"
-              + "@SQ  SN:Y  LN:59373566";
+      var bamHeader = "@HD\tVN:1.3\tSO:coordinate\n"
+              + "@SQ\tSN:1\tLN:249250621\n"
+              + "@SQ\tSN:2\tLN:243199373\n"
+              + "@SQ\tSN:3\tLN:198022430\n"
+              + "@SQ\tSN:4\tLN:191154276\n"
+              + "@SQ\tSN:5\tLN:180915260\n"
+              + "@SQ\tSN:6\tLN:171115067\n"
+              + "@SQ\tSN:X\tLN:155270560\n"
+              + "@SQ\tSN:Y\tLN:59373566";
       var buildInfo = genomeBuildHelper.getBuildFromBamHeader(bamHeader);
       expect(Object.keys(buildInfo.references).length).toEqual(8);
       expect(buildInfo.references["1"]).toEqual(249250622);
@@ -244,9 +244,9 @@ describe('genomeBuildHelper', function() {
       expect(speciesBuild.species.name).toEqual("Human");
       expect(speciesBuild.build.name).toEqual("GRCh37");
 
-      var bamHeader = "@HD  VN:1.3  SO:coordinate\n"
-              + "@SQ  SN:1  LN:248956422  SP:Human  AS:NCBI38\n"
-              + "@SQ  SN:2  LN:242193529  SP:Human  AS:NCBI38";
+      var bamHeader = "@HD\tVN:1.3\tSO:coordinate\n"
+              + "@SQ\tSN:1\tLN:248956422\tSP:Human\tAS:NCBI38\n"
+              + "@SQ\tSN:2\tLN:242193529\tSP:Human\tAS:NCBI38";
       var buildInfo = genomeBuildHelper.getBuildFromBamHeader(bamHeader);
       expect(Object.keys(buildInfo.references).length).toEqual(2);
       expect(buildInfo.references["1"]).toEqual(248956423);
@@ -256,9 +256,9 @@ describe('genomeBuildHelper', function() {
       expect(speciesBuild.build.name).toEqual("GRCh38");
 
 
-      var bamHeader = "@HD  VN:1.3  SO:coordinate\n"
-              + "@SQ  SN:1  AS:NCBI38\n"
-              + "@SQ  SN:2  AS:NCBI38";
+      var bamHeader = "@HD\tVN:1.3\tSO:coordinate\n"
+              + "@SQ\tSN:1\tAS:NCBI38\n"
+              + "@SQ\tSN:2\tAS:NCBI38";
       var buildInfo = genomeBuildHelper.getBuildFromBamHeader(bamHeader);
       var speciesBuild = genomeBuildHelper.getProperSpeciesAndBuild(buildInfo);
       expect(speciesBuild.species.name).toEqual("Human");
@@ -271,15 +271,15 @@ describe('genomeBuildHelper', function() {
   describe('#getBuildsInHeaders', function() {
 
     it('get the build infos from the headers of vcf and bams', function() {
-      var bamHeader = "@HD  VN:1.3  SO:coordinate\n"
-              + "@SQ  SN:1  LN:249250621\n"
-              + "@SQ  SN:2  LN:243199373\n"
-              + "@SQ  SN:3  LN:198022430\n"
-              + "@SQ  SN:4  LN:191154276\n"
-              + "@SQ  SN:5  LN:180915260\n"
-              + "@SQ  SN:6  LN:171115067\n"
-              + "@SQ  SN:X  LN:155270560\n"
-              + "@SQ  SN:Y  LN:59373566";
+      var bamHeader = "@HD\tVN:1.3\tSO:coordinate\n"
+              + "@SQ\tSN:1\tLN:249250621\n"
+              + "@SQ\tSN:2\tLN:243199373\n"
+              + "@SQ\tSN:3\tLN:198022430\n"
+              + "@SQ\tSN:4\tLN:191154276\n"
+              + "@SQ\tSN:5\tLN:180915260\n"
+              + "@SQ\tSN:6\tLN:171115067\n"
+              + "@SQ\tSN:X\tLN:155270560\n"
+              + "@SQ\tSN:Y\tLN:59373566";
 
       var vcfHeader = "##contig=<ID=1,length=249250621>\n##contig=<ID=chr2,length=243199373>";
 
@@ -294,9 +294,9 @@ describe('genomeBuildHelper', function() {
       expect(speciesBuilds[0].from[1].type).toEqual('vcf');
 
 
-      var bamHeaderMother = "@HD  VN:1.3  SO:coordinate\n"
-                  + "@SQ  SN:1  AS:NCBI38\n"
-                  + "@SQ  SN:2  AS:NCBI38";
+      var bamHeaderMother = "@HD\tVN:1.3\tSO:coordinate\n"
+                  + "@SQ\tSN:1\tAS:NCBI38\n"
+                  + "@SQ\tSN:2\tAS:NCBI38";
       speciesBuilds = genomeBuildHelper.getBuildsInHeaders({proband: bamHeader, mother: bamHeaderMother}, {mother: vcfHeader});
       expect(speciesBuilds.length).toEqual(2);
       expect(speciesBuilds[0].species.name).toEqual('Human');

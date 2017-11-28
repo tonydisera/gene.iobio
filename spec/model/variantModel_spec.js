@@ -12,8 +12,11 @@ describe('variantModel', function() {
     it('sets the load state on the vcf data object', function() {
       var theVcfData = {};
       var taskName = 'clinvar';
-      variantModel.setLoadState(theVcfData, taskName);
-      expect(theVcfData).toEqual({ loadState: { clinvar: true } });
+      variantModel.promiseSetLoadState(theVcfData, taskName)
+       .then(function() {
+          expect(theVcfData).toEqual({ loadState: { clinvar: true } });
+
+       })
     });
   });
 
@@ -63,14 +66,20 @@ describe('variantModel', function() {
       var variants = [variant_1, variant_2, variant_3, variant_4, variant_5, variant_6];
       window.gene = 'BRCA1';
       window.selectedTranscript = 'transcript';
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
-      expect(variantModel.getMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })).toEqual(variant_6);
-      expect(variantModel.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve({ features: variants }));
+      variantModel.promiseGetMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })
+       .then(function(data) {
+        expect(data).toEqual(variant_6);
+       })
+      expect(variantModel.promiseGetVcfData).toHaveBeenCalledWith('BRCA1', 'transcript');
     });
 
     it('returns null when there is no vcfdata', function() {
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue(null);
-      expect(variantModel.getMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })).toBeNull();
+      spyOn(variantModel, 'promiseGetVcfDataForGene').and.returnValue(Promise.resolve(null));
+      variantModel.promiseGetMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })
+       .then(data) {
+        expect(data).toBeNull();
+       })
     })
   });
 
