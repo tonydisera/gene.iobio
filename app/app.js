@@ -13,6 +13,8 @@ var gene_engine = new Bloodhound({
 
 var videoPlayer = null;
 
+var siteConfig = {};
+
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
@@ -242,6 +244,10 @@ $(document).ready(function(){
 	promises.push(promiseLoadTemplate('templates/filterAffectedTemplate.hbs').then(function(compiledTemplate) {
 		filterAffectedTemplate = compiledTemplate;
 	}));
+
+	// Load site config
+	promises.push(promiseLoadSiteConfig());
+
 	Promise.all(promises).then(function() {
 		// Initialize genomeBuild helper
 		genomeBuildHelper = new GenomeBuildHelper();
@@ -262,6 +268,30 @@ function promiseLoadTemplate(templateName) {
 		}, 'html');
 	});
 
+}
+
+function promiseLoadSiteConfig() {
+
+  return new Promise(function(resolve, reject) {
+
+    $.ajax({
+        url: global_siteConfigUrl,
+        type: "GET",
+        crossDomain: true,
+        dataType: "json",
+        success: function( res ) {
+          siteConfig = res;
+          resolve();
+        },
+        error: function( xhr, status, errorThrown ) {
+          console.log( "Error: " + errorThrown );
+          console.log( "Status: " + status );
+          console.log( xhr );
+          reject("Error " + errorThrown + " occurred in promiseLoadSiteConfig() when attempting get siteConfig.json ");
+        }
+    });
+
+  })
 }
 
 function determineStyle() {

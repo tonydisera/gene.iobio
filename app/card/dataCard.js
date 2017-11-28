@@ -265,88 +265,98 @@ DataCard.prototype.loadDemoData = function() {
 DataCard.prototype.loadMygene2Data = function() {
 	var me = this;
 
-
-	var loadProband = function(vcfFilePath) {
-
-		if (isLevelBasic) {
-			window.showSidebar("Phenolyzer");
-		}
-		if (vcfFilePath != null) {
-			// Get rid of leading "/" in file path when server instance already ends with "/"
-			if (endsWith(serverInstance, "/") && vcfFilePath.indexOf("/") == 0) {
-				vcfFilePath = vcfFilePath.slice(1);
-			}
-			// Create a URL that only the IOBIO service has access to
-			var probandUrl = window.location.protocol + "//" + serverInstance + vcfFilePath;
-
-			// If the genome build was specified, load the endpoint variant file
-			if (genomeBuildHelper.getCurrentBuild()) {
-				me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
-				  .then(function() {
-				  	window.getAffectedInfo(true);
-					window.setGeneratedSampleNames();
-					window.loadTracksForGene();
-					window.cacheHelper.clearCache();
-					window.matrixCard.reset();		
-				  })
-			} else {
-				alertify.alert("Cannot load data.  The genome build must be specified.");
-			}
-		} else {
-			me.loadDemoData();
-		}
-	};
-
-
-
-	var missingVariables = "";
-	if (mygene2Endpoint == "") {
-		missingVariables += "mygene2Endpoint ";
-	} 
-	if (mygene2XAuthToken == "") {
-		missingVariables += "mygene2XAuthToken ";
-	} 
-	if (missingVariables.length > 0) {
-		alertify.confirm("Cannot load data files until the following variables are initialized in globalDeployments.js: " + missingVariables + ".",
-					    function(){ 
-					    }, 
-					    function(){ 
-					    	loadProband();
-					    }
-					 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});   			
+	var validationMsg = "";
+	if (siteConfig == null || Object.keys(siteConfig).length == 0 || !siteConfig.hasOwnProperty('mygene2')) {
+		validationMsg += "<br>&nbsp;&nbsp;Site configuration is missing for mygene2. "
 	} else {
-		
-		var endpointUrl = mygene2Endpoint + "?token=" + getUrlParameter("token");
+		if (siteConfig.mygene2.tokenEndpoint == "") {
+			validationMsg += "<br>&nbsp;&nbsp;Missing site configuration field 'tokenEndpoint'. ";
+		}
+		if (siteConfig.mygene2.xAuthToken == "") {
+			validationMsg += "<br>&nbsp;&nbsp;Missing site configuration field 'xAuthToken'. ";
+		}
+	}
+	var fileId = getUrlParameter("fileId");
+	if (fileId == null || fileId == "") {
+		validationMsg += "<br>&nbsp;&nbsp;Missing request parameter 'fileId'."
+	}
+
+	if (!genomeBuildHelper.getCurrentBuild()) {
+		validationMsg += "<br>&nbsp;&nbsp;Missing request parameter 'build'.";
+	}
+
+	if (validationMsg.length > 0) {
+		alertify.confirm("Cannot load data due to the following errors: " + validationMsg,
+		 function(){
+		 },
+		 function(){
+			 me._loadMygene2Proband();
+		 }).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
+	} else {
+
+		var endpointUrl = siteConfig.mygene2.tokenEndpoint + "token/" + fileId;
+
 		$.ajax({
-		    url : endpointUrl,
-		    headers: {
-		        'X-Auth-Token' : mygene2XAuthToken,
-		        'Content-Type':'application/x-www-form-urlencoded; charset=utf-8'
-		    },
-		    crossDomain: true,
-		    type: "GET",
-			success: function(response) {
-				loadProband(response);	    	
-		    },
-		    error: function( xhr, status, errorThrown ) {
-		        console.log( "Error: " + errorThrown );
-		        console.log( "Status: " + status );
-		        console.log( xhr );
-		        console.log("Unable to get MyGene2 endpoint filenames");
-		        alertify.confirm("Unable to obtain variant files using MyGene2 token.",
-				    function(){ 
-				    }, 
-				    function(){ 
-				    	loadProband();
-				    }
-				 ).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
-		         
-		    }
+				type: 'get',
+				url: endpointUrl,
+				dataType: 'json',
+				contentType: 'json',
+				xhrFields: {
+						withCredentials: true
+				},
+				headers: {
+						'X-Auth-Token': siteConfig.mygene2.xAuthToken
+				},
+				success: function(res) {
+					vcfUrl = siteConfig.mygene2.dataEndpoint + res.token + "/" + res.fileUpload.name;
+					me._loadMygene2Proband(vcfUrl);
+				},
+				error: function( xhr, status, errorThrown ) {
+					console.log( "Error: " + errorThrown );
+					console.log( "Status: " + status );
+					console.log( xhr );
+					console.log("Unable to get MyGene2 endpoint filenames");
+					alertify.confirm("Unable to obtain variant files using MyGene2 token.",
+					 function(){
+					 },
+					 function(){
+						me._loadMygene2Proband();
+					 }).set('labels', {ok:'OK', cancel:'Continue, but just use demo data'});
+				}
 		});
+
+
+
 	}
 
 }
 
+
+
+DataCard.prototype._loadMygene2Proband = function(probandUrl) {
+	var me = this;
+	if (isLevelBasic) {
+		window.showSidebar("Phenolyzer");
+	}
+	if (probandUrl != null) {
+
+		// If the genome build was specified, load the endpoint variant file
+		if (genomeBuildHelper.getCurrentBuild()) {
+			me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
+				.then(function() {
+					window.getAffectedInfo(true);
+				window.setGeneratedSampleNames();
+				window.loadTracksForGene();
+				window.cacheHelper.clearCache();
+				window.matrixCard.reset();
+				})
+		} else {
+			alertify.alert("Cannot load data.  The genome build must be specified.");
+		}
+	} else {
+		me.loadDemoData();
+	}
+}
 DataCard.prototype.loadSampleData = function(relationship, name, sampleName, mode) {
 	variantCard = getVariantCard(relationship);
 	variantCard.setName(name);
