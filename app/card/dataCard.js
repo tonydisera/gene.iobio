@@ -299,6 +299,7 @@ DataCard.prototype.loadMygene2Data = function() {
 		$.ajax({
 				type: 'get',
 				url: endpointUrl,
+				crossDomain: true,
 				dataType: 'json',
 				contentType: 'json',
 				xhrFields: {
