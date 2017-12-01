@@ -16,6 +16,8 @@ var videoPlayer = null;
 
 var siteConfig = {};
 
+var clinvarGenes = {};
+
 // Handlebar templates
 var dataCardEntryTemplate = null;
 var variantCardTemplate = null;
@@ -215,6 +217,9 @@ $(document).ready(function(){
      return promiseLoadSiteConfig();
    })
    .then(function() {
+     return promiseLoadClinvarGenes();
+   })
+   .then(function() {
       // Clear the local cache
       cacheHelper.clearCache();
 
@@ -276,7 +281,7 @@ function initHub() {
 
 function promiseLoadSiteConfig() {
 
-  return new Promise(function(resolve, reject) {
+  var p = new Promise(function(resolve, reject) {
 
     $.ajax({
         url: global_siteConfigUrl,
@@ -295,7 +300,52 @@ function promiseLoadSiteConfig() {
         }
     });
 
-  })
+  });
+
+}
+
+function promiseLoadClinvarGenes() {
+
+  var p = new Promise(function(resolve, reject) {
+
+    clinvarGenes = {};
+
+    $.ajax({
+        url: global_clinvarGenesUrl,
+        type: "GET",
+        crossDomain: true,
+        dataType: "text",
+        success: function( res ) {
+          if (res && res.length > 0) {
+            recs = res.split("\n");
+            var firstTime = true;
+            recs.forEach(function(rec) {
+              if (firstTime) {
+                // ignore col headers
+                firstTime = false;
+              } else {
+                var fields = rec.split("\t");
+                clinvarGenes[fields[0]] = +fields[1];
+              }
+            })
+
+            resolve();
+          } else {
+            reject("Empty results returned from promiseLoadClinvarGenes");
+
+          }
+
+        },
+        error: function( xhr, status, errorThrown ) {
+          console.log( "Error: " + errorThrown );
+          console.log( "Status: " + status );
+          console.log( xhr );
+          reject("Error " + errorThrown + " occurred in promiseLoadClinvarGenes() when attempting get clinvar gene counts ");
+        }
+    });
+
+  });
+
 }
 
 // Get sample name, gene(?), build(?) from ajax call and then only call this for each file?

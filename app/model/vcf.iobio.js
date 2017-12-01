@@ -1297,9 +1297,10 @@ var effectCategories = [
 
     return new Promise( function(resolve, reject) {
       var batchSize = 100;
-      // For every 100 variants, make an http request to eutils to get clinvar records.  Keep
+      // When the clinvar vcf is used, just use 1 batch to get all clinvar variants.  But if accessing clinvar
+      // via eutils, for every 100 variants, make an http request to eutils to get clinvar records.  Keep
       // repeating until all variants have been processed.
-      var numberOfBatches = Math.ceil(theVcfData.features.length / batchSize);
+      var numberOfBatches = isClinvarOffline || clinvarSource == 'vcf' ? 1 : Math.ceil(theVcfData.features.length / batchSize);
       if (numberOfBatches == 0) {
         numberOfBatches = 1;
       }
@@ -1308,7 +1309,6 @@ var effectCategories = [
         var start = i * batchSize;
         var end = start + batchSize;
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
-        //var isLastBatch = (i == numberOfBatches - 1 ? true : false);
 
         if (isClinvarOffline || clinvarSource == 'vcf') {
           var promise = me.promiseGetClinvarVCFImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
@@ -1365,7 +1365,30 @@ var effectCategories = [
       var refFastaFile = genomeBuildHelper.getFastaPath(refName);
 
 
-      var regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+      var regionParm = "";
+      if (variants && variants.length > 0) {
+        var clinvarVariantCount = clinvarGenes[geneObject.gene_name];
+        // Avoid returning ALL clinvar variants for a gene when this gene has
+        // a huge number of variants in clinvar.  Instead, just get the clinvar variants
+        // for the specific positions of the sample's variants
+        if (clinvarVariantCount != null && clinvarVariantCount > variants.length) {
+
+          // Interrogate clinvar vcf by specific positions
+          variants.forEach(function(variant) {
+            if (regionParm.length > 0) {
+              regionParm += " ";
+            }
+            regionParm += refName + ":" + variant.start + "-" + variant.end;
+          })
+        } else {
+          // Just grab all clinvar variants for the gene
+          regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
+        }
+      } else {
+        // We don't have any variants for the sample, so don't bother interogating clinvar vcf
+        regionParm = "0:0"
+      }
+
       var args = ['-h', clinvarUrl, regionParm];
       if (tbiUrl) {
         args.push(tbiUrl);
