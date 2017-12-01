@@ -17,7 +17,7 @@ describe('geneBadgeLoaderDisplay', function() {
   describe('#addGene', function() {
     it('should display the added gene', function() {
       display.addGene('BRCA1', 1);
-      expect($('#loading-display')).toContainText('BRCA1');
+      expect($('#loading-display')).toContainText('Analyzing genes');
     });
 
     describe('when the page count is greater than 1', function() {
@@ -39,27 +39,7 @@ describe('geneBadgeLoaderDisplay', function() {
   });
 
   describe('#removeGene', function() {
-    it('should not display the gene name once the gene has been removed', function() {
-      display.addGene('BRCA1', 1)
-             .addGene('BRAF', 2)
-             .removeGene('BRAF');
-      expect($('#loading-display')).not.toContainText('BRAF');
-    });
 
-    it('should display the gene that was last added', function() {
-      display.addGene('BRCA1', 1)
-             .addGene('BRAF', 2)
-             .removeGene('BRAF');
-      expect($('#loading-display')).toContainText('BRCA1');
-    });
-
-    it('should display the gene that was last added even if the removed gene was not the one being displayed', function() {
-      display.addGene('BRCA1', 1)
-             .addGene('BRAF', 2)
-             .addGene('ACTA', 3)
-             .removeGene('BRAF');
-      expect($('#loading-display')).toContainText('ACTA');
-    });
 
     describe('when the page count is greater than 1', function() {
       it('should display the correct page number', function() {

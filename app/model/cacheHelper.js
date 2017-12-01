@@ -121,6 +121,7 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
 }
 
 CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field, clearStandardFilterCounts) {
+  var me = this;
   var geneCount = countObject.geneCount;
   var counts    = countObject[field];
 
@@ -136,6 +137,9 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
   if (counts.analyzed == geneCount) {
     progressBar.addClass("done");
     progressBar.find(".text").text(counts.analyzed + " analyzed");
+    if (me.geneBadgeLoaderDisplay) {
+      me.geneBadgeLoaderDisplay.clearAll();
+    }
   } else {
     progressBar.removeClass("done");
   }
