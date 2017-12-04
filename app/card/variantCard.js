@@ -2116,7 +2116,7 @@ VariantCard.prototype.promiseGetMaxAlleleCount = function() {
     } else {
       var count = theVcfData.maxAlleleCount;
       if (!count) {
-        me.determineMaxAlleleCount(theVcfData)
+        me.promiseDetermineMaxAlleleCount(theVcfData)
          .then(function() {
           resolve(theVcfData.maxAlleleCount);
          },

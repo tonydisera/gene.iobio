@@ -184,30 +184,46 @@ BookmarkCard.prototype.compressKey = function(bookmarkKey) {
   return bookmarkKey;
 }
 
-BookmarkCard.prototype.determineVariantBookmarks = function(vcfData, geneObject, theTranscript) {
+BookmarkCard.prototype.promiseDetermineVariantBookmarks = function(vcfData, geneObject, theTranscript) {
   var me = this;
 
-  if (geneObject == null) {
-    return;
-  }
-
-  if (vcfData && vcfData.features) {
-    var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
-    if (bookmarkKeys && bookmarkKeys.length > 0) {
-      bookmarkKeys.forEach( function(bookmarkKey) {
-        var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
-        var theBookmarkEntry = bookmarkEntry.hasOwnProperty("isProxy") ? me.reviseCoord(bookmarkEntry, geneObject) : bookmarkEntry;
-        getProbandVariantCard().promiseGetBookmarkedVariant(theBookmarkEntry, vcfData, geneObject, theTranscript)
-         .then(function(variant) {
-          if (variant) {
-            variant.isBookmark = 'Y';
-            me.bookmarkedVariants[bookmarkKey] = variant;
-          }
-         })
-      });
+  return new Promise(function(resolve, reject) {
+    if (geneObject == null) {
+      resolve();
     }
-    //me.refreshBookmarkList();
-  }
+
+    if (vcfData && vcfData.features) {
+      var bookmarkKeys = me.bookmarkedGenes[geneObject.gene_name];
+      if (bookmarkKeys && bookmarkKeys.length > 0) {
+        var promises = [];
+        bookmarkKeys.forEach( function(bookmarkKey) {
+          var bookmarkEntry = me.bookmarkedVariants[bookmarkKey];
+          var theBookmarkEntry = bookmarkEntry.hasOwnProperty("isProxy") ? me.reviseCoord(bookmarkEntry, geneObject) : bookmarkEntry;
+          var p = getProbandVariantCard().promiseGetBookmarkedVariant(theBookmarkEntry, vcfData, geneObject, theTranscript)
+           .then(function(variant) {
+            if (variant) {
+              variant.isBookmark = 'Y';
+              me.bookmarkedVariants[bookmarkKey] = variant;
+            }
+           })
+          promises.push(p);
+        });
+
+        Promise.all(promises).then(function() {
+          resolve();
+        },
+        function(error) {
+          reject(error);
+        })
+      } else {
+        resolve();
+      }
+    } else {
+      resolve();
+    }
+  });
+
+
 }
 
 
@@ -283,16 +299,14 @@ BookmarkCard.prototype.promiseResolveBookmarkedVariant = function(key, bookmarkE
           variant.chrom = bookmarkEntry.chrom;
           me.bookmarkedVariants[key] = variant;
           bookmarkEntry = variant;
-        } else {
-          variant = bookmarkEntry;
-          variant.isBookmark = "Y";
-          variant.isProxy = false;
         }
-
         resolve(variant);
        })
     } else {
-      resolve(null);
+      variant = bookmarkEntry;
+      variant.isBookmark = "Y";
+      variant.isProxy = false;
+      resolve(variant);
     }
 
   })
