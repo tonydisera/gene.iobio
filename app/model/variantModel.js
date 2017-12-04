@@ -312,13 +312,13 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
   var me = this;
 
   return new Promise( function(resolve, reject) {
-    if (transcript.features == null || transcript.features.length == 0) {
-      resolve({model: me, gene: geneObject, transcript: transcript, 'geneCoverage': []});
-    } else {
-      me.promiseGetCachedGeneCoverage(geneObject, transcript)
-       .then( function(cachedGeneCoverage) {
-        if (cachedGeneCoverage) {
-          resolve({model: me, 'geneCoverage': cachedGeneCoverage})
+    me.promiseGetCachedGeneCoverage(geneObject, transcript)
+     .then( function(cachedGeneCoverage) {
+      if (cachedGeneCoverage) {
+        resolve({model: me, 'geneCoverage': cachedGeneCoverage})
+      } else {
+        if (transcript.features == null || transcript.features.length == 0) {
+          resolve({model: me, gene: geneObject, transcript: transcript, 'geneCoverage': []});
         } else {
           me.bam.getGeneCoverage(geneObject,
             transcript,
@@ -336,13 +336,14 @@ VariantModel.prototype.promiseGetGeneCoverage = function(geneObject, transcript)
             }
           );
         }
+      }
 
-       },
-       function(error) {
-        reject(error);
-       });
+     },
+     function(error) {
+      reject(error);
+     });
 
-    }
+
 
   });
 }
@@ -670,6 +671,7 @@ VariantModel._summarizeDanger = function(geneName, theVcfData, options = {}, gen
 VariantModel.summarizeDangerForGeneCoverage = function(dangerObject, geneCoverageAll, clearOtherDanger=false, refreshOnly=false) {
   dangerObject.geneCoverageInfo = {};
   dangerObject.geneCoverageProblem = false;
+
 
   if (geneCoverageAll && Object.keys(geneCoverageAll).length > 0) {
     for (relationship in geneCoverageAll) {
@@ -1598,25 +1600,24 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
     // First the gene vcf data has been cached, just return
     // it.  (No need to retrieve the variants from the iobio service.)
-    me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
-     .then(function(vcfData) {
+    me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript).then(function(vcfData) {
       if (vcfData != null && vcfData != '') {
         me.vcfData = vcfData;
         me._populateEffectFilters(me.vcfData.features);
         me._populateRecFilters(me.vcfData.features);
 
         // Flag any bookmarked variants
-        if (me.getRelationship() == 'proband') {
-            bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
-        }
-
-
+        me._promisesDetermineVariantBookmarks(vcfData, theGene, theTranscript).then(function() {
           // Invoke callback now that we have annotated variants
           if (onVcfData) {
             onVcfData();
           }
 
-        resolve(me.vcfData);
+          resolve(me.vcfData);
+
+        })
+
+
       } else {
         // We don't have the variants for the gene in cache,
         // so call the iobio services to retreive the variants for the gene region
@@ -1624,7 +1625,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
         me._promiseVcfRefName(theGene.chr).then( function() {
           me._promiseGetAndAnnotateVariants(
             me.getVcfRefName(theGene.chr),
-            theGene,
+                theGene,
                 theTranscript,
                 global_getVariantIdsForGene,
                 false,   // parseMultipleSamples
@@ -1646,24 +1647,23 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
               if (theGeneObject) {
 
                 // Flag any bookmarked variants
-                if (me.getRelationship() == 'proband') {
-                  bookmarkCard.determineVariantBookmarks(data, theGeneObject, theTranscript);
-                }
+                me._promiseDetermineVariantBookmarks(data, theGeneObject, theTranscript).then(function() {
+                  // Cache the data (if there are variants)
+                  if (data && data.features) {
+                    me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript).then(function() {
+                      me.vcfData = data;
+                      resolve(me.vcfData);
+                    },
+                    function(error) {
+                      var msg = "A problem occurred when caching data in VariantModel.promiseGetVariants(): " + error + ". Unable to cache annotated variants for gene " + data.gene.gene_name;
+                      console.log(msg);
+                      reject(msg);
 
-                // Cache the data (if there are variants)
-                if (data && data.features) {
-                  me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript)
-                   .then(function() {
-                    me.vcfData = data;
-                  resolve(me.vcfData);
-                   },
-                   function(error) {
-                    var msg = "A problem occurred when caching data in VariantModel.promiseGetVariants(): " + error + ". Unable to cache annotated variants for gene " + data.gene.gene_name;
-                    console.log(msg);
-                    reject(msg);
+                    });
+                  }
 
-                   });
-                }
+                })
+
 
               } else {
                 var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
@@ -1680,14 +1680,27 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
 
       }
 
-     },
-     function(error) {
+    },
+      function(error) {
       var msg = "A problem occurred in VariantModel.promiseGetVariants() " + error;
       console.log(msg);
       reject(msg);
-     })
+    })
 
   });
+
+}
+
+VariantModel.prototype._promiseDetermineVariantBookmarks = function(theVcfData, theGeneObject, theTranscript) {
+  var me = this;
+
+  if (me.getRelationship() == 'proband') {
+    return bookmarkCard.promiseDetermineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
+  } else {
+    return new Promise(function(resolve, reject) {
+      resolve();
+    })
+  }
 
 }
 
@@ -1700,6 +1713,7 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
     // it.  (No need to retrieve the variants from the iobio service.)
     resultMap = {};
     var promises = [];
+    var bookmarkPromises = [];
     variantCards.forEach(function(vc) {
       var p = vc.model._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript)
        .then(function(vcfData) {
@@ -1709,162 +1723,169 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
           vc.model.vcfData = vcfData;
           me._populateEffectFilters(me.vcfData.features);
           me._populateRecFilters(me.vcfData.features);
-          if (me.getRelationship() == 'proband') {
-              bookmarkCard.determineVariantBookmarks(vcfData, theGene, theTranscript);
-          }
+          var bp = me._promiseDetermineVariantBookmarks(vcfData, theGene, theTranscript);
+          bookmarkPromises.push(bp);
+
         }
        })
        promises.push(p);
     })
 
     Promise.all(promises).then(function() {
-      if (Object.keys(resultMap).length == variantCards.length) {
-        resolve(resultMap);
-      } else {
+      Promise.all(bookmarkPromises).then(function() {
+        if (Object.keys(resultMap).length == variantCards.length) {
+          resolve(resultMap);
+        } else {
 
 
-        // Place any called variants back in the cache (for proband).  This is necessary, because
-        // the mother and father vcf data will not be cached?
-        getProbandVariantCard().model.promiseGetFbData(theGene, theTranscript, true)
-         .then(function(data) {
-          var theFbData = data.fbData;
+          // Place any called variants back in the cache (for proband).  This is necessary, because
+          // the mother and father vcf data will not be cached?
+          getProbandVariantCard().model.promiseGetFbData(theGene, theTranscript, true)
+           .then(function(data) {
+            var theFbData = data.fbData;
 
-          var promise = null;
-          if (theFbData && theFbData.features) {
-            promise = getProbandVariantCard().model._promiseCacheData(theFbData, CacheHelper.FB_DATA, theGene.gene_name, theTranscript)
-          } else {
-            promise = new Promise(function(resolve, reject) {
-              resolve();
-            })
-          }
+            var promise = null;
+            if (theFbData && theFbData.features) {
+              promise = getProbandVariantCard().model._promiseCacheData(theFbData, CacheHelper.FB_DATA, theGene.gene_name, theTranscript)
+            } else {
+              promise = new Promise(function(resolve, reject) {
+                resolve();
+              })
+            }
 
-          // We don't have the variants for the gene in cache,
-          // so call the iobio services to retreive the variants for the gene region
-          // and annotate them.
-          promise.then(function() {
-            me._promiseVcfRefName(theGene.chr).then( function() {
-              var refName = me.getVcfRefName(theGene.chr);
-              me._promiseGetAndAnnotateVariants(
-                refName,
-                theGene,
-                    theTranscript,
-                    global_getVariantIdsForGene,
-                    true // parseMultipleSamples
-                    )
-              .then( function(results) {
+            // We don't have the variants for the gene in cache,
+            // so call the iobio services to retreive the variants for the gene region
+            // and annotate them.
+            promise.then(function() {
+              me._promiseVcfRefName(theGene.chr).then( function() {
+                var refName = me.getVcfRefName(theGene.chr);
+                me._promiseGetAndAnnotateVariants(
+                  refName,
+                  theGene,
+                      theTranscript,
+                      global_getVariantIdsForGene,
+                      true // parseMultipleSamples
+                      )
+                .then( function(results) {
 
-                if (results && results.length > 0) {
-                  var data = results[0];
+                  if (results && results.length > 0) {
+                    var data = results[0];
 
-                    // Associate the correct gene with the data
-                    var theGeneObject = null;
-                    for( var key in window.geneObjects) {
-                      var geneObject = geneObjects[key];
-                      if (me.getVcfRefName(geneObject.chr) == data.ref &&
-                        geneObject.start == data.start &&
-                        geneObject.end == data.end &&
-                        geneObject.strand == data.strand) {
-                        theGeneObject = geneObject;
+                      // Associate the correct gene with the data
+                      var theGeneObject = null;
+                      for( var key in window.geneObjects) {
+                        var geneObject = geneObjects[key];
+                        if (me.getVcfRefName(geneObject.chr) == data.ref &&
+                          geneObject.start == data.start &&
+                          geneObject.end == data.end &&
+                          geneObject.strand == data.strand) {
+                          theGeneObject = geneObject;
+                        }
                       }
-                    }
-                    if (theGeneObject) {
+                      if (theGeneObject) {
 
-                      var resultMap = {};
-                      var idx = 0;
-                      var variantCards = getRelevantVariantCards();
+                        var resultMap = {};
+                        var idx = 0;
+                        var variantCards = getRelevantVariantCards();
 
-                      var postProcessNextVariantCard = function(idx, callback) {
+                        var postProcessNextVariantCard = function(idx, callback) {
 
-                        if (idx == variantCards.length) {
-                          if (callback) {
-                            callback();
-                          }
-                          return;
-                        } else {
-                          var vc          = variantCards[idx];
-                          var theVcfData  = results[idx];
-                          if (theVcfData == null) {
+                          if (idx == variantCards.length) {
                             if (callback) {
                               callback();
                             }
                             return;
+                          } else {
+                            var vc          = variantCards[idx];
+                            var theVcfData  = results[idx];
+                            if (theVcfData == null) {
+                              if (callback) {
+                                callback();
+                              }
+                              return;
+                            }
+
+                            theVcfData.gene = theGeneObject;
+                            resultMap[vc.getRelationship()] = theVcfData;
+
+                            // Perform post-annotation processing for each variant card's model
+                            vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData).then(function() {
+
+                              // Flag any bookmarked variants
+                              me._promiseDetermineVariantBookmarks(theVcfData, theGeneObject, theTranscript).then(function() {
+
+                                if (vc.getRelationship() == 'proband') {
+                                  me._populateEffectFilters(theVcfData.features);
+                                  me._populateRecFilters(theVcfData.features);
+                                  filterCard.displayDataGeneratedFilters();
+                                }
+
+                                // Cache the data (if there are variants)
+                                var promise = null;
+                                if (theVcfData && theVcfData.features) {
+                                  promise = vc.model._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theVcfData.gene.gene_name, theVcfData.transcript);
+                                } else {
+                                  promise = new Promise(function(resolve, reject) {
+                                    resolve()
+                                  });
+                                }
+
+                                //  Store the data and process next variant card
+                                promise.then(function() {
+                                  vc.model.vcfData = theVcfData;
+                                  idx++;
+                                  postProcessNextVariantCard(idx, callback);
+
+                                },
+                                function(error) {
+                                  var msg = "A problem occurred while caching data in VariantModel.promiseGetVariantsMultipleSamples(): " + error + ". Unable to cache annotated variants for gene " + theVcfData.gene.gene_name;
+                                  console.log(msg);
+                                  reject(msg);
+                                })
+                              })
+
+
+                            })
                           }
-
-                          theVcfData.gene = theGeneObject;
-                          resultMap[vc.getRelationship()] = theVcfData;
-
-                          // Perform post-annotation processing for each variant card's model
-                          vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData)
-                            .then(function() {
-                            // Flag any bookmarked variants
-                            if (vc.getRelationship() == 'proband') {
-                              bookmarkCard.determineVariantBookmarks(theVcfData, theGeneObject, theTranscript);
-
-                            me._populateEffectFilters(theVcfData.features);
-                            me._populateRecFilters(theVcfData.features);
-                              filterCard.displayDataGeneratedFilters();
-                            }
-
-                            // Cache the data (if there are variants)
-                            var promise = null;
-                            if (theVcfData && theVcfData.features) {
-                              promise = vc.model._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theVcfData.gene.gene_name, theVcfData.transcript);
-                            } else {
-                              promise = new Promise(function(resolve, reject) {
-                                resolve()
-                              });
-                            }
-
-                            //  Store the data and process next variant card
-                            promise.then(function() {
-                              vc.model.vcfData = theVcfData;
-                              idx++;
-                              postProcessNextVariantCard(idx, callback);
-
-                            },
-                            function(error) {
-                              var msg = "A problem occurred while caching data in VariantModel.promiseGetVariantsMultipleSamples(): " + error + ". Unable to cache annotated variants for gene " + theVcfData.gene.gene_name;
-                              console.log(msg);
-                              reject(msg);
-                            })
-                            })
                         }
+
+                        postProcessNextVariantCard(idx, function() {
+
+                          resolve(resultMap);
+                        });
+
+
+                      } else {
+                        var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+                        console.log(error);
+                        reject(error);
                       }
-
-                      postProcessNextVariantCard(idx, function() {
-
-                        resolve(resultMap);
-                      });
-
-
-                    } else {
-                      var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+                  } else {
+                      var error = "ERROR - empty vcf results for " + theGene.gene_name;;
                       console.log(error);
                       reject(error);
-                    }
-                } else {
-                    var error = "ERROR - empty vcf results for " + theGene.gene_name;;
-                    console.log(error);
+                  }
+
+
+                  }, function(error) {
                     reject(error);
-                }
+                  });
+              },
+              function(error) {
+                reject("missing reference")
+              });
+            })
 
 
-                }, function(error) {
-                  reject(error);
-                });
-            },
-            function(error) {
-              reject("missing reference")
-            });
-          })
+           },
+           function(error) {
 
+           });
 
-         },
-         function(error) {
+        }
 
-         });
+      })
 
-      }
     });
 
 
@@ -2187,25 +2208,26 @@ VariantModel.prototype.promiseCacheVariants = function(ref, geneObject, transcri
               }
               if (theGeneObject) {
                 me._populateEffectFilters(data.features);
-              me._populateRecFilters(data.features);
+                me._populateRecFilters(data.features);
 
                 // Flag any bookmarked variants
-                bookmarkCard.determineVariantBookmarks(data, data.gene, data.transcript);
+                me._promiseDetermineVariantBookmarks(data, data.gene, data.transcript).then(function() {
+
+                  // show in the Filter panel
+                  filterCard.displayDataGeneratedFilters();
+
+                  // Cache the data
+                  me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript).then(function() {
+                    resolve(data);
+                  },
+                  function(error) {
+                    var msg = "A problem occurred during caching data in VariantModel.promiseCacheVariants(): " + error;
+                    console.log(msg);
+                    reject({isValid: false, message: msg});
+                  });
+                })
 
                 // Refresh the VEP consequence filters and the rec filters that
-                // show in the Filter panel
-                filterCard.displayDataGeneratedFilters();
-
-                // Cache the data
-                me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript)
-                 .then(function() {
-                resolve(data);
-                 },
-                 function(error) {
-                  var msg = "A problem occurred during caching data in VariantModel.promiseCacheVariants(): " + error;
-                  console.log(msg);
-                  reject({isValid: false, message: msg});
-                 });
               } else {
                 reject({isValid: false, message: "Cannot find gene object to match data for " + data.ref + " " + data.start + "-" + data.end});
               }

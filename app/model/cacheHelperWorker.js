@@ -10,7 +10,7 @@ if( 'function' === typeof importScripts) {
         try {
            dataString = LZString.decompressFromUTF16(data.compressedData);
            var uncompressedData =  JSON.parse(dataString);
-           postMessage(uncompressedData);
+           postMessage({data: uncompressedData, keyObject: data.keyObject});
         } catch(e) {
 
         }
