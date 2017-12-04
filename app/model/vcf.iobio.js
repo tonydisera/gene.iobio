@@ -937,9 +937,7 @@ var effectCategories = [
     // Create an iobio command get get the variants and add any header recs.
     var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
     var tabixArgs = ['-h', clinvarUrl, regionParm];
-    if (tbiUrl) {
-      tabixArgs.push(tbiUrl);
-    }
+
     var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL})
                        .pipe(IOBIO.knownvariants, knownVariantsArgs, {ssl: false})
 
