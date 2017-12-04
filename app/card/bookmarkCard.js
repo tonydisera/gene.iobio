@@ -79,19 +79,21 @@ BookmarkCard.prototype.reverseBases = function(bases) {
     return reversedBases;
 }
 
-BookmarkCard.prototype.bookmarkVariant = function(variant) {
+BookmarkCard.prototype.flagCurrentBookmark = function(key) {
   var me = this;
-
-  var flagCurrentBookmark = function(key) {
-    var bookmark = d3.selectAll("a.bookmark")
+  var bookmark = d3.selectAll("a.bookmark")
                  .filter(function(d) {
                   return d.key === key;
                  });
-    if (bookmark) {
-      d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-      bookmark.classed("current", true);
-    }
+  if (bookmark) {
+    d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+    bookmark.classed("current", true);
   }
+}
+
+BookmarkCard.prototype.bookmarkVariant = function(variant) {
+  var me = this;
+
 
   if (variant) {
     var key = this.getBookmarkKey(gene.gene_name, selectedTranscript.transcript_id, gene.chr, variant.start, variant.ref, variant.alt);
@@ -113,19 +115,20 @@ BookmarkCard.prototype.bookmarkVariant = function(variant) {
       showSidebar('Bookmarks');
 
       genesCard.setBookmarkBadge(gene.gene_name);
-      flagCurrentBookmark(key);
+      me.flagCurrentBookmark(key);
 
       me.promiseGetExtraAnnotsForVariant(variant, gene, selectedTranscript)
         .then(function(refreshedVariant) {
         me.bookmarkedVariants[key] = refreshedVariant;
         me._refreshVariantLabel(refreshedVariant, key);
-        flagCurrentBookmark(key);
+        me.flagCurrentBookmark(key);
         })
     } else {
       genesCard.setBookmarkBadge(gene.gene_name);
     }
   }
 }
+
 
 BookmarkCard.prototype.removeBookmark = function(key, variant) {
   var me = this;

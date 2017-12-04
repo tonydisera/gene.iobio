@@ -4219,8 +4219,17 @@ function filterVariantsImpl() {
 
 function bookmarkVariant() {
   if (clickedVariant) {
-    this.bookmarkCard.bookmarkVariant(clickedVariant);
+    bookmarkCard.bookmarkVariant(clickedVariant);
     unpinAll();
+  }
+}
+
+function flagBookmarkedVariant() {
+  if (clickedVariant) {
+    var bookmarkKey = bookmarkCard.getBookmarkKey(gene.gene_name, window.selectedTranscript.transcript_id, gene.chr, clickedVariant.start, clickedVariant.ref, clickedVariant.alt);
+    if (bookmarkKey) {
+      this.bookmarkCard.flagCurrentBookmark(bookmarkKey);
+    }
   }
 }
 

@@ -68,6 +68,10 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
   if (lock && !isLevelEdu) {
     me.showScrollButtons($(tooltip[0]));
+
+    if (variant.hasOwnProperty('isBookmark') && variant.isBookmark == 'Y')  {
+      flagBookmarkedVariant(variant);
+    }
   }
 
 
