@@ -856,6 +856,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
   var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i>up</button>'
   var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i>more</button>'
 
+  var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
 
   var bookmarkLink =  '<button id="bookmarkLink"  class="tooltip-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark</button>';
 
