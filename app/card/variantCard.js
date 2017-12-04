@@ -1084,7 +1084,7 @@ VariantCard.prototype.promiseGetBookmarkedVariant = function(variantProxy, data,
     } else {
       me.model.promiseGetVcfData(geneObject, transcriptObject)
        .then(function(data) {
-        resolveIt(data.vcfData);
+        resolveIt(resolve, data.vcfData);
        })
     }
 
