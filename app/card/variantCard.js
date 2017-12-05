@@ -115,7 +115,6 @@ VariantCard.prototype.getRelationship = function() {
 
 VariantCard.prototype.promiseSummarizeDanger = function(geneName, data, options, geneCoverageAll) {
   var me = this;
-  console.log("VariantCard.promiseSummarizeDanger(): " + geneName + " " + JSON.stringify(geneCoverageAll));
   return new Promise(function(resolve, reject) {
     var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);
     me.model.promiseCacheDangerSummary(dangerSummary, geneName).then(function() {

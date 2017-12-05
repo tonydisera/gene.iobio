@@ -1002,10 +1002,13 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
       theGeneNames[geneName] = true;
     });
 
-    var thePromises = [];
 
     me.promiseGetKeys()
      .then(function(allKeys) {
+
+      var thePromises = [];
+      var dangerPromises = [];
+
       allKeys.forEach(function(key) {
         keyObject = CacheHelper._parseCacheKey(key);
         if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
@@ -1013,56 +1016,66 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
             if (keyObject.dataKind == CacheHelper.VCF_DATA && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
               counts.geneCount++;
 
-            var geneObject   = window.geneObjects[keyObject.gene];
-            var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript})
-             .then(function(data) {
-              var geneCoverageAll = data.geneCoverage;
+              var geneObject   = window.geneObjects[keyObject.gene];
+              var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript}).then(function(data) {
+                var geneCoverageAll = data.geneCoverage;
 
-              return getProbandVariantCard().promiseGetDangerSummary(data.gene.gene_name)
-               .then(function(dangerObject) {
-                if (geneCoverageAll && dangerObject) {
-                  var clearOtherDanger = refreshOnly ? false : true;
-                  VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
+                var dp = getProbandVariantCard().promiseGetDangerSummary(data.gene.gene_name).then(function(dangerObject) {
+                  if (geneCoverageAll && dangerObject) {
+                    var clearOtherDanger = refreshOnly ? false : true;
+                    VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
 
-                    counts.all.analyzed++;
-                    counts.loaded.analyzed++;
-                    counts.called.analyzed++;
-                  if (dangerObject.geneCoverageProblem) {
-                      counts.all.pass++;
-                      counts.loaded.pass++;
-                      counts.called.pass++;
-                    }
+                      counts.all.analyzed++;
+                      counts.loaded.analyzed++;
+                      counts.called.analyzed++;
+                    if (dangerObject.geneCoverageProblem) {
+                        counts.all.pass++;
+                        counts.loaded.pass++;
+                        counts.called.pass++;
+                      }
 
-                  getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name)
-                   .then(function() {
-                    genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
-                   })
-                } else {
+                    getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name).then(function() {
+                      genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
+                    })
+                  } else {
                     counts.all.unanalyzed++;
                     counts.loaded.unanalyzed++;
                     counts.called.unanalyzed++;
 
-                }
-               })
+                  }
+                })
+                dangerPromises.push(dp);
 
+              }, function(error) {
+                var msg = "Problem encountered in CacheHelper.refreshGeneBadgesGeneCoverage() " + error;
+                console.log(msg);
+                reject(msg);
 
+              });
 
-             }, function(error) {
-              var msg = "Problem encountered in CacheHelper.refreshGeneBadgesGeneCoverage() " + error;
-              console.log(msg);
-              reject(msg);
-
-             });
-
-             thePromises.push(p);
-
-
-
+              thePromises.push(p);
             }
         }
 
       })
 
+      Promise.all(thePromises).then(function() {
+        Promise.all(dangerPromises).then(function() {
+          if (!refreshOnly) {
+            genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
+          }
+
+          $('#gene-badges-loader').addClass("hide");
+          resolve(counts);
+
+        },
+        function(error) {
+          reject(error);
+        })
+      },
+      function(error) {
+        reject(error);
+      })
      },
      function(error) {
       var msg = "A problem occurred in CacheHelper.promiseRefreshGeneBadgesGeneCoverage(): " + error;
@@ -1071,14 +1084,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
 
     });
 
-    Promise.all(thePromises).then(function() {
-      if (!refreshOnly) {
-        genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
-      }
 
-      $('#gene-badges-loader').addClass("hide");
-      resolve(counts);
-    })
   })
 
 

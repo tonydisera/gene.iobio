@@ -193,7 +193,7 @@ FilterCard.prototype.clearCurrentStandardFilter = function() {
 
 FilterCard.prototype.applyStandardFilter = function(button, filterName) {
   var me = this;
-    filterCard.setStandardFilter(button, filterName);
+  filterCard.setStandardFilter(button, filterName);
   filterVariants();
 }
 
@@ -896,18 +896,17 @@ FilterCard.prototype.filterGenes = function(callback) {
   // refresh all of the gene badges based on the filter
   if (me.applyLowCoverageFilter) {
     genesCard.setOrderBy(genesCard.LOW_COVERAGE_OPTION);
-    var geneCounts = cacheHelper.promiseRefreshGeneBadgesGeneCoverage()
-     .then(function(geneCounts) {
+    cacheHelper.promiseRefreshGeneBadgesGeneCoverage().then(function(geneCounts) {
       cacheHelper.showGeneCounts(geneCounts);
       if (callback) {
         callback();
       }
-     }, function(error) {
+    }, function(error) {
       console.log("Problem encounted in FilterCard.filterGenes():  " + error);
       if (callback) {
         callback();
       }
-     });
+    });
   } else {
     genesCard.setOrderBy(genesCard.HARMFUL_VARIANTS_OPTION);
     var geneCounts = cacheHelper.refreshGeneBadges(function() {
