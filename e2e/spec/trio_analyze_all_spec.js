@@ -116,7 +116,7 @@ module.exports = {
     filterPanel.clickLowCoverage();
     client.pause(2000);
     filterPanel.assertLowCoverageCounts(2);
-    appTitleSection.assertAnalyzeAllCounts(2,3,2,3);
+    appTitleSection.assertAnalyzeAllCounts(2,3,null,null);
 
   },
   'Clear all filter': function(client) {
