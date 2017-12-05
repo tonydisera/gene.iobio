@@ -75,12 +75,14 @@ module.exports = {
 
   'Warning appears when no variants found for a gene': function(client) {
     nav.searchGene('NNMT');
+    client.pause(5000);
     matrixTrack.waitForZeroVariantsWarning();
   },
 
   'Allele Frequency <5% row should be accurate': function(client) {
     filterPanel.clickClearAll();
     nav.searchGene("RAI1");
+    client.pause(5000);
     matrixTrack.waitForMatrixLoaded();
     matrixTrack.assertAfHighest([1,2]);
   },

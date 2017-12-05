@@ -116,7 +116,7 @@ module.exports = {
     HGVSp: { selector: '//div[@class="tooltip-header" and text()="HGVSp"]/following-sibling::div', locateStrategy: 'xpath' },
     bookmarkLink:  {selector: '#bookmarkLink', locateStrategy: 'css selector'},
     removeBookmarkLink:  {selector: '#remove-bookmark-link', locateStrategy: 'css selector'},
-    unpinLink:  {selector: 'a#unpin', locateStrategy: 'css selector'},
+    unpinLink:  {selector: 'button#unpin', locateStrategy: 'css selector'},
 
     inheritance: {selector: '//*[local-name()="svg" and @class="inheritance-badge"]/following-sibling::span', locateStrategy: 'xpath'},
 

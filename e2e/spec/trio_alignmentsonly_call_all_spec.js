@@ -34,7 +34,7 @@ module.exports = {
     dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
-    client.pause(2000);
+    client.pause(10000);
     dataCard.clickLoad();
 
     client.pause(1000);
@@ -130,7 +130,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
 
-    client.pause(1000);
+    client.pause(5000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(0);
     probandVariantCard.assertCalledVariantCountEquals(3);

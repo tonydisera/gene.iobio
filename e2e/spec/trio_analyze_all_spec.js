@@ -153,7 +153,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('AIRE');
 
-    client.pause(2000);
+    client.pause(9000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -162,7 +162,7 @@ module.exports = {
 
     nav.searchGene('PDHA1');
 
-    client.pause(2000);
+    client.pause(9000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -179,7 +179,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
 
-    client.pause(2000);
+    client.pause(9000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(2);
     probandVariantCard.assertCalledVariantCountEquals(1);

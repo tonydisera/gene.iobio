@@ -34,7 +34,7 @@ module.exports = {
     dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
-    client.pause(2000);
+    client.pause(12000);
     dataCard.clickLoad();
 
     client.pause(1000);

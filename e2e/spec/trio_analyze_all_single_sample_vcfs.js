@@ -158,7 +158,7 @@ module.exports = {
     client.pause(1000);
 
     nav.searchGene('AIRE');
-    client.pause(1000);
+    client.pause(7000);
     matrixTrack.waitForMatrixLoaded();
 
     filterPanel.clickRecfilterUnassigned();
@@ -173,7 +173,7 @@ module.exports = {
     filterPanel.clickClearAll();
     nav.searchGene('AIRE');
 
-    client.pause(1000);
+    client.pause(7000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
@@ -182,7 +182,7 @@ module.exports = {
 
     nav.searchGene('PDHA1');
 
-    client.pause(1000);
+    client.pause(7000);
     matrixTrack.waitForMatrixLoaded();
 
     probandVariantCard.waitForBamDepthLoaded();
