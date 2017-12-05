@@ -2228,11 +2228,11 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
       updateUrl('gene', window.gene.gene_name);
 
       if (!isLevelBasic) {
-      loadTracksForGene(false, function() {
-        if (callbackVariantsLoaded) {
-          callbackVariantsLoaded();
-        }
-      });
+        loadTracksForGene(false, function() {
+          if (callbackVariantsLoaded) {
+            callbackVariantsLoaded();
+          }
+        });
       }
 
       me.updateGeneInfoLink(window.gene.gene_name, function() {

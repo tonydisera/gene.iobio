@@ -324,24 +324,24 @@ BookmarkCard.prototype.promiseGetExtraAnnotsForVariant = function(variant, geneO
   return new Promise(function(resolve, reject) {
 
     getProbandVariantCard().model.promiseGetVariantExtraAnnotations(geneObject, theTranscript, variant)
-        .then( function(refreshedVariant) {
-          // Now show tooltip again with the hgvs notations.
-            if (variant.start == refreshedVariant.start &&
-              variant.ref == refreshedVariant.ref &&
-              variant.alt == refreshedVariant.alt) {
+    .then( function(refreshedVariant) {
+      // Now show tooltip again with the hgvs notations.
+      if (variant.start == refreshedVariant.start &&
+          variant.ref == refreshedVariant.ref &&
+          variant.alt == refreshedVariant.alt) {
 
-              variant.vepHGVSc = refreshedVariant.vepHGVSc;
-          variant.vepHGVSp = refreshedVariant.vepHGVSp;
-          variant.vepVariationIds = refreshedVariant.vepVariationIds;
-          variant.extraAnnot = true;
+        variant.vepHGVSc = refreshedVariant.vepHGVSc;
+        variant.vepHGVSp = refreshedVariant.vepHGVSp;
+        variant.vepVariationIds = refreshedVariant.vepVariationIds;
+        variant.extraAnnot = true;
 
-          resolve(variant);
-        }
+        resolve(variant);
+      }
 
-      },
-      function(error) {
-        reject("Error occurred when getting extra annots for bookmarked variant " + error);
-      } );
+    },
+    function(error) {
+      reject("Error occurred when getting extra annots for bookmarked variant " + error);
+    });
 
   })
 
@@ -440,33 +440,33 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
             return  geneName + " " + chr;
            })
            .on('click', function(entry,i) {
-            d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-            var currentBookmarkGene = d3.select(this);
-            var currentBookmarkDiv = d3.select(this.parentNode);
-            currentBookmarkGene.classed("current", true);
+              d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+              var currentBookmarkGene = d3.select(this);
+              var currentBookmarkDiv = d3.select(this.parentNode);
+              currentBookmarkGene.classed("current", true);
 
-            me.selectedBookmarkKey = entry.key;
+              me.selectedBookmarkKey = entry.key;
 
-        var geneName = entry.key;
-        var bookmarkKeys = entry.value;
+              var geneName = entry.key;
+              var bookmarkKeys = entry.value;
 
-        // Remove any locked tooltip, hide coordinate frame
-        unpinAll();
+              // Remove any locked tooltip, hide coordinate frame
+              unpinAll();
 
 
 
-        if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
-          genesCard.selectGene(geneName, function() {
+              if (window.gene.gene_name != geneName || !getProbandVariantCard().isLoaded()) {
+                genesCard.selectGene(geneName, function() {
 
-          }, function() {
-            me._flagBookmarksForGene(getProbandVariantCard(), window.gene, window.selectedTranscript, bookmarkKeys, true);
-            me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene, window.selectedTranscript);
-          });
-        } else {
-          me._flagBookmarksForGene(getProbandVariantCard(), window.gene, window.selectedTranscript, bookmarkKeys, true);
-          me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene, window.selectedTranscript);
-        }
-      });
+                }, function() {
+                  me._flagBookmarksForGene(getProbandVariantCard(), window.gene, window.selectedTranscript, bookmarkKeys, true);
+                  me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene, window.selectedTranscript);
+                });
+              } else {
+                me._flagBookmarksForGene(getProbandVariantCard(), window.gene, window.selectedTranscript, bookmarkKeys, true);
+                me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, window.gene, window.selectedTranscript);
+              }
+           });
 
   me.addPhenotypeGlyphs(container);
   me.addCallVariantsButton(container);
@@ -490,67 +490,68 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
           bookmark.append("a")
                   .attr("class", "bookmark")
                   .on('click', function(entry,i) {
-                  var prevSelectedBookmark = d3.select('#bookmark-card #bookmark-panel a.current');
-                  var currentBookmark = d3.select(this);
+                    var prevSelectedBookmark = d3.select('#bookmark-card #bookmark-panel a.current');
+                    var currentBookmark = d3.select(this);
 
-                  if (prevSelectedBookmark[0][0] && prevSelectedBookmark.datum() == currentBookmark.datum()) {
-                    // If the user clicked on the bookmark that is already selected,
-                    // de-select it
-                    currentBookmark.classed("current", false);
-                    me.hideTooltip();
-                    unpinAll();
-                    getProbandVariantCard().removeBookmarkFlags();
+                    if (prevSelectedBookmark[0][0] && prevSelectedBookmark.datum() == currentBookmark.datum()) {
+                      // If the user clicked on the bookmark that is already selected,
+                      // de-select it
+                      currentBookmark.classed("current", false);
+                      me.hideTooltip();
+                      unpinAll();
+                      getProbandVariantCard().removeBookmarkFlags();
 
-                  } else {
-                    // The user has clicked on a bookmark entry.  Select it and show
-                    // the matrix tooltip and highlight the variant in the
-                    // proband variant chart.
+                    } else {
+                      // The user has clicked on a bookmark entry.  Select it and show
+                      // the matrix tooltip and highlight the variant in the
+                      // proband variant chart.
                       me.clickInProgress = true;
 
 
                       me.hideTooltip();
-                    d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-                    currentBookmark.classed("current", true);
+                      d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+                      currentBookmark.classed("current", true);
 
-                    me.selectedBookmarkKey = entry.key;
+                      me.selectedBookmarkKey = entry.key;
 
-                    var geneName = me.parseKey(entry.key).gene;
-                var bookmarkEntry = entry.value;
-                var key = entry.key;
+                      var geneName = me.parseKey(entry.key).gene;
+                      var bookmarkEntry = entry.value;
+                      var key = entry.key;
 
-                // Remove any locked tooltip, hide coordinate frame
-                unpinAll();
+                      // Remove any locked tooltip, hide coordinate frame
+                      unpinAll();
 
-                var showBookmarkedVariant = function(bookmarkEntry, key) {
-                  me.promiseResolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript)
-                   .then(function(variant) {
-                    currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
-                    if (variant) {
-                      me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
-                      if (!variant.extraAnnot) {
-                        me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
-                          .then(function(refreshedVariant) {
-                            me._refreshVariantLabel(refreshedVariant, key);
-                          })
-                      } else {
-                        me._refreshVariantLabel(variant, key);
+                      var showBookmarkedVariant = function(bookmarkEntry, key) {
+                        me.promiseResolveBookmarkedVariant(key, bookmarkEntry, window.gene, window.selectedTranscript)
+                        .then(function(variant) {
+                          currentBookmark.select("span.not-found").classed("hide", variant ? true : false);
+                          if (variant) {
+                            me._flagBookmark(getProbandVariantCard(), window.gene, variant, key);
+                            if (!variant.extraAnnot) {
+                              me.promiseGetExtraAnnotsForVariant(variant, window.gene, window.selectedTranscript)
+                                .then(function(refreshedVariant) {
+                                  me._refreshVariantLabel(refreshedVariant, key);
+                                })
+                            } else {
+                              me._refreshVariantLabel(variant, key);
+                            }
+                          }
+
+                        })
                       }
+
+                      if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
+                        genesCard.selectGene(geneName, function() {
+
+                        },
+                        function() {
+                          showBookmarkedVariant(bookmarkEntry, key);
+                        });
+                      } else {
+                        showBookmarkedVariant(bookmarkEntry, key);
+                      }
+
                     }
-
-                   })
-                }
-
-                if (window.gene.gene_name != geneName  || !getProbandVariantCard().isLoaded()) {
-                  genesCard.selectGene(geneName, function() {
-
-                  }, function() {
-                    showBookmarkedVariant(bookmarkEntry, key);
-                  });
-                } else {
-                  showBookmarkedVariant(bookmarkEntry, key);
-                }
-
-                  }
 
                   });
 

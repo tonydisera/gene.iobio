@@ -163,7 +163,7 @@ MatrixCard.prototype.setCellSize = function(sizeEnum) {
   if (toggle && this.featureMatrix) {
     this.featureMatrix.cellSize(this.CELL_SIZE);
     if (getProbandVariantCard().model && getProbandVariantCard().model.vcfData) {
-      this.fillFeatureMatrix(getProbandVariantCard().model.vcfData);
+      this.promiseFillFeatureMatrix(getProbandVariantCard().model.vcfData);
     }
   }
 
@@ -697,254 +697,259 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 
 }
 
-MatrixCard.prototype.fillFeatureMatrix = function(theVcfData) {
+MatrixCard.prototype.promiseFillFeatureMatrix = function(theVcfData) {
   var me = this;
 
-  if (theVcfData == null) {
-    return;
-  }
+  return new Promise(function(resolve, reject) {
 
-
-  // Flag any bookmarked variants
-  bookmarkCard.promiseDetermineVariantBookmarks(theVcfData, window.gene)
-   .then(function() {
-
-
-    // Figure out if we should show the unaffected sibs row
-    if (me.filteredMatrixRows == null) {
-      me.filteredMatrixRows = $.extend(true, [], me.matrixRows);
-      var affectedInfo = getAffectedInfo();
-      var affected = affectedInfo.filter(function(info) {
-        return info.status == 'affected' && info.relationship != 'proband';
-      })
-      var unaffected = affectedInfo.filter(function(info) {
-        return info.status == 'unaffected' && info.relationship != 'proband';
-      })
-      if (affected.length == 0) {
-        me.removeRow('Present in Affected', me.filteredMatrixRows);
-      }
-      if (unaffected.length == 0) {
-        me.removeRow('Absent in Unaffected', me.filteredMatrixRows);
-      }
-
-      // Figure out if we should show any rows for generic annotations
-      var genericMatrixRows = genericAnnotation.getMatrixRows(theVcfData.genericAnnotators);
-
-      genericMatrixRows.forEach(function(matrixRow) {
-        matrixRow.index = me.filteredMatrixRows.length;
-        matrixRow.order = me.filteredMatrixRows.length;
-        me.filteredMatrixRows.push(matrixRow);
-      })
+    if (theVcfData == null) {
+      resolve();
     }
 
 
+    // Flag any bookmarked variants
+    bookmarkCard.promiseDetermineVariantBookmarks(theVcfData, window.gene).then(function() {
 
 
-    resizeCardWidths();
+      // Figure out if we should show the unaffected sibs row
+      if (me.filteredMatrixRows == null) {
+        me.filteredMatrixRows = $.extend(true, [], me.matrixRows);
+        var affectedInfo = getAffectedInfo();
+        var affected = affectedInfo.filter(function(info) {
+          return info.status == 'affected' && info.relationship != 'proband';
+        })
+        var unaffected = affectedInfo.filter(function(info) {
+          return info.status == 'unaffected' && info.relationship != 'proband';
+        })
+        if (affected.length == 0) {
+          me.removeRow('Present in Affected', me.filteredMatrixRows);
+        }
+        if (unaffected.length == 0) {
+          me.removeRow('Absent in Unaffected', me.filteredMatrixRows);
+        }
 
+        // Figure out if we should show any rows for generic annotations
+        var genericMatrixRows = genericAnnotation.getMatrixRows(theVcfData.genericAnnotators);
 
-    if (theVcfData != null) {
-      me.featureVcfData = {};
-      me.featureVcfData.features = [];
-      theVcfData.features.forEach(function(variant) {
-        me.featureVcfData.features.push($.extend({}, variant));
-      });
-    }
-
-    // Sort the matrix columns
-    me.filteredMatrixRows = me.filteredMatrixRows.sort(function(a, b) {
-      if (a.order == b.order) {
-        return 0;
-      } else if (a.order < b.order) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-
-
-
-    // Fill all features used in feature matrix for each variant
-    me.featureVcfData.features.forEach( function(variant) {
-      var features = [];
-      for (var i = 0; i < me.filteredMatrixRows.length; i++) {
-        features.push(null);
+        genericMatrixRows.forEach(function(matrixRow) {
+          matrixRow.index = me.filteredMatrixRows.length;
+          matrixRow.order = me.filteredMatrixRows.length;
+          me.filteredMatrixRows.push(matrixRow);
+        })
       }
 
-      me.filteredMatrixRows.forEach( function(matrixRow) {
-        var rawValue = null;
-        if (matrixRow.attribute instanceof Array) {
-          rawValue = genericAnnotation.getValue(variant, matrixRow.attribute);
+
+
+
+      resizeCardWidths();
+
+
+      if (theVcfData != null) {
+        me.featureVcfData = {};
+        me.featureVcfData.features = [];
+        theVcfData.features.forEach(function(variant) {
+          me.featureVcfData.features.push($.extend({}, variant));
+        });
+      }
+
+      // Sort the matrix columns
+      me.filteredMatrixRows = me.filteredMatrixRows.sort(function(a, b) {
+        if (a.order == b.order) {
+          return 0;
+        } else if (a.order < b.order) {
+          return -1;
         } else {
-          rawValue = variant[matrixRow.attribute];
+          return 1;
         }
-        var theValue    = null;
-        var mappedValue = null;
-        var mappedClazz = null;
-        var symbolFunction = null;
-        var clickFunction = matrixRow.clickFunction;
-        // Don't fill in clinvar for now
-        if (matrixRow.attribute == 'clinvar') {
-          rawValue = 'N';
-        }
-        if (rawValue != null && (me.isNumeric(rawValue) || rawValue != "")) {
-          if (matrixRow.match == 'field') {
-            if (matrixRow.formatFunction) {
-              theValue = matrixRow.formatFunction.call(me, variant, rawValue);
-            } else {
-              theValue = rawValue;
-            }
-            mappedClazz = matrixRow.attribute;
-            if (matrixRow.rankFunction) {
-              mappedValue = matrixRow.rankFunction.call(me, variant, rawValue);
-            } else {
-              mappedValue = theValue;
-            }
-            symbolFunction = matrixRow.symbolFunction ? matrixRow.symbolFunction : me.showTextSymbol;
+      });
 
-          } else if (matrixRow.match == 'exact') {
-            // We are going to get the mapped value through exact match,
-            // so this will involve a simple associative array lookup.
-            // Some features (like impact) are multi-value and are stored in a
-            // an associative array.  In this case, we loop through the feature
-            // values, keeping the lowest (more important) mapped value.
-            if (me.isDictionary(rawValue)) {
-              // Iterate through the objects in the associative array.
-              // Keep the lowest mapped value
-              if (Object.keys(rawValue).length > 0) {
-                for (val in rawValue) {
-                  var entry = matrixRow.map[val];
+
+
+      // Fill all features used in feature matrix for each variant
+      me.featureVcfData.features.forEach( function(variant) {
+        var features = [];
+        for (var i = 0; i < me.filteredMatrixRows.length; i++) {
+          features.push(null);
+        }
+
+        me.filteredMatrixRows.forEach( function(matrixRow) {
+          var rawValue = null;
+          if (matrixRow.attribute instanceof Array) {
+            rawValue = genericAnnotation.getValue(variant, matrixRow.attribute);
+          } else {
+            rawValue = variant[matrixRow.attribute];
+          }
+          var theValue    = null;
+          var mappedValue = null;
+          var mappedClazz = null;
+          var symbolFunction = null;
+          var clickFunction = matrixRow.clickFunction;
+          // Don't fill in clinvar for now
+          if (matrixRow.attribute == 'clinvar') {
+            rawValue = 'N';
+          }
+          if (rawValue != null && (me.isNumeric(rawValue) || rawValue != "")) {
+            if (matrixRow.match == 'field') {
+              if (matrixRow.formatFunction) {
+                theValue = matrixRow.formatFunction.call(me, variant, rawValue);
+              } else {
+                theValue = rawValue;
+              }
+              mappedClazz = matrixRow.attribute;
+              if (matrixRow.rankFunction) {
+                mappedValue = matrixRow.rankFunction.call(me, variant, rawValue);
+              } else {
+                mappedValue = theValue;
+              }
+              symbolFunction = matrixRow.symbolFunction ? matrixRow.symbolFunction : me.showTextSymbol;
+
+            } else if (matrixRow.match == 'exact') {
+              // We are going to get the mapped value through exact match,
+              // so this will involve a simple associative array lookup.
+              // Some features (like impact) are multi-value and are stored in a
+              // an associative array.  In this case, we loop through the feature
+              // values, keeping the lowest (more important) mapped value.
+              if (me.isDictionary(rawValue)) {
+                // Iterate through the objects in the associative array.
+                // Keep the lowest mapped value
+                if (Object.keys(rawValue).length > 0) {
+                  for (val in rawValue) {
+                    var entry = matrixRow.map[val];
+                    if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
+                      mappedValue = entry.value;
+                      mappedClazz = entry.clazz;
+                      symbolFunction = entry.symbolFunction;
+                      theValue = val;
+                    }
+                  }
+                } else {
+                  var entry = matrixRow.map.none;
                   if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
                     mappedValue = entry.value;
                     mappedClazz = entry.clazz;
                     symbolFunction = entry.symbolFunction;
-                    theValue = val;
+                    theValue = '';
                   }
                 }
               } else {
-                var entry = matrixRow.map.none;
-                if (entry != null && entry.symbolFunction && (mappedValue == null || entry.value < mappedValue)) {
-                  mappedValue = entry.value;
-                  mappedClazz = entry.clazz;
-                  symbolFunction = entry.symbolFunction;
-                  theValue = '';
+                if (matrixRow.map.hasOwnProperty(rawValue)) {
+                  mappedValue = matrixRow.map[rawValue].value;
+                  mappedClazz = matrixRow.map[rawValue].clazz;
+                  symbolFunction = matrixRow.map[rawValue].symbolFunction;
+                  theValue = rawValue;
+                } else {
+                  console.log("No matrix value to map to " + rawValue + " for " + matrixRow.attribute);
                 }
-              }
-            } else {
-              if (matrixRow.map.hasOwnProperty(rawValue)) {
-                mappedValue = matrixRow.map[rawValue].value;
-                mappedClazz = matrixRow.map[rawValue].clazz;
-                symbolFunction = matrixRow.map[rawValue].symbolFunction;
-                theValue = rawValue;
-              } else {
-                console.log("No matrix value to map to " + rawValue + " for " + matrixRow.attribute);
-              }
 
-            }
-          } else if (matrixRow.match == 'range') {
-            // If this feature is a range, get the mapped value be testing if the
-            // value is within a min-max range.
-            if (me.isNumeric(rawValue)) {
-              theValue = d3.format(",.3%")(+rawValue);
-              var lowestValue = 9999;
-              matrixRow.map.forEach( function(rangeEntry) {
-                if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
-                  if (rangeEntry.value < lowestValue) {
-                    lowestValue = rangeEntry.value;
-                    mappedValue = rangeEntry.value;
-                    mappedClazz = rangeEntry.clazz;
-                    symbolFunction = rangeEntry.symbolFunction;
+              }
+            } else if (matrixRow.match == 'range') {
+              // If this feature is a range, get the mapped value be testing if the
+              // value is within a min-max range.
+              if (me.isNumeric(rawValue)) {
+                theValue = d3.format(",.3%")(+rawValue);
+                var lowestValue = 9999;
+                matrixRow.map.forEach( function(rangeEntry) {
+                  if (+rawValue > rangeEntry.min && +rawValue <= rangeEntry.max) {
+                    if (rangeEntry.value < lowestValue) {
+                      lowestValue = rangeEntry.value;
+                      mappedValue = rangeEntry.value;
+                      mappedClazz = rangeEntry.clazz;
+                      symbolFunction = rangeEntry.symbolFunction;
+                    }
                   }
-                }
-              });
+                });
+              }
             }
+
+          } else {
+            rawValue = '';
+            mappedClazz = '';
           }
+          features[matrixRow.order] = {
+                                'value': theValue,
+                                'rank': (mappedValue ? mappedValue : me.featureUnknown),
+                                'clazz': mappedClazz,
+                                'symbolFunction': symbolFunction,
+                                'clickFunction': clickFunction
+                              };
+        });
 
+        variant.features = features;
+      });
+      // Sort the variants by the criteria that matches
+      var sortedFeatures = me.featureVcfData.features.sort(function (a, b) {
+        var featuresA = "";
+        var featuresB = "";
+
+        // The features have been initialized in the same order as
+        // the matrix column order. In each interation,
+        // exit with -1 or 1 if we have non-matching values;
+        // otherwise, go to next iteration.  After iterating
+        // through every column, if we haven't exited the
+        // loop, that means all features of a and b match
+        // so return 0;
+        for (var i = 0; i < me.filteredMatrixRows.length; i++) {
+          if (a.features[i] == null) {
+            return 1;
+          } else if (b.features[i] == null) {
+            return -1;
+          } else if (a.features[i].rank > 99  && b.features[i].rank > 99) {
+            // In this case, we don't consider the rank and will look at the next feature for ordering
+          } else if (a.features[i].rank > 99) {
+            return 1;
+          } else if (b.features[i].rank > 99) {
+            return -1;
+          } else if (a.features[i].rank < b.features[i].rank) {
+            return -1;
+          } else if (a.features[i].rank > b.features[i].rank) {
+          return 1;
         } else {
-          rawValue = '';
-          mappedClazz = '';
         }
-        features[matrixRow.order] = {
-                              'value': theValue,
-                              'rank': (mappedValue ? mappedValue : me.featureUnknown),
-                              'clazz': mappedClazz,
-                              'symbolFunction': symbolFunction,
-                              'clickFunction': clickFunction
-                            };
+        }
+        return 0;
       });
 
-      variant.features = features;
-    });
-    // Sort the variants by the criteria that matches
-    var sortedFeatures = me.featureVcfData.features.sort(function (a, b) {
-      var featuresA = "";
-      var featuresB = "";
+      $("#feature-matrix").removeClass("hide");
+      $("#feature-matrix-note").removeClass("hide");
+      $('#move-rows').removeClass("hide");
+      //$("#matrix-panel .loader").addClass("hide");
 
-      // The features have been initialized in the same order as
-      // the matrix column order. In each interation,
-      // exit with -1 or 1 if we have non-matching values;
-      // otherwise, go to next iteration.  After iterating
-      // through every column, if we haven't exited the
-      // loop, that means all features of a and b match
-      // so return 0;
-      for (var i = 0; i < me.filteredMatrixRows.length; i++) {
-        if (a.features[i] == null) {
-          return 1;
-        } else if (b.features[i] == null) {
-          return -1;
-        } else if (a.features[i].rank > 99  && b.features[i].rank > 99) {
-          // In this case, we don't consider the rank and will look at the next feature for ordering
-        } else if (a.features[i].rank > 99) {
-          return 1;
-        } else if (b.features[i].rank > 99) {
-          return -1;
-        } else if (a.features[i].rank < b.features[i].rank) {
-          return -1;
-        } else if (a.features[i].rank > b.features[i].rank) {
-        return 1;
-      } else {
-      }
-      }
-      return 0;
-    });
-
-    $("#feature-matrix").removeClass("hide");
-    $("#feature-matrix-note").removeClass("hide");
-    $('#move-rows').removeClass("hide");
-    //$("#matrix-panel .loader").addClass("hide");
-
-    // Load the chart with the new data
-    me.featureMatrix.matrixRows(me.filteredMatrixRows);
-    var selection = d3.select("#feature-matrix").data([sortedFeatures]);
+      // Load the chart with the new data
+      me.featureMatrix.matrixRows(me.filteredMatrixRows);
+      var selection = d3.select("#feature-matrix").data([sortedFeatures]);
 
 
 
 
 
-    me.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
+      me.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
 
-    getProbandVariantCard().model.promiseGetVcfData(window.gene, window.selectedTranscript)
-     .then(function(data) {
-      var unfilteredVcfData = data.vcfData;
-      if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
-        $('#zero-variants').addClass("zero-filtered-variants");
-        $('#zero-variants').text("No variants passed the filter" );
-        $('#zero-variants').removeClass("hide");
-        $('#matrix-panel').addClass("hide");
-      } else if (sortedFeatures.length == 0 ) {
-        $('#zero-variants').removeClass("zero-filtered-variants");
-        $('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
-        $('#zero-variants').removeClass("hide");
-        $('#matrix-panel').addClass("hide");
-      } else {
-        $('#zero-variants').text("");
-        $('#zero-variants').addClass("hide");
-        $('#matrix-panel').removeClass("hide");
-      }
+      getProbandVariantCard().model.promiseGetVcfData(window.gene, window.selectedTranscript)
+      .then(function(data) {
+        var unfilteredVcfData = data.vcfData;
+        if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
+          $('#zero-variants').addClass("zero-filtered-variants");
+          $('#zero-variants').text("No variants passed the filter" );
+          $('#zero-variants').removeClass("hide");
+          $('#matrix-panel').addClass("hide");
+        } else if (sortedFeatures.length == 0 ) {
+          $('#zero-variants').removeClass("zero-filtered-variants");
+          $('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
+          $('#zero-variants').removeClass("hide");
+          $('#matrix-panel').addClass("hide");
+        } else {
+          $('#zero-variants').text("");
+          $('#zero-variants').addClass("hide");
+          $('#matrix-panel').removeClass("hide");
+        }
+
+        resolve();
+      })
+
      })
 
-   })
+  })
 
 
 }

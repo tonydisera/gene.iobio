@@ -1039,18 +1039,23 @@ VariantCard.prototype._fillBamChart = function(data, regionStart, regionEnd, max
 *  vep, clinvar, coverage (from alignments), and inheritance (for trio).
 *
 */
-VariantCard.prototype.showFinalizedVariants = function() {
+VariantCard.prototype.promiseShowFinalizedVariants = function() {
   var me = this;
-  me.endVariantProgress();
 
-  me._showVariants(regionStart, regionEnd, null, false);
+  return new Promise(function(resolve, reject) {
+    me.endVariantProgress();
 
-  if (me.model.getRelationship() == 'proband') {
-    if (me.model.isVcfReadyToLoad() || me.model.isLoaded()) {
-      me.fillFeatureMatrix(regionStart, regionEnd);
+    me._showVariants(regionStart, regionEnd, null, false);
+
+    if (me.model.getRelationship() == 'proband' && (me.model.isVcfReadyToLoad() || me.model.isLoaded() || isAlignmentsOnly())) {
+      me.promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
+        resolve();
+      })
+    } else {
+      resolve();
     }
 
-  }
+  })
 
 }
 
@@ -1325,7 +1330,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
                 if (getProbandVariantCard().isLoaded()) {
                   $("#matrix-panel .loader").addClass("hide");
-                getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+                  getProbandVariantCard().promiseFillFeatureMatrix(regionStart, regionEnd);
                 }
             }
 
@@ -1439,42 +1444,45 @@ VariantCard.prototype._displayRefNotFoundWarning = function() {
 }
 
 
-VariantCard.prototype.fillFeatureMatrix = function(regionStart, regionEnd) {
+VariantCard.prototype.promiseFillFeatureMatrix = function(regionStart, regionEnd) {
   var me = this;
 
-  // Don't show the feature matrix (rank card) if there are no variants for the proband
-  this.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-   .then(function(data) {
-    var theVcfData = data.vcfData;
+  return new Promise(function(resolve, reject) {
+    // Don't show the feature matrix (rank card) if there are no variants for the proband
+    me.model.promiseGetVcfData(window.gene, window.selectedTranscript).then(function(data) {
+      var theVcfData = data.vcfData;
 
-    // If only alignments provided, only show feature matrix if variants have been called.
-    if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
-      if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
-        $('#matrix-track').addClass("hide");
-        me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
+      // If only alignments provided, only show feature matrix if variants have been called.
+      if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
+        if (!theVcfData || !theVcfData.loadState || !theVcfData.loadState['called']) {
+          $('#matrix-track').addClass("hide");
+          me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
           me.cardSelector.find("#vcf-variant-count").text("");
-        return;
+          resolve();
+        }
       }
-    }
 
 
-    $('#filter-and-rank-card').removeClass("hide");
+      $('#filter-and-rank-card').removeClass("hide");
       $('#matrix-track').removeClass("hide");
-    if (firstTimeShowVariants) {
-      firstTimeShowVariants = false;
-    }
+      if (firstTimeShowVariants) {
+        firstTimeShowVariants = false;
+      }
 
-    // Show called variants
-    me.promiseFilterAndShowCalledVariants();
+      // Show called variants
+      me.promiseFilterAndShowCalledVariants().then(function() {
+        // Show feature matrix
+        me._promiseFilterVariants().then(function(filteredVcfData) {
+          window.matrixCard.promiseFillFeatureMatrix(filteredVcfData).then(function() {
+            resolve();
+          })
+        });
 
-    // Show feature matrix
-    me._promiseFilterVariants()
-     .then(function(filteredVcfData) {
-      window.matrixCard.fillFeatureMatrix(filteredVcfData);
-     });
-   })
+      })
 
+    })
 
+  })
 }
 
 VariantCard.prototype.sortFeatureMatrix = function() {
@@ -1627,29 +1635,36 @@ VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) 
 
       // If this is the proband card, refresh the feature matrix to
       // show union of vcf variants and called variants
+      var promise = null;
       if (me.getRelationship() == 'proband') {
-        me.fillFeatureMatrix(regionStart, regionEnd);
+        promise = me.promiseFillFeatureMatrix(regionStart, regionEnd);
+      } else {
+        promise = new Promise(function(resolve, reject) {
+          resolve();
+        })
       }
 
-      // Show gene badges
-      if (me.getRelationship() == 'proband') {
-        genesCard.refreshCurrentGeneBadge();
-      }
-
-      // Enable inheritance filters
-      me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-       .then(function(data) {
-        var theVcfData = data.vcfData;
-        filterCard.enableInheritanceFilters(theVcfData);
-
-        // Enable the clinvar filter
-        filterCard.enableClinvarFilters(theVcfData);
-
-        if (callback) {
-          callback();
+      promise.then(function() {
+        // Show gene badges
+        if (me.getRelationship() == 'proband') {
+          genesCard.refreshCurrentGeneBadge();
         }
 
-       })
+        // Enable inheritance filters
+        me.model.promiseGetVcfData(window.gene, window.selectedTranscript).then(function(data) {
+          var theVcfData = data.vcfData;
+          filterCard.enableInheritanceFilters(theVcfData);
+
+          // Enable the clinvar filter
+          filterCard.enableClinvarFilters(theVcfData);
+
+          if (callback) {
+            callback();
+          }
+
+        })
+
+      })
 
 
     }, function(error) {

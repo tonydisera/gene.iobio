@@ -650,12 +650,15 @@ function init() {
           // Wait until all variant cards have finished with onBrush,
           // then fill feature matrix and circle variants.
           if (cardCount == getRelevantVariantCards().length) {
-            getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+            getProbandVariantCard().promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
+
               if (clickedVariant && clickedVariantCard) {
-              clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
-              window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
-              showCoordinateFrame(clickedVariant.screenX)
-            }
+                clickedVariantCard.showCoverageCircle(clickedVariant, clickedVariantCard);
+                window.showCircleRelatedVariants(clickedVariant, clickedVariantCard);
+                showCoordinateFrame(clickedVariant.screenX)
+              }
+
+            })
           }
           });
 
@@ -3023,10 +3026,11 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
           getRelevantVariantCards().forEach(function(vc) {
             // The inheritance has been determined for the trio, so now
             // show the variants and the feature matrix
-            vc.showFinalizedVariants();
-            if (vc.getRelationship() == 'proband' && callback) {
-              callback();
-            }
+            vc.promiseShowFinalizedVariants().then(function() {
+              if (vc.getRelationship() == 'proband' && callback) {
+                callback();
+              }
+            })
           })
         });
 
@@ -3419,18 +3423,20 @@ function jointCallVariantsImpl(checkCache, callback) {
 
       });
 
-      getProbandVariantCard().fillFeatureMatrix(regionStart, regionEnd);
+      getProbandVariantCard().promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
+        // Cache the updated the danger summary now that called variants are merged into
+        // variant set
+        cacheHelper.processCachedTrio(window.gene, window.selectedTranscript, true, false, function() {
+          cacheHelper.showAnalyzeAllProgress();
 
-      // Cache the updated the danger summary now that called variants are merged into
-      // variant set
-      cacheHelper.processCachedTrio(window.gene, window.selectedTranscript, true, false, function() {
-        cacheHelper.showAnalyzeAllProgress();
+          if (callback) {
+            callback();
+          }
 
-        if (callback) {
-          callback();
-        }
+        });
 
-      });
+      })
+
 
 
 
@@ -4208,7 +4214,7 @@ function filterVariantsImpl() {
          .then(function() {
             variantCard.promiseFilterAndShowCalledVariants();
             if (variantCard.getRelationship() == 'proband') {
-              variantCard.fillFeatureMatrix(regionStart, regionEnd);
+              variantCard.promiseFillFeatureMatrix(regionStart, regionEnd);
             }
          })
 
