@@ -3305,13 +3305,13 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
     // Figure out max level (lost for some reason)
     var maxLevel = 1;
     theVcfData.features.forEach(function(feature) {
-      if (feature.level > maxLevel) {
-        maxLevel = feature.level;
-      }
-    });
-    theVcfData.maxLevel = maxLevel;
+    if (feature.level > maxLevel) {
+      maxLevel = feature.level;
+    }
+  });
+  theVcfData.maxLevel = maxLevel;
 
-    pileupObject = me._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
+  pileupObject = me._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
   theFbData.maxLevel = pileupObject.maxLevel + 1;
   theFbData.featureWidth = pileupObject.featureWidth;
 
