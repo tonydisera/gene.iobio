@@ -768,7 +768,7 @@ VariantModel.prototype.setCalledVariants = function(theFbData, cache=false) {
 VariantModel.prototype.promiseGetCalledVariantCount = function() {
   var me = this;
   return new Promise(function(resolve, reject) {
-    me.promiseGetFbData(window.gene, window.selectedTranscript)
+    me.promiseGetFbData(window.gene, window.selectedTranscript, true)
      .then(function(data) {
       var theFbData = data.fbData;
       if (theFbData && theFbData.features ) {

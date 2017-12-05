@@ -2935,14 +2935,20 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 
 
       if (isAlignmentsOnly() && autocall) {
-        // Only alignment files are loaded and user, when prompted, responded
-        // that variants should be autocalled when gene is selected.
-        // First perform joint calling, then load the bam data (for coverage)
-        // for each sample.
-        var callPromise = promiseJointCallVariants(true).then(function() {
-          showNavVariantLinks();
+
+        promiseHasCalledVariants().then(function(hasCalledVariants) {
+          // Only alignment files are loaded and user, when prompted, responded
+          // that variants should be autocalled when gene is selected.
+          // First perform joint calling, then load the bam data (for coverage)
+          // for each sample.
+          if (!hasCalledVariants) {
+            var callPromise = promiseJointCallVariants(true).then(function() {
+              showNavVariantLinks();
+            })
+            variantPromises.push(callPromise);
+          }
+
         })
-        variantPromises.push(callPromise);
 
       } else if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
         // We have a multi-sample vcf, so we only need to retrieve the vcf records once for
@@ -3583,7 +3589,7 @@ function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback)
               // So initialize the vcfData to 0 features.
               var promise = null;
               if (vc.model.isAlignmentsOnly()) {
-                promise = vc.model.cacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
+                promise = vc.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
               } else {
                 promise = new Promise(function(resolve, reject) {
                   resolve();

@@ -1690,17 +1690,15 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
       if (hasCalledVariants) {
         me.cardSelector.find('.fbloader').addClass("hide");
 
-        me.model.promiseGetFbData(window.gene, window.selectedTranscript)
-         .then(function(data) {
+        me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
+        .then(function(data) {
           var theFbData = data.fbData;
           me._promiseFilterVariants(theFbData, me.fbChart)
-           .then(function(filteredFBData) {
+          .then(function(filteredFBData) {
 
             // Only show the 'displayed variant' count if a variant filter is turned on.  Test for
             // this by checking if the number filter flags exceed those that are hidden
-            if (me.cardSelector.find(".filter-flag").length > me.cardSelector.find(".filter-flag.hide").length
-              || me.cardSelector.find("#region-flag").length > me.cardSelector.find("#region-flag.hide").length
-              || me.cardSelector.find("#recfilter-flag").length > me.cardSelector.find("#recfilter-flag.hide").length) {
+            if (filterCard.hasFilters() || filterCard.hasCardSpecificFilters(me.getRelationship())) {
               me.cardSelector.find('#displayed-called-variant-count-label').removeClass("hide");
               me.cardSelector.find('#displayed-called-variant-count').removeClass("hide");
               me.cardSelector.find('#displayed-called-variant-count').text(filteredFBData.features.length);
@@ -1710,14 +1708,14 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
               me.cardSelector.find('#displayed-called-variant-count').text("");
             }
             me._fillFreebayesChart(filteredFBData,
-                           regionStart ? regionStart : window.gene.start,
-                         regionEnd ? regionEnd : window.gene.end);
+              regionStart ? regionStart : window.gene.start,
+              regionEnd ? regionEnd : window.gene.end);
 
             resolve(filteredFBData);
 
-           })
+          })
 
-         })
+        })
       }  else {
         resolve(null);
       }
