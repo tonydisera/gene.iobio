@@ -1717,15 +1717,14 @@ CacheHelper.prototype.promiseGetData = function(key, decompressIt=true) {
     if (CacheHelper.useLocalStorage()) {
       if (localStorage) {
             var dataCompressed = localStorage.getItem(key);
-            CacheHelper.promiseDecompressData(dataCompressed, decompressIt)
-             .then(function(data) {
+            CacheHelper.promiseDecompressData(dataCompressed, decompressIt).then(function(data) {
               resolve(data);
-             },
-             function(error) {
-          var errorMsg = "an error occurred when uncompressing data for key " + key;
-          console.log(errorMsg);
-          reject(errorMsg);
-             });
+            },
+            function(error) {
+              var errorMsg = "an error occurred when uncompressing data for key " + key;
+              console.log(errorMsg);
+              reject(errorMsg);
+            });
         }
     } else if (CacheHelper.useIndexedDB()) {
       var keyObject = CacheHelper._parseCacheKey(key);
@@ -1863,28 +1862,28 @@ CacheHelper.prototype.promiseGetAllKeys = function() {
 
 }
 
-CacheHelper.prototype.logCacheContents = function(filterObject) {
+CacheHelper.prototype.logCacheContents = function(filterObject, showData=false) {
   var me = this;
   me.promiseGetKeys()
    .then(function(keys) {
-    me._logCacheContents(keys, filterObject);
+    me._logCacheContents(keys, filterObject, showData);
    });
 }
 
-CacheHelper.prototype.logAllCacheContents = function(filterObject) {
+CacheHelper.prototype.logAllCacheContents = function(filterObject, showData=false) {
   var me = this;
   me.promiseGetAllKeys()
    .then(function(allKeys) {
-    me._logCacheContents(allKeys, filterObject);
+    me._logCacheContents(allKeys, filterObject, showData);
    });
 }
 
 
-CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
+CacheHelper.prototype._logCacheContents = function(keys, filterObject, showData=false) {
   var me = this;
 
   var itemSize = 0;
-  var lines = [];
+  var recs = [];
   var totalKb = 0;
 
   var promises = [];
@@ -1915,15 +1914,24 @@ CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
     }
     if (keep) {
       var p = me.promiseGetData(key, false)
-       .then(function(data) {
+       .then(function(dataCompressed) {
 
-        if (data) {
-          var dataSize = data.length + key.length;
+        if (dataCompressed) {
+
+          var dataSize = dataCompressed.length + key.length;
           itemSize =  (dataSize/1024);
           totalKb += itemSize;
-          lines.push(key + " = " +  itemSize.toFixed(2) + " KB");
+
+          var rec = {'key': key, 'size': itemSize.toFixed(2) + " KB"};
+          if (showData) {
+            CacheHelper.promiseDecompressData(dataCompressed, true).then(function(data) {
+              rec.data = data;
+            });
+          }
+
+          recs.push(rec);
         } else {
-          lines.push(key + " = " + " 0KB");
+          recs.push({'key': key, 'size': '0 KB'});
         }
        })
        promises.push(p);
@@ -1932,12 +1940,20 @@ CacheHelper.prototype._logCacheContents = function(keys, filterObject) {
 
   })
   Promise.all(promises).then(function() {
+    recs.forEach(function(rec) {
+      if (showData) {
+        console.log(rec.key);
+        console.log(rec.data);
+      } else {
+        console.log(rec.key + "=" + rec.size);
+      }
+
+    });
     if (totalKb > 1024){
-      lines.unshift("Total = " + (totalKb/1024).toFixed(2)+ " MB");
+      console.log("Total = " + (totalKb/1024).toFixed(2)+ " MB");
     } else {
-      lines.unshift("Total = " + totalKb.toFixed(2)+ " KB");
+      console.log("Total = " + totalKb.toFixed(2)+ " KB");
     }
-    console.log(lines.join("\n"));
   });
 }
 
