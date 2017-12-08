@@ -156,36 +156,29 @@ var effectCategories = [
 
       var buffer = "";
       var success = false;
-      var args = ['-H', '"'+vcfURL+'"'];
-      if (tbiUrl) {
-        args.push('"'+tbiUrl+'"');
-      }
-      var cmd = new iobio.cmd(
-            IOBIO.tabix,
-            args,
-            {ssl: useSSL}
-        );
 
-        cmd.on('data', function(data) {
-          if (data != undefined) {
-            success = true;
-            buffer += data;
-          }
-        });
+      var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
 
-        cmd.on('end', function() {
-          if (success == null) {
-            success = true;
-          }
-          if (success && buffer.length > 0) {
-            callback(buffer);
-          }
-        });
+      cmd.on('data', function(data) {
+        if (data != undefined) {
+          success = true;
+          buffer += data;
+        }
+      });
 
-        cmd.on('error', function(error) {
-          console.log(error);
-        })
-        cmd.run();
+      cmd.on('end', function() {
+        if (success == null) {
+          success = true;
+        }
+        if (success && buffer.length > 0) {
+          callback(buffer);
+        }
+      });
+
+      cmd.on('error', function(error) {
+        console.log(error);
+      })
+      cmd.run();
 
     } else if (vcfFile) {
         var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
@@ -206,15 +199,7 @@ var effectCategories = [
     var buffer = "";
     var recordCount = 0;
 
-    var args = ['-H', '"'+url+'"'];
-    if (tbiUrl) {
-      args.push('"'+tbiUrl+'"');
-    }
-    var cmd = new iobio.cmd(
-        IOBIO.tabix,
-        args,
-        {ssl: useSSL}
-    );
+    var cmd = endpoint.getVcfHeader(url, tbiUrl);
 
     cmd.on('data', function(data) {
       if (data != undefined) {
@@ -473,18 +458,7 @@ var effectCategories = [
     var buffer = "";
     var refName;
 
-    var args = ['-i'];
-    if (tbiUrl) {
-      args.push('"'+tbiUrl+'"');
-    } else {
-      args.push('"'+vcfURL + '.tbi'+'"');
-    }
-
-    var cmd = new iobio.cmd(
-        IOBIO.vcfReadDepther,
-        args,
-        {ssl: useSSL}
-    );
+    var cmd = endpoint.getVcfDepth(vcfURL, tbiUrl)
 
     cmd.on('data', function(data) {
 
@@ -709,106 +683,19 @@ var effectCategories = [
 
   }
 
-  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, cache, callback, errorCallback) {
+  exports._getRemoteVariantsImpl = function(refName, geneObject, selectedTranscript, regions, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, clinvarMap, isRefSeq, hgvsNotation, getRsId, vepAF, useServerCache, callback, errorCallback) {
 
     var me = this;
 
-    // Figure out the file location of the reference seq files
-    var regionParm = null;
-    if (regions && regions.length > 0) {
-      regionParm = "";
-      regions.forEach(function(region) {
-        regionParm += " ";
-        regionParm += region.name + ":" + region.start + "-" + region.end;
-      })
-    } else {
-      regionParm = ' ' + refName + ":" + geneObject.start + "-" + geneObject.end;
 
-    }
-    var refFastaFile = genomeBuildHelper.getFastaPath(refName);
-
-
-    var contigStr = "";
-    getHumanRefNames(refName).split(" ").forEach(function(ref) {
-        contigStr += "##contig=<ID=" + ref + ">\n";
-    })
-    var contigNameFile = new Blob([contigStr])
-
-    // Create an iobio command get get the variants and add any header recs.
-    var args = ['-h', '"'+vcfURL+'"', regionParm];
-    if (tbiUrl) {
-      args.push('"'+tbiUrl+'"');
-    }
-    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
-      .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
-
-
-    if (vcfSampleNames && vcfSampleNames.length > 0) {
-      var sampleNameFile = new Blob([vcfSampleNames.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ["subset", "-s", sampleNameFile, '-'], {ssl: useSSL})
+    if (regions == null || regions.length == 0) {
+      regions = [];
+      regions.push({'name': refName, 'start': geneObject.start, 'end': geneObject.end});
     }
 
-    // normalize variants
-    cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
+    var serverCacheKey = me._getServerCacheKey(vcfURL, annotationEngine, refName, geneObject, vcfSampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
 
-    // if af not retreived from vep, get allele frequencies from 1000G and ExAC in af service
-    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL});
-
-    // Skip snpEff if RefSeq transcript set or we are just annotating with the vep engine
-    if (annotationEngine == 'none') {
-      // skip annotation if annotationEngine set to  'none'
-
-
-    } else if (isRefSeq || annotationEngine == 'vep') {
-      // VEP
-      var vepArgs = [];
-      vepArgs.push(" --assembly");
-      vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-      vepArgs.push(" --format vcf");
-      vepArgs.push(" --allele_number");
-      if (vepAF) {
-        vepArgs.push("--af");
-        vepArgs.push("--af_gnomad");
-        vepArgs.push("--af_esp");
-        vepArgs.push("--af_1kg");
-        vepArgs.push("--max_af");
-      }
-      if (isRefSeq) {
-        vepArgs.push("--refseq");
-      }
-      // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-      // since we won't have the original vcf records as input
-      if (hgvsNotation) {
-        vepArgs.push("--hgvs");
-      }
-      if (getRsId) {
-        vepArgs.push("--check_existing");
-      }
-      if (hgvsNotation || getRsId || isRefSeq) {
-        vepArgs.push("--fasta");
-        vepArgs.push(refFastaFile);
-      }
-
-      //
-      //  SERVER SIDE CACHING
-      //
-      var cacheKey = null;
-      var urlParameters = {};
-      if (cache) {
-          cacheKey = me._getCacheKey(annotationEngine, refName, geneObject, vcfSampleNames, {refseq: isRefSeq, hgvs: hgvsNotation, rsid: getRsId});
-          console.log(cacheKey);
-          urlParameters.cache = cacheKey;
-          urlParameters.partialCache = true;
-          cmd = cmd.pipe("nv-dev-new.iobio.io/vep/", vepArgs, {ssl: useSSL, urlparams: urlParameters});
-      } else {
-          cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL, urlparams: urlParameters});
-      }
-
-    } else if (annotationEngine == 'snpeff') {
-        cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
-    }
-
-
+    var cmd = endpoint.annotateVariants({'vcfUrl': vcfURL, 'tbiUrl': tbiUrl}, refName, regions, vcfSampleNames, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, useServerCache, serverCacheKey);
 
 
     var annotatedData = "";
@@ -891,23 +778,9 @@ var effectCategories = [
     });
   }
 
-  exports._getKnownVariantsImpl = function(refName, geneObject, transcript, binLength, callback) {
+  exports._getExonRegions = function(transcript) {
 
-    var me = this;
-
-    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
-
-    // For the knownVariants service, pass in an argument for the gene region, then pass in eith
-    // the length of the bin region or a comma separate string of region parts (e.g. the exons)
-    var knownVariantsArgs = [];
-    knownVariantsArgs.push("-r");
-    knownVariantsArgs.push(regionParm);
-    if (binLength) {
-      knownVariantsArgs.push("-b");
-      knownVariantsArgs.push(binLength);
-    } else if (transcript) {
-      var regionParts = "";
-      transcript.features
+    return transcript.features
       .filter( function(feature) {
         return feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR';
       })
@@ -920,27 +793,18 @@ var effectCategories = [
           return 0;
         }
       })
-      .forEach( function(exon) {
-        if (regionParts.length > 0) {
-          regionParts += ",";
-        }
-        regionParts += exon.start + "-" + exon.end;
+      .map( function(exon) {
+        return {start: exon.start, end: exon.end};
       })
-      if (regionParts.length > 0) {
-        knownVariantsArgs.push("-p");
-        knownVariantsArgs.push(regionParts);
-      }
-    }
-    knownVariantsArgs.push("-");
+  }
 
+  exports._getKnownVariantsImpl = function(refName, geneObject, transcript, binLength, callback) {
 
-    // Create an iobio command get get the variants and add any header recs.
+    var me = this;
+
     var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
-    var tabixArgs = ['-h', clinvarUrl, regionParm];
 
-    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL})
-                       .pipe(IOBIO.knownvariants, knownVariantsArgs, {ssl: false})
-
+    var cmd = endpoint.getClinvarCountsForGene(clinvarUrl, refName, geneObject, binLength, (binLength == null ? me._getExonRegions(transcript) : null));
 
     var summaryData = "";
     // Get the results from the iobio command
@@ -992,24 +856,6 @@ var effectCategories = [
   }
 
 
-  exports._getCacheKey = function(service, refName, geneObject, sampleName, miscObject) {
-    var key =  "backend.gene.iobio"
-      + "-" + cacheHelper.launchTimestamp
-      + "-" + (vcfURL ? vcfURL : (vcfFile ? vcfFile.name : ""))
-      + "-" + service
-      + "-" + refName
-      + "-" + geneObject.start.toString()
-      + "-" + geneObject.end.toString()
-      + "-" + geneObject.strand
-      + "-" + sampleName;
-
-    if (miscObject) {
-      for (miscKey in miscObject) {
-        key += "-" + miscKey + "=" + miscObject[miscKey];
-      }
-    }
-    return key;
-  }
 
   exports.clearVepInfoFields = function() {
     this.infoFields.VEP = null;
@@ -1086,14 +932,7 @@ var effectCategories = [
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
 
-    var args = ['-h', '"'+vcfURL+'"', '1:1-1'];
-    if (tbiUrl) {
-      args.push('"'+tbiUrl+'"');
-    }
-    var cmd = new iobio.cmd(
-        IOBIO.tabix,
-        args,
-        {ssl: useSSL});
+    var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
 
 
     var headerData = "";
@@ -1114,77 +953,6 @@ var effectCategories = [
                 callback(sampleNames);
               }
          });
-
-    });
-
-    cmd.on('error', function(error) {
-      console.log(error);
-    });
-
-    cmd.run();
-
-  }
-
-
-
-  exports._getVariantCount = function(ref, start, end, sampleName, callback) {
-    var me = this;
-
-    var region = ref + ":" + start + "-" + end;
-
-    var contigStr = "";
-    getHumanRefNames(refName).split(" ").forEach(function(ref) {
-        contigStr += "##contig=<ID=" + ref + ">\n";
-    })
-    var contigNameFile = new Blob([contigStr])
-
-    var args = ['-h', '"'+vcfURL+'"', region];
-    if (tbiUrl) {
-      args.push(tbiUrl);
-    }
-    var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL});
-
-    cmd  = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
-
-    if (sampleName != null && sampleName != "") {
-      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
-    }
-
-    cmd = cmd.pipe(IOBIO.bcftools, ['stats'], {ssl: useSSL});
-
-
-    var statsData = "";
-    // Use Results
-    cmd.on('data', function(data) {
-         if (data == undefined) {
-            return;
-         }
-         statsData += data;
-    });
-
-    cmd.on('end', function(data) {
-
-        var recs = statsData.split("\n");
-        var startIdx = null;
-        for(var i =0; i < recs.length && startIdx == null; i++) {
-          if (recs[i].indexOf("# SN, Summary numbers:") == 0) {
-            startIdx = i + 2;
-          }
-        };
-
-        var numRecs = null;
-        if (startIdx) {
-          for (var i = startIdx; i < recs.length && numRecs == null; i++) {
-            var fields = recs[i].split("\t");
-            if (fields.length > 3 && fields[2] == 'number of records:') {
-              numRecs = +fields[3];
-            }
-          }
-        }
-        if (callback) {
-          callback(numRecs);
-        }
 
     });
 
@@ -1341,6 +1109,30 @@ var effectCategories = [
     });
   }
 
+  exports._getClinvarVariantRegions = function(refName, geneObject, variants) {
+    var regions = [];
+    if (variants && variants.length > 0) {
+      var clinvarVariantCount = clinvarGenes[geneObject.gene_name];
+      // Avoid returning ALL clinvar variants for a gene when this gene has
+      // a huge number of variants in clinvar.  Instead, just get the clinvar variants
+      // for the specific positions of the sample's variants
+      if (clinvarVariantCount != null && clinvarVariantCount > variants.length) {
+
+        // Interrogate clinvar vcf by specific positions
+        variants.forEach(function(variant) {
+          regions.push({'refName': refName, 'start': variant.start, 'end': variant.end});
+        })
+      } else {
+        // Just grab all clinvar variants for the gene
+        regions.push({'refName': refName, 'start': geneObject.start, 'end': geneObject.end});
+      }
+    } else {
+      // We don't have any variants for the sample, so don't bother interogating clinvar vcf
+      regions.push({'refName': '0', 'start': 0, 'end': 0});
+    }
+    return regions;
+  }
+
   // This method will obtain clinvar annotations from a clinvar vcf.
   // When there is no internet (isOffline == true), read the clinvar vcf from a locally served
   // file; otherwise, serve clinvar vcf from standard ftp site.
@@ -1348,9 +1140,6 @@ var effectCategories = [
     var me = this;
 
     return new Promise( function(resolve, reject) {
-      var regionStart = geneObject.start;
-      var regionEnd = geneObject.end;
-
 
       var clinvarUrl = null;
       if (isOffline) {
@@ -1359,50 +1148,9 @@ var effectCategories = [
         clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
       }
 
-      // Figure out the reference sequence file path
-      var refFastaFile = genomeBuildHelper.getFastaPath(refName);
+      var regions = me._getClinvarVariantRegions(refName, geneObject, variants);
 
-
-      var regionParm = "";
-      if (variants && variants.length > 0) {
-        var clinvarVariantCount = clinvarGenes[geneObject.gene_name];
-        // Avoid returning ALL clinvar variants for a gene when this gene has
-        // a huge number of variants in clinvar.  Instead, just get the clinvar variants
-        // for the specific positions of the sample's variants
-        if (clinvarVariantCount != null && clinvarVariantCount > variants.length) {
-
-          // Interrogate clinvar vcf by specific positions
-          variants.forEach(function(variant) {
-            if (regionParm.length > 0) {
-              regionParm += " ";
-            }
-            regionParm += refName + ":" + variant.start + "-" + variant.end;
-          })
-        } else {
-          // Just grab all clinvar variants for the gene
-          regionParm = ' ' + refName + ":" + regionStart + "-" + regionEnd;
-        }
-      } else {
-        // We don't have any variants for the sample, so don't bother interogating clinvar vcf
-        regionParm = "0:0"
-      }
-
-      var args = ['-h', clinvarUrl, regionParm];
-      if (tbiUrl) {
-        args.push(tbiUrl);
-      }
-
-      var contigStr = "";
-      getHumanRefNames(refName).split(" ").forEach(function(ref) {
-          contigStr += "##contig=<ID=" + ref + ">\n";
-      })
-      var contigNameFile = new Blob([contigStr])
-
-      var cmd = new iobio.cmd(IOBIO.tabix, args, {ssl: useSSL})
-        .pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile, '-'], {ssl: useSSL})
-
-      // normalize variants
-      cmd = cmd.pipe(IOBIO.vt, ["normalize", "-n", "-r", refFastaFile, '-'], {ssl: useSSL})
+      var cmd = endpoint.normalizeVariants(clinvarUrl, null, refName, regions);
 
 
       var clinvarData = "";
@@ -1598,64 +1346,7 @@ var effectCategories = [
       stream.end();
     }
 
-    //  Streamed vcf recs first go through contig appender to add mandatory header recs
-    var contigStr = "";
-    getHumanRefNames(refName).split(" ").forEach(function(ref) {
-        contigStr += "##contig=<ID=" + ref + ">\n";
-    })
-    var contigNameFile = new Blob([contigStr])
-
-    var cmd = new iobio.cmd(IOBIO.bcftools, ['annotate', '-h', contigNameFile, writeStream ], {ssl: useSSL})
-
-    // Filter samples
-    if (sampleName != null && sampleName != "") {
-      var sampleNameFile = new Blob([sampleName.split(",").join("\n")])
-      cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', sampleNameFile, '-'], {ssl: useSSL});
-    }
-
-    // Normalize the variants (e.g. AAA->AAG becomes A->AG)
-    cmd = cmd.pipe(IOBIO.vt, ['normalize', '-n', '-r', refFastaFile, '-'], {ssl: useSSL})
-
-    // If af not retreived from VEP, get Allele Frequencies from 1000G and ExAC service
-    cmd = cmd.pipe(IOBIO.af, ["-b", genomeBuildHelper.getCurrentBuildName()], {ssl: useSSL})
-
-
-    if (annotationEngine == 'none') {
-      // skip annotation with vep or snpeff if annotationEngine is not set
-    } else if (annotationEngine == 'vep' || isRefSeq) {
-      // VEP
-      var vepArgs = [];
-      vepArgs.push(" --assembly");
-      vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-      vepArgs.push(" --format vcf");
-      vepArgs.push(" --allele_number");
-      if (vepAF) {
-        vepArgs.push("--af");
-        vepArgs.push("--af_gnomad");
-        vepArgs.push("--af_esp");
-        vepArgs.push("--af_1kg");
-        vepArgs.push("--max_af");
-      }
-      if (isRefSeq) {
-        vepArgs.push("--refseq");
-      }
-      // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-      // since we won't have the original vcf records as input
-      if (hgvsNotation) {
-        vepArgs.push("--hgvs");
-      }
-      if (getRsId) {
-        vepArgs.push("--check_existing");
-      }
-      if (hgvsNotation || getRsId) {
-        vepArgs.push("--fasta");
-        vepArgs.push(refFastaFile);
-      }
-      cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
-    } else {
-      cmd = cmd.pipe(IOBIO.snpEff, [], {ssl: useSSL});
-    }
-
+    var cmd = endpoint.annotateVariants({'writeStream': writeStream}, refName, null, regions, null, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, useServerCache);
 
 
     var buffer = "";
@@ -2666,6 +2357,28 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
 
     return result;
  }
+
+exports._getServerCacheKey = function(vcfName, service, refName, geneObject, sampleName, miscObject) {
+  var me = this;
+
+  var key =  "backend.gene.iobio"
+    + "-" + cacheHelper.launchTimestamp
+    + "-" + vcfName
+    + "-" + service
+    + "-" + refName
+    + "-" + geneObject.start.toString()
+    + "-" + geneObject.end.toString()
+    + "-" + geneObject.strand
+    + "-" + sampleName;
+
+  if (miscObject) {
+    for (miscKey in miscObject) {
+      key += "-" + miscKey + "=" + miscObject[miscKey];
+    }
+  }
+  return key;
+}
+
 exports._appendTranscript = function(theObject, key, theTranscriptId) {
   var me = this;
   var transcripts = theObject[key];

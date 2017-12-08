@@ -88,6 +88,10 @@ var keepShowingIntro = false;
 var affectedInfo = null;
 
 
+// Endpoint commands (encapsulate API to IOBIO services)
+var endpoint = null;
+
+
 // bookmark card
 var bookmarkCard = new BookmarkCard();
 
@@ -207,11 +211,15 @@ $(document).ready(function(){
      });
    })
    .then(function() {
+
     // now init cache
     return promiseInitCache();
    })
    .then(function() {
-     return cacheHelper.promiseCheckCacheSize();
+    // Instantiate helper class than encapsulates IOBIO commands
+    endpoint = new EndpointCmd(useSSL, IOBIO, cacheHelper.launchTimestamp, genomeBuildHelper, getHumanRefNames)
+
+    return cacheHelper.promiseCheckCacheSize();
    })
    .then(function() {
      return promiseLoadSiteConfig();
