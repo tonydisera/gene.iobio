@@ -77,20 +77,10 @@ var Bam = Class.extend({
 
   checkBamUrl: function(url, baiUrl, callback) {
     var me = this;
-    var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
 
+    var cmd = endpoint.getBamHeader(url, baiUrl);
 
     var success = null;
-    var args = ['view', '-H', '"'+url+'"'];
-    if (baiUrl) {
-      args.push('"'+baiUrl+'"');
-    }
-    var cmd = new iobio.cmd(
-        samtools,
-        args,
-        {ssl: useSSL}
-    );
-
     cmd.on('data', function(data) {
       if (data != undefined) {
         success = true;
@@ -210,196 +200,115 @@ var Bam = Class.extend({
   },
 
 
+  fetch: function( name, start, end, callback, options ) {
+    var me = this;
+    // handle bam has been created yet
+    if(this.bam == undefined) // **** TEST FOR BAD BAM ***
+       this.promise(function() { me.fetch( name, start, end, callback, options ); });
+    else
+       this.bam.fetch( name, start, end, callback, options );
+  },
+
+  promise: function( callback ) {
+    this.promises.push( callback );
+  },
+
+  provide: function(bam) {
+    this.bam = bam;
+    while( this.promises.length != 0 )
+       this.promises.shift()();
+  },
 
 
-   fetch: function( name, start, end, callback, options ) {
-      var me = this;
-      // handle bam has been created yet
-      if(this.bam == undefined) // **** TEST FOR BAD BAM ***
-         this.promise(function() { me.fetch( name, start, end, callback, options ); });
-      else
-         this.bam.fetch( name, start, end, callback, options );
-   },
+  // *** bamtools functionality ***
+  convert: function(format, name, start, end, callback, options) {
+    // Converts between BAM and a number of other formats
+    if (!format || !name || !start || !end)
+       return "Error: must supply format, sequenceid, start nucleotide and end nucleotide"
 
-   promise: function( callback ) {
-      this.promises.push( callback );
-   },
-
-   provide: function(bam) {
-      this.bam = bam;
-      while( this.promises.length != 0 )
-         this.promises.shift()();
-   },
-
-   _makeid: function() {
-      // make unique string id;
-       var text = "";
-       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-       for( var i=0; i < 5; i++ )
-           text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-       return text;
-   },
-
-   _getBamUrl: function(name, start, end) {
-      return this._getBamRegionsUrl([ {'name':name,'start':start,'end':end} ]);
-   },
-
-   _getBamRegionsUrl: function(regions, golocal) {
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      if ( this.sourceType == "url") {
-         var regionStr = "";
-         regions.forEach(function(region) { regionStr += " " + region.name + ":" + region.start + "-" + region.end });
-         var url = samtools + "?cmd= view -b " + '"'+this.bamUri+'"' + regionStr + (this.baiUri ? " " + '"'+this.baiUri+'"' : "") + "&protocol=http&encoding=binary";
-      } else {
-
-        var url = samtools + "?protocol=websocket&encoding=binary&cmd=view -S -b " + encodeURIComponent("http://client");
-
-
-      }
-      return encodeURI(url);
-   },
-
-    _getBamPileupUrl: function(region, golocal) {
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      if ( this.sourceType == "url") {
-         var bamRegionsUrl = this._getBamRegionsUrl([region], golocal);
-         var url = samtools + "?protocol=http&encoding=utf8&cmd= mpileup " + encodeURIComponent(bamRegionsUrl);
-      } else {
-
-        var url = samtools + "?protocol=websocket&encoding=utf8&cmd= mpileup " + encodeURIComponent("http://client");
-
-      }
-      return encodeURI(url);
-   },
-
-
-
-   getReferencesWithReads: function(callback) {
-      var refs = [];
-      var me = this;
-      if (this.sourceType == 'url') {
-
-      } else {
-         this.getHeader(function(header) {
-            for (var i=0; i < header.sq.length; i++) {
-               if ( me.bam.indices[me.bam.chrToIndex[header.sq[i].name]] != undefined )
-                  refs.push( header.sq[i] );
-            }
-            callback(refs);
-         })
-      }
-   },
-
-   // *** bamtools functionality ***
-
-   convert: function(format, name, start, end, callback, options) {
-      // Converts between BAM and a number of other formats
-      if (!format || !name || !start || !end)
-         return "Error: must supply format, sequenceid, start nucleotide and end nucleotide"
-
-      if (format.toLowerCase() != "sam")
-         return "Error: format + " + options.format + " is not supported"
-      var me = this;
-      this.fetch(name, start, end, function(data,e) {
-         if(options && options.noHeader)
-            callback(data, e);
-         else {
-            me.getHeader(function(h) {
-               callback(h.toStr + data, e);
-            })
-         }
-      }, { 'format': format })
+    if (format.toLowerCase() != "sam")
+       return "Error: format + " + options.format + " is not supported"
+    var me = this;
+    this.fetch(name, start, end, function(data,e) {
+       if(options && options.noHeader)
+          callback(data, e);
+       else {
+          me.getHeader(function(h) {
+             callback(h.toStr + data, e);
+          })
+       }
+    }, { 'format': format })
    },
 
 
    getHeaderStr: function(callback) {
-      var me = this;
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+    var me = this;
 
-      if (me.headerStr) {
-         callback(me.headerStr);
-      }
-      else if (me.sourceType == 'file') {
-        console.log('Error: header not set for local bam file');
-        callback(null);
-      } else {
+    if (me.headerStr) {
+       callback(me.headerStr);
+    }
+    else if (me.sourceType == 'file') {
+      console.log('Error: header not set for local bam file');
+      callback(null);
+    } else {
 
-        var args = ['view', '-H', '"'+me.bamUri+'"'];
-        if (me.baiUri) {
-          args.push('"'+me.baiUri+'"');
+      var cmd = endpoint.getBamHeader(me.bamUri, me.baiUri);
+
+      var success = null;
+      var rawHeader = "";
+      cmd.on('data', function(data) {
+        if (data != undefined) {
+          rawHeader += data;
         }
+      });
 
-        var success = null;
-        var cmd = new iobio.cmd(
-            samtools,
-            args,
-            {ssl: useSSL}
-        );
-        var rawHeader = "";
-        cmd.on('data', function(data) {
-          if (data != undefined) {
-            rawHeader += data;
-          }
-        });
+      cmd.on('end', function() {
+        me.setHeader(rawHeader);
+        callback(me.headerStr);
+      });
 
-        cmd.on('end', function() {
-          me.setHeader(rawHeader);
-          callback(me.headerStr);
-        });
-
-        cmd.on('error', function(error) {
-          console.log(error);
-        });
-        cmd.run();
+      cmd.on('error', function(error) {
+        console.log(error);
+      });
+      cmd.run();
 
 
-      }
-   },
+    }
+  },
 
-   getHeader: function(callback) {
-      var me = this;
-      var samtools = this.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
+  getHeader: function(callback) {
+    var me = this;
 
-      if (me.header) {
-         callback(me.header);
-      }
-      else if (me.sourceType == 'file') {
-        console.log('Error: header not set for local bam file');
-        callback(null);
-      } else {
+    if (me.header) {
+       callback(me.header);
+    }
+    else if (me.sourceType == 'file') {
+      console.log('Error: header not set for local bam file');
+      callback(null);
+    } else {
 
-        var args = ['view', '-H', '"'+me.bamUri+'"'];
-        if (me.baiUri) {
-          args.push('"'+me.baiUri+'"');
+      var   cmd = endpoint.getBamHeader(me.bamUri, me.baiUri);
+
+      var success = null;
+      var rawHeader = "";
+      cmd.on('data', function(data) {
+        if (data != undefined) {
+          rawHeader += data;
         }
+      });
 
-        var success = null;
-        var cmd = new iobio.cmd(
-            samtools,
-            args,
-            {ssl: useSSL}
-        );
-        var rawHeader = "";
-        cmd.on('data', function(data) {
-          if (data != undefined) {
-            rawHeader += data;
-          }
-        });
+      cmd.on('end', function() {
+        me.setHeader(rawHeader);
+        callback( me.header);
+      });
 
-        cmd.on('end', function() {
-          me.setHeader(rawHeader);
-          callback( me.header);
-        });
-
-        cmd.on('error', function(error) {
-          console.log(error);
-        });
-        cmd.run();
+      cmd.on('error', function(error) {
+        console.log(error);
+      });
+      cmd.run();
 
 
-      }
+    }
    },
 
 
@@ -426,7 +335,7 @@ var Bam = Class.extend({
 
 
 
-   transformRefName: function(refName, callback) {
+  transformRefName: function(refName, callback) {
     var found = false;
     this.getHeader(function(header) {
       header.sq.forEach(function(seq) {
@@ -437,13 +346,13 @@ var Bam = Class.extend({
       })
       if (!found) callback(refName); // not found
     })
-   },
+  },
 
-  _getCacheKey: function(service, refName, start, end, miscObject) {
+  _getServerCacheKey: function(service, refName, start, end, miscObject) {
     var me = this;
     var key =  "backend.gene.iobio"
       + "-" + cacheHelper.launchTimestamp
-      + "-" + (me.bamUri ? me.bamUri : (me.bamFile ? me.bamFile.name : "?"))
+      + "-" + me.bamUri ? me.bamUri : (me.bamFile ? me.bamFile.name : "?")
       + "-" + service
       + "-" + refName
       + "-" + start.toString()
@@ -456,150 +365,93 @@ var Bam = Class.extend({
     return key;
   },
 
-   /*
-   *  This method will return coverage as point data.  It takes the reference name along
-   *  with the region start and end.  Optionally, the caller can provide an array of
-   *  region objects to get the coverage at exact positions.  Also, this method takes an
-   *  optional argument of maxPoints that will specify how many data points should be returned
-   *  for the region.  If not specified, all data points are returned.  The callback method
-   *  will send back to arrays; one for the coverage points, reduced down to the maxPoints, and
-   *  the second for coverage of specific positions.  The latter can then be matched to vcf records
-   *  , for example, to obtain the coverage for each variant.
-   */
-   getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, cache, callback, callbackError) {
-      var me = this;
-      this.transformRefName(refName, function(trRefName){
-        var samtools = me.sourceType == "url" ?  IOBIO.samtoolsOnDemand : IOBIO.samtools;
+  /*
+  *  This method will return coverage as point data.  It takes the reference name along
+  *  with the region start and end.  Optionally, the caller can provide an array of
+  *  region objects to get the coverage at exact positions.  Also, this method takes an
+  *  optional argument of maxPoints that will specify how many data points should be returned
+  *  for the region.  If not specified, all data points are returned.  The callback method
+  *  will send back to arrays; one for the coverage points, reduced down to the maxPoints, and
+  *  the second for coverage of specific positions.  The latter can then be matched to vcf records
+  *  , for example, to obtain the coverage for each variant.
+  */
+  getCoverageForRegion: function(refName, regionStart, regionEnd, regions, maxPoints, useServerCache, callback, callbackError) {
+    var me = this;
 
-        var regionsArg = "";
-        regions.forEach( function(region) {
-          region.name = trRefName;
-          if (region.name && region.start && region.end) {
-            if (regionsArg.length == 0) {
-              regionsArg += " -p ";
+    this.transformRefName(refName, function(trRefName){
+
+      var bamSource = {};
+      if (me.sourceType == 'url') {
+        bamSource.bamUrl = me.bamUri;
+        bamSource.baiUrl = me.baiUri;
+      } else {
+        bamSource.writeStream = function(stream) {
+          stream.write(me.header.toStr);
+          me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
+            stream.write(data);
+            stream.end();
+          },
+          {noHeader:true});
+        }
+      }
+
+      var serverCacheKey = me._getServerCacheKey("coverage", trRefName, regionStart, regionEnd, {maxPoints: maxPoints});
+
+      var cmd = endpoint.getBamCoverage(bamSource, trRefName, regionStart, regionEnd, regions, maxPoints, useServerCache, serverCacheKey);
+
+      var samData = "";
+      cmd.on('data', function(data) {
+        if (data == undefined) {
+          return;
+        }
+
+        samData += data;
+      });
+
+      cmd.on('end', function() {
+
+        if (samData != "") {
+          var coverage = null;
+          var coverageForPoints = [];
+          var coverageForRegion = [];
+          var lines = samData.split('\n');
+          lines.forEach(function(line) {
+            if (line.indexOf("#specific_points") == 0) {
+              coverage = coverageForPoints;
+            } else if (line.indexOf("#reduced_points") == 0 ) {
+              coverage = coverageForRegion;
             } else {
-              regionsArg += ",";
-            }
-            regionsArg += region.name + ":" + region.start +  ":" + region.end;
-          }
-        });
-        var maxPointsArg = "";
-        if (maxPoints) {
-          maxPointsArg = "-m " + maxPoints;
-        } else {
-          maxPointsArg = "-m 0"
-        }
-        var spanningRegionArg = " -r " + trRefName + ":" + regionStart + ":" + regionEnd;
-        var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
-
-        var cmd = null;
-        // When file served remotely, first run samtools view, then run samtools mpileup.
-        // When bam file is read as a local file, just stream sam records for region to
-        // samtools mpileup.
-        if (me.sourceType == "url") {
-          var args = ['view', '-b', '"'+me.bamUri+'"', regionArg];
-          if (me.baiUri) {
-            args.push('"'+me.baiUri+'"');
-          }
-          cmd = new iobio.cmd(samtools, args,
-            {
-              'urlparams': { 'encoding':'binary'},
-              ssl: useSSL
-            });
-          cmd = cmd.pipe(samtools, ["mpileup", "-"], {ssl: useSSL});
-        } else {
-
-          function writeSamFile (stream) {
-             stream.write(me.header.toStr);
-             me.convert('sam', trRefName, regionStart, regionEnd, function(data,e) {
-                stream.write(data);
-                stream.end();
-             }, {noHeader:true});
-          }
-
-          cmd = new iobio.cmd(samtools, ['mpileup',  writeSamFile ],
-            {
-              'urlparams': {'encoding':'utf8'},
-              ssl: useSSL
-            });
-
-        }
-
-
-        //
-        //  SERVER SIDE CACHING for coverage service
-        //
-        var cacheKey = null;
-        var urlParameters = {};
-        if (cache) {
-            cacheKey = me._getCacheKey("coverage", refName, regionStart, regionEnd, {maxPoints: maxPoints});
-            console.log(cacheKey);
-            urlParameters.cache = cacheKey;
-            urlParameters.partialCache = true;
-            cmd = cmd.pipe("nv-dev-new.iobio.io/coverage/", [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL, urlparams: urlParameters});
-        } else {
-          // After running samtools mpileup, run coverage service to summarize point data.
-          // NOTE:  Had to change to protocol http(); otherwise signed URLs don't work (with websockets)
-          cmd = cmd.pipe(IOBIO.coverage, [maxPointsArg, spanningRegionArg, regionsArg], {ssl: useSSL});
-
-        }
-
-        var samData = "";
-        cmd.on('data', function(data) {
-          if (data == undefined) {
-            return;
-          }
-
-          samData += data;
-        });
-
-        cmd.on('end', function() {
-
-          if (samData != "") {
-            var coverage = null;
-            var coverageForPoints = [];
-            var coverageForRegion = [];
-            var lines = samData.split('\n');
-            lines.forEach(function(line) {
-              if (line.indexOf("#specific_points") == 0) {
-                coverage = coverageForPoints;
-              } else if (line.indexOf("#reduced_points") == 0 ) {
-                coverage = coverageForRegion;
-              } else {
-                var fields = line.split('\t');
-                var pos = -1;
-                var depth = -1;
-                if (fields[0] != null && fields[0] != '') {
-                  var pos   = +fields[0];
-                }
-                if (fields[1] != null && fields[1] != '') {
-                  var depth = +fields[1];
-                }
-                if (coverage){
-                  if (pos > -1  && depth > -1) {
-                    coverage.push([pos, depth]);
-                  }
+              var fields = line.split('\t');
+              var pos = -1;
+              var depth = -1;
+              if (fields[0] != null && fields[0] != '') {
+                var pos   = +fields[0];
+              }
+              if (fields[1] != null && fields[1] != '') {
+                var depth = +fields[1];
+              }
+              if (coverage){
+                if (pos > -1  && depth > -1) {
+                  coverage.push([pos, depth]);
                 }
               }
-            });
-          }
-          callback(coverageForRegion, coverageForPoints);
-        });
+            }
+          });
+        }
+        callback(coverageForRegion, coverageForPoints);
+      });
 
-        cmd.on('error', function(error) {
-          console.log(error);
-
-        });
-
-        cmd.run();
-
+      cmd.on('error', function(error) {
+        console.log(error);
 
       });
 
-   },
+      cmd.run();
+    });
+  },
 
 
-   freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, vepAF, callback) {
+  freebayesJointCall: function(geneObject, transcript, bams, isRefSeq, fbArgs, vepAF, callback) {
     var me = this;
 
     var refName     = geneObject.chr;
@@ -608,149 +460,13 @@ var Bam = Class.extend({
 
     this.transformRefName(refName, function(trRefName){
 
-      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var refFastaFile = genomeBuildHelper.getFastaPath(trRefName);
-      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
 
-      var getBamCmds = [];
-      var nextBamCmd = function(bams, idx, callback) {
-
-          if (idx == bams.length) {
-
-            callback(getBamCmds);
-
-          } else {
-
-            var bam = bams[idx];
-
-            if (bam.sourceType == "url") {
-              var args = ['view', '-b', '"'+bam.bamUri+'"', regionArg];
-              if (bam.baiUri) {
-                args.push('"'+bam.baiUri+'"');
-              }
-              var bamCmd = new iobio.cmd(samtools, args,
-              {
-                'urlparams': {'encoding':'binary'},
-                ssl: useSSL
-              });
-              getBamCmds.push(bamCmd);
-
-              idx++;
-              nextBamCmd(bams, idx, callback);
-
-            } else {
-
-              bam.convert('sam', trRefName, regionStart, regionEnd,
-                function(data,e) {
-                  var bamBlob = new Blob([bam.header.toStr + "\n" + data]);
-                  var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
-                  {
-                    'urlparams': {'encoding':'binary'},
-                    ssl: useSSL
-                  });
-                  getBamCmds.push(bamCmd);
-
-                  idx++;
-                  nextBamCmd(bams, idx, callback);
-                },
-                {noHeader:true}
-              );
-
-            }
-
-          }
-
-      }
-
+      //  Once all bam sources have been established
       var index = 0;
-      nextBamCmd(bams, index, function(getBamCmds) {
-        var freebayesArgs = [];
-        getBamCmds.forEach( function(bamCmd) {
-          freebayesArgs.push("-b");
-          freebayesArgs.push(bamCmd);
-        });
-        freebayesArgs.push("-f");
-        freebayesArgs.push(refFastaFile);
-        if (fbArgs && fbArgs.useSuggestedVariants.value == true) {
-          freebayesArgs.push("-@");
-          freebayesArgs.push(me.getSuggestedVariantsCmd(trRefName, geneObject));
-        }
-        if (fbArgs) {
-          for (var key in fbArgs) {
-            var theArg = fbArgs[key];
-            if (theArg.hasOwnProperty('argName')) {
-              if (theArg.hasOwnProperty('isFlag') && theArg.isFlag == true) {
-                if (theArg.value && theArg.value == true) {
-                    freebayesArgs.push(theArg.argName);
-                }
-              } else {
-                if (theArg.value && theArg.value != '') {
-                  freebayesArgs.push(theArg.argName);
-                  freebayesArgs.push(theArg.value);
-                }
-              }
+      var bamSources = [];
+      me._initializeBamSource(bams, trRefName, regionStart, regionEnd, bamSources, index, function() {
 
-            }
-          }
-
-        }
-
-
-        var cmd = new iobio.cmd(IOBIO.freebayes, freebayesArgs, {ssl: useSSL});
-
-
-        // Normalize variants
-        cmd = cmd.pipe(IOBIO.vt, ['normalize', '-r', refFastaFile, '-'], {ssl: useSSL});
-
-        // Subset on all samples (this will get rid of low quality cases where no sample
-        // is actually called as having the alt)
-        //cmd = cmd.pipe(IOBIO.vt, ['subset', '-s', '-']);
-
-        // Filter out anything with qual <= 0
-        cmd = cmd.pipe(IOBIO.vt, ['filter', '-f', "\'QUAL>1\'", '-t', '\"PASS\"', '-d', '\"Variants called by iobio\"', '-'], {ssl: useSSL});
-
-
-        //
-        // Annotate variants that were just called from freebayes
-        //
-
-        // bcftools to append header rec for contig
-        var contigStr = "";
-        getHumanRefNames(refName).split(" ").forEach(function(ref) {
-            contigStr += "##contig=<ID=" + ref + ">\n";
-        })
-        var contigNameFile = new Blob([contigStr])
-        cmd = cmd.pipe(IOBIO.bcftools, ['annotate', '-h', contigNameFile], {ssl: useSSL})
-
-        // Get Allele Frequencies from 1000G and ExAC
-        cmd = cmd.pipe(IOBIO.af, [], {ssl: useSSL})
-
-        // VEP to annotate
-        var vepArgs = [];
-        vepArgs.push(" --assembly");
-        vepArgs.push(genomeBuildHelper.getCurrentBuildName());
-        vepArgs.push(" --format vcf");
-        vepArgs.push(" --allele_number");
-        if (vepAF) {
-          vepArgs.push("--af");
-          vepArgs.push("--af_gnomad");
-          vepArgs.push("--af_esp");
-          vepArgs.push("--af_1kg");
-          vepArgs.push("--max_af");
-        }
-
-        if (isRefSeq) {
-          vepArgs.push("--refseq");
-        }
-        // Get the hgvs notation and the rsid since we won't be able to easily get it one demand
-        // since we won't have the original vcf records as input
-        vepArgs.push("--hgvs");
-        vepArgs.push("--check_existing");
-        vepArgs.push("--fasta");
-        vepArgs.push(refFastaFile);
-        cmd = cmd.pipe(IOBIO.vep, vepArgs, {ssl: useSSL});
-
-
+        var cmd = endpoint.freebayesJointCall(bamSources, trRefName, regionStart, regionEnd, isRefSeq, fbArgs, vepAF);
 
         var variantData = "";
         cmd.on('data', function(data) {
@@ -775,123 +491,66 @@ var Bam = Class.extend({
 
     });
 
-   },
-
-
-  getSuggestedVariantsCmd: function(refName, geneObject) {
-    // Create an iobio command get get the variants from clinvar for the region of the gene
-    var regionParm = refName + ":" + geneObject.start + "-" + geneObject.end;
-
-    var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
-
-    var tabixArgs = ['-h', clinvarUrl, regionParm];
-    var cmd = new iobio.cmd (IOBIO.tabix,         tabixArgs,         {ssl: useSSL});
-
-    cmd = cmd.pipe(IOBIO.vt, ['view', '-f', '\"INFO.CLNSIG=~\'5|4\'\"', '-'], {ssl: useSSL});
-
-
-    return cmd;
   },
 
-   getGeneCoverage: function(geneObject, transcript, bams, callback) {
+  /*
+   * Sequentially examine each bam source, either specifying the bamUrl, or creating
+   * a blob (for local files)
+   */
+  _initializeBamSource: function(bams, refName, regionStart, regionEnd, bamSources, idx, callback) {
+    var me  = this;
+    if (idx == bams.length) {
+      callback();
+    } else {
+      var bam = bams[idx];
+      if (bam.sourceType == "url") {
+        bamSources.push({'bamUrl': me.bamUri, 'baiUrl': me.baiUri});
+        idx++;
+        me._initializeBamSource(bams, refName, regionStart, regionEnd, bamSources, idx, callback);
+      } else {
+        bam.convert('sam', refName, regionStart, regionEnd,
+          function(data,e) {
+            var bamBlob = new Blob([bam.header.toStr + "\n" + data]);
+            bamSources.push({'bamBlob': bamBlob});
+            idx++;
+            me._initializeBamSource(bams, refName, regionStart, regionEnd, bamSources, idx, callback);
+          },
+          {noHeader:true}
+        );
+      }
+    }
+  },
+
+
+
+
+  getGeneCoverage: function(geneObject, transcript, bams, callback) {
     var me = this;
 
     var refName     = geneObject.chr;
     var regionStart = geneObject.start;
     var regionEnd   = geneObject.end;
 
-
-
-
+    // Capture all of the exon regions from the transcript
+    var regions = [];
+    transcript.features.forEach(function(feature) {
+      if (feature.feature_type.toUpperCase() == 'CDS') {
+        regions.push({start: feature.start, end: feature.end});
+      }
+    });
 
     this.transformRefName(refName, function(trRefName){
 
-      // Create a region text file with the gene name followed by
-      // a record for each coding region
-      var regionStr = "#" + geneObject.gene_name + "\n";
-      transcript.features.forEach(function(feature) {
-          if (feature.feature_type.toUpperCase() == 'CDS'
-            //|| feature.feature_type.toUpperCase() == 'UTR'
-            ) {
-            regionStr += trRefName + ":" + feature.start + "-" + feature.end + "\n";
-          }
-      })
-      var regionFile = new Blob([regionStr])
-
-      var samtools = me.sourceType == "url" ? IOBIO.samtoolsOnDemand : IOBIO.samtools;
-      var regionArg =  trRefName + ":" + regionStart + "-" + regionEnd;
-
-      var getBamCmds = [];
-      var nextBamCmd = function(bams, idx, callback) {
-
-          if (idx == bams.length) {
-
-            callback(getBamCmds);
-
-          } else {
-
-            var bam = bams[idx];
-
-            if (bam.sourceType == "url") {
-              var args = ['view', '-b', '"'+bam.bamUri+'"', regionArg];
-              if (bam.baiUri) {
-                args.push('"'+bam.baiUri+'"');
-              }
-              var bamCmd = new iobio.cmd(samtools, args,
-              {
-                'urlparams': {'encoding':'binary'},
-                ssl: useSSL
-              });
-              getBamCmds.push(bamCmd.url());
-
-              idx++;
-              nextBamCmd(bams, idx, callback);
-
-            } else {
-
-              bam.convert('sam', trRefName, regionStart, regionEnd,
-                function(data,e) {
-                  var bamBlob = new Blob([bam.header.toStr + "\n" + data]);
-                  var bamCmd = new iobio.cmd(samtools, ['view', '-b', bamBlob],
-                  {
-                    'urlparams': {'encoding':'binary'},
-                    ssl: useSSL
-                  });
-                  getBamCmds.push(bamCmd);
-
-                  idx++;
-                  nextBamCmd(bams, idx, callback);
-                },
-                {noHeader:true}
-              );
-
-            }
-
-          }
-
-      }
-
       var index = 0;
-      nextBamCmd(bams, index, function(getBamCmds) {
-        var geneCoverageArgs = [];
-        getBamCmds.forEach( function(bamCmd) {
-          geneCoverageArgs.push("-b");
-          geneCoverageArgs.push(bamCmd);
-        });
-        geneCoverageArgs.push("-r");
-        geneCoverageArgs.push(regionFile);
-
-
-        var cmd = new iobio.cmd(IOBIO.geneCoverage, geneCoverageArgs, {ssl: useSSL});
-//        var cmd = new iobio.cmd(IOBIO.samtoolsOnDemand, ["mpileup", "-"], {ssl: useSSL});
-
+      var bamSources = [];
+      me._initializeBamSource(bams, trRefName, regionStart, regionEnd, bamSources, index, function() {
+        var cmd = endpoint.getGeneCoverage(bamSources, trRefName, geneObject.gene_name, regionStart, regionEnd, regions);
 
         var geneCoverageData = "";
         cmd.on('data', function(data) {
             if (data == undefined) {
               return;
             }
-
             geneCoverageData += data;
         });
 
@@ -910,7 +569,7 @@ var Bam = Class.extend({
     });
 
 
-   },
+  },
 
 
   reducePoints: function(data, factor, xvalue, yvalue) {
