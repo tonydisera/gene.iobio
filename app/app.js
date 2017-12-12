@@ -216,6 +216,9 @@ $(document).ready(function(){
     return promiseInitCache();
    })
    .then(function() {
+    return cacheHelper.promiseClearStaleCache();
+   })
+   .then(function() {
     // Instantiate helper class than encapsulates IOBIO commands
     endpoint = new EndpointCmd(useSSL, IOBIO, cacheHelper.launchTimestamp, genomeBuildHelper, getHumanRefNames)
 

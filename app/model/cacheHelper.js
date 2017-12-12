@@ -31,6 +31,30 @@ CacheHelper.prototype.isolateSession = function() {
   this.launchTimestamp = Date.now().valueOf();
 }
 
+CacheHelper.prototype.promiseClearStaleCache = function() {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+
+    var staleSessions = localStorage["gene.iobio.stale"];
+    if (staleSessions && staleSessions.length > 0) {
+      var promises = [];
+      staleSessions.split(",").forEach(function(timestamp) {
+        var p = me._promiseClearCache(timestamp, false, false);
+        promises.push(p);
+      });
+      Promise.all(promises).then(function() {
+        localStorage["gene.iobio.stale"] = "";
+        resolve();
+      },
+      function(error) {
+        reject();
+      })
+    } else {
+      resolve();
+    }
+  })
+}
+
 CacheHelper.prototype.promiseCheckCacheSize = function() {
   var me = this;
 
@@ -1261,6 +1285,9 @@ CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide 
 
 CacheHelper.prototype.cleanupCacheOnClose = function(launchTimestampToClear) {
   var me = this;
+  if (launchTimestampToClear == null) {
+    launchTimestampToClear = me.launchTimestamp;
+  }
   if (CacheHelper.useLocalStorage() && localStorage) {
     var keys = [];
     for (var i=0; i<=localStorage.length-1; i++)  {
@@ -1274,6 +1301,15 @@ CacheHelper.prototype.cleanupCacheOnClose = function(launchTimestampToClear) {
     keys.forEach(function(key) {
       localStorage.removeItem(key);
     })
+  } else {
+    var key = 'gene.iobio.stale';
+    var staleSessions = localStorage[key];
+    if (staleSessions == null || staleSessions == "") {
+      staleSessions = launchTimestampToClear;
+    } else {
+      staleSessions += "," + launchTimestampToClear;
+    }
+    localStorage[key] = staleSessions;
   }
 }
 
