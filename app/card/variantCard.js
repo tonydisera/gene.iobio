@@ -1220,8 +1220,8 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
       //  The user has entered a gene.  Get the annotated variants.
       var theGene =  $.extend({}, window.gene);
       var theTranscript = $.extend({}, window.selectedTranscript);
-      me.model.promiseGetVariants(theGene, theTranscript, regionStart, regionEnd,
-        function(data) {
+      me.model.promiseGetVariants(theGene, theTranscript, false, // isAnalyzeAll
+      function(data) {
           // When variants annotated with snpEff and VEP...
 
           if (me.isViewable()) {

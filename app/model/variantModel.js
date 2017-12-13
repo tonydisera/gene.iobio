@@ -1593,7 +1593,7 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
 
 }
 
-VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, regionStart, regionEnd, onVcfData) {
+VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, isAnalyzeAll, onVcfData) {
   var me = this;
 
   return new Promise( function(resolve, reject) {
@@ -1602,9 +1602,12 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
     // it.  (No need to retrieve the variants from the iobio service.)
     me._promiseGetData(CacheHelper.VCF_DATA, theGene.gene_name, theTranscript).then(function(vcfData) {
       if (vcfData != null && vcfData != '') {
-        me.vcfData = vcfData;
-        me._populateEffectFilters(me.vcfData.features);
-        me._populateRecFilters(me.vcfData.features);
+
+        // Only set the vcfData on this model if we have selected this gene
+        // (not running during 'analyzeAll')
+        if (!isAnalyzeAll) {
+          me.vcfData = vcfData;
+        }
 
         // Flag any bookmarked variants
         me._promisesDetermineVariantBookmarks(vcfData, theGene, theTranscript).then(function() {
@@ -1613,7 +1616,7 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, reg
             onVcfData();
           }
 
-          resolve(me.vcfData);
+          resolve(vcfData);
 
         })
 

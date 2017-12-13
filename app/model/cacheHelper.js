@@ -492,10 +492,11 @@ CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, call
                   getRelevantVariantCards().forEach(function(variantCard) {
 
                     if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-                      variantCard.model.promiseCacheVariants(
-                        theGeneObject.chr,
+                      variantCard.model.promiseGetVariants(
                         theGeneObject,
-                      theTranscript)
+                        theTranscript,
+                        true, // isAnalyzeAll
+                      )
                       .then( function(vcfData) {
                       return me.promiseIsCachedForCards(vcfData.gene.gene_name, vcfData.transcript)
                        .then(function(isCached) {
