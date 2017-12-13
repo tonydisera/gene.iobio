@@ -55,6 +55,16 @@ vcfiobio = function module() {
     '255': 'other'
   }
 
+  var CLINVAR_ANNOTS = {
+    clinvarSubmissions: [],
+    clinVarClinicalSignificance: {},
+    clinVarPhenotype:  {},
+    clinVarAccession: {},
+    clinvarRank: null,
+    clinvar: null
+  }
+
+
 
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
@@ -1981,17 +1991,14 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
   }
 }
 
+exports.getClinvarAnnots = function() {
+  return CLINVAR_ANNOTS;
+}
+
 exports.parseClinvarInfo = function(info, clinvarMap) {
   var me = this;
 
-  var result = {
-    clinvarSubmissions: [],
-    clinVarClinicalSignificance: {},
-    clinVarPhenotype:  {},
-    clinVarAccession: {},
-    clinvarRank: null,
-    clinvar: null
-  }
+  var result = $.extend({}, CLINVAR_ANNOTS);
 
 
   var initClinvarSubmissions = function(clinvarSubmissions, length) {

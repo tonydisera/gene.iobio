@@ -1628,11 +1628,11 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, isA
         me._promiseVcfRefName(theGene.chr).then( function() {
           me._promiseGetAndAnnotateVariants(
             me.getVcfRefName(theGene.chr),
-                theGene,
-                theTranscript,
-                global_getVariantIdsForGene,
-                false,   // parseMultipleSamples
-                onVcfData)
+            theGene,
+            theTranscript,
+            global_getVariantIdsForGene,
+            false,   // parseMultipleSamples
+            onVcfData)
           .then( function(data) {
 
               // Associate the correct gene with the data
@@ -1651,16 +1651,22 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, isA
 
                 // Flag any bookmarked variants
                 me._promiseDetermineVariantBookmarks(data, theGeneObject, theTranscript).then(function() {
-                  // Cache the data (if there are variants)
-                  if (data && data.features) {
+                  // Cache the data. For currently selected gene (isAnalyzeAll is false), only
+                  // cache the data if there are variants.  For 'analyze all', (isAnalyzeAll is true),
+                  // cache the data regardless if has zero variants
+                  if (isAnalyzeAll || (data && data.features)) {
                     me._promiseCacheData(data, CacheHelper.VCF_DATA, data.gene.gene_name, data.transcript).then(function() {
-                      me.vcfData = data;
-                      resolve(me.vcfData);
+                      // Only set the vcfData on this model if we have selected this gene
+                      // (not running during 'analyzeAll')
+                      if (!isAnalyzeAll) {
+                        me.vcfData = data;
+                      }
+                      resolve(data);
                     },
                     function(error) {
                       var msg = "A problem occurred when caching data in VariantModel.promiseGetVariants(): " + error + ". Unable to cache annotated variants for gene " + data.gene.gene_name;
                       console.log(msg);
-                      reject(msg);
+                      reject({isValid: false, message: msg});
 
                     });
                   }
@@ -1669,25 +1675,33 @@ VariantModel.prototype.promiseGetVariants = function(theGene, theTranscript, isA
 
 
               } else {
-                var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-                console.log(error);
-                reject(error);
+                var msg = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+                console.log(msg);
+                reject({isValid: false, message: msg});
               }
 
-            }, function(error) {
-              reject(error);
-            });
+          },
+          function(error) {
+            var msg = "ERROR - error occurred in VariantModel.promiseGetVariants() when calling _promiseGetAndAnnotateVariants(): " + error;
+            console.log(msg);
+            reject({isValid: false, message: msg});
+          });
         }, function(error) {
-          reject("missing reference")
+          var isValid = false;
+          // for caching, treat missing chrX as a normal case.
+          if (theGene.chr != null && theGene.chr.toUpperCase().indexOf("X")) {
+            isValid = true;
+          }
+          reject({isValid: isValid, message: "missing reference"});
         });
 
       }
 
     },
-      function(error) {
-      var msg = "A problem occurred in VariantModel.promiseGetVariants() " + error;
+    function(error) {
+      var msg = "A problem occurred in VariantModel.promiseGetVariants() when getting cached data: " + error;
       console.log(msg);
-      reject(msg);
+      reject({isValid: false, message: msg});
     })
 
   });
@@ -1774,18 +1788,34 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
                   if (results && results.length > 0) {
                     var data = results[0];
 
-                      // Associate the correct gene with the data
-                      var theGeneObject = null;
-                      for( var key in window.geneObjects) {
-                        var geneObject = geneObjects[key];
-                        if (me.getVcfRefName(geneObject.chr) == data.ref &&
-                          geneObject.start == data.start &&
-                          geneObject.end == data.end &&
-                          geneObject.strand == data.strand) {
-                          theGeneObject = geneObject;
-                        }
+
+
+                    // Associate the correct gene with the data
+                    var theGeneObject = null;
+                    for( var key in window.geneObjects) {
+                      var geneObject = geneObjects[key];
+                      if (me.getVcfRefName(geneObject.chr) == data.ref &&
+                        geneObject.start == data.start &&
+                        geneObject.end == data.end &&
+                        geneObject.strand == data.strand) {
+                        theGeneObject = geneObject;
                       }
-                      if (theGeneObject) {
+                    }
+                    if (theGeneObject) {
+
+                      // Obtain the clinvar variants for all variants in the trio.  We do this once rather than
+                      // per sample for performance reasons.
+                      var multiSampleVcfData = me._unionMultiSampleVcfData(results);
+                      var refreshVariantsFunction = isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, multiSampleVcfData) : me._refreshVariantsWithClinvarEutils.bind(me, multiSampleVcfData);
+                      me.vcf.promiseGetClinvarRecords(
+                        multiSampleVcfData,
+                        me._stripRefName(refName),
+                        theGene,
+                        refreshVariantsFunction)
+                      .then(function() {
+
+                        // Create a hash lookup of all clinvar variants
+                        var clinvarLookup = me._getClinvarLookup(multiSampleVcfData);
 
                         var resultMap = {};
                         var idx = 0;
@@ -1808,8 +1838,12 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
                               return;
                             }
 
+                            // Use the clinvar variant lookup to initialize variants with clinvar annotations
+                            me._refreshVariantsWithClinvarLookup(theVcfData, clinvarLookup)
+
                             theVcfData.gene = theGeneObject;
                             resultMap[vc.getRelationship()] = theVcfData;
+
 
                             // Perform post-annotation processing for each variant card's model
                             vc.model._promisePostAnnotateProcessing(refName, theGene, theTranscript, theVcfData).then(function() {
@@ -1857,12 +1891,16 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
                           resolve(resultMap);
                         });
 
+                      })
 
-                      } else {
-                        var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
-                        console.log(error);
-                        reject(error);
-                      }
+
+
+
+                    } else {
+                      var error = "ERROR - cannot locate gene object to match with vcf data " + data.ref + " " + data.start + "-" + data.end;
+                      console.log(error);
+                      reject(error);
+                    }
                   } else {
                       var error = "ERROR - empty vcf results for " + theGene.gene_name;;
                       console.log(error);
@@ -1897,6 +1935,7 @@ VariantModel.prototype.promiseGetVariantsMultipleSamples = function(theGene, the
   });
 
 }
+
 
 
 VariantModel.prototype.postInheritanceParsing = function(data, theGene, theTranscript, affectedInfo, callback) {
@@ -3715,6 +3754,61 @@ VariantModel.prototype._promiseCacheData = function(data, dataKind, geneName, tr
 }
 
 
+VariantModel.prototype._unionMultiSampleVcfData = function(results, refName) {
+  var me = this;
+
+  var uniqueVariants = {};
+
+  results.forEach(function(vcfData) {
+    vcfData.features.forEach(function(feature) {
+      uniqueVariants[me._formatClinvarKey(feature)] = true;
+    });
+  })
+  var multiSampleVcfData = {features: []};
+  for (var key in uniqueVariants) {
+    multiSampleVcfData.features.push(me._formatClinvarThinVariant(key));
+  }
+  return multiSampleVcfData;
+}
+
+VariantModel.prototype._getClinvarLookup = function(multiSampleVcfData) {
+  var me = this;
+  var clinvarLookup = {};
+  multiSampleVcfData.features.forEach(function(variant) {
+    var clinvarAnnot = {};
+
+    for (var key in me.vcf.getClinvarAnnots()) {
+        clinvarAnnot[key] = variant[key];
+        clinvarLookup[me._formatClinvarKey(variant)] = clinvarAnnot;
+    }
+
+
+  })
+  return clinvarLookup;
+}
+
+VariantModel.prototype._refreshVariantsWithClinvarLookup = function(theVcfData, clinvarLookup) {
+  var me = this;
+  theVcfData.features.forEach(function(variant) {
+    var clinvarAnnot = clinvarLookup[me._formatClinvarKey(variant)];
+    if (clinvarAnnot) {
+      for (var key in clinvarAnnot) {
+         clinvarAnnot[key] = variant[key];
+      }
+    }
+  })
+}
+
+VariantModel.prototype._formatClinvarKey = function(variant) {
+  var delim = '^^';
+  return variant.chrom + delim + variant.ref + delim + variant.alt + delim + variant.start + delim + variant.end;
+}
+
+VariantModel.prototype._formatClinvarThinVariant = function(key) {
+  var delim = '^^';
+  var tokens = key.split(delim);
+  return {'chrom': tokens[0], 'ref': tokens[1], 'alt': tokens[2], 'start': tokens[3], 'end': tokens[4]};
+}
 
 
 
