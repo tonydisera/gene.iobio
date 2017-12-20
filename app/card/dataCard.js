@@ -221,12 +221,12 @@ DataCard.prototype.loadDemoData = function() {
     window.updateUrl("gene", me.demoGenes[0]);
     window.updateUrl("genes", me.demoGenes.join(","));
 
-    cacheHelper.clearCache();
-    window.matrixCard.reset();
-    window.loadedUrl = false;
-
-
-    reloadGeneFromUrl();
+    cacheHelper.promiseClearCache()
+    .then(function() {
+      window.matrixCard.reset();
+      window.loadedUrl = false;
+      reloadGeneFromUrl();
+    })
   } else if (window.isLevelEdu && this.eduTourGenes[+eduTourNumber].length > 0) {
     var theGenes       = me.eduTourGenes[+eduTourNumber];
     window.updateUrl("gene", theGenes[0]);
@@ -248,10 +248,12 @@ DataCard.prototype.loadDemoData = function() {
       window.getAffectedInfo(true);
       window.setGeneratedSampleNames();
       window.loadTracksForGene();
-      window.cacheHelper.clearCache();
-      window.matrixCard.reset();
-      genesCard.selectGene(theGenes[0]);
-      });
+      window.cacheHelper.promiseClearCache()
+      .then(function() {
+        window.matrixCard.reset();
+        genesCard.selectGene(theGenes[0]);
+        });
+      })
 
   } else {
     loadUrlSources();
@@ -343,13 +345,16 @@ DataCard.prototype._loadMygene2Proband = function(probandUrl) {
     // If the genome build was specified, load the endpoint variant file
     if (genomeBuildHelper.getCurrentBuild()) {
       me.promiseSetVcfUrl("proband", "Variants", null, probandUrl)
-        .then(function() {
-          window.getAffectedInfo(true);
+      .then(function() {
+        window.getAffectedInfo(true);
         window.setGeneratedSampleNames();
         window.loadTracksForGene();
-        window.cacheHelper.clearCache();
-        window.matrixCard.reset();
+        window.cacheHelper.promiseClearCache()
+        .then(function() {
+          window.matrixCard.reset();
+
         })
+      })
     } else {
       alertify.alert("Cannot load data.  The genome build must be specified.");
     }
@@ -364,8 +369,6 @@ DataCard.prototype.loadSampleData = function(relationship, name, sampleName, mod
   variantCard.setSampleName(sampleName);
   this.mode = 'single';
 
-
-  //cacheHelper.clearCache();
   window.loadTracksForGene();
 }
 
@@ -836,58 +839,61 @@ DataCard.prototype.init = function() {
 
     genesCard.showAnalyzeAllButton();
     // Clear the cache
-    cacheHelper.clearCache();
-    cacheHelper.hideAnalyzeAllProgress();
+    cacheHelper.promiseClearCache()
+    .then(function() {
+      cacheHelper.hideAnalyzeAllProgress();
 
-    // Clear any filters
-    filterCard.clearFilters();
-    filterCard.resetStandardFilterCounts();
-    // Clear out filters for VEP consequences and rec filters as these are
-    // generated from the data
-    filterCard.clearDataGeneratedFilters();
-
-
-
-     // If we switched from a trio back to a single, clear out the mother and father
-    // data
-    if (me.mode == 'single') {
-      window.clearMotherFatherData();
-    }
-
-    // Create variant cards for the affected and unaffected sibs.
-    // We will load the data later once the proband, mother, father
-    // data is loaded.
-    var affectedSibIds  = $("#affected-sibs-select")[0].selectize.getValue();
-    var unaffectedSibIds = $("#unaffected-sibs-select")[0].selectize.getValue();
-
-    window.loadSibs(affectedSibIds, 'affected');
-    window.loadSibs(unaffectedSibIds, 'unaffected');
-
-    window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
-    window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
-
-    window.getAffectedInfo(true);
-    filterCard.displayAffectedFilters();
-    genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
+      // Clear any filters
+      filterCard.clearFilters();
+      filterCard.resetStandardFilterCounts();
+      // Clear out filters for VEP consequences and rec filters as these are
+      // generated from the data
+      filterCard.clearDataGeneratedFilters();
 
 
-    window.enableCallVariantsButton();
 
-    window.setGeneratedSampleNames();
+       // If we switched from a trio back to a single, clear out the mother and father
+      // data
+      if (me.mode == 'single') {
+        window.clearMotherFatherData();
+      }
 
-    window.matrixCard.reset();
+      // Create variant cards for the affected and unaffected sibs.
+      // We will load the data later once the proband, mother, father
+      // data is loaded.
+      var affectedSibIds  = $("#affected-sibs-select")[0].selectize.getValue();
+      var unaffectedSibIds = $("#unaffected-sibs-select")[0].selectize.getValue();
+
+      window.loadSibs(affectedSibIds, 'affected');
+      window.loadSibs(unaffectedSibIds, 'unaffected');
+
+      window.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
+      window.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
+
+      window.getAffectedInfo(true);
+      filterCard.displayAffectedFilters();
+      genericAnnotation.appendGenericFilters(getProbandVariantCard().model.getAnnotators());
 
 
-    if (theGeneName) {
-      setGeneBloodhoundInputElement(theGeneName, false, true);
-    } else if (getUrlParameter("gene")) {
-      // If the genome build was missing, the user was forced into the data dialog to select
-      // the genome build.  Now we want to load the gene if it was provided in the URL parameter
-      // list.
-      setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
-    } else {
-      window.loadTracksForGene();
-    }
+      window.enableCallVariantsButton();
+
+      window.setGeneratedSampleNames();
+
+      window.matrixCard.reset();
+
+
+      if (theGeneName) {
+        setGeneBloodhoundInputElement(theGeneName, false, true);
+      } else if (getUrlParameter("gene")) {
+        // If the genome build was missing, the user was forced into the data dialog to select
+        // the genome build.  Now we want to load the gene if it was provided in the URL parameter
+        // list.
+        setGeneBloodhoundInputElement(getUrlParameter("gene"), true, true);
+      } else {
+        window.loadTracksForGene();
+      }
+
+    })
 
 
   });

@@ -1132,17 +1132,13 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
       var barContainer = row.append("div")
                               .attr("class", rel + "-alt-count tooltip-allele-count-bar")
       if (genotype) {
-        getProbandVariantCard().promiseGetMaxAlleleCount()
-         .then(function(maxAlleleCount) {
-          me._appendAlleleCountSVG(barContainer,
-            genotype.altCount,
-            genotype.refCount,
-            genotype.genotypeDepth,
-            null,
-            barWidth,
-            maxAlleleCount);
-
-         });
+        me._appendAlleleCountSVG(barContainer,
+          genotype.altCount,
+          genotype.refCount,
+          genotype.genotypeDepth,
+          null,
+          barWidth,
+          window.maxAlleleCount);
       }
     }
 

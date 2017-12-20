@@ -432,3 +432,4 @@ VariantTrioModel.prototype.promiseCompareVariants = function(vcfData, otherVcfDa
 
 
 
+

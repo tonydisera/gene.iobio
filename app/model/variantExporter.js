@@ -329,8 +329,13 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
           (variantEntry.hasOwnProperty('freebayesCalled') && variantEntry.freebayesCalled == 'Y')) {
           // If the variant was called on-demand, issue the service calls to
           // generate the vcf records.
-          cacheJointCallVariants(theGeneObject, theTranscript, variantEntry,
-            function(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant) {
+          promiseCacheJointCallVariants(theGeneObject, theTranscript, variantEntry)
+          .then(function(data) {
+              var theGeneObject1    = data.gene;
+              var theTranscript1    = data.transcript;
+              var jointVcfRecs      = data.jointVcfRecs
+              var translatedRefName = data.refName;
+              var sourceVariant     = data.sourceVariant;
               var theVariant = null;
               var theVcfRecs = null;
 
@@ -358,7 +363,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
                     })
 
                          });
-            });
+          });
 
         } else {
 

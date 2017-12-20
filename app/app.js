@@ -86,6 +86,7 @@ var readyToHideIntro = false;
 var keepShowingIntro = false;
 
 var affectedInfo = null;
+var maxAlleleCount = 0;
 
 
 // Endpoint commands (encapsulate API to IOBIO services)
@@ -143,7 +144,6 @@ var variantCards = [];
 // variant cards for unaffected and affected sibs
 var variantCardsSibs = {'affected': [], 'unaffected': []};
 
-var fulfilledTrioPromise = false;
 
 var variantExporter = null;
 
@@ -232,17 +232,14 @@ $(document).ready(function(){
    })
    .then(function() {
       // Clear the local cache
-      cacheHelper.clearCache();
-
-
-
-      // cache is initialized
+      return cacheHelper.promiseClearCache();
+   })
+   .then(function() {
       showWelcomePanel();
-
       init();
    },
    function(error) {
-    alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
+      alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
    })
 
 
@@ -2255,7 +2252,7 @@ function adjustGeneRegionBuffer() {
     GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
     setGeneBloodhoundInputElement(gene.gene_name, false, true);
   }
-  cacheHelper.clearCache();
+  cacheHelper.promiseClearCache();
 
 }
 
@@ -2939,8 +2936,10 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
     // the coverage so that the max depth for all variant cards is determined
     // so that the coverage scales across all samples.
     var variantPromises = [];
+    var variantDisplayPromises = [];
 
-    promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true).then(function() {
+    promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true)
+    .then(function() {
         return promiseMarkCodingRegions(window.gene, window.selectedTranscript);
 
     }).then(function() {
@@ -2964,55 +2963,33 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
 
         })
 
-      } else if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
-        // We have a multi-sample vcf, so we only need to retrieve the vcf records once for
-        // the proband and then obtain the genotypes for the mother/father and affected/unaffected
-        // sibs.
-        var variantPromise = getProbandVariantCard().model.promiseGetVariantsMultipleSamples(window.gene, window.selectedTranscript, getRelevantVariantCards())
-                    .then( function() {
+      } else {
+        var variantPromise = promiseAnnotateVariants(window.gene, window.selectedTranscript, dataCard.mode == 'trio' && samplesInSingleVcf(), false)
+        .then( function() {
 
             getRelevantVariantCards().forEach(function(vc) {
 
               // We have variants, either to load from a vcf or called from alignments and
               // optionally alignments.  First annotate the show the variants in the
               // variant cards and calcuate the coverage (if alignments provided).
-              vc.promiseLoadAndShowVariants(true)
-                        .then( function() {
+              if (!isAlignmentsOnly()) {
+                var p = vc.promiseShowVariants(true)
+                .then( function() {
 
-                          if (vc.getRelationship() == 'proband') {
-                            showNavVariantLinks();
-                          }
+                  if (vc.getRelationship() == 'proband') {
+                    showNavVariantLinks();
+                  }
 
                 });
+                variantDisplayPromises.push(p);
+              }
 
             });
          });
          variantPromises.push(variantPromise);
 
 
-      } else {
-        getRelevantVariantCards().forEach(function(vc) {
-
-          if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
-            // We have variants, either to load from a vcf or called from alignments and
-            // optionally alignments.  First annotate the show the variants in the
-            // variant cards and calcuate the coverage (if alignments provided).
-            var variantPromise = vc.promiseLoadAndShowVariants(true)
-                      .then( function() {
-
-                        if (vc.getRelationship() == 'proband') {
-                          showNavVariantLinks();
-                        }
-
-              });
-              variantPromises.push(variantPromise);
-
-          }
-
-        });
-
       }
-
 
 
 
@@ -3024,19 +3001,28 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
       // get the bam depth and display it.  We do this last since we want to show the variants
       // in the ranked table as soon as possible.
       Promise.all(variantPromises).then(function() {
+        return Promise.all(variantDisplayPromises);
+      })
+      .then(function() {
+        return promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true);
+      })
+      .then(function() {
 
         var coveragePromises = [];
         var allMaxDepth = 0;
-        fulfilledTrioPromise = false;
 
 
         // the variants are fully annotated so determine inheritance (if trio).
-        // Also scale the coverage chart y-axis
-        // based on the max depth of all sample's coverage data
-        promiseDetermineInheritance(promiseFullTrio).then(function() {
+        promiseAnnotateInheritance(window.gene, window.selectedTranscript, {isBackground: false, cacheData: true, refreshCalledGenotypes: false})
+        .then(function(data) {
+
+          // Now summarize the danger for the selected gene
+          return promiseSummarizeDanger(window.gene, window.selectedTranscript, data.trioVcfData.proband, data.trioFbData.proband);
+        })
+        .then(function() {
+
+          // Now show the variant cards and the ranked variants table
           getRelevantVariantCards().forEach(function(vc) {
-            // The inheritance has been determined for the trio, so now
-            // show the variants and the feature matrix
             vc.promiseShowFinalizedVariants().then(function() {
               if (vc.getRelationship() == 'proband' && callback) {
                 callback();
@@ -3048,17 +3034,16 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
         // Get the bam depth for each sample.  Calculate the max depth
         // so that all coverage charts use the same y-Axis
         getRelevantVariantCards().forEach(function(vc) {
-            var coveragePromise = vc.promiseLoadBamDepth()
-                             .then( function(coverageData) {
-                        if (coverageData) {
-                          var max = d3.max(coverageData, function(d,i) { return d[1]});
-                          if (max > allMaxDepth) {
-                            allMaxDepth = max;
-                          }
-                        }
-
-                             });
-            coveragePromises.push(coveragePromise);
+            var cp = vc.promiseLoadBamDepth()
+            .then( function(coverageData) {
+              if (coverageData) {
+                var max = d3.max(coverageData, function(d,i) { return d[1]});
+                if (max > allMaxDepth) {
+                  allMaxDepth = max;
+                }
+              }
+            });
+            coveragePromises.push(cp);
         });
 
         // When we have figured out the max bam depth, show the bam depth
@@ -3075,15 +3060,57 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
       });
 
 
-
-
-
-
-        });
-
-
+    });
 
   }
+
+}
+
+function promiseSummarizeDanger(geneObject, theTranscript, probandVcfData, probandFbData) {
+
+  return new Promise(function(resolve, reject) {
+
+    promiseGetCachedGeneCoverage(geneObject, theTranscript, false)
+    .then(function(data) {
+
+      var geneCoverageAll = data.geneCoverage;
+
+      getProbandVariantCard().promiseGetDangerSummary(geneObject.gene_name)
+      .then(function(dangerSummary) {
+
+          // Summarize the danger for the gene based on the filtered annotated variants and gene coverage
+          var filteredVcfData = null;
+          if (probandVcfData.features && probandVcfData.features.length > 0) {
+            filteredVcfData = getVariantCard('proband').model.filterVariants(probandVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
+          }
+          var options = {};
+          if (probandFbData || (dangerSummary && dangerSummary.CALLED)) {
+              options.CALLED = true;
+          }
+
+          return getProbandVariantCard().promiseSummarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverageAll);
+      })
+      .then(function(theDangerSummary) {
+
+        genesCard.setGeneBadgeGlyphs(geneObject.gene_name, theDangerSummary, true);
+        resolve();
+      },
+      function(error) {
+        var msg = "An error occurred in promiseSummarizeDanger() when calling VariantCard.promiseGetDangerSummary(): " + error;
+        console.log(msg);
+        reject(msg);
+      })
+
+
+    },
+    function(error) {
+      var msg = "An error occurred in promiseSummarizeDanger() when calling promiseGetCachedGeneCoverage(): " + error;
+      console.log(msg);
+      reject(msg);
+    });
+
+  });
+
 
 }
 
@@ -3277,7 +3304,10 @@ function addKnownVariantsCard()  {
   var variantCard = getVariantCard('known-variants');
   var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
   variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
-    variantCard.promiseLoadAndShowVariants(true);
+    variantCard.model.promiseAnnotateVariants(window.gene, window.selectedTranscript, [variantCard], false, false)
+    .then(function() {
+      variantCard.promiseShowVariants(true);
+    })
   });
 
   hideKnownVariantsCard = false;
@@ -3415,36 +3445,33 @@ function jointCallVariantsImpl(checkCache, callback) {
   }
 
   var processFbTrio = function(callback) {
-    fulfilledTrioPromise = false;
-    promiseDetermineInheritance(promiseFullTrioCalledVariants).then( function() {
+    promiseAnnotateInheritance(window.gene, window.selectedTranscript, {isBackground: false, cacheData: true, refreshCalledGenotypes: true})
+    .then( function(data) {
+        // Now summarize the danger for the selected gene
+        return promiseSummarizeDanger(window.gene, window.selectedTranscript, data.trioVcfData.proband, data.trioFbData.proband);
+    })
+    .then(function() {
 
       window.hideCircleRelatedVariants();
 
 
       getRelevantVariantCards().forEach( function(vc) {
 
-        // Reflect me new info in the freebayes variants.
-        vc.model.loadCalledTrioGenotypes();
-
         // Show the counts
         vc.showCallVariantsProgress('counting');
         vc.showCallVariantsProgress('done');
 
-        vc.promiseLoadAndShowVariants(false);
+        vc.promiseShowVariants(false);
 
       });
 
       getProbandVariantCard().promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
-        // Cache the updated the danger summary now that called variants are merged into
-        // variant set
-        cacheHelper.processCachedTrio(window.gene, window.selectedTranscript, true, false, function() {
-          cacheHelper.showAnalyzeAllProgress();
 
-          if (callback) {
-            callback();
-          }
+        cacheHelper.showAnalyzeAllProgress();
 
-        });
+        if (callback) {
+          callback();
+        }
 
       })
 
@@ -3555,142 +3582,185 @@ function jointCallVariantsImpl(checkCache, callback) {
 
 
 
-function cacheJointCallVariants(geneObject, transcript, sourceVariant, callback) {
+function promiseCacheJointCallVariants(geneObject, transcript, sourceVariant) {
 
+  return new Promise(function(resolve, reject) {
 
-  var bams = [];
-  var cards = getRelevantVariantCards();
-  cards.forEach(function(vc) {
-    if (vc.getRelationship() != 'known-variants') {
-      bams.push(vc.model.bam);
-    }
-  });
-
-
-  var sampleIndex = 0;
-  var jointVcfRecs = null;
-  var translatedRefName = null;
-
-  var parseNextCalledVariants = function(theGeneObject, theTranscript, afterParseCallback) {
-    if (sampleIndex >= cards.length) {
-      if (afterParseCallback) {
-        afterParseCallback(theGeneObject, theTranscript);
+    var bams = [];
+    var cards = getRelevantVariantCards();
+    cards.forEach(function(vc) {
+      if (vc.getRelationship() != 'known-variants') {
+        bams.push(vc.model.bam);
       }
-      return;
-    }
-    var vc = cards[sampleIndex];
-    var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
-    vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
-                  .then(function(data) {
-                    var theFbData = data[1];
+    });
 
-                    if (theFbData.loadState == null) {
-                      theFbData.loadState = {};
-                    }
-                    theFbData.loadState['called'] = true;
-                    theFbData.loadState['clinvar'] = true;
 
-                    theFbData.features.forEach(function(variant) {
-                      variant.fbCalled = "Y";
-                      variant.extraAnnot = true;
-                    })
+    var sampleIndex = 0;
+    var jointVcfRecs = null;
+    var translatedRefName = null;
 
-                // Pileup the variants
-                var pileupObject = vc.model._pileupVariants(theFbData.features, theGeneObject.start, theGeneObject.end);
-            theFbData.maxLevel = pileupObject.maxLevel + 1;
-            theFbData.featureWidth = pileupObject.featureWidth;
-
-            vc.model._promiseCacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript)
-             .then(function() {
-              // When only alignments provided, only the called variants were cached as "fbData".
-              // So initialize the vcfData to 0 features.
-              var promise = null;
-              if (vc.model.isAlignmentsOnly()) {
-                promise = vc.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
-              } else {
-                promise = new Promise(function(resolve, reject) {
-                  resolve();
-                });
-              }
-
-              promise.then(function() {
-                sampleIndex++;
-                parseNextCalledVariants(theGeneObject, theTranscript, afterParseCallback);
-              })
-
-             })
-            });
-  }
-
-  var trioFbData = {};
-  var trioModel = null;
-  var parseNextExportVariant = function(theGeneObject, theTranscript, afterParseCallback) {
-    if (sampleIndex >= cards.length) {
-      if (afterParseCallback) {
-        afterParseCallback(theGeneObject, theTranscript, trioFbData);
+    var parseNextCalledVariants = function(theGeneObject, theTranscript, afterParseCallback) {
+      if (sampleIndex >= cards.length) {
+        if (afterParseCallback) {
+          afterParseCallback(theGeneObject, theTranscript);
+        }
+        return;
       }
-      return;
-    }
-    var vc = cards[sampleIndex];
-    var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
-    vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
-                  .then(function(data) {
-                    var theFbData = data[1];
+      var vc = cards[sampleIndex];
+      var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
+      vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
+                    .then(function(data) {
+                      var theFbData = data[1];
 
-                    theFbData.features.forEach(function(variant) {
-                      variant.fbCalled = "Y";
-                    })
+                      if (theFbData.loadState == null) {
+                        theFbData.loadState = {};
+                      }
+                      theFbData.loadState['called'] = true;
+                      theFbData.loadState['clinvar'] = true;
 
-                    var relationship = cards[sampleIndex].getRelationship();
-                    trioFbData[relationship] = theFbData;
+                      theFbData.features.forEach(function(variant) {
+                        variant.fbCalled = "Y";
+                        variant.extraAnnot = true;
+                      })
 
-            sampleIndex++;
-            parseNextExportVariant(theGeneObject, theTranscript, afterParseCallback);
-            });
-  }
-  getProbandVariantCard().model.bam.freebayesJointCall(
-    geneObject,
-    transcript,
-    bams,
-    window.geneSource == 'refseq' ? true : false,
-    fbSettings.arguments,
-    global_vepAF,    // vep af
-    function(theData, trRefName, theGeneObject, theTranscript) {
+                  // Pileup the variants
+                  var pileupObject = vc.model._pileupVariants(theFbData.features, theGeneObject.start, theGeneObject.end);
+              theFbData.maxLevel = pileupObject.maxLevel + 1;
+              theFbData.featureWidth = pileupObject.featureWidth;
 
-      translatedRefName = trRefName;
-      jointVcfRecs =  theData.split("\n");
-
-      if (sourceVariant) {
-        parseNextExportVariant(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1, trioFbData) {
-          if (callback) {
-            trioModel = new VariantTrioModel(trioFbData.proband, trioFbData.mother, trioFbData.father);
-            trioModel.compareVariantsToMotherFather(function() {
-              var found = false;
-              trioModel.probandVcfData.features.forEach(function(variant) {
-                if (!found &&
-                  variant.chrom == sourceVariant.chrom &&
-                  variant.start == sourceVariant.start &&
-                  variant.ref == sourceVariant.ref &&
-                  variant.alt == variant.alt) {
-
-                  sourceVariant = variant;
-                  found = true;
+              vc.model._promiseCacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript)
+               .then(function() {
+                // When only alignments provided, only the called variants were cached as "fbData".
+                // So initialize the vcfData to 0 features.
+                var promise = null;
+                if (vc.model.isAlignmentsOnly()) {
+                  promise = vc.model.promiseCacheDummyVcfDataAlignmentsOnly(theFbData, theGeneObject, theTranscript);
+                } else {
+                  promise = new Promise(function(resolve, reject) {
+                    resolve();
+                  });
                 }
-              });
-              callback(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, sourceVariant);
-            });
-          }
-        });
-      } else {
-        parseNextCalledVariants(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1) {
-          if (callback) {
-            callback(theGeneObject1, theTranscript1, jointVcfRecs, translatedRefName, null);
-          }
-        });
-      }
-    }
-  );
 
+                promise.then(function() {
+                  sampleIndex++;
+                  parseNextCalledVariants(theGeneObject, theTranscript, afterParseCallback);
+                })
+
+               })
+              });
+    }
+
+    var trioFbData = {};
+    var trioModel = null;
+    var parseNextExportVariant = function(theGeneObject, theTranscript, afterParseCallback) {
+      if (sampleIndex >= cards.length) {
+        if (afterParseCallback) {
+          afterParseCallback(theGeneObject, theTranscript, trioFbData);
+        }
+        return;
+      }
+      var vc = cards[sampleIndex];
+      var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
+      vc.model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), sampleIndex, global_vepAF)
+                    .then(function(data) {
+                      var theFbData = data[1];
+
+                      theFbData.features.forEach(function(variant) {
+                        variant.fbCalled = "Y";
+                      })
+
+                      var relationship = cards[sampleIndex].getRelationship();
+                      trioFbData[relationship] = theFbData;
+
+              sampleIndex++;
+              parseNextExportVariant(theGeneObject, theTranscript, afterParseCallback);
+              });
+    }
+    getProbandVariantCard().model.bam.freebayesJointCall(
+      geneObject,
+      transcript,
+      bams,
+      window.geneSource == 'refseq' ? true : false,
+      fbSettings.arguments,
+      global_vepAF,    // vep af
+      function(theData, trRefName, theGeneObject, theTranscript) {
+
+        translatedRefName = trRefName;
+        jointVcfRecs =  theData.split("\n");
+
+        if (sourceVariant) {
+          parseNextExportVariant(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1, trioFbData) {
+            if (callback) {
+              trioModel = new VariantTrioModel(trioFbData.proband, trioFbData.mother, trioFbData.father);
+              trioModel.compareVariantsToMotherFather(function() {
+                var found = false;
+                trioModel.probandVcfData.features.forEach(function(variant) {
+                  if (!found &&
+                    variant.chrom == sourceVariant.chrom &&
+                    variant.start == sourceVariant.start &&
+                    variant.ref == sourceVariant.ref &&
+                    variant.alt == variant.alt) {
+
+                    sourceVariant = variant;
+                    found = true;
+                  }
+                });
+                resolve({ 'gene': theGeneObject1,
+                          'transcript': theTranscript1,
+                          'jointVcfRecs': jointVcfRecs,
+                          'refName': translatedRefName,
+                          'sourceVariant': sourceVariant});
+              });
+            }
+          });
+        } else {
+          parseNextCalledVariants(theGeneObject, theTranscript, function(theGeneObject1, theTranscript1) {
+            resolve({ 'gene': theGeneObject1,
+                      'transcript': theTranscript1,
+                      'jointVcfRecs': jointVcfRecs,
+                      'refName': translatedRefName,
+                      'sourceVariant': null});
+          });
+        }
+      }
+    );
+  })
+
+
+}
+
+function promiseAnnotateVariants(theGene, theTranscript, isMultiSample, isBackground, onVcfData) {
+  return new Promise(function(resolve, reject) {
+    var annotatePromises = [];
+    var theResultMap = {};
+    if (isMultiSample) {
+      var p = getProbandVariantCard().model.promiseAnnotateVariants(theGene, theTranscript, getRelevantVariantCards(), isMultiSample, isBackground, onVcfData)
+      .then(function(resultMap) {
+        theResultMap = resultMap;
+      })
+      annotatePromises.push(p);
+    } else {
+      getRelevantVariantCards().forEach(function(vc) {
+        if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
+          var p = vc.model.promiseAnnotateVariants(theGene, theTranscript, [vc], isMultiSample, isBackground, onVcfData)
+          .then(function(resultMap) {
+            for (var rel in resultMap) {
+              theResultMap[rel] = resultMap[rel];
+            }
+          })
+          annotatePromises.push(p);
+        }
+      })
+    }
+
+    Promise.all(annotatePromises)
+    .then(function() {
+      promiseAnnotateWithClinvar(theResultMap, theGene, theTranscript, isBackground)
+      .then(function() {
+        resolve();
+      })
+    });
+  })
 }
 
 
@@ -3802,263 +3872,296 @@ function loadSibs(sibs, affectedStatus) {
 
 }
 
+function promiseAnnotateInheritance(geneObject, theTranscript, options={isBackground: false, cacheData: true, refreshCalledGenotypes: false}) {
+  var me = this;
 
+  return new Promise(function(resolve,reject) {
 
-/**
- *  Every time app gets variant data back, th app determines (via promise) if we have
- *  the full trio of returned.  When this occurs, the app will compare the
- *  proband variants to mother and father to flag recessive and de nove modes of
- *  inheritance.  Then the app will compare the proband variants to unaffected sibs
- *  to determine of any recessive variants on the proband are hom-ref or het-alt on the
- *  unaffected sibs.  These recessive variants on the proband are flagged, indicating
- *  that these variants are more likely to be causative.  (If any of the unaffected sibs
- *  reported the same recessive variant, the variant would unlikely be causative.)
- *  We also determine the max allele count across all variants in the trio so that
- *  the tooltip can show a scaled allele count bar, with the max width set to the
- *  highest total (alt + ref) allele count.
- *
- */
-function promiseDetermineInheritance(promise) {
-
-  return new Promise( function(resolve, reject) {
-    var thePromise = null;
-    if (promise == null) {
-      thePromise = promiseFullTrio;
-    } else {
-      thePromise = promise;
+    if (!options.isBackground) {
+      $('#filter-and-rank-card').removeClass("hide");
+      $('#matrix-track').removeClass("hide");
+      $("#feature-matrix-note").addClass("hide");
+      if (dataCard.mode == 'trio') {
+        $("#matrix-panel .loader").removeClass("hide");
+        $("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
+      }
     }
 
-    var postInheritanceProcessing = function(theVcfData, probandVariantCard) {
-
-      probandVariantCard.populateEffectFilters();
-
-      probandVariantCard.promiseDetermineMaxAlleleCount()
-       .then(function() {
-        // Enable inheritance filters
-        filterCard.enableInheritanceFilters(theVcfData);
+    var trioVcfData = {proband: null, mother: null, father: null};
+    var trioFbData  = {proband: null, mother: null, father: null};
 
 
-        $('#filter-and-rank-card').removeClass("hide");
-        $('#matrix-track').removeClass("hide");
+    var thePromises = [];
+    getRelevantVariantCards().forEach(function(vc) {
+      var p = new Promise(function(resolve, reject) {
+        var theFbData = null;
+        var theVcfData = null;
+        var theModel = null;
 
-        $("#matrix-panel .loader").removeClass("hide");
-        $("#matrix-panel .loader .loader-label").text("Reviewing affected and unaffected siblings");
-        $("#feature-matrix-note").addClass("hide");
+        vc.model.promiseGetFbData(geneObject, theTranscript)
+        .then(function(data) {
+          theFbData = data.fbData;
+          theModel = data.model;
+          return theModel.promiseGetVcfData(geneObject, theTranscript);
+         })
+         .then(function(data) {
+          theVcfData = data.vcfData;
+          if (theVcfData == null) {
+            theVcfData = {features: []};
+          }
 
-        getProbandVariantCard().model.postInheritanceParsing(theVcfData, window.gene, window.selectedTranscript, getAffectedInfo(), function() {
-          $("#matrix-panel .loader").addClass("hide");
-            $("#matrix-panel .loader .loader-label").text("Ranking variants");
-          $("#feature-matrix-note").removeClass("hide");
+          if (theFbData && theFbData.features.length > 0) {
+            theVcfData = theModel.addCalledVariantsToVcfData(theVcfData, theFbData);
+            if (options.refreshCalledGenotypes) {
+              // Reflect me new info in the freebayes variants.
+              vc.model.loadCalledTrioGenotypes(trioVcfData[vc.getRelationship()], trioFbData[vc.getRelationship()]);
+            }
+          }
 
-          genesCard.refreshCurrentGeneBadge(null, null, function() {
-            cacheHelper.showAnalyzeAllProgress();
-          });
-
+          trioVcfData[theModel.getRelationship()] = theVcfData;
+          trioFbData[theModel.getRelationship()] = theFbData;
+          data.model.vcfData = theVcfData;
+          data.model.fbData  = theFbData;
           resolve();
 
-        });
+         },
+         function(error) {
+          var msg = "A problem occurred in promiseAnnotateInheritance() when getting trio vcf data: " + error;
+          console.log(msg);
+          reject(msg);
+         });
 
        })
 
+      thePromises.push(p);
+    })
 
+
+    var calcMaxAlleleCount = function(theVcfData) {
+      if (theVcfData && theVcfData.features) {
+        theVcfData.features.forEach(function(theVariant) {
+          if (theVariant.genotypeDepth) {
+            if ((+theVariant.genotypeDepth) > maxAlleleCount) {
+              maxAlleleCount = +theVariant.genotypeDepth;
+            }
+          }
+        })
+      }
     }
 
-    thePromise().then( function(probandVariantCard) {
-      if (!fulfilledTrioPromise) {
-        fulfilledTrioPromise = true;
 
-        var trioVcfData = {proband: null, mother: null, father: null};
-        var trioFbData  = {proband: null, mother: null, father: null};
+    Promise.all(thePromises)
+    .then(function() {
 
-        var thePromises = [];
-        getRelevantVariantCards().forEach(function(vc) {
-          var p = new Promise(function(resolve, reject) {
-            var theFbData = null;
-            var theVcfData = null;
-            var theModel = null;
 
-            vc.model.promiseGetFbData(window.gene, window.selectedTranscript)
-               .then(function(data) {
-              theFbData = data.fbData;
-              theModel = data.model;
-              return theModel.promiseGetVcfData(window.gene, window.selectedTranscript);
-             })
-             .then(function(data) {
-              theVcfData = data.vcfData;
-              if (theVcfData == null) {
-                theVcfData = {features: []};
-              }
-
-              if (theFbData && theFbData.features.length > 0) {
-                theVcfData = theModel.addCalledVariantsToVcfData(theVcfData, theFbData);
-              }
-
-              trioVcfData[theModel.getRelationship()] = theVcfData;
-              trioFbData[theModel.getRelationship()] = theFbData;
-              data.model.vcfData = theVcfData;
-              data.model.fbData  = theFbData;
-
-              resolve();
-             },
-             function(error) {
-              var msg = "A problem occurred in promiseDetermineInheritance(): " + error;
-              console.log(msg);
-              reject(msg);
-             });
-
-           })
-
-          thePromises.push(p);
+      if (dataCard.mode == 'single') {
+        promiseCacheTrioVcfData(geneObject, theTranscript, trioVcfData, options.cacheData)
+        .then(function() {
+          resolve({'trioVcfData': trioVcfData, 'trioFbData': trioFbData, 'gene': geneObject, 'transcript': theTranscript});
         })
+      } else if (trioVcfData.proband == null || trioVcfData.mother == null || trioVcfData.father == null) {
+        reject("Unable to annotate inheritance because there is missing trio data");
+      } else {
 
-        Promise.all(thePromises).then(function() {
-          if (dataCard.mode == 'trio' && (trioVcfData.proband == null || trioVcfData.mother == null || trioVcfData.father == null)) {
-            genesCard.clearGeneGlyphs(window.gene.gene_name);
-            genesCard.setGeneBadgeError(window.gene.gene_name);
-            reject("Unable to determine inheritance for gene " + window.gene.gene_name + " because full trio data for gene is not available");
-          } else if (dataCard.mode == 'trio') {
+        // Set the max allele count across all variants in the trio.  We use this to properly scale
+        // the allele counts bars in the tooltip
+        maxAlleleCount = 0;
+        for(var rel in trioVcfData) {
+          calcMaxAlleleCount(trioVcfData[rel]);
+        }
+        for(var rel in trioFbData) {
+          calcMaxAlleleCount(trioFbData[rel]);
+        }
+
+        // Enable inheritance filters
+        filterCard.enableInheritanceFilters(trioVcfData.proband);
 
 
+        // We only pass in the affected info if we need to sync up genotypes because samples
+        // where in separate vcf files
+        var affectedInfo = getAffectedInfo();
+        var affectedInfoToSync = isAlignmentsOnly() || samplesInSingleVcf() ? null : affectedInfo;
 
-            $('#filter-and-rank-card').removeClass("hide");
-            $('#matrix-track').removeClass("hide");
+        var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfoToSync);
 
-            $("#matrix-panel .loader").removeClass("hide");
-            $("#matrix-panel .loader .loader-label").text("Determining inheritance mode");
-            $("#feature-matrix-note").addClass("hide");
+        // Compare the mother and father variants to the proband, setting the inheritance
+        // mode on the proband's variants
+        trioModel.compareVariantsToMotherFather(function() {
 
-            // we need to compare the proband variants to mother and father variants to determine
-            // the inheritance mode.  After this completes, we are ready to show the
-            // feature matrix.
-            // We only pass in the affected info if we need to sync up genotypes because samples
-            // where in separate vcf files
-            var affectedInfo = isAlignmentsOnly() || samplesInSingleVcf() ? null : getAffectedInfo();
-            var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father, null, affectedInfo);
-            trioModel.compareVariantsToMotherFather(function() {
-              getRelevantVariantCards().forEach(function(vc) {
-                if (trioVcfData[vc.getRelationship()]) {
-                  vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], window.selectedTranscript);
-                }
-              })
-              postInheritanceProcessing(trioVcfData.proband, probandVariantCard);
-            });
+          // Now set the affected status for the family on each variant of the proband
+          getProbandVariantCard().model.determineAffectedStatus(trioVcfData.proband, geneObject, theTranscript, affectedInfo, function() {
 
-          } else {
-            probandVariantCard.model.performAdditionalParsing(trioVcfData.proband, window.selectedTranscript);
+            // Now that inheritance mode has been determined, we can assess each variant's impact
+            getRelevantVariantCards().forEach(function(vc) {
+              if (trioVcfData[vc.getRelationship()]) {
+                vc.model.assessVariantImpact(trioVcfData[vc.getRelationship()], theTranscript);
+              }
+            })
 
-            probandVariantCard.promiseDetermineMaxAlleleCount()
-             .then(function() {
-              probandVariantCard.populateEffectFilters();
-
-              //mat $("#matrix-panel .loader").addClass("hide");
+            if (!options.isBackground) {
+              $("#matrix-panel .loader").addClass("hide");
+              $("#matrix-panel .loader .loader-label").text("Ranking variants");
               $("#feature-matrix-note").removeClass("hide");
+            }
 
-              probandVariantCard.model._promiseCacheData(trioVcfData.proband, "vcfData", window.gene.gene_name, window.selectedTranscript)
-               .then(function() {
-                genesCard.refreshCurrentGeneBadge(null, trioVcfData.proband, function() {
-                  resolve();
-                });
-               },
-               function(error) {
-                reject(error);
-               })
-
-
-
-             })
-
-          }
+            promiseCacheTrioVcfData(geneObject, theTranscript, trioVcfData, options.cacheData)
+            .then(function() {
+              resolve({'trioVcfData': trioVcfData, 'trioFbData': trioFbData, 'gene': geneObject, 'transcript': theTranscript});
+            })
+          });
 
         })
-
       }
-
 
     },
     function(error) {
-      // no need to deal with error since these are just the times
-      // when we didn't yet have a full trio.
+      $("#matrix-panel .loader").addClass("hide");
+      $("#matrix-panel .loader .loader-label").text("Ranking variants");
 
-    });
-  });
-
-
+      genesCard.clearGeneGlyphs(window.gene.gene_name);
+      genesCard.setGeneBadgeError(window.gene.gene_name);
+      var msg = "Error occurred in promiseAnnotateInheritance for gene " + geneObject.gene_name + ": " + error;
+      console.log(msg)
+      reject(msg);
+    })
+  })
 
 }
 
 
+function promiseCacheTrioVcfData(geneObject, theTranscript, trioVcfData, cacheIt) {
 
-function promiseFullTrio() {
-  return new Promise( function(resolve, reject) {
-    var loaded = {};
-    var promises = [];
-    variantCards.forEach(function(vc) {
-      var p = vc.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-       .then(function(data) {
-        if (data.vcfData) {
-          loaded[data.model.getRelationship()] = getVariantCard(data.model.getRelationship());
+  return new Promise(function(resolve, reject) {
+    // Cache vcf data for trio
+    var cachePromise = null;
+    if (cacheIt) {
+      var cachedPromises = [];
+      getRelevantVariantCards().forEach(function(vc) {
+        if (trioVcfData[vc.getRelationship()]) {
+          console.log("caching " + geneObject.gene_name + " for " + vc.getRelationship());
+          var p = vc.model._promiseCacheData(trioVcfData[vc.getRelationship()], CacheHelper.VCF_DATA, geneObject.gene_name, theTranscript);
+          cachedPromises.push(p);
         }
+      })
+      Promise.all(cachedPromises).then(function() {
+        resolve();
+      })
+    } else {
+      resolve();
+    }
 
+  })
+
+}
+
+
+
+
+
+function promiseAnnotateWithClinvar(resultMap, geneObject, transcript, isBackground) {
+
+  var formatClinvarKey = function(variant) {
+    var delim = '^^';
+    return variant.chrom + delim + variant.ref + delim + variant.alt + delim + variant.start + delim + variant.end;
+  }
+
+  var formatClinvarThinVariant = function(key) {
+    var delim = '^^';
+    var tokens = key.split(delim);
+    return {'chrom': tokens[0], 'ref': tokens[1], 'alt': tokens[2], 'start': tokens[3], 'end': tokens[4]};
+  }
+
+
+
+  var refreshVariantsWithClinvarLookup = function(theVcfData, clinvarLookup) {
+    theVcfData.features.forEach(function(variant) {
+      var clinvarAnnot = clinvarLookup[formatClinvarKey(variant)];
+      if (clinvarAnnot) {
+        for (var key in clinvarAnnot) {
+          variant[key] = clinvarAnnot[key];
+        }
+      }
+    })
+    if (theVcfData.loadState == null) {
+      theVcfData.loadState = {};
+    }
+    theVcfData.loadState['clinvar'] = true;
+  }
+
+
+
+  return new Promise(function(resolve, reject) {
+
+    // Combine the trio variants into one set of variants so that we can access clinvar once
+    // instead of on a per sample basis
+    var uniqueVariants = {};
+    var unionVcfData = {features: []}
+    for (var rel in resultMap) {
+      var vcfData = resultMap[rel];
+      if (!vcfData.loadState['clinvar']) {
+       vcfData.features.forEach(function(feature) {
+          uniqueVariants[formatClinvarKey(feature)] = true;
        })
-       promises.push(p);
-    });
+      }
+    }
+    if (Object.keys(uniqueVariants).length == 0) {
+      resolve();
+    } else {
 
-    Promise.all(promises).then(function() {
-
-      var uaSibsLoaded = true;
-
-      if (dataCard.mode == 'trio' && loaded.proband != null
-          && loaded.mother  != null && loaded.father != null
-          && uaSibsLoaded) {
-        resolve(loaded.proband);
-      } else if (dataCard.mode == 'single' && loaded.proband != null) {
-        // Not sure if this is still needed for filter slide bar ?????
-        var windowWidth = $(window).width();
-          var filterPanelWidth = $('#filter-track').width();
-
-        resolve(loaded.proband);
-      } else if (isAlignmentsOnly()) {
-        resolve(getProbandVariantCard());
-      } else {
-        reject();
+      for (var key in uniqueVariants) {
+        unionVcfData.features.push(formatClinvarThinVariant(key));
       }
 
-    })
+      var refreshVariantsFunction = isClinvarOffline || clinvarSource == 'vcf' ? getProbandVariantCard().model._refreshVariantsWithClinvarVCFRecs.bind(getProbandVariantCard().model, unionVcfData) : getProbandVariantCard().model._refreshVariantsWithClinvarEutils.bind(getProbandVariantCard().model, unionVcfData);
 
-  });
+      getProbandVariantCard().model.vcf.promiseGetClinvarRecords(
+          unionVcfData,
+          getProbandVariantCard().model._stripRefName(geneObject.chr),
+          geneObject,
+          refreshVariantsFunction)
+      .then(function() {
 
-}
+          // Create a hash lookup of all clinvar variants
+          var clinvarLookup = {};
+          unionVcfData.features.forEach(function(variant) {
+            var clinvarAnnot = {};
 
-function promiseFullTrioCalledVariants() {
-  return new Promise( function(resolve, reject) {
-    var loaded = {};
-    var promises = [];
-    variantCards.forEach(function(vc) {
-      if (vc.isLoaded()) {
-        var promise = vc.promiseVariantsHaveBeenCalled()
-         .then(function(variantsHaveBeenCalled) {
-          if (variantsHaveBeenCalled) {
-            loaded[vc.getRelationship()] = vc;
+            for (var key in getProbandVariantCard().model.vcf.getClinvarAnnots()) {
+                clinvarAnnot[key] = variant[key];
+                clinvarLookup[formatClinvarKey(variant)] = clinvarAnnot;
+            }
+          })
+
+          var refreshPromises = [];
+
+          // Use the clinvar variant lookup to initialize variants with clinvar annotations
+          for (var rel in resultMap) {
+            var vcfData = resultMap[rel];
+            if (!vcfData.loadState['clinvar']) {
+              refreshVariantsWithClinvarLookup(vcfData, clinvarLookup);
+              if (!isBackground) {
+                getVariantCard(rel).model.vcfData = vcfData;
+              }
+              var p = getVariantCard(rel).model._promiseCacheData(vcfData, CacheHelper.VCF_DATA, vcfData.gene.gene_name, vcfData.transcript);
+              refreshPromises.push(p);
+            }
           }
-         })
-         promises.push(promise);
-      }
-    });
-    Promise.all(promises).then(function() {
-      if (dataCard.mode == 'trio' && loaded.proband != null
-          && loaded.mother  != null && loaded.father != null) {
-        resolve(loaded.proband);
-      } else if (dataCard.mode == 'single' && loaded.proband != null) {
-        resolve(loaded.proband);
-      } else {
-        reject();
-      }
 
-    })
+          Promise.all(refreshPromises)
+          .then(function() {
+            resolve();
+          },
+          function(error) {
+            reject(error);
+          })
 
-  });
+      })
+    }
 
+
+  })
 }
+
 
 
 function isDataLoaded() {

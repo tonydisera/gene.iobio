@@ -695,7 +695,7 @@ VariantCard.prototype.clearWarnings = function() {
 /*
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.promiseLoadAndShowVariants = function (fullRefresh) {
+VariantCard.prototype.promiseShowVariants = function (fullRefresh) {
   var me = this;
 
   return new Promise( function(resolve, reject) {
@@ -1047,13 +1047,18 @@ VariantCard.prototype.promiseShowFinalizedVariants = function() {
 
     me._showVariants(regionStart, regionEnd, null, false);
 
-    if (me.model.getRelationship() == 'proband' && (me.model.isVcfReadyToLoad() || me.model.isLoaded() || isAlignmentsOnly())) {
-      me.promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
+    me.promiseVariantsHaveBeenCalled()
+    .then(function(variantsHaveBeenCalled) {
+      if (me.model.getRelationship() == 'proband' && (me.model.isVcfLoaded() || (isAlignmentsOnly() && variantsHaveBeenCalled))) {
+        me.promiseFillFeatureMatrix(regionStart, regionEnd).then(function() {
+          resolve();
+        })
+      } else {
         resolve();
-      })
-    } else {
-      resolve();
-    }
+      }
+
+    })
+
 
   })
 
@@ -1207,148 +1212,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
 
       }
 
-    } else if (me.model.isVcfReadyToLoad()) {
 
-      if (me.isViewable()) {
-        me.cardSelector.find('.vcfloader').removeClass("hide");
-        var annotationEngines = filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP";
-        me.cardSelector.find('.vcfloader .loader-label').text(me.getRelationship() == "known-variants" ? "Accessing variants" : "Annotating variants with " + annotationEngines);
-        me.cardSelector.find("#region-flag").addClass("hide");
-      }
-
-
-      //  The user has entered a gene.  Get the annotated variants.
-      var theGene =  $.extend({}, window.gene);
-      var theTranscript = $.extend({}, window.selectedTranscript);
-      me.model.promiseGetVariants(theGene, theTranscript, false, // isAnalyzeAll
-      function(data) {
-          // When variants annotated with snpEff and VEP...
-
-          if (me.isViewable()) {
-            // show the 'Loading Clinvar' progress
-            me.cardSelector.find('.vcfloader').removeClass("hide");
-            me.cardSelector.find('.vcfloader .loader-label').text("Accessing ClinVar");
-            me.cardSelector.find('#clinvar-warning').addClass("hide");
-
-            // We have variants, so show them now even though we still
-            // don't have clinvar annotations nor coverage
-            // Here we call this method again and since we
-            // have vcf data, the variant chart will be filled
-            //me._showVariants(regionStart ? regionStart : window.gene.start,
-            //         regionEnd ? regionEnd : window.gene.end,
-            //         onVcfData,
-            //         onVariantsDisplayed);
-            filterCard.enableVariantFilters(true);
-
-            filterCard.autoSetFilters();
-
-          }
-          //if (onVcfData) {
-           //   onVcfData();
-            //}
-
-        }).then ( function(data) {
-          // After clinvar data retrieved...
-
-            if (me.isViewable()) {
-              // Show the variant count
-            me.cardSelector.find('#vcf-variant-count-label').removeClass("hide");
-            me.model.promiseGetVariantCount()
-             .then(function(count) {
-                  me.cardSelector.find('#vcf-variant-count').text(count);
-             })
-
-            me.cardSelector.find('#gene-box').css("visibility", "hidden");
-            me.cardSelector.find('.vcfloader').addClass("hide");
-
-
-            // At this point, the variants should be cached.  If they aren't,
-            // an error occurred
-            me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-             .then(function(data) {
-              var theVcfData = data;
-              if (theVcfData) {
-
-                  // Here we call this method again and since we
-                // have vcf data, the variant chart will be filled
-                  me._showVariants(regionStart ? regionStart : window.gene.start,
-                         regionEnd ? regionEnd : window.gene.end,
-                         onVariantsDisplayed,
-                         true);
-
-                  // Enable the variant filters
-                  if (me.getRelationship() == 'proband') {
-                    filterCard.enableClinvarFilters(data);
-                  }
-
-                // Show the 'Call from alignments' button if we a bam file/url was specified
-                if (me.isBamLoaded() && me.isViewable()) {
-                  me.cardSelector.find('#button-find-missing-variants').removeClass("hide");
-                } else {
-                  me.cardSelector.find('#button-find-missing-variants').addClass("hide");
-                }
-
-                if (me.getRelationship() == 'proband') {
-                  //genesCard.refreshCurrentGeneBadge(null, null, function() {
-                  //  cacheHelper.showAnalyzeAllProgress();
-                  //});
-                }
-              } else {
-                if (me.getRelationship() == 'proband') {
-                  me.model.promiseCacheDangerSummary({}, window.gene.gene_name)
-                   .then(function() {
-                    genesCard._geneBadgeLoading(window.gene.gene_name, false);
-                    genesCard.setGeneBadgeWarning(window.gene.gene_name);
-                   })
-                }
-              }
-             })
-
-
-            }
-
-        }, function(error) {
-          me.cardSelector.find('.vcfloader').addClass("hide");
-
-          if (me.getRelationship() == 'proband') {
-               genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-             genesCard.refreshCurrentGeneBadge(error);
-              }
-
-          if (error && error == "missing reference") {
-            me._displayRefNotFoundWarning();
-          } else if (error && ($.type(error) === "string") && error.toLowerCase() == "no variants") {
-
-            if (me.isViewable()) {
-               $('#matrix-track').addClass("hide");
-                me.cardSelector.find("#vcf-track").addClass("hide");
-                me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-                me.cardSelector.find("#vcf-variant-count").text("");
-                me.cardSelector.find('.vcfloader').addClass("hide");
-                me.cardSelector.find('#error-warning #message').text(error);
-                me.cardSelector.find('#error-warning').removeClass("hide");
-
-                if (getProbandVariantCard().isLoaded()) {
-                  $("#matrix-panel .loader").addClass("hide");
-                  getProbandVariantCard().promiseFillFeatureMatrix(regionStart, regionEnd);
-                }
-            }
-
-          } else {
-            console.log(error);
-            if (me.isViewable()) {
-               $('#matrix-track').addClass("hide");
-                me.cardSelector.find("#vcf-track").addClass("hide");
-                me.cardSelector.find('#vcf-variant-count-label').addClass("hide");
-                me.cardSelector.find("#vcf-variant-count").text("");
-                me.cardSelector.find('.vcfloader').addClass("hide");
-                me.cardSelector.find('#error-warning #message').text(error);
-                me.cardSelector.find('#error-warning').removeClass("hide");
-            }
-          }
-
-
-        });
     } else {
       genesCard._geneBadgeLoading(window.gene.gene_name, false);
     }
@@ -1600,87 +1464,6 @@ VariantCard.prototype.showCallVariantsProgress = function(state, message) {
 }
 
 
-VariantCard.prototype.callVariants = function(regionStart, regionEnd, callback) {
-  var me = this;
-
-  me.showCallVariantsProgress('starting');
-
-  this.model.promiseCallVariants(
-    regionStart,
-    regionEnd,
-    function() {
-      // After variants have been been called from alignments...
-        var msg = "Annotating variants with " + (filterCard.getAnnotationScheme().toLowerCase() == "vep" ? "VEP" : "SnpEff and VEP");
-        me.showCallVariantsProgress('running', message);
-    },
-    function(data) {
-      // After variants have been annotated
-      // Enable the variant filters based on the new union of
-      // vcf variants + called variants
-      filterCard.enableVariantFilters(true);
-
-      me.showCallVariantsProgress('counting');
-
-      // Show the called variants
-      me._fillFreebayesChart(data, regionStart, regionEnd);
-
-    }).then( function(data) {
-      // After variants have been annotated with clinvar and inheritance has been determined...
-
-      // Hide the clinvar loader
-      me.showCallVariantsProgress('done');
-
-      // Show the called variants
-      me._fillFreebayesChart(data, regionStart, regionEnd);
-
-      // If this is the proband card, refresh the feature matrix to
-      // show union of vcf variants and called variants
-      var promise = null;
-      if (me.getRelationship() == 'proband') {
-        promise = me.promiseFillFeatureMatrix(regionStart, regionEnd);
-      } else {
-        promise = new Promise(function(resolve, reject) {
-          resolve();
-        })
-      }
-
-      promise.then(function() {
-        // Show gene badges
-        if (me.getRelationship() == 'proband') {
-          genesCard.refreshCurrentGeneBadge();
-        }
-
-        // Enable inheritance filters
-        me.model.promiseGetVcfData(window.gene, window.selectedTranscript).then(function(data) {
-          var theVcfData = data.vcfData;
-          filterCard.enableInheritanceFilters(theVcfData);
-
-          // Enable the clinvar filter
-          filterCard.enableClinvarFilters(theVcfData);
-
-          if (callback) {
-            callback();
-          }
-
-        })
-
-      })
-
-
-    }, function(error) {
-
-      console.log(error);
-      me.showCallVariantsProgress('error');
-
-    });
-
-
-}
-
-VariantCard.prototype.updateCalledVariantsWithInheritance = function() {
-  this.model.updateCalledVariantsWithInheritance();
-}
-
 
 VariantCard.prototype.getDefaultVariantColorClass = function() {
   if (this.getRelationship() == 'known-variants') {
@@ -1833,10 +1616,6 @@ VariantCard.prototype._promiseFilterVariants = function(dataToFilter) {
 
 }
 
-
-VariantCard.prototype.promiseDetermineMaxAlleleCount = function(vcfData) {
-  return this.model.promiseDetermineMaxAlleleCount(vcfData);
-}
 
 VariantCard.prototype.populateEffectFilters = function() {
   this.model.populateEffectFilters();
@@ -2119,51 +1898,6 @@ VariantCard.prototype.hideCoverageCircle = function() {
    })
 }
 
-VariantCard.prototype.promiseGetMaxAlleleCount = function() {
-  var me = this;
-
-  var resolveIt = function(resolve, theVcfData) {
-    if (theVcfData == null) {
-      resolve(null);
-    } else {
-      var count = theVcfData.maxAlleleCount;
-      if (!count) {
-        me.promiseDetermineMaxAlleleCount(theVcfData)
-         .then(function() {
-          resolve(theVcfData.maxAlleleCount);
-         },
-         function(error) {
-          var msg = "A problem occurred in VariantModel.promiseGetMaxAlleleCount(): " + error;
-          console.log(msg);
-          reject(msg);
-         })
-      } else {
-        resolve(count);
-      }
-    }
-
-  }
-
-  return new Promise(function(resolve, reject) {
-    var theVcfData = null;
-    if (me.model.isVcfLoaded()) {
-      me.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-       .then(function(data) {
-        var theVcfData = data.vcfData;
-        resolveIt(resolve, theVcfData);
-       })
-    } else {
-      me.model.promiseGetFbData(window.gene, window.selectedTranscript)
-       .then(function(data) {
-        theVcfData = data.fbData;
-        resolveIt(resolve, theVcfData);
-       })
-
-
-    }
-  })
-
-}
 
 
 VariantCard.prototype.highlightBookmarkedVariants = function() {

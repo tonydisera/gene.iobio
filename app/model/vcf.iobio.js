@@ -55,16 +55,6 @@ vcfiobio = function module() {
     '255': 'other'
   }
 
-  var CLINVAR_ANNOTS = {
-    clinvarSubmissions: [],
-    clinVarClinicalSignificance: {},
-    clinVarPhenotype:  {},
-    clinVarAccession: {},
-    clinvarRank: null,
-    clinvar: null
-  }
-
-
 
 var effectCategories = [
 ['coding_sequence_variant', 'coding'],
@@ -1619,6 +1609,7 @@ var effectCategories = [
           'strand':             geneObject.strand,
           'transcript':         selectedTranscript,
           'variantRegionStart': variantRegionStart,
+          'loadState':          {},
           'features':           allVariants[i],
           'genericAnnotators':  me.infoFields ? Object.keys(me.infoFields) : []
         };
@@ -1627,6 +1618,7 @@ var effectCategories = [
 
 
       return  parseMultiSample ? results :  results[0];
+      //return  results;
   };
 
 exports._parseAnnot = function(rec, altIdx, isMultiAllelic, geneObject, selectedTranscript, selectedTranscriptID, vepAF) {
@@ -1992,13 +1984,20 @@ exports._parseSnpEffAnnot = function(annotToken, annot, geneObject, selectedTran
 }
 
 exports.getClinvarAnnots = function() {
-  return CLINVAR_ANNOTS;
+  return   {
+    clinvarSubmissions: [],
+    clinVarClinicalSignificance: {},
+    clinVarPhenotype:  {},
+    clinVarAccession: {},
+    clinvarRank: null,
+    clinvar: null
+  };
 }
 
 exports.parseClinvarInfo = function(info, clinvarMap) {
   var me = this;
 
-  var result = $.extend({}, CLINVAR_ANNOTS);
+  var result = me.getClinvarAnnots();
 
 
   var initClinvarSubmissions = function(clinvarSubmissions, length) {

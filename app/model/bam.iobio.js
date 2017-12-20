@@ -504,7 +504,7 @@ var Bam = Class.extend({
     } else {
       var bam = bams[idx];
       if (bam.sourceType == "url") {
-        bamSources.push({'bamUrl': me.bamUri, 'baiUrl': me.baiUri});
+        bamSources.push({'bamUrl': bam.bamUri, 'baiUrl': bam.baiUri});
         idx++;
         me._initializeBamSource(bams, refName, regionStart, regionEnd, bamSources, idx, callback);
       } else {
