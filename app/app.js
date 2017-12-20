@@ -255,7 +255,10 @@ function onYouTubeIframeAPIReady() {
 
 function initHub() {
     // Hub api URL
-  var api =  "https://staging.frameshift.io/apiv1";
+  // var api =  "https://staging.frameshift.io/apiv1";
+  var api =  "http://localhost:3000/apiv1";
+
+  console.log('url = ' + window.location.href);
 
   // Parse params
   var params = {};
@@ -283,7 +286,25 @@ function initHub() {
       headers: {
         'Authorization': localStorage.getItem('hub-iobio-tkn')
       }
-    }).then(appendHubFileNamesToURL);
+    }).then(function(res) {
+      var promises = [];
+      res.data.forEach(function(file) {
+        var {uri, name, type, uuid } = file;
+        var req = $.ajax({
+          url: api + '/files/'+uuid+'/url',
+          type: 'GET',
+          contentType: 'application/json',
+          headers: {
+            'Authorization': localStorage.getItem('hub-iobio-tkn')
+          }
+        }).then(function(res) {
+          return {'name': name, 'type': type, 'url': res.url};
+        })
+        promises.push(req);
+      })
+
+      Promise.all(promises).then(appendHubFileNamesToURL);
+    });
   }
 }
 
@@ -357,12 +378,12 @@ function promiseLoadClinvarGenes() {
 }
 
 // Get sample name, gene(?), build(?) from ajax call and then only call this for each file?
-function appendHubFileNamesToURL(res) {
-  res.data.forEach(function(file) {
-    var {uri, name, type } = file;
-    updateUrl(type+"0", uri);
+function appendHubFileNamesToURL(data) {
+  data.forEach(function(file) {
+    var {url, name, type } = file;
+    console.log(type + " : " + url);
+    updateUrl(type+"0", encodeURIComponent(url));
     updateUrl("name0", name.split(".")[0]);
-    updateUrl("sample0", name.split(".")[0]);
     updateUrl("genes","RAI1,AIRE,MYLK2,PDGFB,PDHA1");
     updateUrl("gene","RAI1");
     updateUrl("build","GRCh37");
