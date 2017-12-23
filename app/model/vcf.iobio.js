@@ -964,10 +964,9 @@ var effectCategories = [
 
   }
 
-  exports.promiseParseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, sampleNamesToGenotype, sampleIndex, vepAF) {
+  exports.parseVcfRecordsForASample = function(annotatedRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, sampleNamesToGenotype, sampleIndex, vepAF) {
     var me = this;
 
-    return new Promise( function(resolve, reject) {
       // For each vcf records, call snpEff to get the annotations.
       // Each vcf record returned will have an EFF field in the
       // info field.
@@ -1006,9 +1005,8 @@ var effectCategories = [
 
       // Parse the vcf object into a variant object that is visualized by the client.
       var results = me._parseVcfRecords(vcfObjects, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, false, sampleNamesToGenotype, sampleIndex, vepAF);
-      resolve([annotatedRecs, results]);
+      return {'annotatedRecs': annotatedRecs, 'results': results};
 
-    });
   }
 
   exports._promiseAnnotateVcfRecords = function(records, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, isMultiSample, vcfSampleNames, sampleNamesToGenotype, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF) {

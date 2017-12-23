@@ -695,27 +695,22 @@ VariantCard.prototype.clearWarnings = function() {
 /*
 * A gene has been selected.  Load all of the tracks for the gene's region.
 */
-VariantCard.prototype.promiseShowVariants = function (fullRefresh) {
+VariantCard.prototype.promiseShowVariants = function () {
   var me = this;
 
   return new Promise( function(resolve, reject) {
-    if (fullRefresh) {
-      me.prepareToShowVariants();
-    }
 
     // Clear out previous variant data and set up variant card
     // to show that loading messages.
     if (me.isViewable()) {
 
       // Load the variant chart.
-      me._showVariants( regionStart,
-        regionEnd,
-        function() {
-
-          readjustCards();
-          resolve();
-        },
-        true);
+      me._showVariants(regionStart, regionEnd,
+      function() {
+        readjustCards();
+        resolve();
+      },
+      true);
     } else {
       resolve();
     }
@@ -1122,13 +1117,15 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
   }
 
 
-  this.model.promiseGetVcfData(window.gene, window.selectedTranscript)
-   .then(function(data) {
-    var theVcfData = data.vcfData;
+  //this.model.promiseGetVcfData(window.gene, window.selectedTranscript)
+  // .then(function(data) {
+    //var theVcfData = data.vcfData;
+    var theVcfData = me.model.vcfData;
 
     if (theVcfData) {
 
       // Set the current model's loaded and called variants based on the cached data.
+      /*
       me.model.setLoadedVariants(theVcfData);
       if (me.model.isBamLoaded()) {
         me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
@@ -1139,6 +1136,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
          })
 
       }
+      */
 
 
       // The user has selected a region to zoom into or the data has come back for a selected gene that
@@ -1157,26 +1155,26 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
         // Show the proband's (cached) freebayes variants (loaded with inheritance)
         if (me.model.isBamLoaded()) {
           me.model.promiseHasCalledVariants()
-           .then(function(hasCalledVariants) {
-                if (hasCalledVariants) {
-                  me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+          .then(function(hasCalledVariants) {
+            if (hasCalledVariants) {
+              me.cardSelector.find('#called-variant-count-label').removeClass("hide");
               me.cardSelector.find('#called-variant-count').removeClass("hide");
               me.model.promiseGetCalledVariantCount().then(function(count) {
                 me.cardSelector.find('#called-variant-count').text(count);
               })
 
-                } else {
-                  me.model.promiseVariantsHaveBeenCalled()
-                   .then(function(variantsHaveBeenCalled) {
-                    if (variantsHaveBeenCalled) {
-                      // If call variants has occurred but 0 variants returned.
-                      me.cardSelector.find('#called-variant-count-label').removeClass("hide");
+            } else {
+              me.model.promiseVariantsHaveBeenCalled()
+              .then(function(variantsHaveBeenCalled) {
+                if (variantsHaveBeenCalled) {
+                  // If call variants has occurred but 0 variants returned.
+                  me.cardSelector.find('#called-variant-count-label').removeClass("hide");
                   me.cardSelector.find('#called-variant-count').removeClass("hide");
                   me.cardSelector.find('#called-variant-count').text("0");
-                    }
-
-                   })
                 }
+
+              })
+            }
 
             me.promiseFilterAndShowCalledVariants();
 
@@ -1217,7 +1215,7 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
       genesCard._geneBadgeLoading(window.gene.gene_name, false);
     }
 
-   })
+  //});
 
 }
 
@@ -1313,8 +1311,9 @@ VariantCard.prototype.promiseFillFeatureMatrix = function(regionStart, regionEnd
 
   return new Promise(function(resolve, reject) {
     // Don't show the feature matrix (rank card) if there are no variants for the proband
-    me.model.promiseGetVcfData(window.gene, window.selectedTranscript).then(function(data) {
-      var theVcfData = data.vcfData;
+    //me.model.promiseGetVcfData(window.gene, window.selectedTranscript).then(function(data) {
+      //var theVcfData = data.vcfData;
+      var theVcfData = me.vcfData;
 
       // If only alignments provided, only show feature matrix if variants have been called.
       if (isAlignmentsOnly() && (theVcfData == null || theVcfData.features.length == 0)) {
@@ -1344,7 +1343,7 @@ VariantCard.prototype.promiseFillFeatureMatrix = function(regionStart, regionEnd
 
       })
 
-    })
+    //})
 
   })
 }
@@ -1411,16 +1410,6 @@ VariantCard.prototype._fillFreebayesChart = function(data, regionStart, regionEn
 
 }
 
-VariantCard.prototype.clearCalledVariants = function() {
-  var me = this;
-  // Clear out the freebayes charts in the variant card
-  me.cardSelector.find('#fb-chart-label').addClass("hide");
-  me.cardSelector.find('#fb-separator').addClass("hide");
-  me.d3CardSelector.select('#fb-variants svg').remove();
-
-  // Clear out data
-  this.model.clearCalledVariants();
-}
 
 VariantCard.prototype.showCallVariantsProgress = function(state, message) {
   var me = this;
@@ -1483,14 +1472,19 @@ VariantCard.prototype.setVariantColorClass = function(clazz) {
 VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart, regionEnd) {
   var me = this;
   return new Promise(function(resolve, reject) {
-    me.model.promiseHasCalledVariants()
-     .then(function(hasCalledVariants) {
-      if (hasCalledVariants) {
+    //me.model.promiseHasCalledVariants()
+     //.then(function(hasCalledVariants) {
+
+      if (me.model.fbData == null || me.model.fbData.features == null) {
+        me.model.reconstituteFbData(me.model.vcfData);
+      }
+
+      if (me.model.fbData && me.model.fbData.features && me.model.fbData.features.length > 0) {
         me.cardSelector.find('.fbloader').addClass("hide");
 
-        me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
-        .then(function(data) {
-          var theFbData = data.fbData;
+        //me.model.promiseGetFbData(window.gene, window.selectedTranscript, true)
+        //.then(function(data) {
+          var theFbData = me.model.fbData;
           me._promiseFilterVariants(theFbData, me.fbChart)
           .then(function(filteredFBData) {
 
@@ -1513,16 +1507,16 @@ VariantCard.prototype.promiseFilterAndShowCalledVariants = function(regionStart,
 
           })
 
-        })
+        //})
       }  else {
         resolve(null);
       }
-     },
-     function(error) {
+     //},
+     /*function(error) {
       var msg = "VariantCard.promiseFilterAndShowCalledVariants(): " + error;
       console.log(msg);
       reject(msg);
-     });
+     });*/
 
   });
 

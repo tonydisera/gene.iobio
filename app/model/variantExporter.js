@@ -344,25 +344,22 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
               }
 
               var sampleNamesToGenotype = getProbandVariantCard().getSampleNamesToGenotype();
-              getProbandVariantCard().model.vcf.promiseParseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0, global_vepAF)
-                         .then(function(data) {
-                          var theFbData = data[1];
+              var data = getProbandVariantCard().model.vcf.parseVcfRecordsForASample(jointVcfRecs, translatedRefName, theGeneObject1, theTranscript1, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), 0, global_vepAF)
+              var theFbData = data.results;
 
-                  theFbData.features.forEach(function(v) {
-                    if (theVariant == null
-                      && getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom)
-                      && v.start  == sourceVariant.start
-                      && v.ref    == sourceVariant.ref
-                      && v.alt    == sourceVariant.alt) {
-                      theVariant = v;
-                    }
-                  })
-                  me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, exportRec)
-                      .then(function(data) {
-                        resolve(data);
-                    })
-
-                         });
+              theFbData.features.forEach(function(v) {
+                if (theVariant == null
+                  && getProbandVariantCard().model._stripRefName(v.chrom) == getProbandVariantCard().model._stripRefName(sourceVariant.chrom)
+                  && v.start  == sourceVariant.start
+                  && v.ref    == sourceVariant.ref
+                  && v.alt    == sourceVariant.alt) {
+                  theVariant = v;
+                }
+              })
+              me._promiseFormatRecord(theVariant, sourceVariant, theVcfRecs, theGeneObject, format, exportRec)
+              .then(function(data) {
+                resolve(data);
+              })
           });
 
         } else {

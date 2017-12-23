@@ -207,7 +207,7 @@ VariantModel.prototype.promiseGetFbData = function(geneObject, selectedTranscrip
             var theVcfData = data.vcfData;
             var dangerSummary = me.promiseGetDangerSummary(geneObject.gene_name)
              .then(function(dangerSummary) {
-              if (theVcfData && theVcfData.features && dangerSummary && dangerSummary.CALLED) {
+              if (theVcfData && theVcfData.features) {
                 theFbData = me.reconstituteFbData(theVcfData);
                 resolve({fbData: theFbData, model: me});
               } else {
@@ -259,8 +259,8 @@ VariantModel.prototype.reconstituteFbData = function(theVcfData) {
         theFbData.features.push(variantObject);
         variantObject.source = v;
     }
-    });
-    return theFbData;
+  });
+  return theFbData;
 }
 
 VariantModel.prototype.promiseGetKnownVariants = function(geneObject, transcript, binLength) {
@@ -1622,6 +1622,7 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
 
           if (!isBackground) {
             vc.model.vcfData = vcfData;
+            vc.model.fbData = me.reconstituteFbData(vcfData);
           }
           me._populateEffectFilters(me.vcfData.features);
           me._populateRecFilters(me.vcfData.features);
@@ -1714,49 +1715,51 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
                   theVcfData.gene = theGeneObject;
                   resultMap[vc.getRelationship()] = theVcfData;
 
-                  // Perform post-annotation processing for each variant card's model
-                  vc.model._promisePostAnnotateProcessing(me.getVcfRefName(theGene.chr), theGene, theTranscript, theVcfData).then(function() {
+                  // Show the snpEff effects / vep consequences in the filter card
+                  me._populateEffectFilters(theVcfData.features);
 
-                    // Flag any bookmarked variants
-                    me._promiseDetermineVariantBookmarks(theVcfData, theGeneObject, theTranscript).then(function() {
+                  // Determine the unique values in the VCF filter field
+                  me._populateRecFilters(theVcfData.features);
 
-                      if (vc.getRelationship() == 'proband') {
-                        me._populateEffectFilters(theVcfData.features);
-                        me._populateRecFilters(theVcfData.features);
-                        filterCard.displayDataGeneratedFilters();
+
+                  // Flag any bookmarked variants
+                  me._promiseDetermineVariantBookmarks(theVcfData, theGeneObject, theTranscript).then(function() {
+
+
+                    // Cache the data (if there are variants)
+                    /*var promise = null;
+                    if (theVcfData && theVcfData.features) {
+                      promise = vc.model._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theVcfData.gene.gene_name, theVcfData.transcript);
+                    } else {
+                      promise = new Promise(function(resolve, reject) {
+                        resolve()
+                      });
+                    }*/
+
+                    //  Store the data and process next variant card
+                    //promise.then(function() {
+                      if (!isBackground) {
+                        vc.model.vcfData = theVcfData;
                       }
+                      idx++;
+                      postProcessNextVariantCard(idx, callback);
 
-                      // Cache the data (if there are variants)
-                      var promise = null;
-                      if (theVcfData && theVcfData.features) {
-                        promise = vc.model._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theVcfData.gene.gene_name, theVcfData.transcript);
-                      } else {
-                        promise = new Promise(function(resolve, reject) {
-                          resolve()
-                        });
-                      }
-
-                      //  Store the data and process next variant card
-                      promise.then(function() {
-                        if (!isBackground) {
-                          vc.model.vcfData = theVcfData;
-                        }
-                        idx++;
-                        postProcessNextVariantCard(idx, callback);
-
-                      },
-                      function(error) {
-                        var msg = "A problem occurred while caching data in VariantModel.promiseGetVariantsMultipleSamples(): " + error + ". Unable to cache annotated variants for gene " + theVcfData.gene.gene_name;
-                        console.log(msg);
-                        reject(msg);
-                      })
-                    })
+                    //},
+                    /*function(error) {
+                     var msg = "A problem occurred while caching data in VariantModel.promiseGetVariantsMultipleSamples(): " + error + ". Unable to cache annotated variants for gene " + theVcfData.gene.gene_name;
+                      console.log(msg);
+                      reject(msg);
+                    }) */
                   })
+
                 }
               }
 
               postProcessNextVariantCard(idx, function() {
+
+                filterCard.displayDataGeneratedFilters();
                 resolve(resultMap);
+
               });
 
             } else {
@@ -1830,7 +1833,7 @@ VariantModel.prototype.determineAffectedStatus = function(data, theGene, theTran
 
     // For some reason, vcf data is reset to pre determineSibStatus unless we clear out vcfData
     // at this point
-    me.vcfData = null;
+    //me.vcfData = null;
 
     if (callback) {
       callback(theVcfData);
@@ -2160,59 +2163,6 @@ VariantModel.prototype._otherSampleInThisVcf = function(otherModel) {
 }
 
 
-VariantModel.prototype._promisePostAnnotateProcessing = function(ref, geneObject, transcript, theVcfData, onVcfData) {
-  var me = this;
-  return new Promise( function(resolve, reject) {
-    if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
-
-
-        // Show the snpEff effects / vep consequences in the filter card
-        me._populateEffectFilters(theVcfData.features);
-
-        // Determine the unique values in the VCF filter field
-        me._populateRecFilters(theVcfData.features);
-
-        // Invoke callback now that we have annotated variants
-        me.vcfData = theVcfData;
-      if (onVcfData) {
-        onVcfData(theVcfData);
-      }
-
-      //
-      // Get the clinvar records (for proband, mom, data)
-      //
-      if (me.getRelationship() == 'sibling') {
-        resolve(theVcfData);
-      } else if (me.getRelationship() == 'known-variants') {
-        resolve(theVcfData);
-      } else {
-          /*
-          me.vcf.promiseGetClinvarRecords(
-            theVcfData,
-            me._stripRefName(ref), geneObject,
-            isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theVcfData) : me._refreshVariantsWithClinvarEutils.bind(me, theVcfData))
-          .then(function() {
-            resolve(theVcfData);
-          }, function(error) {
-            reject(error);
-          });*/
-          resolve(theVcfData);
-      }
-
-    } else if (theVcfData.features.length == 0) {
-
-        // Invoke callback now that we have annotated variants
-        me.vcfData = theVcfData;
-        if (onVcfData) {
-          onVcfData(theVcfData);
-        }
-        resolve(theVcfData);
-
-    }
-  })
-
-
-}
 
 
 VariantModel.prototype.populateEffectFilters = function() {
@@ -2575,180 +2525,7 @@ VariantModel.prototype._addClinVarInfoToVariant = function(variant, clinvar) {
   }
 }
 
-VariantModel.prototype.clearCalledVariants = function() {
-  var me = this;
-  this._promiseCacheData(null, CacheHelper.FB_DATA, window.gene.gene_name, window.selectedTranscript)
-   .then(function() {
-    if (me.relationship == 'proband') {
-      me._promiseGetData(CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
-       .then(function(theVcfData) {
-        if (theVcfData && theVcfData.features && theVcfData.features.length > 0) {
-          var loadedVariantsOnly = theVcfData.features.filter(function(variant) {
-            return !variant.fbCalled || variant.fbCalled != 'Y';
-          })
-          if (loadedVariantsOnly.length < theVcfData.features.length ) {
-            theVcfData.features = loadedVariantsOnly;
-            me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
-             .then(function() {
-              me.vcfData = theVcfData;
-             })
-          }
-        }
-       })
-    }
-   },
-   function(error) {
 
-   })
-
-
-}
-
-
-
-VariantModel.prototype.processFreebayesVariants = function(theFbData, theVcfData, callback) {
-  var me = this;
-
-
-  // Flag the called variants
-    theFbData.features.forEach( function(feature) {
-      feature.fbCalled = 'Y';
-      feature.extraAnnot = true;
-    });
-
-  // We may have called variants that are slightly outside of the region of interest.
-  // Filter these out.
-  if (window.regionStart != null && window.regionEnd != null ) {
-    theFbData.features = theFbData.features.filter( function(d) {
-      meetsRegion = (d.start >= window.regionStart && d.start <= window.regionEnd);
-      return meetsRegion;
-    });
-  }
-
-
-  // We are done getting the clinvar data for called variants.
-  // Now merge called data with variant set and display.
-  // Prepare vcf and fb data for comparisons
-  me._prepareVcfAndFbData(theFbData, theVcfData);
-
-  // Filter the freebayes variants to only keep the ones
-  // not present in the vcf variant set.
-  me._determineUniqueFreebayesVariants(window.gene, window.selectedTranscript, theVcfData, theFbData);
-
-
-  // Show the snpEff effects / vep consequences in the filter card
-  me._populateEffectFilters(theFbData.features);
-
-  // Determine the unique values in the VCF filter field
-  me._populateRecFilters(theFbData.features);
-
-
-
-  // Now get the clinvar data
-  me.vcf.promiseGetClinvarRecords(
-          theFbData,
-          me._stripRefName(window.gene.chr), window.gene,
-          isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs.bind(me, theFbData) : me._refreshVariantsWithClinvarEutils.bind(me, theFbData)
-      ).then( function() {
-        if (callback) {
-
-          // We need to refresh the fb variants in vcfData with the latest clinvar annotations
-        theFbData.features.forEach(function (fbVariant) {
-          if (fbVariant.source) {
-            fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
-            fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
-            fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
-            fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
-            fbVariant.source.clinvar                     = fbVariant.clinvar;
-            fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
-            fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
-          }
-        });
-
-        // Re-cache the vcf data and fb data now that the called variants have been merged,
-        // inheritance has been determined, and newly called variants have
-        // been annotated with clinvar
-        me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, window.gene.gene_name, window.selectedTranscript)
-         .then(function() {
-          return me._promiseCacheData(theFbData, CacheHelper.FB_DATA, window.gene.gene_name, window.selectedTranscript);
-         })
-         .then(function() {
-            callback(theFbData);
-         },
-         function(error) {
-          console.log("An error occurred when caching data in VariantModel.processFreebayesVariants(): " + error);
-          callback(null);
-         })
-
-
-        }
-      });
-
-
-}
-
-VariantModel.prototype.promiseProcessCachedFreebayesVariants = function(geneObject, theTranscript) {
-  var me = this;
-
-  return new Promise(function(resolve, reject) {
-
-    var theVcfData = null;
-    var theFbData = null;
-
-    me.promiseGetVcfData(geneObject, theTranscript)
-     .then(function(data) {
-      theVcfData = data.vcfData;
-     })
-     .then(function() {
-      return me.promiseGetFbData(geneObject, theTranscript)
-       .then(function(data) {
-
-        theFbData = data.fbData;
-          theFbData.features.forEach( function(feature) {
-            feature.fbCalled = 'Y';
-          });
-
-        // Filter the freebayes variants to only keep the ones
-        // not present in the vcf variant set.
-        me._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
-
-      });
-     })
-     .then(function() {
-      // Now get the clinvar data
-      // ADD CODE HERE!!! to check to see if the fbData already has the clinvar annotations.  If so,
-      // bypass getting clinvar records and just perform code inside callback
-      var refreshDataFunction = isClinvarOffline || clinvarSource == 'vcf' ? me._refreshVariantsWithClinvarVCFRecs : me._refreshVariantsWithClinvarEutils;
-      me.vcf.promiseGetClinvarRecords(theFbData, me._stripRefName(geneObject.chr), geneObject, refreshDataFunction.bind(me, theFbData))
-       .then( function() {
-          // We need to refresh the fb variants in vcfData with the latest clinvar annotations
-        theFbData.features.forEach(function (fbVariant) {
-          if (fbVariant.source) {
-            fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
-            fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
-            fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
-            fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
-            fbVariant.source.clinvar                     = fbVariant.clinvar;
-            fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
-            fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
-          }
-        });
-        resolve({'fbData': theFbData, 'vcfData': theVcfData, 'geneObject': geneObject, 'transcript': theTranscript});
-       });
-
-
-     },
-     function(error) {
-      var msg = "An error occurred in VariantMode.processCachedFreebayesVariants(): " + error;
-      console.log(msg);
-      reject(msg);
-     });
-  })
-
-
-
-
-}
 
 
 VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData) {
@@ -2812,7 +2589,7 @@ VariantModel.prototype.loadCalledTrioGenotypes = function(theVcfData, theFbData)
 }
 
 
-
+/*
 VariantModel.prototype._prepareVcfAndFbData = function(theFbData, theVcfData) {
   var me = this;
   var theFbData = theFbData ? theFbData : me.fbData;
@@ -2851,30 +2628,10 @@ VariantModel.prototype._prepareVcfAndFbData = function(theFbData, theVcfData) {
      })
   }
 }
+*/
 
 VariantModel.prototype.isAlignmentsOnly = function() {
   return !this.isVcfReadyToLoad() && this.isBamLoaded();
-}
-
-/*
- * No variants are loaded, create a dummy vcfData with 0 features
- */
-VariantModel.prototype.promiseCacheDummyVcfDataAlignmentsOnly = function(theFbData, theGeneObject, theTranscript) {
-  var me = this;
-  return new Promise(function(resolve, reject) {
-    theVcfData = $.extend({}, theFbData);
-    theVcfData.features = [];
-    theVcfData.loadState = {clinvar: true, coverage: true, inheritance: true};
-
-    me._promiseCacheData(theVcfData, CacheHelper.VCF_DATA, theGeneObject.gene_name, theTranscript)
-     .then(function() {
-      resolve(theVcfData);
-     },
-     function(error) {
-      reject(error);
-     })
-
-  })
 }
 
 
@@ -2931,12 +2688,6 @@ VariantModel.prototype.addCalledVariantsToVcfData = function(theVcfData, theFbDa
 VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, theTranscript, theVcfData, theFbData) {
   var me = this;
 
-  if (geneObject == null) {
-    geneObject = window.gene;
-  }
-  if (theTranscript == null) {
-    theTranscript = window.selectedTranscript;
-  }
 
   if (theVcfData == null) {
     theVcfData = me.vcfData;
@@ -2967,13 +2718,13 @@ VariantModel.prototype._determineUniqueFreebayesVariants = function(geneObject, 
   // in feature matrix
   theFbData.features.forEach( function(v) {
     var variantObject = $.extend({}, v);
-      theVcfData.features.push(variantObject);
-      v.source = variantObject;
-    });
+    theVcfData.features.push(variantObject);
+    v.source = variantObject;
+  });
 
-    // Figure out max level (lost for some reason)
-    var maxLevel = 1;
-    theVcfData.features.forEach(function(feature) {
+  // Figure out max level (lost for some reason)
+  var maxLevel = 1;
+  theVcfData.features.forEach(function(feature) {
     if (feature.level > maxLevel) {
       maxLevel = feature.level;
     }
