@@ -269,7 +269,7 @@ EndpointCmd.prototype.getBamCoverage = function(bamSource, refName, regionStart,
   // samtools mpileup.
   if (bamSource.bamUrl) {
     var args = ['view', '-b', '"'+bamSource.bamUrl+'"', regionArg];
-    if (me.baiUrl) {
+    if (bamSource.baiUrl) {
       args.push('"'+bamSource.baiUrl+'"');
     }
     cmd = new iobio.cmd(samtools, args,
