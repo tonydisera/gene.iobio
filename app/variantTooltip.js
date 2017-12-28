@@ -7,14 +7,21 @@ function VariantTooltip() {
   this.WIDTH_SIMPLE_WIDER     = 500;
   this.WIDTH_ALLELE_COUNT_BAR = 160;
   this.WIDTH_ALLELE_COUNT_ROW = 300;
-  this.HEIGHT_SCROLLABLE_AREA = 200;
+  this.HEIGHT_SCROLLABLE_AREA = 196;
+  this.ARROW_OFFSET           = 10;
+  this.ARROW_WIDTH            = 10;
+
   this.VALUE_EMPTY        = "-";
   this.AFFECTED_GLYPH =   "<i class='material-icons tooltip-affected-symbol'>spellcheck</i>";
 
 }
 
-VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, screenX, screenY, variantCard, html, adjustPosition=true) {
+VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, coord, variantCard, html) {
   var me = this;
+
+  if (lock) {
+    console.log("locked");
+  }
   tooltip.style("z-index", 1032);
   tooltip.transition()
    .duration(1000)
@@ -54,16 +61,52 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
   var h = d3.round(tooltip[0][0].offsetHeight);
 
-  var x = screenX;
-  var y = screenY;
+  var x = coord.x;
+  var y = coord.y;
+
   var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
-  if (adjustPosition) {
-    y -= navbarHeight;
-    if (lock && y - h < (navbarHeight * -1)) {
-      y = h - navbarHeight;
-    }
-    x = sidebarAdjustX(x);
+  var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
+  y -= navbarHeight;
+  var yScroll = window.pageYOffset;
+
+  tooltip.classed("arrow-down-left", false);
+  tooltip.classed("arrow-down-right", false);
+  tooltip.classed("arrow-down-center", false);
+  tooltip.classed("arrow-up-left", false);
+  tooltip.classed("arrow-up-right", false);
+  tooltip.classed("arrow-up-center", false);
+  var arrow           = {direction: null, position:   null};
+
+  var tooltipTop =  (y - h);
+  var tooltipLeft = null;
+
+  if (tooltipTop > yScroll) {
+    // position tooltip above element if there is enough vertical space.
+    tooltipTop = (y - h);
+    arrow.direction   = 'down';
+  } else  {
+    // If user has scrolled down, beyond the top of the tooltip, it will be cropped,
+    // so position tooltip below the hovered/clicked element.
+    tooltipTop = y + coord.height;
+    arrow.direction   = 'up';
   }
+
+  if (x > 0 && (x+w) < coord.parentWidth) {
+    // If there is room, show tooltip to the right of the hovered/clicked element
+    tooltipLeft = x - (me.ARROW_OFFSET + me.ARROW_WIDTH);
+    arrow.position     = 'left';
+  } else if (x - w > 0 ) {
+    // Otherwise, if there is room, show tooltip to the left of the hovered/clicked element
+    tooltipLeft = (x - w) + (me.ARROW_OFFSET + me.ARROW_WIDTH);
+    arrow.position     = 'right';
+
+  } else {
+    // Otherwise, show the tooltip in the center
+    tooltipLeft = (x - (w/2) +  me.ARROW_WIDTH);
+    arrow.position      = 'center';
+  }
+
+  tooltip.classed("arrow-" + arrow.direction + '-' + arrow.position, true);
 
 
   if (lock && !isLevelEdu) {
@@ -74,34 +117,10 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     }
   }
 
-
-
-  if (x > 0 && (x+w) < $('#matrix-panel').outerWidth()) {
-    tooltip.classed("arrow-down-left", true);
-    tooltip.classed("arrow-down-right", false);
-    tooltip.classed("arrow-down-center", false);
-    tooltip.style("width", w + "px")
-           .style("left", (x-33) + "px")
-           .style("text-align", 'left')
-           .style("top", (y - h) + "px");
-
-  } else if (x - w > 0 ) {
-    tooltip.classed("arrow-down-right", true);
-    tooltip.classed("arrow-down-left", false);
-    tooltip.classed("arrow-down-center", false);
-    tooltip.style("width", w + "px")
-           .style("left", (x - w + 2) + "px")
-           .style("text-align", 'left')
-           .style("top", (y - h) + "px");
-  } else {
-    tooltip.classed("arrow-down-right", false);
-    tooltip.classed("arrow-down-left", false);
-    tooltip.classed("arrow-down-center", true);
-    tooltip.style("width", w + "px")
-           .style("left", (x - w/2) + "px")
-           .style("text-align", 'left')
-           .style("top", (y - h) + "px");
-  }
+  tooltip.style("width", w + "px")
+         .style("left", tooltipLeft + "px")
+         .style("text-align", 'left')
+         .style("top", tooltipTop + "px");
 
 }
 
@@ -1155,7 +1174,6 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
   var me = this;
   var svg = container.append("div")
              .attr("id", "allele-count-legend")
-                   .style("padding-top", "0px")
                .append("svg")
                .attr("width", me.WIDTH_ALLELE_COUNT_ROW)
                    .attr("height", "20");
@@ -1167,7 +1185,7 @@ VariantTooltip.prototype._appendReadCountHeading = function(container) {
        .text("Read Counts");
 
   var g = svg.append("g")
-             .attr("transform", "translate(77,0)");
+             .attr("transform", "translate(77,1)");
 
   g.append("text")
        .attr("x", "13")

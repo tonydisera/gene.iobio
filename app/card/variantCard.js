@@ -1656,7 +1656,7 @@ VariantCard.prototype.adjustTooltip = function(variant) {
   }
   if (tooltip) {
     if (tooltip.style("opacity") != 0) {
-      this._showTooltipImpl(tooltip, matchingVariant, this, false);
+      this._showTooltipImpl(tooltip, matchingVariant, this, clickedVariant != null);
     }
   }
 
@@ -1811,10 +1811,22 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
   matrixCard.highlightVariant(variant);
 
 
-  var x = variant.screenX + 7;
-  var y = variant.screenY - 27;
+  var x = variant.screenX;
 
-  variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, x, y, me);
+  // The variant tooltip is inside the variant panel, so we have to subtract the width of
+  // the sidepanel if it is showing
+  x = sidebarAdjustX(x);
+
+
+  var y = variant.screenY;
+
+  var coord = {'x':        x,
+               'y':        y,
+               'height':   33,
+               'parentWidth': me.cardSelector.outerWidth(),
+               'preferredPosition': 'top'};
+
+  variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, me);
 
   tooltip.select("#unpin").on('click', function() {
     me.unpin(null, true);

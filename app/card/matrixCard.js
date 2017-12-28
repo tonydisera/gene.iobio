@@ -316,7 +316,7 @@ MatrixCard.prototype.init = function() {
   }
 
   this.featureMatrix = featureMatrixD3()
-            .margin({top: 0, right: 40, bottom: 7, left: 24})
+            .margin({top: 0, right: 40, bottom: 7, left: 0})
             .cellSize(isLevelEdu ? me.CELL_SIZE_EDU : (isLevelBasic ? null : me.CELL_SIZE))
             .cellWidth(isLevelBasic ? me.CELL_WIDTH_BASIC : null)
             .cellHeights(isLevelBasic ? me.matrixRowsBasic.map(function(d){return d.height}) : null)
@@ -327,7 +327,7 @@ MatrixCard.prototype.init = function() {
             .columnLabelSymbol( me.showColumnHeaderSymbol)
             .adjustTooltipCoordinates( function(variant) {
                   variant.screenYMatrix += $('.navbar-fixed-top').outerHeight();
-                  variant.screenXMatrix += $("#slider-left").hasClass("hide") ? 0 : $('#slider-left').outerWidth();
+                  //variant.screenXMatrix += $("#slider-left").hasClass("hide") ? 0 : $('#slider-left').outerWidth();
             })
             .on('d3click', function(variant) {
               if (variant ==  null) {
@@ -335,7 +335,7 @@ MatrixCard.prototype.init = function() {
               } else {
                 if (variant != clickedVariant) {
                   clickedVariant = isLevelBasic ? null : variant;
-                  me.showTooltip(variant, isLevelBasic ? false : true);
+                  me.showTooltip(variant, true);
                   variantCards.forEach(function(variantCard) {
                     variantCard.showVariantCircle(variant);
                     variantCard.showCoverageCircle(variant, getProbandVariantCard());
@@ -498,7 +498,7 @@ MatrixCard.prototype.removeBookmarkFlag = function(theVariant) {
   }
 
 }
-MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip, adjustPosition=true) {
+MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip) {
   var me  = this;
   var index = -1;
   var i = 0;
@@ -521,36 +521,33 @@ MatrixCard.prototype.highlightVariant = function(theVariant, showTooltip, adjust
     var colNode = d3.selectAll('#feature-matrix .col')[0][index];
     var column  = d3.select(colNode);
     var colObject = column.datum();
-        column.classed("active", true);
-        column.select(".colbox").classed("current", true);
+    column.classed("active", true);
+    column.select(".colbox").classed("current", true);
 
-        var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1;
-        $("#feature-matrix").scrollLeft(left);
+    var left = (isLevelBasic ? me.CELL_WIDTH_BASIC : me.CELL_SIZE) * index+1;
+    $("#feature-matrix").scrollLeft(left);
 
-        if (showTooltip) {
-          // Get screen coordinates of column.  We will use this to position the
-          // tooltip above the column and scroll left if necessary
-          var matrix = column.node()
-                         .getScreenCTM()
-                         .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
-          var screenXMatrix = window.pageXOffset + matrix.e + me.featureMatrix.margin().left;
-          var screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
-
-
-          matrix = column.node()
+    if (showTooltip) {
+      // Get screen coordinates of column.  We will use this to position the
+      // tooltip above the column and scroll left if necessary
+      var matrix = column.node()
                      .getScreenCTM()
                      .translate(+column.node().getAttribute("cx"),+column.node().getAttribute("cy"));
       // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
-            // so instead the app will use getBoundingClientRect() method instead which does take into consideration
-            // the transform.
-            var boundRect = column.node().getBoundingClientRect();
-            colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + me.featureMatrix.margin().left;
-          colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
+      // so instead the app will use getBoundingClientRect() method instead which does take into consideration
+      // the transform.
+      var boundRect = column.node().getBoundingClientRect();
+      colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2));
 
-          clickedVariant = colObject;
-          me.showTooltip(colObject, true, adjustPosition);
+      // Since the body is vertically scrollable, we need to calculate the y by offsetting to a height of the
+      // scroll position in the container.
+      colObject.screenYMatrix = window.pageYOffset + matrix.f + me.featureMatrix.margin().top;
+      colObject.screenYMatrix  += $('.navbar-fixed-top').outerHeight();
 
-        }
+      clickedVariant = colObject;
+      me.showTooltip(colObject, true);
+
+    }
 
   }
 
@@ -595,7 +592,7 @@ MatrixCard.prototype.adjustTooltip = function(variant) {
   }
 }
 
-MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) {
+MatrixCard.prototype.showTooltip = function(variant, lock) {
   var me = this;
 
   // Don't show the tooltip for mygene2 beginner mode
@@ -607,7 +604,9 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
   var yMatrix = variant.screenYMatrix;
 
   if (lock) {
-    getProbandVariantCard().unpin(true);
+    getRelevantVariantCards().forEach(function(vc) {
+      vc.unpin(true);
+    })
 
     if (isLevelEdu) {
       eduTourCheckVariant(variant);
@@ -635,7 +634,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
         var annotatedVariant = targetVariants[0];
         annotatedVariant.screenXMatrix = xMatrix;
             annotatedVariant.screenYMatrix = yMatrix;
-        me._showTooltipImpl(annotatedVariant, true, adjustPosition);
+        me._showTooltipImpl(annotatedVariant, true);
       } else {
         if (callbackNotFound) {
           callbackNotFound();
@@ -663,13 +662,13 @@ MatrixCard.prototype.showTooltip = function(variant, lock, adjustPosition=true) 
       });
 
   } else {
-    me._showTooltipImpl(variant, lock, adjustPosition);
+    me._showTooltipImpl(variant, lock);
   }
 }
 
 
 
-MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=true) {
+MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
   var me = this;
 
   //var tooltip = d3.select('#container #matrix-track .tooltip');
@@ -677,14 +676,20 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock, adjustPosition=t
 
 
   var screenX = variant.screenXMatrix;
-  screenX    -= me.featureMatrix.cellSize()/2;
 
   var screenY = variant.screenYMatrix;
   if (isLevelEdu) {
     screenY += $('#nav-edu-tour').outerHeight();
   }
 
-  variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, screenX, screenY, getProbandVariantCard(), null, adjustPosition);
+  var coord = {'x':           screenX,
+               'y':           screenY,
+               'height':      matrixCard.featureMatrix.height(),
+               'parentWidth': $('.navbar-fixed-top').outerWidth(),
+               'preferredPosition': 'side' };
+
+
+  variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, getProbandVariantCard() );
   tooltip.select("#unpin").on('click', function() {
     me.unpin();
   });

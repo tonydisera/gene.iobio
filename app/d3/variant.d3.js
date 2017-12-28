@@ -98,12 +98,13 @@ function variantD3() {
       // Firefox doesn't consider the transform (slideout's shift left) with the getScreenCTM() method,
       // so instead the app will use getBoundingClientRect() method instead which does take into consideration
       // the transform.
-      matchingVariant.screenX = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;
-      //matchingVariant.screenX = d3.round(window.pageXOffset + matrix.e + margin.left);
+      matchingVariant.screenX = d3.round(boundRect.left + (boundRect.width/2));
 
-      matchingVariant.screenY = d3.round(window.pageYOffset + matrix.f + margin.top);
+      // Since the body is vertically scrollable, we need to calculate the y by offsetting to a height of the
+      // scroll position in the container.
+      matchingVariant.screenY = d3.round((window.pageYOffset + matrix.f + margin.top) - boundRect.height);
 
-      showCoordinateFrame(matchingVariant.screenX);
+      //showCoordinateFrame(matchingVariant.screenX);
 
     } else if (indicateMissingVariant) {
       var mousex = d3.round(x(d.start));

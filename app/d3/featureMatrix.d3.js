@@ -123,13 +123,17 @@ function featureMatrixD3() {
             return this.parentNode === container.node();
           })
          .attr("width", parseInt(width))
-         .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height));
+         .attr('viewBox', "0 0 " + parseInt(width) + " " + parseInt(height))
+         .append("g")
+         .attr("class", "group")
+         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+      var topLevelGroup = svg.select("g.group");
 
 
 
       // Generate the column headers
-      svg.selectAll("g.colhdr").remove();
+      topLevelGroup.selectAll("g.colhdr").remove();
       if (options.showColumnLabels) {
         var translateColHdrGroup = "";
         if (options.simpleColumnLabels) {
@@ -141,7 +145,7 @@ function featureMatrixD3() {
         } else {
           translateColHdrGroup = "translate(" + (+rowLabelWidth+( (cellWidth != null ? cellWidth : cellSize) / 2 )) + "," + (columnLabelHeight) + ")";
         }
-        var colhdrGroup =  svg.selectAll("g.colhdr").data([data])
+        var colhdrGroup =  topLevelGroup.selectAll("g.colhdr").data([data])
           .enter()
           .append("g")
           .attr("class", "colhdr")
@@ -183,8 +187,8 @@ function featureMatrixD3() {
       } else {
         translate += "-30)"
       }
-      svg.selectAll("g.group").remove();
-      var g =  svg.selectAll("g.group").data([data])
+      topLevelGroup.selectAll("g.group").remove();
+      var g =  topLevelGroup.selectAll("g.group").data([data])
         .enter()
         .append("g")
         .attr("class", "group")
@@ -192,8 +196,8 @@ function featureMatrixD3() {
 
 
       // Create the y-axis at the top.  This will show the labels for the rows
-      svg.selectAll(".y.axis").remove();
-      svg.selectAll("g.y").data([matrixRowNames]).enter()
+      topLevelGroup.selectAll(".y.axis").remove();
+      topLevelGroup.selectAll("g.y").data([matrixRowNames]).enter()
           .append("g")
           .attr("class", "y axis")
           .attr("transform", "translate(20," + (options.showColumnLabels ? columnLabelHeight + (cellHeights != null && cellHeights.length > 0 ? 4 : 0) : "0") + ")")
@@ -205,8 +209,8 @@ function featureMatrixD3() {
           .attr("dy", ".15em");
 
       // Add the up and down arrows to the x-axis
-      svg.selectAll("g.y.axis .tick .up").remove();
-      svg.selectAll("g.y.axis .tick")
+      topLevelGroup.selectAll("g.y.axis .tick .up").remove();
+      topLevelGroup.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "up faded")
          //.attr("transform", "translate(" + rowLabelWidth + ", -13)")
@@ -247,8 +251,8 @@ function featureMatrixD3() {
 
 
 
-      svg.selectAll("g.y.axis .tick .down").remove();
-      svg.selectAll("g.y.axis .tick")
+      topLevelGroup.selectAll("g.y.axis .tick .down").remove();
+      topLevelGroup.selectAll("g.y.axis .tick")
          .append("g")
          .attr("class", "down faded")
          //.attr("transform", "translate(" + (+rowLabelWidth + 17) + ", 9 )")
@@ -290,14 +294,14 @@ function featureMatrixD3() {
 
       // Highlight of the last row label that we moved up or down.  Highlight this
       // row label so that user can keep track of the row he just moved.
-      svg.selectAll(".y.axis .tick text").each( function(d,i) {
+      topLevelGroup.selectAll(".y.axis .tick text").each( function(d,i) {
         d3.select(this).classed('current', matrixRows[i].current == 'Y');
       });
       // On the highlight matrix row, don't fade the arrow buttons.
-      svg.selectAll(".y.axis .tick .up").each( function(d,i) {
+      topLevelGroup.selectAll(".y.axis .tick .up").each( function(d,i) {
         d3.select(this).classed('faded', matrixRows[i].current != 'Y');
       });
-      svg.selectAll(".y.axis .tick .down").each( function(d,i) {
+      topLevelGroup.selectAll(".y.axis .tick .down").each( function(d,i) {
         d3.select(this).classed('faded', matrixRows[i].current != 'Y');
       });
 
@@ -305,13 +309,13 @@ function featureMatrixD3() {
       // in the text
       //svg.selectAll("g.x.axis .tick line").classed("hide", true);
       //svg.selectAll("g.x.axis path").classed("hide", true);
-      svg.selectAll("g.y.axis .tick line").classed("hide", true);
-      svg.selectAll("g.y.axis path").classed("hide", true);
+      topLevelGroup.selectAll("g.y.axis .tick line").classed("hide", true);
+      topLevelGroup.selectAll("g.y.axis path").classed("hide", true);
 
       // Adjust the y-axis transform attribute so that translate(x,y) changes y
       // to cell heights
       if (cellHeights != null && cellHeights.length > 0) {
-        svg.selectAll("g.y.axis g.tick").each( function(d,i) {
+        topLevelGroup.selectAll("g.y.axis g.tick").each( function(d,i) {
             var y = 0;
             for (var idx = 0; idx < i; idx++) {
               y += cellHeights[idx] ;
@@ -438,8 +442,10 @@ function featureMatrixD3() {
               // so instead the app will use getBoundingClientRect() method instead which does take into consideration
               // the transform.
               var boundRect = column.node().getBoundingClientRect();
-              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2)) + margin.left;
-              //colObject.screenXMatrix = window.pageXOffset + matrix.e + margin.left;
+              colObject.screenXMatrix = d3.round(boundRect.left + (boundRect.width/2));
+
+              // Since the body is vertically scrollable, we need to calculate the y by offsetting to a height of the
+              // scroll position in the container.
               colObject.screenYMatrix = window.pageYOffset + matrix.f + margin.top;
 
               // If tooltip sits outside of the of the feature matrix, so make necessary adjustments

@@ -3782,7 +3782,7 @@ function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, opti
 
 
       if (dataCard.mode == 'single') {
-        promiseCacheTrioVcfData(geneObject, theTranscript, trioVcfData, options.cacheData)
+        promiseCacheTrioVcfData(geneObject, theTranscript, CacheHelper.VCF_DATA, trioVcfData, options.cacheData)
         .then(function() {
           //resolve({'trioVcfData': trioVcfData, 'trioFbData': trioFbData, 'gene': geneObject, 'transcript': theTranscript});
           resolve({'trioVcfData': trioVcfData,'gene': geneObject, 'transcript': theTranscript});
