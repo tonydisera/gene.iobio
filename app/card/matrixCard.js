@@ -686,10 +686,10 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
                'y':                  screenY,
                'height':             matrixCard.featureMatrix.height(),
                'parentWidth':        $('.navbar-fixed-top').outerWidth(),
-               'preferredPositions': [ {top:    ['right', 'left',  'center']},
-                                       {right:  ['middle', 'top',  'bottom']},
-                                       {left:   ['middle', 'top',  'bottom']},
-                                       {bottom: ['right',  'left', 'center']} ]};
+               'preferredPositions': [ {top:    ['center', 'right', 'left' ]},
+                                       {right:  ['middle', 'top',   'bottom']},
+                                       {left:   ['middle', 'top',   'bottom']},
+                                       {bottom: ['right',  'left',  'center']} ]};
 
 
   variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, getProbandVariantCard() );

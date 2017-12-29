@@ -3006,9 +3006,9 @@ text.ref-count {
 .tooltip.chevron.chevron-vertical.chevron-left:after {
   right: 10px; }
 .tooltip.chevron.chevron-vertical.chevron-center:before {
-  right: 340px; }
+  right: var(--tooltip-center); }
 .tooltip.chevron.chevron-vertical.chevron-center:after {
-  right: 342px; }
+  right: var(--tooltip-center); }
 .tooltip.chevron.chevron-horizontal.chevron-right:before {
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
@@ -3034,9 +3034,9 @@ text.ref-count {
 .tooltip.chevron.chevron-horizontal.chevron-bottom:after {
   top: 12px; }
 .tooltip.chevron.chevron-horizontal.chevron-middle:before {
-  top: 100px; }
+  top: var(--tooltip-middle); }
 .tooltip.chevron.chevron-horizontal.chevron-middle:after {
-  top: 101px; }
+  top: var(--tooltip-middle); }
 
 .tooltip.left-arrow:before {
   position: absolute;
@@ -3115,11 +3115,12 @@ text.ref-count {
 
 .tooltip.tooltip-wide {
   width: 680px !important; }
-  .tooltip.tooltip-wide.tooltip-extra-wide {
-    width: 1000px !important; }
 
 .tooltip-wide {
   font-size: 13px; }
+  .tooltip-wide #tooltip-body {
+    max-height: 196px;
+    overflow-y: scroll; }
   .tooltip-wide .tooltip-title {
     font-size: 14px; }
   .tooltip-wide .tooltip-row {

@@ -334,9 +334,9 @@ text
 
     &.chevron-center
       &:before
-        right: 340px
+        right: var(--tooltip-center)
       &:after
-        right: 342px
+        right: var(--tooltip-center)
 
   &.chevron-horizontal
 
@@ -374,9 +374,9 @@ text
 
     &.chevron-middle
       &:before
-        top: 100px
+        top: var(--tooltip-middle)
       &:after
-        top: 101px
+        top: var(--tooltip-middle)
 
 
 .tooltip.left-arrow
@@ -465,13 +465,13 @@ text
 .tooltip.tooltip-wide
   width: 680px !important
 
-  &.tooltip-extra-wide
-    width: 1000px !important
 
 .tooltip-wide
   font-size: 13px
 
-
+  #tooltip-body
+    max-height: 196px
+    overflow-y: scroll
 
   .tooltip-title
     font-size: 14px

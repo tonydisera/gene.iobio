@@ -7,9 +7,10 @@ function VariantTooltip() {
   this.WIDTH_SIMPLE_WIDER     = 500;
   this.WIDTH_ALLELE_COUNT_BAR = 160;
   this.WIDTH_ALLELE_COUNT_ROW = 300;
-  this.HEIGHT_SCROLLABLE_AREA = 196;
   this.ARROW_OFFSET           = 10;
   this.ARROW_WIDTH            = 10;
+  this.SIDE_TOOLTIP_HORZ_OFFSET = 35;
+  this.SIDE_TOOLTIP_VERT_OFFSET = 30;
 
   this.VALUE_EMPTY        = "-";
   this.AFFECTED_GLYPH =   "<i class='material-icons tooltip-affected-symbol'>spellcheck</i>";
@@ -68,6 +69,9 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
   var h = d3.round(tooltip[0][0].offsetHeight);
 
+  tooltip.style("--tooltip-middle", h/2 + "px");
+  tooltip.style("--tooltip-center", w/2 + "px");
+
   var x = coord.x;
   var y = coord.y;
   var yScroll = window.pageYOffset;
@@ -100,12 +104,15 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   if ( (y - h) - yScroll >= 0) {
     availSpace.top.allowed = true;
     availSpace.top.tooltipTop = y - h;
+    availSpace.top.sideTooltipVertOffset = me.SIDE_TOOLTIP_VERT_OFFSET;
+
   }
   // If the tooltip sits below the elements, is the bottom of the tooltip
   // above the bottom of the window?
   if ( (y + coord.height + h) - yScroll < visibleHeight($('body'))) {
     availSpace.bottom.allowed = true;
     availSpace.bottom.tooltipTop = y + coord.height;
+    availSpace.bottom.sideTooltipVertOffset = -1 * me.SIDE_TOOLTIP_VERT_OFFSET;
   }
   // If the tooltip sits in the center (either to the left or right) of the element,
   // are both top and bottom edges within the window?
@@ -113,6 +120,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     && ((y + coord.height/2) + (h/2) - yScroll < visibleHeight($('body')))) {
     availSpace.middle.allowed = true;
     availSpace.middle.tooltipTop = y + (coord.height/2);
+    availSpace.middle.sideTooltipVertOffset = -1 * (h/2);
   }
   // If the tooltip sits to the right of the element, is the right
   // edge of the tooltip inside the window?
@@ -120,7 +128,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     availSpace.right.allowed = true;
     availSpace.right.tooltipLeft = x;
     availSpace.right.tooltipLeftOffset = -1 * (me.ARROW_OFFSET + me.ARROW_WIDTH);
-    availSpace.right.tooltipLeftOffsetSideArrow = 30;
+    availSpace.right.sideTooltipHorzOffset = me.SIDE_TOOLTIP_HORZ_OFFSET;
   }
   // If the tooltip sits to the left of the element, is the left
   // edge of the tooltip within the window?
@@ -128,7 +136,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     availSpace.left.allowed = true;
     availSpace.left.tooltipLeft = (x - w);
     availSpace.left.tooltipLeftOffset = me.ARROW_OFFSET + me.ARROW_WIDTH;
-    availSpace.left.tooltipLeftOffsetSideArrow = -30;
+    availSpace.left.sideTooltipHorzOffset = -1 * me.SIDE_TOOLTIP_HORZ_OFFSET;
   }
   // If the tooltip sits in the center (either above or below) of the element,
   // are both left and right edges within the window?
@@ -136,7 +144,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     availSpace.center.allowed = true;
     availSpace.center.tooltipLeft = x - (w/2);
     availSpace.center.tooltipLeftOffset =  me.ARROW_WIDTH;
-    availSpace.center.tooltipLeftOffsetSideArrow = 0;
+    availSpace.center.sideTooltipHorzOffset = 0;
   }
 
   var tooltipTop = null;
@@ -160,7 +168,8 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
         arrowClasses.push('chevron-vertical');
       } else {
         arrowClasses.push('chevron-horizontal');
-        tooltipLeft += availSpace[key1].tooltipLeft ? availSpace[key1].tooltipLeftOffsetSideArrow : availSpace[key2].tooltipLeftOffsetSideArrow;
+        tooltipLeft += availSpace[key1].sideTooltipHorzOffset;
+        tooltipTop  += availSpace[key2].sideTooltipVertOffset;
       }
       arrowClasses.push("chevron-" + key1);
       arrowClasses.push("chevron-" + key2);
@@ -885,7 +894,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
       + me._tooltipMainHeaderRow(bookmarkBadge + (geneObject ? geneObject.gene_name : ""), variant.type ? variant.type.toUpperCase() : "", refalt + " " + coord + " " + exonDisplay, dbSnpLink , 'ref-alt')
       + calledVariantRow
       + inheritanceModeRow
-      + '<div id="tooltip-body" class="row" style="max-height:' + me.HEIGHT_SCROLLABLE_AREA +  'px;overflow-y:scroll">'
+      + '<div id="tooltip-body" class="row">'
         + leftDiv
         + rightDiv
         + otherDiv
