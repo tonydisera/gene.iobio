@@ -682,11 +682,14 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
     screenY += $('#nav-edu-tour').outerHeight();
   }
 
-  var coord = {'x':           screenX,
-               'y':           screenY,
-               'height':      matrixCard.featureMatrix.height(),
-               'parentWidth': $('.navbar-fixed-top').outerWidth(),
-               'preferredPosition': 'side' };
+  var coord = {'x':                  screenX,
+               'y':                  screenY,
+               'height':             matrixCard.featureMatrix.height(),
+               'parentWidth':        $('.navbar-fixed-top').outerWidth(),
+               'preferredPositions': [ {top:    ['right', 'left',  'center']},
+                                       {right:  ['middle', 'top',  'bottom']},
+                                       {left:   ['middle', 'top',  'bottom']},
+                                       {bottom: ['right',  'left', 'center']} ]};
 
 
   variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, getProbandVariantCard() );

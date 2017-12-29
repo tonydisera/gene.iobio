@@ -4700,3 +4700,10 @@ function formatDate(d) {
   }
   return d.getMonth() + "-" + d.getDay() + "-" + d.getFullYear() + " " + formatHours(d.getHours()) + ":" + padMinutes(d.getMinutes()) + " " + getAmPm(d.getHours());
 }
+
+function visibleHeight($el) {
+    var elH = $el.outerHeight(),
+        H = $(window).height(),
+        r = $el[0].getBoundingClientRect(), t=r.top, b=r.bottom;
+    return Math.max(0, t>0? Math.min(elH, H-t) : (b<H?b:H));
+}

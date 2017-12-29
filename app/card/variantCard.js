@@ -1820,11 +1820,15 @@ VariantCard.prototype._showTooltipImpl = function(tooltip, variant, sourceVarian
 
   var y = variant.screenY;
 
-  var coord = {'x':        x,
-               'y':        y,
-               'height':   33,
-               'parentWidth': me.cardSelector.outerWidth(),
-               'preferredPosition': 'top'};
+  var coord = {'x':                  x,
+               'y':                  y,
+               'height':             33,
+               'parentWidth':        me.cardSelector.outerWidth(),
+               'preferredPositions': [ {top:    ['right', 'left',  'center']},
+                                       {right:  ['top',  'bottom', 'middle']},
+                                       {left:   ['top',  'bottom', 'middle']},
+                                       {bottom: ['right',  'left', 'center']} ] };
+
 
   variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, me);
 

@@ -283,6 +283,102 @@ text
     font-size: 11px
     color: $text-color
 
+
+.tooltip.chevron
+  &:before
+    border-top: 10px solid #A7A5A5
+    border-left: 10px solid transparent
+    border-right: 10px solid transparent
+    border-top-color: rgba(0, 0, 0, 0.2)
+    position: absolute
+    display: inline-block
+    content: ""
+
+  &:after
+    border-top: 9px solid #FFFFFF
+    border-left: 9px solid transparent
+    border-right: 9px solid transparent
+    position: absolute
+    display: inline-block
+    content: ""
+
+  &.chevron-vertical
+
+    &.chevron-top
+      &:before
+        bottom: -10px
+      &:after
+        bottom: -8px
+
+    &.chevron-bottom
+      &:before
+        -webkit-transform: rotate(180deg)
+        transform: rotate(180deg)
+        top: -10px
+      &:after
+        -webkit-transform: rotate(180deg)
+        transform: rotate(180deg)
+        top: -8px
+
+    &.chevron-right
+      &:before
+        left: 8px
+      &:after
+        left: 10px
+
+    &.chevron-left
+      &:before
+        right: 8px
+      &:after
+        right: 10px
+
+    &.chevron-center
+      &:before
+        right: 340px
+      &:after
+        right: 342px
+
+  &.chevron-horizontal
+
+    &.chevron-right
+      &:before
+        -webkit-transform: rotate(90deg)
+        transform: rotate(90deg)
+        left: -15px
+      &:after
+        -webkit-transform: rotate(90deg)
+        transform: rotate(90deg)
+        left: -13px
+
+    &.chevron-left
+      &:before
+        -webkit-transform: rotate(-90deg)
+        transform: rotate(-90deg)
+        right: -16px
+      &:after
+        -webkit-transform: rotate(-90deg)
+        transform: rotate(-90deg)
+        right: -14px
+
+    &.chevron-top
+      &:before
+        bottom: 11px
+      &:after
+        bottom: 12px
+
+    &.chevron-bottom
+      &:before
+        top: 11px
+      &:after
+        top: 12px
+
+    &.chevron-middle
+      &:before
+        top: 100px
+      &:after
+        top: 101px
+
+
 .tooltip.left-arrow
   &:before
     position: absolute
@@ -332,158 +428,6 @@ text
     -webkit-transform: rotate(160deg)
     transform: rotate(160deg)
     content: ""
-
-.tooltip.arrow-down-left
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    bottom: -10px
-    content: ""
-    left: 8px
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    bottom: -8px
-    content: ""
-    left: 10px
-
-.tooltip.arrow-up-left
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    top: -10px
-    content: ""
-    left: 8px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    top: -8px
-    content: ""
-    left: 10px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-.tooltip.arrow-down-right
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    bottom: -10px
-    content: ""
-    right: 8px
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    bottom: -8px
-    content: ""
-    right: 10px
-
-.tooltip.arrow-up-right
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    top: -10px
-    content: ""
-    right: 8px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    top: -8px
-    content: ""
-    right: 10px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-.tooltip-wide.arrow-down-center
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    bottom: -10px
-    content: ""
-    right: 340px
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    bottom: -8px
-    content: ""
-    right: 342px
-
-.tooltip-wide.arrow-up-center
-  &:before
-    position: absolute
-    display: inline-block
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
-    top: -10px
-    content: ""
-    right: 340px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-  &:after
-    position: absolute
-    display: inline-block
-    border-top: 9px solid #FFFFFF
-    border-left: 9px solid transparent
-    border-right: 9px solid transparent
-    top: -8px
-    content: ""
-    right: 342px
-    -webkit-transform: rotate(180deg)
-    transform: rotate(180deg)
-
-
-.tooltip-extra-wide.arrow-down-center
-  &:before
-    right: 448px
-
-  &:after
-    right: 450px
 
 
 
@@ -612,6 +556,8 @@ text
 
   .tooltip-footer
     clear: both
+    margin-right: 0px
+    margin-left: 0px
 
     a
       font-size: 14px !important

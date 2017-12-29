@@ -19,9 +19,6 @@ function VariantTooltip() {
 VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, lock, coord, variantCard, html) {
   var me = this;
 
-  if (lock) {
-    console.log("locked");
-  }
   tooltip.style("z-index", 1032);
   tooltip.transition()
    .duration(1000)
@@ -57,57 +54,6 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
 
 
-  var hasLongText = $(tooltip[0]).find('.col-sm-8').length > 0  || $(tooltip[0]).find('.col-sm-9').length > 0;
-  var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
-  var h = d3.round(tooltip[0][0].offsetHeight);
-
-  var x = coord.x;
-  var y = coord.y;
-
-  var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
-  var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
-  y -= navbarHeight;
-  var yScroll = window.pageYOffset;
-
-  tooltip.classed("arrow-down-left", false);
-  tooltip.classed("arrow-down-right", false);
-  tooltip.classed("arrow-down-center", false);
-  tooltip.classed("arrow-up-left", false);
-  tooltip.classed("arrow-up-right", false);
-  tooltip.classed("arrow-up-center", false);
-  var arrow           = {direction: null, position:   null};
-
-  var tooltipTop =  (y - h);
-  var tooltipLeft = null;
-
-  if (tooltipTop > yScroll) {
-    // position tooltip above element if there is enough vertical space.
-    tooltipTop = (y - h);
-    arrow.direction   = 'down';
-  } else  {
-    // If user has scrolled down, beyond the top of the tooltip, it will be cropped,
-    // so position tooltip below the hovered/clicked element.
-    tooltipTop = y + coord.height;
-    arrow.direction   = 'up';
-  }
-
-  if (x > 0 && (x+w) < coord.parentWidth) {
-    // If there is room, show tooltip to the right of the hovered/clicked element
-    tooltipLeft = x - (me.ARROW_OFFSET + me.ARROW_WIDTH);
-    arrow.position     = 'left';
-  } else if (x - w > 0 ) {
-    // Otherwise, if there is room, show tooltip to the left of the hovered/clicked element
-    tooltipLeft = (x - w) + (me.ARROW_OFFSET + me.ARROW_WIDTH);
-    arrow.position     = 'right';
-
-  } else {
-    // Otherwise, show the tooltip in the center
-    tooltipLeft = (x - (w/2) +  me.ARROW_WIDTH);
-    arrow.position      = 'center';
-  }
-
-  tooltip.classed("arrow-" + arrow.direction + '-' + arrow.position, true);
-
 
   if (lock && !isLevelEdu) {
     me.showScrollButtons($(tooltip[0]));
@@ -117,10 +63,141 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     }
   }
 
-  tooltip.style("width", w + "px")
-         .style("left", tooltipLeft + "px")
-         .style("text-align", 'left')
-         .style("top", tooltipTop + "px");
+
+  var hasLongText = $(tooltip[0]).find('.col-sm-8').length > 0  || $(tooltip[0]).find('.col-sm-9').length > 0;
+  var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
+  var h = d3.round(tooltip[0][0].offsetHeight);
+
+  var x = coord.x;
+  var y = coord.y;
+  var yScroll = window.pageYOffset;
+
+  var navbarHeight = (+$('body #container').css('top').split("px")[0] - 5);
+  y -= navbarHeight;
+
+  tooltip.classed("chevron", false);
+  tooltip.classed("chevron-vertical", false);
+  tooltip.classed("chevron-horizontal", false);
+  tooltip.classed("chevron-top", false);
+  tooltip.classed("chevron-bottom", false);
+  tooltip.classed("chevron-middle", false);
+  tooltip.classed("chevron-left", false);
+  tooltip.classed("chevron-right", false);
+  tooltip.classed("chevron-center", false);
+
+
+  var availSpace = {
+    'top':    {allowed: false},
+    'bottom': {allowed: false},
+    'middle': {allowed: false},
+    'right':  {allowed: false},
+    'left':   {allowed: false},
+    'center': {allowed: false},
+  };
+
+  // If the tooltip sits above the element, is the top of the tooltip
+  // below the top of the window?
+  if ( (y - h) - yScroll >= 0) {
+    availSpace.top.allowed = true;
+    availSpace.top.tooltipTop = y - h;
+  }
+  // If the tooltip sits below the elements, is the bottom of the tooltip
+  // above the bottom of the window?
+  if ( (y + coord.height + h) - yScroll < visibleHeight($('body'))) {
+    availSpace.bottom.allowed = true;
+    availSpace.bottom.tooltipTop = y + coord.height;
+  }
+  // If the tooltip sits in the center (either to the left or right) of the element,
+  // are both top and bottom edges within the window?
+  if ((y + coord.height/2) - (h/2) - yScroll >= 0
+    && ((y + coord.height/2) + (h/2) - yScroll < visibleHeight($('body')))) {
+    availSpace.middle.allowed = true;
+    availSpace.middle.tooltipTop = y + (coord.height/2);
+  }
+  // If the tooltip sits to the right of the element, is the right
+  // edge of the tooltip inside the window?
+  if (x > 0 && (x+w) < coord.parentWidth) {
+    availSpace.right.allowed = true;
+    availSpace.right.tooltipLeft = x;
+    availSpace.right.tooltipLeftOffset = -1 * (me.ARROW_OFFSET + me.ARROW_WIDTH);
+    availSpace.right.tooltipLeftOffsetSideArrow = 30;
+  }
+  // If the tooltip sits to the left of the element, is the left
+  // edge of the tooltip within the window?
+  if (x - w > 0 ) {
+    availSpace.left.allowed = true;
+    availSpace.left.tooltipLeft = (x - w);
+    availSpace.left.tooltipLeftOffset = me.ARROW_OFFSET + me.ARROW_WIDTH;
+    availSpace.left.tooltipLeftOffsetSideArrow = -30;
+  }
+  // If the tooltip sits in the center (either above or below) of the element,
+  // are both left and right edges within the window?
+  if (x - (w/2) > 0 && x + (w/2) < coord.parentWidth) {
+    availSpace.center.allowed = true;
+    availSpace.center.tooltipLeft = x - (w/2);
+    availSpace.center.tooltipLeftOffset =  me.ARROW_WIDTH;
+    availSpace.center.tooltipLeftOffsetSideArrow = 0;
+  }
+
+  var tooltipTop = null;
+  var tooltipLeft = null;
+  var arrowClasses = null;
+  var found = false;
+
+  assignTooltip = function(key1, key2) {
+    found = false;
+    tooltipTop = null;
+    tooltipLeft = null;
+    arrowClasses = ['chevron'];
+
+
+    tooltipTop  = availSpace[key1].tooltipTop  ? availSpace[key1].tooltipTop  : availSpace[key2].tooltipTop;
+    tooltipLeft = availSpace[key1].tooltipLeft ? availSpace[key1].tooltipLeft + availSpace[key1].tooltipLeftOffset : availSpace[key2].tooltipLeft + availSpace[key2].tooltipLeftOffset;
+    found = tooltipTop && tooltipLeft;
+
+    if (found) {
+      if (key1 == 'top' || key1 == 'bottom') {
+        arrowClasses.push('chevron-vertical');
+      } else {
+        arrowClasses.push('chevron-horizontal');
+        tooltipLeft += availSpace[key1].tooltipLeft ? availSpace[key1].tooltipLeftOffsetSideArrow : availSpace[key2].tooltipLeftOffsetSideArrow;
+      }
+      arrowClasses.push("chevron-" + key1);
+      arrowClasses.push("chevron-" + key2);
+
+    }
+  }
+
+  coord.preferredPositions.forEach(function(preferredPos) {
+    for (var key1 in preferredPos) {
+      if (!found && availSpace[key1].allowed) {
+        preferredPos[key1].forEach(function(key2) {
+          if (!found && availSpace[key2].allowed) {
+            assignTooltip(key1, key2);
+          }
+        })
+      }
+    }
+  })
+
+  // If we can't find enough space, just choose first preferred position.
+  if (!found) {
+    var pp = coord.preferredPositions[0];
+    var key1 = Object.keys(pp)[0];
+    var key2 = pp[key1][0];
+    assignTooltip(key1, key2)
+  }
+
+
+  if (found) {
+    arrowClasses.forEach(function(arrowClass) {
+      tooltip.classed(arrowClass, true);
+    })
+    tooltip.style("width", w + "px")
+           .style("left", tooltipLeft + "px")
+           .style("text-align", 'left')
+           .style("top", tooltipTop + "px");
+  }
 
 }
 
