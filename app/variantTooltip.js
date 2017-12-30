@@ -69,10 +69,13 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   var w = isLevelEdu || isLevelBasic ? (hasLongText ? me.WIDTH_SIMPLE_WIDER : me.WIDTH_SIMPLE) : (lock ? (extraWide ? me.WIDTH_EXTRA_WIDE : me.WIDTH_LOCK) : me.WIDTH_HOVER);
   var h = d3.round(tooltip[0][0].offsetHeight);
 
-  tooltip.style("--tooltip-middle", h/2 + "px");
-  tooltip.style("--tooltip-middle-before", ((h/2) - 3) + "px");
-  tooltip.style("--tooltip-center", w/2 + "px");
-  tooltip.style("--tooltip-center-before", ((w/2) - 3) + "px");
+  // We use css variables to place the tooltip chevron in the middle, center of the tooltip
+  var middlePos = (h/2);
+  tooltip.style("--tooltip-middle", middlePos  + "px");
+  tooltip.style("--tooltip-middle-before", (middlePos - 3) + "px");
+  var centerPos = (w/2);
+  tooltip.style("--tooltip-center", centerPos + "px");
+  tooltip.style("--tooltip-center-before", (centerPos - 3) + "px");
 
   var x = coord.x;
   var y = coord.y;
@@ -980,12 +983,12 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
   if (pinMessage == null) {
     pinMessage = 'Click on variant for more details';
   }
-  var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i></button>'
-  var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i></button>'
+  var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i>scroll</button>'
+  var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i>scroll</button>'
 
   var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
 
-  var bookmarkLink =  '<button id="bookmarkLink"  class="hide tooltip-button tooltip-control-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);"><i class="material-icons">bookmark_border</i></button>';
+  var bookmarkLink =  '<button id="bookmarkLink"  class="hide tooltip-button tooltip-control-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);"><i class="material-icons">bookmark_border</i>bookmark</button>';
 
   var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="hide tooltip-control-button tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove<i class="material-icons">bookmark</i></button>';
   showAsBookmarked = function(container) {
@@ -1001,14 +1004,14 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
     if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
       return '<div class="row tooltip-footer">'
         + '<div class="col-sm-4 left-footer" id="bookmarkLink" style="text-align:left;">'  + unpin + removeBookmarkLink  + '</div>'
-        + '<div class="col-sm-4 center-footer"  style="text-align:center;">' +  unpin +  removeBookmarkLink  +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+        + '<div class="col-sm-4 center-footer"  style="text-align:center;">'  +  removeBookmarkLink  +  unpin + (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
         + '<div class="col-sm-4 right-footer" style="text-align:right;">' + removeBookmarkLink + unpin + '</div>'
         + '</div>';
 
     } else {
       return '<div class="row tooltip-footer" style="">'
         + '<div class="col-sm-4 left-footer" style="text-align:left;">' + unpin + bookmarkLink + '</div>'
-        + '<div class="col-sm-4 center-footer"  style="text-align:center;">'  + unpin +   bookmarkLink  + (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+        + '<div class="col-sm-4 center-footer"  style="text-align:center;">'   +   bookmarkLink + unpin  + (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
         + '<div class="col-sm-4 right-footer" style="text-align:right;">' + bookmarkLink + unpin + '</div>'
         + '</div>';
 

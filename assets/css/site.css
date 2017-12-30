@@ -2904,16 +2904,13 @@ inputinput:-moz-placeholder {
   color: white !important;
   background-color: rgba(93, 128, 157, 0.85) !important;
   margin-top: 1px;
-  margin-bottom: 1px; }
+  margin-bottom: 1px;
+  width: 88px; }
   .tooltip .tooltip-button i {
     font-size: 16px;
     color: white;
     vertical-align: top;
     padding-top: 2px; }
-.tooltip #tooltip-scroll-up {
-  background-color: #4797dd !important; }
-.tooltip #tooltip-scroll-down {
-  background-color: #4797dd !important; }
 
 .tooltip {
   position: absolute;
@@ -3145,27 +3142,30 @@ text.ref-count {
       vertical-align: top;
       text-align: left;
       display: inline-block;
-      margin-right: 5px; }
+      margin-right: 15px; }
     .tooltip-wide .tooltip-footer #bookmarkLink {
-      margin-right: 5px; }
+      margin-right: 15px; }
     .tooltip-wide .tooltip-footer .left-footer {
       padding-left: 0px;
       padding-right: 0px;
       width: 33%; }
       .tooltip-wide .tooltip-footer .left-footer #unpin {
-        margin-right: 5px; }
+        margin-right: 15px;
+        width: 30px; }
     .tooltip-wide .tooltip-footer .right-footer {
       width: 33%;
       padding-left: 0px;
       padding-right: 0px; }
       .tooltip-wide .tooltip-footer .right-footer #unpin {
-        margin-right: 0px; }
+        margin-right: 0px;
+        width: 30px; }
     .tooltip-wide .tooltip-footer .center-footer {
       width: 33%;
       padding-left: 0px;
       padding-right: 0px; }
       .tooltip-wide .tooltip-footer .center-footer #unpin {
-        margin-right: 5px; }
+        margin-right: 15px;
+        width: 30px; }
   .tooltip-wide .tooltip-left-column {
     float: left;
     padding-top: 5px;
