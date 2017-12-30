@@ -1274,7 +1274,7 @@ header {
   opacity: 0.7; }
 
 #gene-badge-button g.bookmark {
-  fill: transparent;
+  fill: #5d809d;
   stroke: #3773A7;
   stroke-width: 3px;
   opacity: 1; }
