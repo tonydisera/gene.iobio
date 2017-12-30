@@ -693,13 +693,13 @@ MatrixCard.prototype._showTooltipImpl = function(variant, lock) {
 
 
   variantTooltip.fillAndPositionTooltip(tooltip, variant, lock, coord, getProbandVariantCard() );
-  tooltip.select("#unpin").on('click', function() {
+  tooltip.selectAll("#unpin").on('click', function() {
     me.unpin();
   });
-  tooltip.select("#tooltip-scroll-up").on('click', function() {
+  tooltip.selectAll("#tooltip-scroll-up").on('click', function() {
     me.tooltipScroll("up");
   });
-  tooltip.select("#tooltip-scroll-down").on('click', function() {
+  tooltip.selectAll("#tooltip-scroll-down").on('click', function() {
     me.tooltipScroll("down");
   });
 

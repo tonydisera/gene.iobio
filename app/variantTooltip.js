@@ -70,7 +70,9 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   var h = d3.round(tooltip[0][0].offsetHeight);
 
   tooltip.style("--tooltip-middle", h/2 + "px");
+  tooltip.style("--tooltip-middle-before", ((h/2) - 3) + "px");
   tooltip.style("--tooltip-center", w/2 + "px");
+  tooltip.style("--tooltip-center-before", ((w/2) - 3) + "px");
 
   var x = coord.x;
   var y = coord.y;
@@ -152,7 +154,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   var arrowClasses = null;
   var found = false;
 
-  assignTooltip = function(key1, key2) {
+  assignTooltip = function(key1, key2, force=false) {
     found = false;
     tooltipTop = null;
     tooltipLeft = null;
@@ -161,7 +163,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
 
     tooltipTop  = availSpace[key1].tooltipTop  ? availSpace[key1].tooltipTop  : availSpace[key2].tooltipTop;
     tooltipLeft = availSpace[key1].tooltipLeft ? availSpace[key1].tooltipLeft + availSpace[key1].tooltipLeftOffset : availSpace[key2].tooltipLeft + availSpace[key2].tooltipLeftOffset;
-    found = tooltipTop && tooltipLeft;
+    found = (tooltipTop && tooltipLeft) || force;
 
     if (found) {
       if (key1 == 'top' || key1 == 'bottom') {
@@ -170,6 +172,22 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
         arrowClasses.push('chevron-horizontal');
         tooltipLeft += availSpace[key1].sideTooltipHorzOffset;
         tooltipTop  += availSpace[key2].sideTooltipVertOffset;
+      }
+      if (lock) {
+        var footerClass = null;
+        if (key1 == 'left' || key2 == 'left') {
+          footerClass = "right-footer";
+        } else if (key1 == 'right' || key2 == 'right') {
+          footerClass = "left-footer";
+        } else {
+          footerClass = 'center-footer';
+
+          // Make more room for the center so that buttons down't wrap
+          tooltip.select('.center-footer').style("width", "100%");
+          tooltip.select('.right-footer').classed("hide", true);
+          tooltip.select('.left-footer').classed("hide", true);
+        }
+        tooltip.selectAll('.' + footerClass + " .tooltip-control-button").classed("hide", false);
       }
       arrowClasses.push("chevron-" + key1);
       arrowClasses.push("chevron-" + key2);
@@ -194,7 +212,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
     var pp = coord.preferredPositions[0];
     var key1 = Object.keys(pp)[0];
     var key2 = pp[key1][0];
-    assignTooltip(key1, key2)
+    assignTooltip(key1, key2, true)
   }
 
 
@@ -962,14 +980,14 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
   if (pinMessage == null) {
     pinMessage = 'Click on variant for more details';
   }
-  var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i>up</button>'
-  var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i>more</button>'
+  var scrollUpButton = '<button id="tooltip-scroll-up" class="tooltip-button  btn btn-raised btn-default" ><i class="material-icons">arrow_upward</i></button>'
+  var scrollDownButton = '<button id="tooltip-scroll-down" class="tooltip-button btn btn-raised btn-default" ><i class="material-icons">arrow_downward</i></button>'
 
   var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
 
-  var bookmarkLink =  '<button id="bookmarkLink"  class="tooltip-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);">bookmark</button>';
+  var bookmarkLink =  '<button id="bookmarkLink"  class="hide tooltip-button tooltip-control-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);"><i class="material-icons">bookmark</i>bookmark</button>';
 
-  var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove bookmark</button>'
+  var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="hide tooltip-control-button tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)"><i class="material-icons">bookmark</i>remove bookmark</button>';
   showAsBookmarked = function(container) {
     $(container).parent().html(bookmarkBadge + removeBookmarkLink);
   };
@@ -977,21 +995,21 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
     $(container).parent().html(bookmarkLink);
   };
 
-  var unpin =  '<button id="unpin"  class="tooltip-button btn btn raised btn-default"  >close</button>'
+  var unpin =  '<button id="unpin"  class="hide tooltip-control-button tooltip-button btn btn raised btn-default"><i class="material-icons">close</i>close</button>'
 
   if (window.clickedVariant) {
     if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
       return '<div class="row tooltip-footer">'
-        + '<div class="col-sm-4" id="bookmarkLink" style="text-align:left;">' +  removeBookmarkLink  + '</div>'
-        + '<div class="col-sm-4"  style="text-align:center;">' +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
-        + '<div class="col-sm-4" style="text-align:right;">' + unpin + '</div>'
+        + '<div class="col-sm-4 left-footer" id="bookmarkLink" style="text-align:left;">'  + unpin + removeBookmarkLink  + '</div>'
+        + '<div class="col-sm-4 center-footer"  style="text-align:center;">' +  unpin +  removeBookmarkLink  +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+        + '<div class="col-sm-4 right-footer" style="text-align:right;">' + removeBookmarkLink + unpin + '</div>'
         + '</div>';
 
     } else {
       return '<div class="row tooltip-footer" style="">'
-        + '<div class="col-sm-4" style="text-align:left;">' + bookmarkLink + '</div>'
-        + '<div class="col-sm-4"  style="text-align:center;">' +  (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
-        + '<div class="col-sm-4" style="text-align:right;">' + unpin + '</div>'
+        + '<div class="col-sm-4 left-footer" style="text-align:left;">' + unpin + bookmarkLink + '</div>'
+        + '<div class="col-sm-4 center-footer"  style="text-align:center;">'  + unpin +   bookmarkLink  + (variantCard == null || variantCard.getRelationship() == 'known-variants' ? '' : scrollUpButton + scrollDownButton) + '</div>'
+        + '<div class="col-sm-4 right-footer" style="text-align:right;">' + bookmarkLink + unpin + '</div>'
         + '</div>';
 
     }
@@ -1178,7 +1196,7 @@ VariantTooltip.prototype.showScrollButtons = function(parentNode) {
     var contentHeight = parentNode.find('#tooltip-body')[0].scrollHeight - parentNode.find('.tooltip-wide .tooltip-row').css('padding-bottom').split("px")[0];
     scrollHeight = parentNode.find('#tooltip-body').innerHeight();
 
-    if (scrollHeight + pos < contentHeight) {
+    if (scrollHeight + pos < contentHeight - 5) {
       parentNode.find('#tooltip-scroll-down').removeClass("hide");
     } else {
       parentNode.find('#tooltip-scroll-down').addClass("hide");

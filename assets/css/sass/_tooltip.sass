@@ -203,7 +203,8 @@
     i
       font-size: 16px
       color: white
-
+      vertical-align: top
+      padding-top: 2px
 
   #tooltip-scroll-up
     background-color: #4797dd !important
@@ -286,16 +287,15 @@ text
 
 .tooltip.chevron
   &:before
-    border-top: 10px solid #A7A5A5
-    border-left: 10px solid transparent
-    border-right: 10px solid transparent
-    border-top-color: rgba(0, 0, 0, 0.2)
+    border-top: 12px solid rgba(0,0,0,.33)
+    border-left: 12px solid transparent
+    border-right: 12px solid transparent
     position: absolute
     display: inline-block
     content: ""
 
   &:after
-    border-top: 9px solid #FFFFFF
+    border-top: 9px solid $current-color
     border-left: 9px solid transparent
     border-right: 9px solid transparent
     position: absolute
@@ -306,35 +306,35 @@ text
 
     &.chevron-top
       &:before
-        bottom: -10px
+        bottom: -12px
       &:after
-        bottom: -8px
+        bottom: -9px
 
     &.chevron-bottom
       &:before
         -webkit-transform: rotate(180deg)
         transform: rotate(180deg)
-        top: -10px
+        top: -12px
       &:after
         -webkit-transform: rotate(180deg)
         transform: rotate(180deg)
-        top: -8px
+        top: -9px
 
     &.chevron-right
       &:before
         left: 8px
       &:after
-        left: 10px
+        left: 11px
 
     &.chevron-left
       &:before
         right: 8px
       &:after
-        right: 10px
+        right: 11px
 
     &.chevron-center
       &:before
-        right: var(--tooltip-center)
+        right: var(--tooltip-center-before)
       &:after
         right: var(--tooltip-center)
 
@@ -374,7 +374,7 @@ text
 
     &.chevron-middle
       &:before
-        top: var(--tooltip-middle)
+        top: var(--tooltip-middle-before)
       &:after
         top: var(--tooltip-middle)
 
@@ -484,9 +484,12 @@ text
       padding-bottom: 0px
 
   .tooltip-footer
+    margin-left: 0px
+    margin-right: 0px
     margin-top: 0px !important
     padding-top: 5px !important
     padding-bottom: 2px
+    min-height: 29px
 
     .bookmark-badge
       height: 14px
@@ -499,6 +502,30 @@ text
       vertical-align: top
       text-align: left
       display: inline-block
+      margin-right: 5px
+
+    #bookmarkLink
+      margin-right: 5px
+
+    .left-footer
+      padding-left: 0px
+      padding-right: 0px
+      width:  33%
+      #unpin
+        margin-right: 5px
+    .right-footer
+      width:  33%
+      padding-left: 0px
+      padding-right: 0px
+      #unpin
+        margin-right: 0px
+    .center-footer
+      width:  33%
+      padding-left: 0px
+      padding-right: 0px
+      #unpin
+        margin-right: 5px
+
 
   .tooltip-left-column
     float: left
@@ -556,8 +583,6 @@ text
 
   .tooltip-footer
     clear: both
-    margin-right: 0px
-    margin-left: 0px
 
     a
       font-size: 14px !important

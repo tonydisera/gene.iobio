@@ -64,9 +64,8 @@ GenesCard.prototype.init = function() {
   $('#select-gene-sort').selectize({
       valueField: 'value',
       labelField: 'value',
-      searchField: 'value',
       disabledField: 'disabled',
-      create: true,
+      create: false,
       options: me.geneSortOptions,
       items: [
          me.HARMFUL_VARIANTS_OPTION

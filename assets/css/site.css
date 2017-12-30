@@ -2907,7 +2907,9 @@ inputinput:-moz-placeholder {
   margin-bottom: 1px; }
   .tooltip .tooltip-button i {
     font-size: 16px;
-    color: white; }
+    color: white;
+    vertical-align: top;
+    padding-top: 2px; }
 .tooltip #tooltip-scroll-up {
   background-color: #4797dd !important; }
 .tooltip #tooltip-scroll-down {
@@ -2971,42 +2973,41 @@ text.ref-count {
   color: #717171; }
 
 .tooltip.chevron:before {
-  border-top: 10px solid #A7A5A5;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top-color: rgba(0, 0, 0, 0.2);
+  border-top: 12px solid rgba(0, 0, 0, 0.33);
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
   position: absolute;
   display: inline-block;
   content: ""; }
 .tooltip.chevron:after {
-  border-top: 9px solid #FFFFFF;
+  border-top: 9px solid #3586c0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
   position: absolute;
   display: inline-block;
   content: ""; }
 .tooltip.chevron.chevron-vertical.chevron-top:before {
-  bottom: -10px; }
+  bottom: -12px; }
 .tooltip.chevron.chevron-vertical.chevron-top:after {
-  bottom: -8px; }
+  bottom: -9px; }
 .tooltip.chevron.chevron-vertical.chevron-bottom:before {
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
-  top: -10px; }
+  top: -12px; }
 .tooltip.chevron.chevron-vertical.chevron-bottom:after {
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
-  top: -8px; }
+  top: -9px; }
 .tooltip.chevron.chevron-vertical.chevron-right:before {
   left: 8px; }
 .tooltip.chevron.chevron-vertical.chevron-right:after {
-  left: 10px; }
+  left: 11px; }
 .tooltip.chevron.chevron-vertical.chevron-left:before {
   right: 8px; }
 .tooltip.chevron.chevron-vertical.chevron-left:after {
-  right: 10px; }
+  right: 11px; }
 .tooltip.chevron.chevron-vertical.chevron-center:before {
-  right: var(--tooltip-center); }
+  right: var(--tooltip-center-before); }
 .tooltip.chevron.chevron-vertical.chevron-center:after {
   right: var(--tooltip-center); }
 .tooltip.chevron.chevron-horizontal.chevron-right:before {
@@ -3034,7 +3035,7 @@ text.ref-count {
 .tooltip.chevron.chevron-horizontal.chevron-bottom:after {
   top: 12px; }
 .tooltip.chevron.chevron-horizontal.chevron-middle:before {
-  top: var(--tooltip-middle); }
+  top: var(--tooltip-middle-before); }
 .tooltip.chevron.chevron-horizontal.chevron-middle:after {
   top: var(--tooltip-middle); }
 
@@ -3129,9 +3130,12 @@ text.ref-count {
     .tooltip-wide .tooltip-row.ped-info {
       padding-bottom: 0px; }
   .tooltip-wide .tooltip-footer {
+    margin-left: 0px;
+    margin-right: 0px;
     margin-top: 0px !important;
     padding-top: 5px !important;
-    padding-bottom: 2px; }
+    padding-bottom: 2px;
+    min-height: 29px; }
     .tooltip-wide .tooltip-footer .bookmark-badge {
       height: 14px;
       width: 120px; }
@@ -3140,7 +3144,28 @@ text.ref-count {
     .tooltip-wide .tooltip-footer #remove-bookmark-link {
       vertical-align: top;
       text-align: left;
-      display: inline-block; }
+      display: inline-block;
+      margin-right: 5px; }
+    .tooltip-wide .tooltip-footer #bookmarkLink {
+      margin-right: 5px; }
+    .tooltip-wide .tooltip-footer .left-footer {
+      padding-left: 0px;
+      padding-right: 0px;
+      width: 33%; }
+      .tooltip-wide .tooltip-footer .left-footer #unpin {
+        margin-right: 5px; }
+    .tooltip-wide .tooltip-footer .right-footer {
+      width: 33%;
+      padding-left: 0px;
+      padding-right: 0px; }
+      .tooltip-wide .tooltip-footer .right-footer #unpin {
+        margin-right: 0px; }
+    .tooltip-wide .tooltip-footer .center-footer {
+      width: 33%;
+      padding-left: 0px;
+      padding-right: 0px; }
+      .tooltip-wide .tooltip-footer .center-footer #unpin {
+        margin-right: 5px; }
   .tooltip-wide .tooltip-left-column {
     float: left;
     padding-top: 5px;
@@ -3188,9 +3213,7 @@ text.ref-count {
     .tooltip-wide .highest-impact-badge a:hover, .tooltip-wide .highest-impact-badge a:focus {
       font-size: 11px !important; }
   .tooltip-wide .tooltip-footer {
-    clear: both;
-    margin-right: 0px;
-    margin-left: 0px; }
+    clear: both; }
     .tooltip-wide .tooltip-footer a {
       font-size: 14px !important; }
       .tooltip-wide .tooltip-footer a:hover, .tooltip-wide .tooltip-footer a:focus {
