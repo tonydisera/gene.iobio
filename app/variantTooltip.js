@@ -985,9 +985,9 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
 
   var bookmarkBadge = '<svg class="bookmark-badge" height="14" width="14" style="padding-top:2px" ><g class="bookmark" transform="translate(0,0)"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#bookmark-symbol" width="14" height="14"></use></g></svg>';
 
-  var bookmarkLink =  '<button id="bookmarkLink"  class="hide tooltip-button tooltip-control-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);"><i class="material-icons">bookmark</i>bookmark</button>';
+  var bookmarkLink =  '<button id="bookmarkLink"  class="hide tooltip-button tooltip-control-button btn btn-raised btn-default" onclick="bookmarkVariant();showAsBookmarked(this);"><i class="material-icons">bookmark_border</i></button>';
 
-  var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="hide tooltip-control-button tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)"><i class="material-icons">bookmark</i>remove bookmark</button>';
+  var removeBookmarkLink  =  '<button id="remove-bookmark-link" class="hide tooltip-control-button tooltip-button btn btn-raised btn-default" onclick="removeBookmarkOnVariant();showAsNotBookmarked(this)">remove<i class="material-icons">bookmark</i></button>';
   showAsBookmarked = function(container) {
     $(container).parent().html(bookmarkBadge + removeBookmarkLink);
   };
@@ -995,7 +995,7 @@ VariantTooltip.prototype._linksRow = function(variant, pinMessage, variantCard) 
     $(container).parent().html(bookmarkLink);
   };
 
-  var unpin =  '<button id="unpin"  class="hide tooltip-control-button tooltip-button btn btn raised btn-default"><i class="material-icons">close</i>close</button>'
+  var unpin =  '<button id="unpin"  class="hide tooltip-control-button tooltip-button btn btn raised btn-default"><i class="material-icons">close</i></button>'
 
   if (window.clickedVariant) {
     if (window.clickedVariant.hasOwnProperty('isBookmark') && window.clickedVariant.isBookmark == 'Y') {
