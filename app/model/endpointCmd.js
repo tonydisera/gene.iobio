@@ -124,7 +124,7 @@ EndpointCmd.prototype.annotateVariants = function(vcfSource, refName, regions, v
     if (getRsId) {
       vepArgs.push("--check_existing");
     }
-    if (hgvsNotation || getRsId || isRefSeq) {
+    if (hgvsNotation || util.getRsId || isRefSeq) {
       vepArgs.push("--fasta");
       vepArgs.push(refFastaFile);
     }

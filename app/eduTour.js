@@ -540,7 +540,7 @@ function showEduTourAnimation(show, step) {
 
 function completeTour() {
   if (isLevelEdu) {
-    var completedTour = getUrlParameter("completedTour");
+    var completedTour = util.getUrlParameter("completedTour");
     var url = null;
     if (completedTour != null && completedTour != "") {
       url = EXHIBIT_URL2;

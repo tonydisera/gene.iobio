@@ -1370,7 +1370,7 @@ var effectCategories = [
   exports._parseVcfRecords = function(vcfRecs, refName, geneObject, selectedTranscript, clinvarMap, hasExtraAnnot, parseMultiSample, sampleNames, sampleIndex, vepAF) {
 
       var me = this;
-      var selectedTranscriptID = stripTranscriptPrefix(selectedTranscript.transcript_id);
+      var selectedTranscriptID = util.stripTranscriptPrefix(selectedTranscript.transcript_id);
 
       // Use the sample index to grab the right genotype column from the vcf record
       // If it isn't provided, assume that the first genotype column is the one
@@ -1381,7 +1381,7 @@ var effectCategories = [
       var gtSampleNames = null;
 
       if (sampleNames != null && sampleNames != "") {
-        gtSampleNames   = uniq(sampleNames.split(","))
+        gtSampleNames   = util.uniq(sampleNames.split(","))
         gtSampleIndices = gtSampleNames.map(function(sampleName,i) {
           return i;
         });
@@ -2336,7 +2336,7 @@ exports.parseClinvarInfo = function(info, clinvarMap) {
               gt.eduGenotype = rec.ref + " " + rec.ref;
             }
           }
-          gt.eduGenotypeReversed = switchGenotype(gt.eduGenotype);
+          gt.eduGenotypeReversed = util.switchGenotype(gt.eduGenotype);
 
         }
       }
@@ -2402,7 +2402,7 @@ exports._cullTranscripts = function(transcriptObject, theTranscriptId) {
     var transcripts = transcriptObject[key];
     var found = false;
     for (var transcriptId in transcripts) {
-      var strippedTranscriptId = stripTranscriptPrefix(transcriptId);
+      var strippedTranscriptId = util.stripTranscriptPrefix(transcriptId);
       if (theTranscriptId.indexOf(strippedTranscriptId) == 0) {
         found = true;
       }

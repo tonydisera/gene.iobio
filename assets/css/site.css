@@ -892,11 +892,12 @@ a.btn {
   height: 30px;
   background: #eee; }
 
-#nav-section {
+#gene-track {
   z-index: 2;
   margin-top: 0px;
   background-color: white;
-  margin-bottom: 6px; }
+  margin-bottom: 6px;
+  min-height: 30px; }
 
 section {
   text-align: left;
@@ -4447,22 +4448,6 @@ textarea#genes-to-copy {
     width: 4px !important; }
   #select-known-variants-filter-box .selectize-control.multi .selectize-input.has-items {
     padding: 3px 8px 0px; }
-
-#transcript-card #known-variants-nav {
-  margin-left: 10px;
-  text-align: left;
-  display: inline-block;
-  vertical-align: top; }
-#transcript-card #known-variants-chart {
-  margin-left: 0px; }
-#transcript-card #known-variants-display-label {
-  font-size: 13px;
-  color: #717171;
-  display: inline-block;
-  vertical-align: top;
-  padding-top: 4px;
-  margin-left: 10px;
-  margin-right: 4px; }
 
 #known-variants-all-card {
   min-height: 35px; }

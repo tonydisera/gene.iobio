@@ -883,7 +883,7 @@ BookmarkCard.prototype._refreshVariantLabel = function(variant, key) {
 BookmarkCard.prototype._getVariantLabel = function(bookmarkEntry, key) {
   var me = this;
 
-  var rsId = getRsId(bookmarkEntry);
+  var rsId = util.getRsId(bookmarkEntry);
   var abbrevHgvsP = bookmarkEntry.extraAnnot ? matrixCard.formatHgvsP(bookmarkEntry, bookmarkEntry.vepHGVSp) : "";
   var vepConsequence = bookmarkEntry.vepConsequence ? Object.keys(bookmarkEntry.vepConsequence).join(" ") : "";
 
@@ -1228,7 +1228,7 @@ BookmarkCard.prototype.exportBookmarks = function(scope, format = 'csv') {
       $('#export-loader').addClass("hide");
       $('#download-bookmarks span').text( "Download " + format + " file");
       $('#download-bookmarks').removeClass("hide");
-      createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
+      util.createDownloadLink("#download-bookmarks", output, "gene-iobio-bookmarked-variants." + format );
     })
 }
 
@@ -1355,7 +1355,7 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
     importRecords.forEach( function(ir) {
       if (!ir.transcript || ir.transcript == '') {
         var geneObject = window.geneObjects[ir.gene];
-        var tx = geneObject ? getCanonicalTranscript(geneObject) : null;
+        var tx = geneObject ? geneCard.getCanonicalTranscript(geneObject) : null;
         if (tx) {
           ir.transcript = tx.transcript_id;
         }

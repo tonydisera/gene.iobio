@@ -1027,9 +1027,9 @@ VariantModel.prototype.clearVcf = function(cardIndex) {
   this.vcfUrlEntered = false;
   this.vcfFileOpened = false;
   this.sampleName = null;
-  window.removeUrl('sample'+ cardIndex);
-  window.removeUrl('vcf' + cardIndex);
-  window.removeUrl('name'+ cardIndex);
+  window.util.removeUrl('sample'+ cardIndex);
+  window.util.removeUrl('vcf' + cardIndex);
+  window.util.removeUrl('name'+ cardIndex);
   this.vcf.clear();
 }
 
@@ -1038,7 +1038,7 @@ VariantModel.prototype.clearBam = function(cardIndex) {
   this.bamData = null;
   this.bamUrlEntered = false;
   this.bamFileOpened = false;
-  window.removeUrl('bam' + cardIndex);
+  window.util.removeUrl('bam' + cardIndex);
   if (this.bam) {
     this.bam.clear();
   }
@@ -1872,7 +1872,7 @@ VariantModel.prototype.assessVariantImpact = function(theVcfData, theTranscript)
       // region (level = unknown)
       if (variant.afExAC == 0) {
       variant.afExAC = -100;
-        getCodingRegions(theTranscript).forEach(function(codingRegion) {
+        geneCard.getCodingRegions(theTranscript).forEach(function(codingRegion) {
           if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
             variant.afExAC = 0;
           }

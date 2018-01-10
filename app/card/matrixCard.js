@@ -1600,7 +1600,7 @@ MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) 
 }
 
 MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
-  return stripTranscriptPrefix(selectedTranscript.transcript_id);
+  return util.stripTranscriptPrefix(selectedTranscript.transcript_id);
 }
 
 MatrixCard.prototype.formatHgvsP = function(variant, value) {
@@ -1652,7 +1652,7 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 }
 
 MatrixCard.prototype.formatAfHighest = function(variant, afField) {
-  return afField && afField.length > 0 && +variant[afField] < .1 ? percentage(variant[afField], false) : "";
+  return afField && afField.length > 0 && +variant[afField] < .1 ? util.percentage(variant[afField], false) : "";
 }
 
 MatrixCard.prototype.formatInheritance = function(variant, value) {

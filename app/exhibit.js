@@ -74,7 +74,7 @@ function showCaseStudy(tourNumber) {
   window.location.href = url;
 }
 function showNewCaseStudy() {
-  var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edu&tour=") + getUrlParameter("tour") + '&completedTour=' + getUrlParameter("completedTour");
+  var url = (isOffline ? "/?mode=edutour&tour=" : "./?mode=edu&tour=") + util.getUrlParameter("tour") + '&completedTour=' + util.getUrlParameter("completedTour");
   window.location.href = url;
 }
 function showCaseStudies() {
@@ -83,7 +83,7 @@ function showCaseStudies() {
 
 }
 
-function getUrlParameter(sParam) {
+function util.getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
     var hits = {};

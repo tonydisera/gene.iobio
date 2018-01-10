@@ -436,7 +436,7 @@ VariantCard.prototype.showExonTooltip = function(featureObject, feature, tooltip
            + '<span id="exon-tooltip-title"' + (lock ? 'style="margin-top:8px">' : '>') + (feature.hasOwnProperty("exon_number") ? "Exon " + feature.exon_number : "") + '</span>'
            + (lock ? '<a href="javascript:void(0)" id="exon-tooltip-close">X</a>' : '')
            + '</div>';
-    html     += '<div style="clear:both">' + feature.feature_type + ' ' + addCommas(feature.start) + ' - ' + addCommas(feature.end) + '</div>';
+    html     += '<div style="clear:both">' + feature.feature_type + ' ' + util.addCommas(feature.start) + ' - ' + util.addCommas(feature.end) + '</div>';
     if (feature.geneCoverage && feature.geneCoverage[me.getRelationship()]) {
       var covFields = filterCard.whichLowCoverage(feature.geneCoverage[me.getRelationship()]);
       html += "<div style='margin-top:4px'>" + "Coverage:"
@@ -707,7 +707,6 @@ VariantCard.prototype.promiseShowVariants = function () {
       // Load the variant chart.
       me._showVariants(regionStart, regionEnd,
       function() {
-        readjustCards();
         resolve();
       },
       true);

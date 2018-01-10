@@ -114,7 +114,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   }
   // If the tooltip sits below the elements, is the bottom of the tooltip
   // above the bottom of the window?
-  if ( (y + coord.height + h) - yScroll < visibleHeight($('body'))) {
+  if ( (y + coord.height + h) - yScroll < util.visibleHeight($('body'))) {
     availSpace.bottom.allowed = true;
     availSpace.bottom.tooltipTop = y + coord.height;
     availSpace.bottom.sideTooltipVertOffset = -1 * me.SIDE_TOOLTIP_VERT_OFFSET;
@@ -122,7 +122,7 @@ VariantTooltip.prototype.fillAndPositionTooltip = function(tooltip, variant, loc
   // If the tooltip sits in the center (either to the left or right) of the element,
   // are both top and bottom edges within the window?
   if ((y + coord.height/2) - (h/2) - yScroll >= 0
-    && ((y + coord.height/2) + (h/2) - yScroll < visibleHeight($('body')))) {
+    && ((y + coord.height/2) + (h/2) - yScroll < util.visibleHeight($('body')))) {
     availSpace.middle.allowed = true;
     availSpace.middle.tooltipTop = y + (coord.height/2);
     availSpace.middle.sideTooltipVertOffset = -1 * (h/2);
@@ -748,9 +748,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
   var polyphenRowSimple = vepPolyPhenDisplay != "" ? me._tooltipWideHeadingRow('Predicted effect', vepPolyPhenDisplay + ' to protein', '3px') : "";
 
 
-  var dbSnpId = getRsId(variant);
+  var dbSnpId = util.getRsId(variant);
 
-  var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', switchGenotype(variant.eduGenotype), '','')  : "";
+  var genotypeRow = isLevelEdu && eduTourNumber == 2 ? me._tooltipHeaderRow('Genotype', util.switchGenotype(variant.eduGenotype), '','')  : "";
 
 
   var formatPopAF = function(afObject) {
@@ -762,7 +762,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
           if (popAF.length > 0) {
             popAF += ", ";
           }
-          popAF += label + " " + (afObject[key] == "." ? "0%" : percentage(afObject[key]));
+          popAF += label + " " + (afObject[key] == "." ? "0%" : util.percentage(afObject[key]));
         }
       }
     }
@@ -774,8 +774,8 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
   var exacAfRow = "";
   var exacAfRowWide = "";
   if (global_vepAF && genomeBuildHelper.getCurrentBuildName() == "GRCh37" && variant.vepAf.gnomAD.hasOwnProperty("AF")) {
-    gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF)), '6px');
-    var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : percentage(variant.vepAf.gnomAD.AF);
+    gnomADAfRow = me._tooltipLabeledRow('Allele Freq gnomAD', (variant.vepAf.gnomAD.AF == "." ? "0%" : util.percentage(variant.vepAf.gnomAD.AF)), '6px');
+    var af   =  variant.vepAf.gnomAD.AF == "." ? "0%" : util.percentage(variant.vepAf.gnomAD.AF);
     var link =  "<a target='_gnomad' href='http://gnomad.broadinstitute.org/variant/" + variant.chrom + "-" + variant.start + "-" + variant.ref + "-" + variant.alt + "'>" + af + "</a>";
     var popAF = formatPopAF(variant.vepAf.gnomAD);
     gnomADAfRowWide  = me._tooltipRow('Allele Freq gnomAD', '<span style="float:left">' + (variant.vepAf.gnomAD.AF == "." ? af : link) + '</span>', null, true, null, '0px');
@@ -785,15 +785,15 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
 
   }
 
-  exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)),  '0px' );
-  exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC) + '</span>'), null, true, null, '0px');
+  exacAfRow = me._tooltipLabeledRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : util.percentage(variant.afExAC)),  '0px' );
+  exacAfRowWide = me._tooltipRow('Allele Freq ExAC', '<span style="float:left">' + (variant.afExAC == -100 ? "n/a" : util.percentage(variant.afExAC) + '</span>'), null, true, null, '0px');
 
   var popAf1000GRow = "";
   var af1000GRow = "";
   if (global_vepAF && variant.vepAf['1000G']) {
     popAF = formatPopAF(variant.vepAf['1000G']);
     if (variant.af1000G) {
-      af1000GRow    = me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + percentage(variant.af1000G) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
+      af1000GRow    = me._tooltipRow('Allele Freq 1000G', '<span style="float:left">' + util.percentage(variant.af1000G) + '</span>', null, true, null, popAF.length > 0 ? '0px' : null);
       if (popAF.length > 0) {
         popAf1000GRow = me._tooltipRow('&nbsp;', '<span style="float:left">' + popAF + '</span>');
       }
@@ -872,7 +872,7 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
       + siftPolyphenRow
       + gnomADAfRow
       + exacAfRow
-      + me._tooltipLabeledRow('Allele Freq 1000G', percentage(variant.af1000G), null)
+      + me._tooltipLabeledRow('Allele Freq 1000G', util.percentage(variant.af1000G), null)
       + (variantCard.getRelationship() == 'known-variants' ? me._tooltipRow('&nbsp;', knownVariantsClinvarLink, '6px')  : clinvarSimpleRow1)
       + (variantCard.getRelationship() == 'known-variants' ? clinvarSimpleRow2 : '')
       + me._linksRow(variant, pinMessage, variantCard)
@@ -938,9 +938,9 @@ VariantTooltip.prototype.formatContent = function(variant, pinMessage, type, rec
       + me._tooltipRow('PolyPhen', vepPolyPhenDisplay, null, false, 'polyphen-glyph')
       + me._tooltipRow('ClinVar', clinvarLink, null, false, 'tooltip-clinvar-pheno')
       + me._tooltipRow('&nbsp;', phenotypeDisplay)
-      + me._tooltipRow('Allele Freq gnomAD', percentage(variant.afgnomAD))
-      + me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : percentage(variant.afExAC)))
-      + me._tooltipRow('Allele Freq 1000G', percentage(variant.af1000G))
+      + me._tooltipRow('Allele Freq gnomAD', util.percentage(variant.afgnomAD))
+      + me._tooltipRow('Allele Freq ExAC', (variant.afExAC == -100 ? "n/a" : util.percentage(variant.afExAC)))
+      + me._tooltipRow('Allele Freq 1000G', util.percentage(variant.af1000G))
       + me._tooltipRowURL('Regulatory', vepRegDisplay)
       + me._tooltipRow('HGVSc', vepHGVScDisplay)
       + me._tooltipRow('HGVSp', vepHGVSpDisplay)
@@ -1244,7 +1244,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
            .attr("class", rel + "-alt-count tooltip-header-small")
            .html("<span class='tooltip-ped-label "
             + selectedClazz + "'>"
-            + " " + (rel == 'sibling' ? 'Sib' : capitalizeFirstLetter(rel))
+            + " " + (rel == 'sibling' ? 'Sib' : util.capitalizeFirstLetter(rel))
             + " " + (rel == 'sibling' ? sampleName : '')
             + "</span>"
             + (affectedStatus == 'affected' ? me.AFFECTED_GLYPH : ''));
@@ -1252,7 +1252,7 @@ VariantTooltip.prototype.createAlleleCountSVGTrio = function(variantCard, contai
           var zyg = genotype ? (!genotype.hasOwnProperty('zygosity') || genotype.zygosity == null || genotype.zygosity == "gt_unknown" ? "unknown" : genotype.zygosity.toLowerCase()) : "none";
       row.append("div")
          .attr("class",  "tooltip-zygosity label " + zyg)
-         .text(capitalizeFirstLetter(zyg));
+         .text(util.capitalizeFirstLetter(zyg));
 
 
       var barContainer = row.append("div")

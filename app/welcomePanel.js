@@ -50,7 +50,7 @@ function WelcomePanel() {
 }
 
 WelcomePanel.prototype.init = function() {
-  $('#welcome-panel-placeholder').append(welcomePanelTemplate());
+  $('#welcome-panel-placeholder').append(templateUtil.welcomePanelTemplate());
 }
 
 WelcomePanel.prototype.playVideo = function(videoName) {

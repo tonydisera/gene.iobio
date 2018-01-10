@@ -1,0 +1,100 @@
+<div id="gene-track" class="fixed app-panel level-edu hide shadow-z-2">
+
+
+    <div id="region-track" class="level-edu level-basic" style="clear:both;">
+        <div class="card-label" style="float:left;">Selected Gene</div>
+
+
+
+
+        <div id="select-gene-box"  class="level-basic hide">
+          <select id="select-gene" class=""  data-placeholder="Choose a gene...">
+          </select>
+        </div>
+        <div id="gene-summary" class="level-basic hide">
+        </div>
+
+        <div style="text-align:center;display:inline-block">
+          <div style="vertical-align:top;display:inline-block">
+            <a id="gene-name" target="_genecards" class="level-basic gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
+            <span id="gene-chr" class="level-basic gene-card-label keep-case" ></span>
+            <span id="gene-region" class="level-edu level-basic gene-card-label keep-case"></span>
+            <span id="minus_strand" class="level-edu level-basic" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
+            <span  id="gene-plus-minus-label" class="level-edu level-basic fullview hide " style="padding-left: 15px">+  -</span>
+            <input id="gene-region-buffer-input" class="level-edu level-basic hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
+          </div>
+
+          <div id="gene-source-box" class="level-edu level-basic" style="width:130px;display:inline-block;margin-left: 20px;vertical-align:top">
+            <select id="select-gene-source" class="fullview" data-placeholder="">
+                  <option value="Gencode Transcript">Gencode Transcript</option>
+                  <option value="RefSeq Transcript">RefSeq Transcript</option>
+             </select>
+          </div>
+
+          <div class="level-edu level-basic fullview" style="margin-top:-10px;display:inline-block">
+            <div class="btn-toolbar fullview"
+               style="display: inline-block;margin-left: 5px;padding-top: 0px; ">
+                <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
+                    <button id="transcript-dropdown-button" type="button"
+                    style="width:150px;padding-top:2px;padding-bottom:1px"
+                    class="btn btn-raised btn-default dropdown-toggle icon-button-sm"
+                    data-toggle="dropdown" aria-expanded="false" >
+                      Choose Transcript
+                      <span class="caret" style="margin-left:4px;"></span>
+                    </button>
+                    <ul id="transcript-menu" class="dropdown-menu" role="menu" style="right: 0;left: initial;min-width: 610px">
+                      <li id="transcript-menu-item">
+                      </li>
+                    </ul>
+                </div>
+            </div>
+          </div>
+
+        </div>
+
+        <span class="level-edu level-basic" style="float:right;margin-right:14px">
+            <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
+              <i class="material-icons">remove</i>
+            </a>
+            <a href="javascript:void(0)" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
+              <i class="material-icons">crop_3_2</i>
+            </a>
+        </span>
+
+    </div>
+
+    <!-- Non protein-coding gene badges -->
+    <div id="non-protein-coding" class="level-edu level-basic"  style="clear: both;padding-bottom: 0px;display: block;">
+        <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+          Enter a gene name
+        </div>
+        <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
+          Pseudogene
+        </div>
+        <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">
+        </div>
+        <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">
+        </div>
+    </div>
+
+    <div id="transcript-panel" class="level-edu fullview" >
+
+      <div id="top-coordinate-frame" class="hide">
+        <svg height="23" width="28">
+            <g  transform="translate(0,0)">
+              <rect class="coordinate-arrow" x="9" y="1" width="10" height="8">
+              </rect>
+            </g>
+            <g transform="translate(24,23),rotate(180)">
+              <polygon class="coordinate-arrow" points="0,14 10,0 20,14" x="0" y="0">
+              </polygon>
+            </g>
+        </svg>
+      </div>
+      <div id="gene-viz" class="track-chart">
+      </div>
+      <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
+          To zoom into region, drag over gene model.
+      </span>
+    </div>
+</div>

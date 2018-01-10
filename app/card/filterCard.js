@@ -84,7 +84,7 @@ FilterCard.prototype.displayAffectedFilters = function() {
         $('#present-in-affected').removeClass("hide");
         $('#present-in-affected-heading').removeClass("hide");
 
-        $('#present-in-affected').append(filterAffectedTemplate());
+        $('#present-in-affected').append(templateUtil.filterAffectedTemplate());
         var cb = $('#present-in-affected').find('.checkbox').last();
         cb.find('input').after("&nbsp;&nbsp;" + info.label);
         cb.attr("id", info.id)
@@ -104,7 +104,7 @@ FilterCard.prototype.displayAffectedFilters = function() {
       } else {
         $('#absent-in-unaffected').removeClass("hide");
         $('#absent-in-unaffected-heading').removeClass("hide");
-        $('#absent-in-unaffected').append(filterAffectedTemplate());
+        $('#absent-in-unaffected').append(templateUtil.filterAffectedTemplate());
         var cb = $('#absent-in-unaffected').find('.checkbox').last();
         cb.find('input').after("&nbsp;&nbsp;" + info.label);
         cb.attr("id", info.id);
