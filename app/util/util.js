@@ -1,5 +1,10 @@
 class Util {
   constructor() {
+
+  }
+
+  formatRegion() {
+    return d3.format(",");
   }
 
   decodeUrl(url) {
@@ -30,6 +35,8 @@ class Util {
     }
     return d.getMonth() + "-" + d.getDay() + "-" + d.getFullYear() + " " + formatHours(d.getHours()) + ":" + padMinutes(d.getMinutes()) + " " + getAmPm(d.getHours());
   }
+
+
 
   visibleHeight($el) {
       var elH = $el.outerHeight(),

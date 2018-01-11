@@ -13,7 +13,87 @@ class GeneModel {
     this.geneObjects = {};
 
     this.geneToLatestTranscript = {};
+
+    this.allKnownGeneNames = {};
+
+    this.clinvarGenes = {};
+
   }
+
+  loadFullGeneSet(callback) {
+    let me = this;
+    $.ajax({url: 'genes.json',
+      data_type: 'json',
+      success: function( data ) {
+        var sortedGenes = me.getRidOfDuplicates(data);
+        me.allKnownGeneNames = {};
+        sortedGenes.forEach(function(geneObject) {
+          if (geneObject && geneObject.name && geneObject.name.length > 0) {
+            me.allKnownGeneNames[geneObject.name.toUpperCase()] = true;
+          }
+        })
+        gene_engine.clear();
+        gene_engine.add(sortedGenes);
+        if (callback) {
+          callback(true);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+        console.log("failed to get genes.json " + thrownError);
+        console.log(xhr.status);
+        if (callback) {
+          callback(false);
+        }
+      }
+    })
+  }
+
+
+  promiseLoadClinvarGenes() {
+    let me = this;
+    var p = new Promise(function(resolve, reject) {
+
+      me.clinvarGenes = {};
+
+      $.ajax({
+          url: global_clinvarGenesUrl,
+          type: "GET",
+          crossDomain: true,
+          dataType: "text",
+          success: function( res ) {
+            if (res && res.length > 0) {
+              let recs = res.split("\n");
+              var firstTime = true;
+              recs.forEach(function(rec) {
+                if (firstTime) {
+                  // ignore col headers
+                  firstTime = false;
+                } else {
+                  var fields = rec.split("\t");
+                  me.clinvarGenes[fields[0]] = +fields[1];
+                }
+              })
+
+              resolve();
+            } else {
+              reject("Empty results returned from promiseLoadClinvarGenes");
+
+            }
+
+          },
+          error: function( xhr, status, errorThrown ) {
+            console.log( "Error: " + errorThrown );
+            console.log( "Status: " + status );
+            console.log( xhr );
+            reject("Error " + errorThrown + " occurred in promiseLoadClinvarGenes() when attempting get clinvar gene counts ");
+          }
+      });
+
+    });
+
+  }
+
+
 
   getRidOfDuplicates(genes) {
     let me = this;
@@ -499,7 +579,9 @@ class GeneModel {
 
     });
   }
-
+  isKnownGene(geneName) {
+    return this.allKnownGeneNames[geneName] || this.allKnownGeneNames[geneName.toUpperCase()]
+  }
 
 
 

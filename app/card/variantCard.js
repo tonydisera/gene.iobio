@@ -1092,13 +1092,17 @@ VariantCard.prototype.promiseGetBookmarkedVariant = function(variantProxy, data,
 VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariantsDisplayed, showTransition, isZoom) {
   var me = this;
 
-  if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+  if (this.getRelationship() == 'known-variants' &&  !knownVariantsCard.shouldShowVariants()) {
     me.cardSelector.find("#variant-badges").addClass("hide");
     me.cardSelector.find('.vcfloader').addClass("hide");
+    if (onVariantsDisplayed) {
+      onVariantsDisplayed();
+    }
     return;
   }
+
   if (this.getRelationship() == 'known-variants') {
-    showKnownVariantsHistoChart(false);
+    knownVariantsCard.showCountsViz(false);
   }
 
 
@@ -1222,7 +1226,7 @@ VariantCard.prototype._fillVariantChart = function(data, regionStart, regionEnd,
     return;
   }
 
-  if (this.getRelationship() == 'known-variants' && hideKnownVariantsCard) {
+  if (this.getRelationship() == 'known-variants' && knownVariantsCard.viz != knownVariantsCard.VIZ_VARIANTS) {
     return;
   }
 
@@ -1318,9 +1322,6 @@ VariantCard.prototype.promiseFillFeatureMatrix = function(regionStart, regionEnd
 
       $('#filter-and-rank-card').removeClass("hide");
       $('#matrix-track').removeClass("hide");
-      if (firstTimeShowVariants) {
-        firstTimeShowVariants = false;
-      }
 
       // Show called variants
       me.promiseFilterAndShowCalledVariants().then(function() {

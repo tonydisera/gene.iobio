@@ -497,7 +497,8 @@ VariantExporter.prototype._promiseFormatRecord = function(theVariant, sourceVari
        .promiseGetClinvarRecords(dummyVcfData,
                        getProbandVariantCard().model._stripRefName(revisedVariant.chrom),
                        theGeneObject,
-                                 clinvarLoader)
+                       geneModel.clinvarGenes,
+                      clinvarLoader)
        .then(function() {
 
         variantTooltip.formatContent(revisedVariant, null, "record", rec);

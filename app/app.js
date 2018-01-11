@@ -16,7 +16,6 @@ var videoPlayer = null;
 
 var siteConfig = {};
 
-var clinvarGenes = {};
 
 var util = new Util();
 var templateUtil = new TemplateUtil();
@@ -33,31 +32,20 @@ var GENE_REGION_BUFFER_MAX = 50000;
 // genes card
 var geneModel = new GeneModel();
 
-// Genes
+// Selected gene
 var gene = '';
-var allKnownGeneNames = {};
+// Selected transcript
+var selectedTranscript = null;
+
+// clicked variant
+var clickedVariant = null;
+var clickedVariantCard = null;
 
 
 var loadedUrl = false;
 
 
-// Transcript data and chart
-var selectedTranscript = null;
-
-
-var hideKnownVariants = true;
-var hideKnownVariantsCard = true;
-var knownVariantsChart = null;
-var knownVariantsChartType = 'exon-bar';
-var knownVariantsAreaChart = null;
-var knownVariantsBarChart = null;
-var KNOWN_VARIANTS_BIN_SPAN  = {'bar': +6, 'exon-bar': +2,  'area': +6};
-var KNOWN_VARIANTS_BAR_WIDTH = {'bar': +6, 'exon-bar': +6,  'area': +6};
-
-
-var firstTimeShowVariants = true;
-var readyToHideIntro = false;
-var keepShowingIntro = false;
+var knownVariantsCard = new KnownVariantsCard();
 
 var affectedInfo = null;
 var maxAlleleCount = 0;
@@ -65,7 +53,6 @@ var maxAlleleCount = 0;
 
 // Endpoint commands (encapsulate API to IOBIO services)
 var endpoint = null;
-
 
 // bookmark card
 var bookmarkCard = new BookmarkCard();
@@ -91,8 +78,6 @@ var matrixCard = new MatrixCard();
 var welcomePanel = new WelcomePanel();
 
 
-
-
 // cache helper
 var cacheHelper = null;
 var launchTimestampToClear = null;
@@ -105,15 +90,6 @@ var genericAnnotation = new GenericAnnotation();
 
 // legend
 var legend = new Legend();
-
-
-// clicked variant
-var clickedVariant = null;
-var clickedVariantCard = null;
-
-
-// Format the start and end positions with commas
-var formatRegion = d3.format(",");
 
 // variant card
 var variantCards = [];
@@ -168,8 +144,6 @@ $(document).ready(function(){
 
   initHub();
 
-  // Initialize material bootstrap
-  $.material.init();
 
   addCloseListeners();
 
@@ -205,7 +179,7 @@ $(document).ready(function(){
      return promiseLoadSiteConfig();
    })
    .then(function() {
-     return promiseLoadClinvarGenes();
+     return geneModel.promiseLoadClinvarGenes();
    })
    .then(function() {
       // Clear the local cache
@@ -282,50 +256,6 @@ function promiseLoadSiteConfig() {
           console.log( "Status: " + status );
           console.log( xhr );
           reject("Error " + errorThrown + " occurred in promiseLoadSiteConfig() when attempting get siteConfig.json ");
-        }
-    });
-
-  });
-
-}
-
-function promiseLoadClinvarGenes() {
-
-  var p = new Promise(function(resolve, reject) {
-
-    clinvarGenes = {};
-
-    $.ajax({
-        url: global_clinvarGenesUrl,
-        type: "GET",
-        crossDomain: true,
-        dataType: "text",
-        success: function( res ) {
-          if (res && res.length > 0) {
-            recs = res.split("\n");
-            var firstTime = true;
-            recs.forEach(function(rec) {
-              if (firstTime) {
-                // ignore col headers
-                firstTime = false;
-              } else {
-                var fields = rec.split("\t");
-                clinvarGenes[fields[0]] = +fields[1];
-              }
-            })
-
-            resolve();
-          } else {
-            reject("Empty results returned from promiseLoadClinvarGenes");
-
-          }
-
-        },
-        error: function( xhr, status, errorThrown ) {
-          console.log( "Error: " + errorThrown );
-          console.log( "Status: " + status );
-          console.log( xhr );
-          reject("Error " + errorThrown + " occurred in promiseLoadClinvarGenes() when attempting get clinvar gene counts ");
         }
     });
 
@@ -423,6 +353,10 @@ function init() {
 
   attachTemplates();
 
+  // Initialize material bootstrap
+  $.material.init();
+
+
   // Set version number on About menu and the Version dialog
   $('.version-number').text(version);
 
@@ -456,45 +390,12 @@ function init() {
   dataCard.init();
 
 
-  // Init known variants nav
-  initKnownVariantsNav();
+  knownVariantsCard.init();
+
 
 
   // Initialize gene card
   geneCard.init();
-
-  knownVariantsAreaChart = stackedAreaChartD3()
-    .widthPercent("100%")
-    .heightPercent("100%")
-        .width($('#container').innerWidth())
-    .height(50)
-    .showXAxis(false)
-    .xTickCount(0)
-    .yTickCount(3)
-    .xValue( function(d, i) { return d.point })
-    .categories(['unknown', 'other', 'benign', 'path'])
-      .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} );
-
-  knownVariantsBarChart = stackedBarChartD3()
-    .widthPercent("100%")
-    .heightPercent("100%")
-        .width($('#container').innerWidth())
-    .height(50)
-    .showXAxis(false)
-    .xTickCount(0)
-    .yTickCount(3)
-    .xValue( function(d, i) { return d.point })
-    .xValueStart( function(d, i) { return d.start })
-    .xValueEnd( function(d, i) { return d.end })
-    .barWidthMin(4)
-    .barHeightMin(3)
-    .categories(['unknown', 'other', 'benign', 'path'])
-      .margin( {top: 7, right: isLevelBasic || isLevelEdu ? 7 : 2, bottom: 0, left: isLevelBasic || isLevelEdu ? 9 : 4} )
-      .tooltipText( function(d,i) {
-        return showKnownVariantsTooltip(d);
-      });
-  toggleKnownVariantsChart('bar');
-
 
 
     // Initialize variant tooltip
@@ -617,84 +518,6 @@ function showGeneControls() {
 }
 
 
-
-function initKnownVariantsNav() {
-
-  $('#known-variants-all-card').find("#known-variants-nav-area").append(templateUtil.knownVariantsNavTemplateHTML);
-
-  $('#select-known-variants-filter').selectize(
-    {
-      placeholder: 'Filter...',
-        maxItems: null,
-        valueField: 'value',
-        labelField: 'display',
-      plugins: ['remove_button'],
-        persist: true,
-        create: function(input) {
-            return {
-                value: input,
-                text: input
-            }
-        }
-    }
-  );
-
-
-  filterCard.getCardSpecificFilters('known-variants').forEach(function(theFilter) {
-    $('#select-known-variants-filter')[0].selectize.addOption({value: theFilter.clazz, display: theFilter.display})
-  })
-  $('#select-known-variants-filter')[0].selectize.setValue(['clinvar_path', 'clinvar_lpath']);
-  $('#select-known-variants-filter')[0].selectize.on('change', function(values) {
-    filterCard.clearCardSpecificFilters('known-variants');
-    if (values) {
-      values.forEach(function(filterName) {
-        filterCard.setCardSpecificFilter('known-variants', filterName, true);
-      })
-    }
-    getVariantCard('known-variants').promiseFilterAndShowLoadedVariants();
-  })
-
-  var variantCard = getVariantCard('known-variants');
-  if (variantCard == null) {
-    variantCard = new VariantCard();
-    variantCard.model                = new VariantModel();
-
-    $('#known-variants-cards').append(templateUtil.variantCardTemplate());
-    var cardSelectorString = "#known-variants-cards .variant-card";
-    var d3CardSelector = d3.selectAll(cardSelectorString);
-
-    variantCard.setRelationship("known-variants");
-    variantCard.setAffectedStatus('unaffected');
-    variantCard.setName('Clinvar variants');
-
-    variantCard.init($(cardSelectorString), d3CardSelector, 0);
-
-
-    variantCard.cardSelector.find('#vcf-variant-count-label').text("Clinvar variants")
-
-
-    variantCard.setVariantCardLabel();
-    variantCards.push(variantCard);
-  }
-
-}
-
-function onKnownVariantsNav(value) {
-  if (value == 'counts') {
-    showKnownVariantsHistoChart(true);
-    showKnownVariantsCounts();
-    clearKnownVariantsCard();
-  } else if (value == 'variants') {
-    showKnownVariantsHistoChart(false);
-    addKnownVariantsCard();
-  } else if (value == 'none' || value == 'hide') {
-    showKnownVariantsHistoChart(false);
-    clearKnownVariantsCard();
-    $('#known-variants-cards #vcf-track').addClass("hide");
-    $('#known-variants-cards #variant-badges').addClass("hide");
-    $('#known-variants-cards #zoom-region-chart').addClass("hide");
-  }
-}
 
 function selectGeneInDropdown(theGeneName, select) {
   if (!select) {
@@ -943,7 +766,7 @@ function showSidebar(sidebar) {
 function showDataDialog(activeTab, geneName) {
 
   if (geneName) {
-    if (isKnownGene(geneName)) {
+    if (geneModel.isKnownGene(geneName)) {
       getGeneBloodhoundInputElementForDataDialog().val(geneName);
       getGeneBloodhoundInputElementForDataDialog().trigger('typeahead:selected', {"name": geneName, loadFromUrl: true});
     }
@@ -1225,7 +1048,7 @@ function loadGeneFromUrl() {
       // If the species and build have been specified, type in the gene name; this will
       // trigger the event to get the gene info and then call loadUrlSources()
       if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
-        if (isKnownGene(geneName)) {
+        if (geneModel.isKnownGene(geneName)) {
           setGeneBloodhoundInputElement(geneName, true, true);
         }
       } else {
@@ -1250,9 +1073,7 @@ function loadGeneFromUrl() {
 
 }
 
-function isKnownGene(geneName) {
-  return allKnownGeneNames[geneName] || allKnownGeneNames[geneName.toUpperCase()]
-}
+
 
 function loadGeneNamesFromUrl(geneNameToSelect) {
   genesCard.geneNames = [];
@@ -1260,7 +1081,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 
   // Add the gene to select to the gene list
   if (geneNameToSelect && geneNameToSelect.length > 0) {
-    if (isKnownGene(geneNameToSelect)) {
+    if (geneModel.isKnownGene(geneNameToSelect)) {
       genesCard.geneNames.push(geneNameToSelect.toUpperCase());
     } else {
       unknownGeneNames[geneNameToSelect] = true;
@@ -1285,7 +1106,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
   if (genes != null && genes.length > 0) {
     genes.split(",").forEach( function(geneName) {
       if ( genesCard.geneNames.indexOf(geneName) < 0 ) {
-        if (isKnownGene(geneName.toUpperCase())) {
+        if (geneModel.isKnownGene(geneName.toUpperCase())) {
           genesCard.geneNames.push(geneName.toUpperCase());
         } else {
           unknownGeneNames[geneName] = true;
@@ -1316,7 +1137,7 @@ function reloadGeneFromUrl() {
   // the gene that was passed in the url parameter
   loadGeneNamesFromUrl(gene);
 
-  if (isKnownGene(gene)) {
+  if (geneModel.isKnownGene(gene)) {
     setGeneBloodhoundInputElement(gene, true, true);
     genesCard._geneBadgeLoading(gene, true, true);
   }
@@ -1744,35 +1565,7 @@ function loadGeneWidgets(callback) {
   });
 
 
-  loadFullGeneSet(callback);
-}
-
-function loadFullGeneSet(callback) {
-
-  $.ajax({url: 'genes.json',
-      data_type: 'json',
-            success: function( data ) {
-              var sortedGenes = geneModel.getRidOfDuplicates(data);
-              allKnownGeneNames = {};
-              sortedGenes.forEach(function(geneObject) {
-                if (geneObject && geneObject.name && geneObject.name.length > 0) {
-                  allKnownGeneNames[geneObject.name.toUpperCase()] = true;
-                }
-              })
-              gene_engine.clear();
-        gene_engine.add(sortedGenes);
-        if (callback) {
-          callback(true);
-        }
-          },
-            error: function(xhr, ajaxOptions, thrownError) {
-              console.log("failed to get genes.json " + thrownError);
-              console.log(xhr.status);
-              if (callback) {
-                callback(false);
-              }
-            }
-  })
+  geneModel.loadFullGeneSet(callback);
 }
 
 
@@ -1784,7 +1577,7 @@ function loadFullGeneSet(callback) {
 */
 function loadTracksForGene(bypassVariantCards, callback) {
 
-  hideIntro();
+  toggleIntroCard(true);
   if (window.gene == null || window.gene == "" && !isLevelBasic) {
     //$('.bloodhound .twitter-typeahead').animateIt('tada');
     return;
@@ -1830,8 +1623,8 @@ function loadTracksForGene(bypassVariantCards, callback) {
   d3.selectAll(".impact").classed("nocolor", false);
   d3.selectAll(".effect").classed("nocolor", true);
 
-  gene.regionStart = formatRegion(window.gene.start);
-  gene.regionEnd   = formatRegion(window.gene.end);
+  gene.regionStart = util.formatRegion(window.gene.start);
+  gene.regionEnd   = util.formatRegion(window.gene.end);
 
     $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
     $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);
@@ -1870,20 +1663,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
   // not rendered.  If the vcf file hasn't been loaded, the vcf variant
   // chart is not rendered.
   geneCard.showTranscripts();
-
-  // If the 'variants' radio button was selected for Known Variants card, reset to
-  // counts because getting the variants is costly for large genes
-  if (!hideKnownVariantsCard) {
-    clearKnownVariantsCard();
-    $('#known-variants-nav-radio-buttons input:radio[name="known-variants-display-radio"]').filter('[value="counts"]').prop("checked", true);
-    hideKnownVariants = false;
-  }
-
-  // Show the chart for known variants
-  if (!bypassVariantCards) {
-    $('#known-variants-all-card').removeClass("hide");
-    showKnownVariantsCounts();
-  }
 
 
   //$('#filter-nd-rank-card').removeClass("hide");
@@ -1947,7 +1726,7 @@ function isAlignmentsOnly(callback) {
 function samplesInSingleVcf() {
   var theVcfs = {};
   var cards = getRelevantVariantCards().forEach(function(vc) {
-    if (!vc.model.isAlignmentsOnly()) {
+    if (!vc.model.isAlignmentsOnly() && vc.getRelationship() != 'known-variants') {
       if (vc.model.vcfUrlEntered) {
         theVcfs[vc.model.vcf.getVcfURL()] = true;
       } else {
@@ -2002,6 +1781,8 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
   genesCard.flagUserVisitedGene(window.gene.gene_name);
   $('#welcome-area').addClass("hide");
 
+  knownVariantsCard.beforeGeneLoaded(geneModel.clinvarGenes[window.gene.gene_name]);
+
   getRelevantVariantCards().forEach(function(vc) {
     vc.prepareToShowVariants();
     vc.clearBamChart();
@@ -2047,12 +1828,15 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
         loadPromise = promiseJointCallVariants(window.gene, window.selectedTranscript, null, {isBackground: false, checkCache: true})
         .then(function(data) {
           trioVcfData = data.trioVcfData;
+          knownVariantsCard.onGeneLoaded();
         })
 
       } else {
         loadPromise = promiseAnnotateVariants(window.gene, window.selectedTranscript, dataCard.mode == 'trio' && samplesInSingleVcf(), false)
         .then( function(data) {
             trioVcfData = data;
+
+            knownVariantsCard.onGeneLoaded();
 
             getRelevantVariantCards().forEach(function(vc) {
               if (!isAlignmentsOnly()) {
@@ -2200,7 +1984,7 @@ function getRelevantVariantCards() {
     rels.father = true;
   }
 
-  if (!hideKnownVariantsCard) {
+  if (knownVariantsCard.viz == knownVariantsCard.VIZ_VARIANTS) {
     rels['known-variants'] = true;
   }
   if (variantCards && variantCards.length > 0) {
@@ -2287,35 +2071,6 @@ function addVariantCard() {
 
   variantCard.init($(cardSelectorString), d3CardSelector, cardIndex);
   variantCard.setName(defaultName);
-}
-
-function addKnownVariantsCard()  {
-
-//  $('#known-variants-cards #variant-badges').removeClass("hide");
-  $('#select-known-variants-filter-box').removeClass("hide");
-
-
-  var variantCard = getVariantCard('known-variants');
-  var clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
-  variantCard.model.onVcfUrlEntered(clinvarUrl, null, function() {
-    variantCard.prepareToShowVariants();
-    variantCard.model.promiseAnnotateVariants(window.gene, window.selectedTranscript, [variantCard], false, false)
-    .then(function() {
-      variantCard.promiseShowVariants();
-    })
-  });
-
-  hideKnownVariantsCard = false;
-
-}
-
-
-function clearKnownVariantsCard() {
-  $('#known-variants-cards #vcf-track').addClass("hide");
-  $('#known-variants-cards #variant-badges').addClass("hide");
-  $('#select-known-variants-filter-box').addClass("hide");
-
-  hideKnownVariantsCard = true;
 }
 
 
@@ -2643,16 +2398,30 @@ function promiseAnnotateVariants(theGene, theTranscript, isMultiSample, isBackgr
     } else {
       getRelevantVariantCards().forEach(function(vc) {
         if (vc.model.isVcfReadyToLoad() || vc.model.isLoaded()) {
-          var p = vc.model.promiseAnnotateVariants(theGene, theTranscript, [vc], isMultiSample, isBackground, onVcfData)
-          .then(function(resultMap) {
-            for (var rel in resultMap) {
-              theResultMap[rel] = resultMap[rel];
-            }
-          })
-          annotatePromises.push(p);
+          if (vc.getRelationship() != 'known-variants') {
+            var p = vc.model.promiseAnnotateVariants(theGene, theTranscript, [vc], isMultiSample, isBackground, onVcfData)
+            .then(function(resultMap) {
+              for (var rel in resultMap) {
+                theResultMap[rel] = resultMap[rel];
+              }
+            })
+            annotatePromises.push(p);
+          }
         }
       })
     }
+
+
+    if (knownVariantsCard.shouldShowVariants()) {
+      let p = getVariantCard('known-variants').model.promiseAnnotateVariants(theGene, theTranscript, [getVariantCard('known-variants')], false, isBackground)
+      .then(function(resultMap) {
+        for (var rel in resultMap) {
+          theResultMap[rel] = resultMap[rel];
+        }
+      })
+      annotatePromises.push(p);
+    }
+
 
     Promise.all(annotatePromises)
     .then(function() {
@@ -2946,6 +2715,7 @@ function promiseAnnotateWithClinvar(resultMap, geneObject, transcript, isBackgro
           unionVcfData,
           getProbandVariantCard().model._stripRefName(geneObject.chr),
           geneObject,
+          geneModel.clinvarGenes,
           refreshVariantsFunction)
       .then(function() {
 
@@ -3142,163 +2912,21 @@ function removeBookmarkOnVariant() {
   }
 }
 
-function hideIntro() {
-  if (isMygene2 && !keepShowingIntro) {
-    // If we are showing info on a gene and the intro panel still shows the full
-    // intro text, hide it.
-    if ($('#intro-text.hide').length == 0 && readyToHideIntro) {
-      toggleIntro();
-    }
-    readyToHideIntro = true;
-  }
-}
 
-function toggleIntro() {
-  if ($('#intro-text.hide').length == 1) {
-    $('#intro-text').removeClass("hide");
-    $('#intro-link').addClass("hide");
-  } else {
-    $('#intro-text').addClass("hide");
-    $('#intro-link').removeClass("hide");
-  }
-}
-
-toggleKnownVariantsChart = function(chartType, refresh=false, button) {
-
-  if (chartType == 'bar') {
-    knownVariantsChart = knownVariantsBarChart;
-    knownVariantsChart.xStart(null);
-    knownVariantsChart.xEnd(null);
-    knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
-
-  } else if (chartType == 'exon-bar') {
-    knownVariantsChart = knownVariantsBarChart;
-    knownVariantsChart.xStart(window.gene.start);
-    knownVariantsChart.xEnd(window.gene.end);
-    knownVariantsChart.barWidth(KNOWN_VARIANTS_BAR_WIDTH[chartType]);
-
-    // If previous chart has detailed histogram data, just recalculate bins
-    if (knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') {
-      var selection = d3.select('#known-variants-chart');
-      var binLength = Math.floor( ((+window.gene.end - +window.gene.start) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
-      var exonBins = getProbandVariantCard().model.binKnownVariantsByExons(window.gene, window.selectedTranscript, binLength, selection.datum());
-      selection.datum(exonBins);
-    }
-
-  } else if (chartType == 'area') {
-    knownVariantsChart = knownVariantsAreaChart;
-  }
-
-
-  if (refresh) {
-    d3.select("#known-variants-chart svg").remove();
-    if (button) {
-      $('#known-variants-nav-chart-type .chart-type.selected').removeClass('selected');
-      $(button).addClass('selected');
-    }
-
-    // No need to obtain counts for gene since prior data is interchangable between
-    // area and barchart
-    if ((knownVariantsChartType == 'bar' || knownVariantsChartType == 'area') &&
-      (chartType == 'bar' || chartType == 'area')) {
-      knownVariantsChartType = chartType;
-      var selection = d3.select('#known-variants-chart');
-      knownVariantsChart(selection, {transition: {'pushUp': true }} );
+function toggleIntroCard(forceHide) {
+  var firstGeneLoading = $('#proband-variant-card .variant-card.hide').length == 1;
+  if (isMygene2 && !firstGeneLoading) {
+    if ( forceHide || $('#intro-text.hide').length == 0) {
+      $('#intro-text').addClass("hide");
+      $('#intro-link').removeClass("hide");
     } else {
-
-      knownVariantsChartType = chartType;
-      showKnownVariantsCounts();
+      $('#intro-text').removeClass("hide");
+      $('#intro-link').addClass("hide");
     }
-
   }
 
 }
 
-showKnownVariantsHistoChart = function(show=true) {
-  if (show) {
-    hideKnownVariants = false;
-    $('#known-variants-chart').removeClass("hide");
-    $('#known-variants-nav-chart-type').removeClass("hide");
-    $('#known-variants-cards #variant-badges').addClass("hide");
-  } else {
-    hideKnownVariants = true;
-    $('#known-variants-chart').addClass("hide");
-    $('#known-variants-nav-chart-type').addClass("hide");
-    $('#known-variants-cards #variant-badges').removeClass("hide");
-  }
-}
-
-
-showKnownVariantsCounts = function() {
-
-  var vc = getVariantCard('known-variants');
-
-  d3.select('#known-variants-chart svg').remove();
-  if (hideKnownVariants) {
-    return;
-  }
-  // This determines if the exon bar will span the width of the exon.
-  var featureBarWidth = true;
-
-  var theTranscript = null;
-  var binLength = null;
-
-  theTranscript =  $.extend({}, window.selectedTranscript);
-  theTranscript.features = window.selectedTranscript.features.filter(function(d) {
-      var inRegion = (d.start >= regionStart && d.start <= regionEnd)
-                         || (d.end >= regionStart && d.end <= regionEnd) ;
-          return inRegion;
-
-  });
-  vc.fillZoomRegionChart(theTranscript, regionStart, regionEnd);
-
-  if (knownVariantsChartType != 'exon-bar') {
-    theTranscript = null;
-    binLength = Math.floor( ((+regionEnd - +regionStart) / $('#transcript-panel #gene-viz').innerWidth()) * KNOWN_VARIANTS_BIN_SPAN[knownVariantsChartType]);
-  }
-
-  if (knownVariantsChartType == 'exon-bar' || knownVariantsChartType == 'bar') {
-    knownVariantsChart.xStart(regionStart);
-    knownVariantsChart.xEnd(regionEnd);
-  }
-
-
-  $('#known-variants-nav-chart-type .loader').removeClass('hide');
-  d3.select('#known-variants-chart svg').remove();
-  getProbandVariantCard().model.promiseGetKnownVariants(window.gene, theTranscript, binLength).then(function(results) {
-
-    results = results.filter(function(binObject) {
-      return binObject.start >= regionStart && binObject.end <= regionEnd;
-    })
-    vc.cardSelector.removeClass("hide");
-    $('#known-variants-chart').removeClass("hide");
-    var selection = d3.select('#known-variants-chart').datum(results);
-
-
-    knownVariantsChart(selection, {transition: {'pushUp': true}, 'featureBarWidth' : featureBarWidth} );
-      $('#known-variants-nav-chart-type .loader').addClass('hide');
-
-  })
-
-
-}
-
-showKnownVariantsTooltip = function(knownVariants) {
-  var tooltipRow = function(valueObject) {
-    var fieldName = Object.keys(valueObject)[0];
-    var row = '<div>';
-    row += '<span style="padding-left:10px;width:70px;display:inline-block">' + fieldName   + '</span>';
-    row += '<span style="width:40px;display:inline-block">' + valueObject[fieldName] + '</span>';
-    row += "</div>";
-    return row;
-  }
-    var html = 'ClinVar variants: ';
-    for (var i = knownVariants.values.length - 1; i >= 0; i--) {
-    html += tooltipRow(knownVariants.values[i])
-    }
-
-    return html;
-}
 
 
 function showFeedback() {
@@ -3361,15 +2989,15 @@ function emailFeedback() {
     htmlAttachment    = '<html>';
 
     htmlAttachment    += '<head>';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap-material-design.css" type="text/css">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap.css" type="text/css">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/gene.d3.css" type="text/css">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/google-fonts.css" type="text/css">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/material-icons.css" type="text/css">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/selectize.css" type="text/css">';
-      htmlAttachment    += '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">';
-      htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/site.css" type="text/css">';
-      htmlAttachment    += '</head>';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap-material-design.css" type="text/css">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap.css" type="text/css">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/gene.d3.css" type="text/css">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/google-fonts.css" type="text/css">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/material-icons.css" type="text/css">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/selectize.css" type="text/css">';
+    htmlAttachment    += '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">';
+    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/site.css" type="text/css">';
+    htmlAttachment    += '</head>';
 
     htmlAttachment    += "<body style='margin-bottom:0px'>";
 

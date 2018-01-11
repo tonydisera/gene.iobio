@@ -1056,7 +1056,7 @@ var effectCategories = [
     });
   }
 
-  exports.promiseGetClinvarRecords = function(theVcfData, refName, geneObject, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarRecords = function(theVcfData, refName, geneObject, clinvarGenes, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1075,7 +1075,7 @@ var effectCategories = [
         var batchOfVariants = theVcfData.features.slice(start, end <= theVcfData.features.length ? end : theVcfData.features.length);
 
         if (isClinvarOffline || clinvarSource == 'vcf') {
-          var promise = me.promiseGetClinvarVCFImpl(batchOfVariants, refName, geneObject, clinvarLoadVariantsFunction)
+          var promise = me.promiseGetClinvarVCFImpl(batchOfVariants, refName, geneObject, clinvarGenes, clinvarLoadVariantsFunction)
           .then(  function() {
 
           }, function(error) {
@@ -1107,7 +1107,7 @@ var effectCategories = [
     });
   }
 
-  exports._getClinvarVariantRegions = function(refName, geneObject, variants) {
+  exports._getClinvarVariantRegions = function(refName, geneObject, variants, clinvarGenes) {
     var regions = [];
     if (variants && variants.length > 0) {
       var clinvarVariantCount = clinvarGenes[geneObject.gene_name];
@@ -1134,7 +1134,7 @@ var effectCategories = [
   // This method will obtain clinvar annotations from a clinvar vcf.
   // When there is no internet (isOffline == true), read the clinvar vcf from a locally served
   // file; otherwise, serve clinvar vcf from standard ftp site.
-  exports.promiseGetClinvarVCFImpl= function(variants, refName, geneObject, clinvarLoadVariantsFunction) {
+  exports.promiseGetClinvarVCFImpl= function(variants, refName, geneObject, clinvarGenes, clinvarLoadVariantsFunction) {
     var me = this;
 
     return new Promise( function(resolve, reject) {
@@ -1146,7 +1146,7 @@ var effectCategories = [
         clinvarUrl = genomeBuildHelper.getBuildResource(genomeBuildHelper.RESOURCE_CLINVAR_VCF_S3);
       }
 
-      var regions = me._getClinvarVariantRegions(refName, geneObject, variants);
+      var regions = me._getClinvarVariantRegions(refName, geneObject, variants, clinvarGenes);
 
       var cmd = endpoint.normalizeVariants(clinvarUrl, null, refName, regions);
 

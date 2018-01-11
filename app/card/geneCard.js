@@ -43,7 +43,7 @@ class GeneCard {
 
 
         var cardCount = 0;
-        showKnownVariantsCounts();
+        knownVariantsCard.showCountsViz();
 
         getRelevantVariantCards().forEach(function(variantCard) {
           variantCard.onBrush(brush,

@@ -680,7 +680,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
   var duplicateGeneNames = {};
   geneNameList.forEach( function(geneName) {
     if (geneName.trim().length > 0) {
-      if (isKnownGene(geneName)) {
+      if (geneModel.isKnownGene(geneName)) {
         if (me.geneNames.indexOf(geneName.trim().toUpperCase()) < 0) {
           me.geneNames.push(geneName.trim().toUpperCase());
         } else {
