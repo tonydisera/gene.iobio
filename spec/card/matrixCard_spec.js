@@ -150,7 +150,7 @@ describe('MatrixCard', function() {
 
     it('returns the one-based index', function() {
       mc = new MatrixCard();
-      spyOn(window, 'util.getRsId').and.returnValue(null);
+      spyOn(util, 'getRsId').and.returnValue(null);
       var variant = {};
       expect(mc.getVariantLabel(variant, 0)).toEqual("1");
     });

@@ -494,6 +494,21 @@ VariantModel.prototype.promiseGetVariantCount = function(data) {
 
 }
 
+
+VariantModel.prototype.promiseSummarizeDanger = function(geneName, theVcfData, options, geneCoverageAll) {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+    var dangerSummary = VariantModel._summarizeDanger(geneName, theVcfData, options, geneCoverageAll);
+    me.promiseCacheDangerSummary(dangerSummary, geneName).then(function() {
+      resolve(dangerSummary);
+    },
+    function(error) {
+      reject(error);
+    })
+  })
+}
+
+
 VariantModel._summarizeDanger = function(geneName, theVcfData, options = {}, geneCoverageAll) {
 
   var dangerCounts = $().extend({}, options);
@@ -1378,7 +1393,7 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
              me._getSamplesToRetrieve(),  // sample names
              filterCard.annotationScheme.toLowerCase(), // annot scheme
              matrixCard.clinvarMap,  // clinvar map
-             window.geneSource == 'refseq' ? true : false,
+             geneModel.geneSource == 'refseq' ? true : false,
              true,  // hgvs notation
              true,  // rsid
              false, // vep af
@@ -1544,7 +1559,7 @@ VariantModel.prototype.promiseGetImpactfulVariantIds = function(theGeneObject, t
              me._getSamplesToRetrieve(),  // sample names
              filterCard.annotationScheme.toLowerCase(), // annot scheme
              matrixCard.clinvarMap,  // clinvar map
-             window.geneSource == 'refseq' ? true : false,
+             geneModel.geneSource == 'refseq' ? true : false,
              true,  // hgvs notation
              true,  // rsid
              false, // vep af
@@ -1603,7 +1618,7 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
     // If this is the refseq gene model, set the annotation
     // scheme on the filter card to 'VEP' since snpEff will
     // be bypassed at this time.
-    if (window.geneSource == 'refseq') {
+    if (geneModel.geneSource == 'refseq') {
       filterCard.setAnnotationScheme("VEP");
     }
 
@@ -1624,8 +1639,8 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
             vc.model.vcfData = vcfData;
             vc.model.fbData = me.reconstituteFbData(vcfData);
           }
-          me._populateEffectFilters(me.vcfData.features);
-          me._populateRecFilters(me.vcfData.features);
+          me.populateEffectFilters(me.vcfData.features);
+          me.populateRecFilters(me.vcfData.features);
           var bp = me._promiseDetermineVariantBookmarks(vcfData, theGene, theTranscript);
           bookmarkPromises.push(bp);
 
@@ -1660,7 +1675,7 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
              me._getSamplesToRetrieve(),
              me.getRelationship() == 'known-variants' ? 'none' : filterCard.annotationScheme.toLowerCase(),
              matrixCard.clinvarMap,
-             window.geneSource == 'refseq' ? true : false,
+             geneModel.geneSource == 'refseq' ? true : false,
              window.isLevelBasic || global_getVariantIdsForGene,  // hgvs notation
              global_getVariantIdsForGene,  // rsid
              global_vepAF    // vep af
@@ -1716,10 +1731,10 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
                   resultMap[vc.getRelationship()] = theVcfData;
 
                   // Show the snpEff effects / vep consequences in the filter card
-                  me._populateEffectFilters(theVcfData.features);
+                  me.populateEffectFilters(theVcfData.features);
 
                   // Determine the unique values in the VCF filter field
-                  me._populateRecFilters(theVcfData.features);
+                  me.populateRecFilters(theVcfData.features);
 
 
                   // Flag any bookmarked variants
@@ -1872,7 +1887,7 @@ VariantModel.prototype.assessVariantImpact = function(theVcfData, theTranscript)
       // region (level = unknown)
       if (variant.afExAC == 0) {
       variant.afExAC = -100;
-        geneCard.getCodingRegions(theTranscript).forEach(function(codingRegion) {
+        geneModel.getCodingRegions(theTranscript).forEach(function(codingRegion) {
           if (variant.start >= codingRegion.start && variant.end <= codingRegion.end) {
             variant.afExAC = 0;
           }
@@ -2165,18 +2180,8 @@ VariantModel.prototype._otherSampleInThisVcf = function(otherModel) {
 
 
 
-VariantModel.prototype.populateEffectFilters = function() {
-  var me = this;
-  this.promiseGetVcfData(window.gene, window.selectedTranscript)
-   .then(function(data) {
-    var theVcfData = data.vcfData;
-    if (theVcfData && theVcfData.features) {
-      me._populateEffectFilters(theVcfData.features);
-    }
-   })
-}
 
-VariantModel.prototype._populateEffectFilters  = function(variants) {
+VariantModel.prototype.populateEffectFilters  = function(variants) {
   variants.forEach(function(variant) {
     for (effect in variant.effect) {
       filterCard.snpEffEffects[effect] = effect;
@@ -2187,7 +2192,10 @@ VariantModel.prototype._populateEffectFilters  = function(variants) {
   });
 }
 
-VariantModel.prototype._populateRecFilters  = function(variants) {
+VariantModel.prototype.populateRecFilters  = function(variants) {
+  if (filterCard.recFilters == null) {
+    filterCard.recFilters = {};
+  }
   variants.forEach( function(variant) {
     if (!variant.hasOwnProperty('fbCalled') || variant.fbCalled != 'Y') {
       filterCard.recFilters[variant.recfilter] = variant.recfilter;
@@ -3024,6 +3032,20 @@ VariantModel.prototype.filterKnownVariants = function(data, start, end, bypassRa
   return vcfDataFiltered;
 }
 
+VariantModel.calcMaxAlleleCount = function(theVcfData, maxAlleleCount=0) {
+  if (theVcfData && theVcfData.features) {
+    theVcfData.features.forEach(function(theVariant) {
+      if (theVariant.genotypeDepth) {
+        if ((+theVariant.genotypeDepth) > maxAlleleCount) {
+          maxAlleleCount = +theVariant.genotypeDepth;
+        }
+      }
+    })
+  }
+  return maxAlleleCount;
+}
+
+
 
 VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttribute, matchAttribute, matchFunction, noMatchFunction ) {
   var me = this;
@@ -3041,7 +3063,7 @@ VariantModel.prototype.promiseCompareVariants = function(theVcfData, compareAttr
            me._getSamplesToRetrieve(),
            filterCard.annotationScheme.toLowerCase(),
            matrixCard.clinvarMap,
-           window.geneSource == 'refseq' ? true : false)
+           geneModel.geneSource == 'refseq' ? true : false)
         .then( function(data) {
 
           if (data != null && data.features != null) {

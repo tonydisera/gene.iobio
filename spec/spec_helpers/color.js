@@ -69,7 +69,7 @@ if (!net.brehaut) {
     var rgb_rgba_integer_regex = new RegExp([
         '^rgb(a?)\\(', css_integer, ',', css_integer, ',', css_integer, '(,(', css_number, '))?\\)$'
     ].join(css_whitespace));
-    var rgb_rgba_util.percentage_regex = new RegExp([
+    var rgb_rgba_percentage_regex = new RegExp([
         '^rgb(a?)\\(', css_percentage, ',', css_percentage, ',', css_percentage, '(,(', css_number, '))?\\)$'
     ].join(css_whitespace));
 
@@ -327,7 +327,7 @@ if (!net.brehaut) {
                 if (withInteger) {
                     return withInteger;
                 }
-                return match(rgb_rgba_util.percentage_regex, 100);
+                return match(rgb_rgba_percentage_regex, 100);
 
                 function match(regex, max_value) {
                     var colorGroups = css.match(regex);

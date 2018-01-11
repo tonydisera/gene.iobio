@@ -1355,7 +1355,7 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
     importRecords.forEach( function(ir) {
       if (!ir.transcript || ir.transcript == '') {
         var geneObject = window.geneObjects[ir.gene];
-        var tx = geneObject ? geneCard.getCanonicalTranscript(geneObject) : null;
+        var tx = geneObject ? geneModel.getCanonicalTranscript(geneObject) : null;
         if (tx) {
           ir.transcript = tx.transcript_id;
         }

@@ -395,16 +395,16 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
     var shouldCallVariants = analyzeCalledVariants;
 
     promiseGetGeneModel(geneName)
-    .then( function(geneModel) {
+    .then( function(data) {
       // Get the gene model
-      geneObject = geneModel;
+      geneObject = data;
       me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
       me.geneBadgeLoaderDisplay.addGene(geneName, genesCard.pageNumberForGene(geneName));
       adjustGeneRegion(geneObject);
-      transcript = geneCard.getCanonicalTranscript(geneObject);
+      transcript = geneModel.getCanonicalTranscript(geneObject);
       window.geneObjects[geneObject.gene_name.toUpperCase()] = geneObject;
 
-      return geneCard.promiseMarkCodingRegions(geneObject, transcript);
+      return geneModel.promiseMarkCodingRegions(geneObject, transcript);
     })
     .then(function() {
       // Find out if this gene has already been analyzed

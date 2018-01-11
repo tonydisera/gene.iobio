@@ -329,7 +329,9 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
           (variantEntry.hasOwnProperty('freebayesCalled') && variantEntry.freebayesCalled == 'Y')) {
           // If the variant was called on-demand, issue the service calls to
           // generate the vcf records.
-          promiseCacheJointCallVariants(theGeneObject, theTranscript, variantEntry)
+
+
+          promiseJointCallVariants(theGeneObject, theTranscript, getCurrentTrioVcfData(), {sourceVariant: variantEntry, checkCache: true, isBackground: true})
           .then(function(data) {
               var theGeneObject1    = data.gene;
               var theTranscript1    = data.transcript;

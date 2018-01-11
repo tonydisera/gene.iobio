@@ -83,7 +83,7 @@ function showCaseStudies() {
 
 }
 
-function util.getUrlParameter(sParam) {
+function getUrlParameter(sParam) {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
     var hits = {};

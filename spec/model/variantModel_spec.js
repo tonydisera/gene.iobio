@@ -64,26 +64,35 @@ describe('variantModel', function() {
       var variant_5 = { start: 1, end: 3, ref: 'A', alt: 'G', type: 'del' };
       var variant_6 = { start: 1, end: 3, ref: 'A', alt: 'G', type: 'SNP' };
       var variants = [variant_1, variant_2, variant_3, variant_4, variant_5, variant_6];
-      window.gene = 'BRCA1';
+      window.gene = {gene_name: 'BRCA1'};
       window.selectedTranscript = 'transcript';
-      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve({ features: variants }));
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve({
+        model: variantModel,
+        vcfData: { features: variants }
+      }
+      ));
       variantModel.promiseGetMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })
        .then(function(data) {
         expect(data).toEqual(variant_6);
        })
-      expect(variantModel.promiseGetVcfData).toHaveBeenCalledWith('BRCA1', 'transcript');
+      expect(variantModel.promiseGetVcfData).toHaveBeenCalledWith({gene_name: 'BRCA1'}, 'transcript');
     });
 
     it('returns null when there is no vcfdata', function() {
-      spyOn(variantModel, 'promiseGetVcfDataForGene').and.returnValue(Promise.resolve(null));
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve({
+        model: variantModel,
+        vcfData: null
+      }
+      ));
       variantModel.promiseGetMatchingVariant({ start: 1, end: 3, ref: 'A', alt: 'G', type: 'snp' })
-       .then(data) {
+      .then(function(data) {
         expect(data).toBeNull();
-       })
+      })
     })
   });
 
   describe('#summarizeDanger', function() {
+    var geneName = "DUMMY";
 
     it('returns a danger counts object with the correct impact when the annotation scheme is snpeff', function() {
       filterCard.annotationScheme = 'snpeff';
@@ -96,27 +105,31 @@ describe('variantModel', function() {
           { type: 'snp', highestImpactSnpeff: { MODIFIER: { downstream_gene_variant: {} } } }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
-        CLINVAR: null,
-        INHERITANCE: {},
-        IMPACT: {
-          MODERATE: {
-            snp: { missense_variant: { ENST000001: "ENST000001" } },
-            del: { missense_variant: { ENST000001: "ENST000001" } }
-          }
-        },
-        CONSEQUENCE: {},
-        AF: {},
-        featureCount: 5,
-        loadedCount: 5,
-        calledCount: 0,
-        harmfulVariantsInfo: [],
-        harmfulVariantsLevel: null,
-        failedFilter: false,
-        geneCoverageInfo: {},
-        geneCoverageProblem: false
+      expect(VariantModel._summarizeDanger(geneName, vcfData, {}, {})).toEqual({
+          'geneName': geneName,
+          CLINVAR: null,
+          INHERITANCE: {},
+          IMPACT: {
+            MODERATE: {
+              snp: { missense_variant: { ENST000001: "ENST000001" } },
+              del: { missense_variant: { ENST000001: "ENST000001" } }
+            }
+          },
+          CONSEQUENCE: {},
+          AF: {},
+          featureCount: 5,
+          loadedCount: 5,
+          calledCount: 0,
+          harmfulVariantsInfo: [],
+          harmfulVariantsLevel: null,
+          failedFilter: false,
+          geneCoverageInfo: {},
+          geneCoverageProblem: false
       });
+
     });
+
+
 
     it('returns a danger counts object with the correct consequence and impact when the annotation scheme is vep', function() {
       filterCard.annotationScheme = 'vep';
@@ -129,7 +142,9 @@ describe('variantModel', function() {
           { type: 'snp', highestImpactVep: { MODIFIER: { downstream_gene_variant: {} } } }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+
+      expect(VariantModel._summarizeDanger(geneName, vcfData, {}, {})).toEqual({
+        'geneName': geneName,
         CLINVAR: null,
         INHERITANCE: {},
         IMPACT: {
@@ -154,6 +169,7 @@ describe('variantModel', function() {
         geneCoverageInfo: {},
         geneCoverageProblem: false
       });
+
     });
 
     it('returns a danger counts object with the correct SIFT', function() {
@@ -165,7 +181,8 @@ describe('variantModel', function() {
           { type: 'snp', highestSIFT: { "": {} } }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+      expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+        'geneName': geneName,
         CLINVAR: null,
         INHERITANCE: {},
         IMPACT: {},
@@ -192,7 +209,8 @@ describe('variantModel', function() {
           { type: 'snp', highestPolyphen: { "": {} } }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+      expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+        'geneName': geneName,
         CLINVAR: null,
         INHERITANCE: {},
         IMPACT: {},
@@ -219,7 +237,8 @@ describe('variantModel', function() {
           { type: 'snp', clinvar: "" }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+      expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+        'geneName': geneName,
         CLINVAR: {
           pathogenic: { value: 1, badge: true, examineBadge: true, clazz: 'clinvar_path', symbolFunction: jasmine.any(Function) }
         },
@@ -247,7 +266,8 @@ describe('variantModel', function() {
           { type: 'snp', inheritance: "recessive" }
         ]
       };
-      expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+      expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+        'geneName': geneName,
         CLINVAR: null,
         INHERITANCE: { denovo: "denovo", recessive: "recessive" },
         IMPACT: {},
@@ -264,6 +284,9 @@ describe('variantModel', function() {
       });
     });
 
+
+
+
     describe('when afExAC is higher than af1000G', function() {
       it('returns a danger counts object with the correct allele frequency (AF)', function() {
         window.matrixCard = new MatrixCard();
@@ -273,7 +296,8 @@ describe('variantModel', function() {
             { type: 'snp', afExAC: 0.005, af1000G: 0.001, afFieldHighest: 'afExAC',  afHighest: 0.005 }, // value of 5
           ]
         };
-        expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+        expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+          'geneName': geneName,
           CLINVAR: null,
           INHERITANCE: {},
           IMPACT: {},
@@ -302,7 +326,8 @@ describe('variantModel', function() {
             { type: 'snp', afExAC: 0.01, af1000G: 0.02, afHighest: 0.02, afFieldHighest: 'af1000G' }, // value of 6
           ]
         };
-        expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+        expect(VariantModel._summarizeDanger(geneName,vcfData)).toEqual({
+          'geneName': geneName,
           CLINVAR: null,
           INHERITANCE: {},
           IMPACT: {},
@@ -331,7 +356,8 @@ describe('variantModel', function() {
             { type: 'snp', afExAC: 0.005, afHighest: 0.005, afFieldHighest: 'afExAC' }  // value of 5
           ]
         };
-        expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+        expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+          'geneName': geneName,
           CLINVAR: null,
           INHERITANCE: {},
           IMPACT: {},
@@ -360,7 +386,8 @@ describe('variantModel', function() {
             { type: 'snp', af1000G: 0.02, afHighest: 0.02, afFieldHighest: 'af1000G'  }, // value of 6
           ]
         };
-        expect(VariantModel.summarizeDanger(vcfData)).toEqual({
+        expect(VariantModel._summarizeDanger(geneName, vcfData)).toEqual({
+          'geneName': geneName,
           CLINVAR: null,
           INHERITANCE: {},
           IMPACT: {},
@@ -379,26 +406,55 @@ describe('variantModel', function() {
         });
       });
     });
+
+
   });
 
   describe('#getVariantCount', function() {
     it('returns the correct count of loaded variants', function() {
-      window.gene = 'BRCA1';
+      window.gene = {gene_name: 'BRCA1'};
       window.selectedTranscript = 'transcript';
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue({
-        features: [{ fbCalled: 'Y' }, { zygosity: 'HOMREF' }, { zygosity: null }, { zygosity: 'HET' }]
-      });
-      expect(variantModel.getVariantCount()).toBe(2);
-      expect(variantModel.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve(
+      {
+        model: variantModel,
+        vcfData: {
+          features: [{ fbCalled: 'Y' }, { zygosity: 'HOMREF' }, { zygosity: null }, { zygosity: 'HET' }]
+        }
+      }));
+      variantModel.promiseGetVariantCount()
+      .then(function(count) {
+        expect(count).toBe(2);
+        //expect(variantModel.promiseGetVcfData).toHaveBeenCalledWith('BRCA1', 'transcript');
+
+      })
     });
 
     it('returns 0 when there are no variants', function() {
-      expect(variantModel.getVariantCount({})).toBe(0);
+      window.gene = {gene_name: 'BRCA1'};
+      window.selectedTranscript = 'transcript';
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve(
+      {
+        model: variantModel,
+        vcfData: {
+          features: []
+        }
+      }));
+      variantModel.promiseGetVariantCount({})
+      .then(function(count) {
+        expect(count).toBe(0);
+      });
     });
 
     it('returns 0 when there is no vcf data', function() {
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue(null);
-      expect(variantModel.getVariantCount()).toBe(0);
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve(
+      {
+        model: variantModel,
+        vcfData: null
+      }));
+      variantModel.promiseGetVariantCount()
+      .then(function(count) {
+        expect(count).toBe(0);
+      });
     });
   });
 
@@ -407,17 +463,34 @@ describe('variantModel', function() {
       window.gene = { chr: 'chr1', gene_name: 'foo' };
       window.selectedTranscript = 'transcript';
       variantModel.relationship = 'proband';
-      variantModel.setCalledVariants(
-        {
-          features: [{ ref: 'chr1', zygosity: 'HET' }, { ref: 'chr1', zygosity: 'HOMREF' }, { ref: 'chr1', zygosity: 'HOM'}]
-        }, true
-      );
-      expect(variantModel.getCalledVariantCount()).toEqual(2);
+      spyOn(variantModel, 'promiseGetFbData').and.returnValue(Promise.resolve(
+      {
+        model: variantModel,
+        fbData: {
+          features: [{ ref: 'chr1', fbCalled: 'Y', zygosity: 'HET' }, { ref: 'chr1', fbCalled: 'Y', zygosity: 'HOMREF' }, { ref: 'chr1', fbCalled: 'Y', zygosity: 'HOM'}]
+        }
+      }));
+      variantModel.promiseGetCalledVariantCount()
+      .then(function(count) {
+        expect(count).toEqual(2);
+      });
     });
 
     it('returns 0 when there are no called variants', function() {
-      variantModel.setCalledVariants({});
-      expect(variantModel.getCalledVariantCount()).toEqual(0);
+      window.gene = { chr: 'chr1', gene_name: 'foo' };
+      window.selectedTranscript = 'transcript';
+      variantModel.relationship = 'proband';
+      spyOn(variantModel, 'promiseGetFbData').and.returnValue(Promise.resolve(
+      {
+        model: variantModel,
+        fbData: {
+          features: []
+        }
+      }));
+      variantModel.promiseGetCalledVariantCount()
+      .then(function(count) {
+        expect(count).toEqual(0);
+      })
     });
   });
 
@@ -818,60 +891,62 @@ describe('variantModel', function() {
     });
   });
 
-  describe('#determineMaxAlleleCount', function() {
+  describe('#calcMaxAlleleCount', function() {
     describe('when the proband has variants in the gene', function() {
       it('it sets the max allele count on the vcf data', function() {
+        var maxAlleleCount = 0;
         dataCard.mode = 'single';
-        var variants = [
-          { genotypeDepth: 1, genotypeDepthMother: "2", genotypeDepthFather: "3"},
-          { genotypeDepth: 1, genotypeDepthMother: "5", genotypeDepthFather: "2"},
-        ];
-        var vcfData = { features: variants };
-        expect(variantModel.determineMaxAlleleCount(vcfData)).toEqual({ features: variants, maxAlleleCount: 5 });
+
+        maxAlleleCount = VariantModel.calcMaxAlleleCount({ features: [ { genotypeDepth: 1}, { genotypeDepth: 1} ] });
+        maxAlleleCount = VariantModel.calcMaxAlleleCount({ features: [ { genotypeDepth: 5}, { genotypeDepth: 3} ] });
+
+        expect(maxAlleleCount).toEqual(5);
       });
     });
 
     describe('when the proband does not have variants in the gene', function() {
       it('it sets the max allele count on the vcf data based on the mother and father', function() {
-        window.gene = 'BRCA1';
+        window.gene = {gene_name: 'BRCA1'};
         window.selectedTranscript = 'transcript';
         dataCard.mode = 'trio';
         var motherVariants = [{ genotypeDepth: 1 }, { genotypeDepth: 8 }];
         var fatherVariants = [{ genotypeDepth: '10' }, { genotypeDepth: '5' }];
-        window.variantCards = [
-          {
-            getRelationship: function() { return 'mother'; },
-            model: { getVcfDataForGene: jasmine.createSpy().and.returnValue({ features: motherVariants }) }
-          },
-          {
-            getRelationship: function() { return 'father'; },
-            model: { getVcfDataForGene: jasmine.createSpy().and.returnValue({ features: fatherVariants }) }
-          }
-        ];
         var vcfData = { features: [] };
-        expect(variantModel.determineMaxAlleleCount(vcfData)).toEqual({ features: [], maxAlleleCount: 10 });
-        expect(window.variantCards[0].model.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
-        expect(window.variantCards[1].model.getVcfDataForGene).toHaveBeenCalledWith('BRCA1', 'transcript');
+
+
+        var maxAlleleCount = 0;
+        maxAlleleCount = VariantModel.calcMaxAlleleCount(vcfData);
+        maxAlleleCount = VariantModel.calcMaxAlleleCount({features: motherVariants});
+        maxAlleleCount = VariantModel.calcMaxAlleleCount({features: fatherVariants});
+        expect(maxAlleleCount).toEqual(10);
       });
     });
   });
 
-  describe('#populateEffectFilters', function() {
+  describe('#populateEffectAndVepConsequenceFilters', function() {
     it('sets the snpEffEffects on the filterCard', function() {
-      window.filterCard = { snpEffEffects: {} };
-      var variants = [{ effect: { EFFECT_1: 'EFFECT_1', EFFECT_2: 'EFFECT_2' } }, { effect: { EFFECT_3: 'EFFECT_3' } }];
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
-      variantModel.populateEffectFilters();
+      window.gene = {gene_name: 'BRCA1'};
+      window.selectedTranscript = 'transcript';
+      window.filterCard = { snpEffEffects: {},  vepConsequences: {}  };
+      var variants = [
+      {
+        effect: { EFFECT_1: 'EFFECT_1', EFFECT_2: 'EFFECT_2' },
+        vepConsequence: { C_1: 'C_1', C_2: 'C_2' }
+      },
+      {
+        effect: { EFFECT_3: 'EFFECT_3' },
+        vepConsequence: { C_3: 'C_3' }
+      }];
+      spyOn(variantModel, 'promiseGetVcfData').and.returnValue(Promise.resolve({
+        model: variantModel,
+        vcfData: { features: variants }
+      }
+      ));
+      variantModel.populateEffectFilters(variants);
       expect(window.filterCard.snpEffEffects).toEqual({ EFFECT_1: 'EFFECT_1', EFFECT_2: 'EFFECT_2', EFFECT_3: 'EFFECT_3' });
-    });
-
-    it('sets the vepConsequences on the filterCard', function() {
-      window.filterCard = { vepConsequences: {} };
-      var variants = [{ vepConsequence: { C_1: 'C_1', C_2: 'C_2' } }, { vepConsequence: { C_3: 'C_3' } }];
-      spyOn(variantModel, 'getVcfDataForGene').and.returnValue({ features: variants });
-      variantModel.populateEffectFilters();
       expect(window.filterCard.vepConsequences).toEqual({ C_1: 'C_1', C_2: 'C_2', C_3: 'C_3' });
     });
+
   });
 
 

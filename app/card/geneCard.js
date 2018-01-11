@@ -1,10 +1,9 @@
 class GeneCard {
-  constructor() {
+  constructor(geneModel) {
     this.transcriptChart = null;
     this.transcriptMenuChart  = null;
     this.transcriptViewMode = "single";
-    this.transcriptCodingRegions = {};
-
+    this.geneModel = geneModel;
   }
 
   init() {
@@ -31,8 +30,8 @@ class GeneCard {
           regionEnd   = d3.round(brush.extent()[1]);
           if (!selectedTranscript) {
             selectedTranscript = window.gene.transcripts.length > 0 ? window.gene.transcripts[0] : null;
-            me.getCodingRegions(selectedTranscript);
-            me.promiseMarkCodingRegions(window.gene, window.selectedTranscript);
+            me.geneModel.getCodingRegions(selectedTranscript);
+            me.geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript);
           }
         } else {
             $('#zoom-hint').text('To zoom into region, drag over gene model.');
@@ -111,6 +110,25 @@ class GeneCard {
     });
 
 
+    $('#select-gene-source').selectize({});
+    $('#select-gene-source')[0].selectize.on('change', function(value) {
+      me.geneModel.geneSource = value.toLowerCase().split(" transcript")[0];
+      // When the user picks a different gene source from the dropdown,
+      // this becomes the 'new' site gene source
+      siteGeneSource = me.geneModel.geneSource;
+      geneToLatestTranscript = {};
+      getRelevantVariantCards().forEach(function(vc) {
+        // When switching from gencode->refseq or vice/versa,
+        // the VEP tokens will be formatted in a different order,
+        // so make sure we clear out the token indices
+        vc.model.vcf.clearVepInfoFields();
+      })
+      if (window.gene) {
+        genesCard.selectGene(window.gene.gene_name);
+      }
+    });
+
+
     $('#transcript-btn-group').data('open', false);
 
     $('#transcript-dropdown-button').click(
@@ -160,18 +178,18 @@ class GeneCard {
       // use when determining the variant's effect and impact (snpEff annotation)
       // For now, let's just grab the first one in the list.
       if (!selectedTranscript) {
-        selectedTranscript = me.getCanonicalTranscript();
+        selectedTranscript = me.geneModel.getCanonicalTranscript();
       }
-        me.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+        me.geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
           .then(function() {
           geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
-          me.getCodingRegions(window.selectedTranscript);
+          me.geneModel.getCodingRegions(window.selectedTranscript);
           });
     }
 
 
-      if (me.transcriptViewMode == "single") {
-        transcripts = [selectedTranscript];
+    if (me.transcriptViewMode == "single") {
+      transcripts = [selectedTranscript];
     }
 
 
@@ -225,277 +243,11 @@ class GeneCard {
     if (me.transcriptMenuChart.selectedTranscript() != null ) {
       if (selectedTranscript == null || selectedTranscript.transcript_id != me.transcriptMenuChart.selectedTranscript().transcript_id) {
         selectedTranscript = me.transcriptMenuChart.selectedTranscript();
-        selectCurrentTranscript();
+        me.selectCurrentTranscript();
        }
     }
   }
 
-
-  getCanonicalTranscript(theGeneObject) {
-    let me = this;
-    var geneObject = theGeneObject != null ? theGeneObject : window.gene;
-    var canonical;
-
-    if (geneObject.transcripts == null || geneObject.transcripts.length == 0) {
-      return null;
-    }
-    var order = 0;
-    geneObject.transcripts.forEach(function(transcript) {
-      transcript.isCanonical = false;
-      var cdsLength = 0;
-      if (transcript.features != null) {
-        transcript.features.forEach(function(feature) {
-          if (feature.feature_type == 'CDS') {
-            cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
-          }
-        })
-        transcript.cdsLength = cdsLength;
-      } else {
-        transcript.cdsLength = +0;
-      }
-      transcript.order = order++;
-
-    });
-    var sortedTranscripts = geneObject.transcripts.slice().sort(function(a, b) {
-      var aType = +2;
-      var bType = +2;
-      if (a.hasOwnProperty("transcript_type") && a.transcript_type == 'protein_coding') {
-        aType = +0;
-      } else if (a.hasOwnProperty("gene_type") && a.gene_type == "gene")  {
-        aType = +0;
-      } else {
-        aType = +1;
-      }
-      if (b.hasOwnProperty("transcript_type") && b.transcript_type == 'protein_coding') {
-        bType = +0;
-      } else if (b.hasOwnProperty("gene_type") && b.gene_type == "gene")  {
-        bType = +0;
-      } else {
-        bType = +1;
-      }
-
-
-      var aLevel = +2;
-      var bLevel = +2;
-      if (geneSource.toLowerCase() == 'refseq') {
-        if (a.transcript_id.indexOf("NM_") == 0 ) {
-          aLevel = +0;
-        }
-        if (b.transcript_id.indexOf("NM_") == 0 ) {
-          bLevel = +0;
-        }
-      } else {
-        // Don't consider level for gencode as this seems to point to shorter transcripts many
-        // of the times.
-        //aLevel = +a.level;
-        //bLevel = +b.level;
-      }
-
-
-      var aSource = +2;
-      var bSource = +2;
-      if (geneSource.toLowerCase() =='refseq') {
-        if (a.annotation_source == 'BestRefSeq' ) {
-          aSource = +0;
-        }
-        if (b.annotation_source == 'BestRefSeq' ) {
-          bSource = +0;
-        }
-      }
-
-      a.sort = aType + ' ' + aLevel + ' ' + aSource + ' ' + a.cdsLength + ' ' + a.order;
-      b.sort = bType + ' ' + bLevel + ' ' + bSource + ' ' + b.cdsLength + ' ' + b.order;
-
-      if (aType == bType) {
-        if (aLevel == bLevel) {
-          if (aSource == bSource) {
-            if (+a.cdsLength == +b.cdsLength) {
-              // If all other sort criteria is the same,
-              // we will grab the first transcript listed
-              // for the gene.
-              if (a.order == b.order) {
-                return 0;
-              } else if (a.order < b.order) {
-                return -1;
-              } else {
-                return 1;
-              }
-              return 0;
-            } else if (+a.cdsLength > +b.cdsLength) {
-              return -1;
-            } else {
-              return 1;
-            }
-          } else if ( aSource < bSource ) {
-            return -1;
-          } else {
-            return 1;
-          }
-        } else if (aLevel < bLevel) {
-          return -1;
-        } else {
-          return 1;
-        }
-      } else if (aType < bType) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-    canonical = sortedTranscripts[0];
-    canonical.isCanonical = true;
-    return canonical;
-  }
-
-
-  getCanonicalTranscriptOld(theGeneObject) {
-    let me = this;
-
-    var geneObject = theGeneObject != null ? theGeneObject : window.gene;
-    var canonical;
-    var maxCdsLength = 0;
-    geneObject.transcripts.forEach(function(transcript) {
-      var cdsLength = 0;
-      if (transcript.features != null) {
-        transcript.features.forEach(function(feature) {
-          if (feature.feature_type == 'CDS') {
-            cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
-          }
-        })
-        if (cdsLength > maxCdsLength) {
-          maxCdsLength = cdsLength;
-          canonical = transcript;
-        }
-        transcript.cdsLength = cdsLength;
-      }
-
-    });
-
-    if (canonical == null) {
-      // If we didn't find the canonical (transcripts didn't have features), just
-      // grab the first transcript to use as the canonical one.
-      if (geneObject.transcripts != null && geneObject.transcripts.length > 0)
-      canonical = geneObject.transcripts[0];
-    }
-    canonical.isCanonical = true;
-    return canonical;
-  }
-
-  getCodingRegions(transcript) {
-    let me = this;
-    if (transcript && transcript.features) {
-      var codingRegions = me.transcriptCodingRegions[transcript.transcript_id];
-      if (codingRegions) {
-        return codingRegions;
-      }
-      codingRegions = [];
-      transcript.features.forEach( function(feature) {
-        if ($.inArray(feature.feature_type, ['EXON', 'CDS', 'UTR']) !== -1) {
-          codingRegions.push({ start: feature.start, end: feature.end });
-        }
-      });
-      me.transcriptCodingRegions[transcript.transcript_id] = codingRegions;
-      return codingRegions;
-    }
-    return [];
-  }
-
-
-
-  promiseMarkCodingRegions(geneObject, transcript) {
-    let me = this;
-    return new Promise(function(resolve, reject) {
-
-      var exonPromises = [];
-      transcript.features.forEach(function(feature) {
-        if (!feature.hasOwnProperty("danger")) {
-          feature.danger = {proband: false, mother: false, father: false};
-        }
-        if (!feature.hasOwnProperty("geneCoverage")) {
-          feature.geneCoverage = {proband: false, mother: false, father: false};
-        }
-
-
-        getRelevantVariantCards().forEach(function(vc) {
-          var promise = vc.model.promiseGetCachedGeneCoverage(geneObject, transcript)
-           .then(function(geneCoverage) {
-              if (geneCoverage) {
-                var matchingFeatureCoverage = geneCoverage.filter(function(gc) {
-                  return feature.start == gc.start && feature.end == gc.end;
-                });
-                if (matchingFeatureCoverage.length > 0) {
-                  var gc = matchingFeatureCoverage[0];
-                  feature.geneCoverage[vc.getRelationship()] = gc;
-                  feature.danger[vc.getRelationship()] = filterCard.isLowCoverage(gc);
-                } else {
-                  feature.danger[vc.getRelationship()]  = false;
-                }
-              } else {
-                feature.danger[vc.getRelationship()] = false;
-              }
-
-           })
-          exonPromises.push(promise);
-        })
-      })
-
-      Promise.all(exonPromises).then(function() {
-        var sortedExons = me._getSortedExonsForTranscript(transcript);
-        me._setTranscriptExonNumbers(transcript, sortedExons);
-        resolve({'gene': geneObject, 'transcript': transcript});
-      });
-    })
-
-  }
-
-  _getSortedExonsForTranscript(transcript) {
-    var sortedExons = transcript
-      .features.filter(function(feature) {
-        return feature.feature_type.toUpperCase() == 'EXON';
-      })
-      .sort(function(feature1, feature2) {
-
-        var compare = 0;
-        if (feature1.start < feature2.start) {
-          compare = -1;
-        } else if (feature1.start > feature2.start) {
-          compare = 1;
-        } else {
-          compare = 0;
-        }
-
-        var strandMultiplier = transcript.strand == "+" ? 1 : -1;
-
-        return compare * strandMultiplier;
-
-      })
-
-    var exonCount = 0;
-    sortedExons.forEach(function(exon) {
-      exonCount++
-    })
-
-    var exonNumber = 1;
-    sortedExons.forEach(function(exon) {
-      exon.exon_number = exonNumber + "/" + exonCount;
-      exonNumber++;
-    })
-    return sortedExons;
-  }
-
-
-  _setTranscriptExonNumbers(transcript, sortedExons) {
-    // Set the exon number on each UTR and CDS within the corresponding exon
-    transcript.features.forEach(function(feature) {
-      if (feature.feature_type.toUpperCase() == 'CDS' || feature.feature_type.toUpperCase() == 'UTR') {
-        sortedExons.forEach(function(exon) {
-          if (feature.start >= exon.start && feature.end <= exon.end) {
-            feature.exon_number = exon.exon_number;
-          }
-        })
-      }
-    })
-  }
 
 
   selectTranscript(transcriptId) {
@@ -519,16 +271,93 @@ class GeneCard {
 
   selectCurrentTranscript() {
     let me = this;
-    me.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
+    me.geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
       .then(function() {
         geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
         d3.selectAll("#gene-viz .transcript rect").remove();
-        me.getCodingRegions(window.selectedTranscript);
+        geneModel.getCodingRegions(window.selectedTranscript);
         loadTracksForGene();
       })
   }
 
 
 
+  checkGeneSource(geneName) {
+    let me = this;
+    $('#no-transcripts-badge').addClass("hide");
+
+    var switchMsg = null;
+    if (me.geneModel.refseqOnly[geneName] && me.geneModel.geneSource != 'refseq') {
+      switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
+      switchGeneSource('RefSeq Transcript');
+    } else if (me.geneModel.gencodeOnly[geneName] && me.geneModel.geneSource != 'gencode') {
+      switchMsg = 'Gene ' + geneName + ' only in Gencode.  Switching to this transcript set.';
+      me.switchGeneSource('Gencode Transcript');
+    } else {
+      // In the case where the gene is valid in both gene sources,
+      // check to see if the gene source needs to be set back to the preferred setting,
+      // which will be either the site specific source or the  gene source
+      // last selected from the dropdown
+      me.resetGeneSource();
+    }
+    if (switchMsg) {
+      //var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
+      //alertify.set('notifier','position', 'top-right');
+      //alertify.error(msg, 6);
+      $('#non-protein-coding #no-transcripts-badge').removeClass("hide");
+      $('#non-protein-coding #no-transcripts-badge').text(switchMsg);
+    }
+  }
+
+  resetGeneSource() {
+    let me = this;
+
+    // Switch back to the site specific gene source (if provided),
+    // but only if the user hasn't already selected a gene
+    // source from the dropdown, which will override any default setting.
+    if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
+      if (siteGeneSource != me.geneModel.geneSource) {
+        me.switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+      }
+    }
+  }
+
+
+  switchGeneSource(newGeneSource) {
+    let me = this;
+
+    // turn off event handling - instead we want to manually set the
+    // gene source value
+    $('#select-gene-source')[0].selectize.off('change');
+
+
+    $('#select-gene-source')[0].selectize.setValue(newGeneSource);
+    me.geneModel.geneSource = newGeneSource.toLowerCase().split(" transcript")[0];
+
+
+    // turn on event handling
+    $('#select-gene-source')[0].selectize.on('change', function(value) {
+      me.geneModel.geneSource = value.toLowerCase().split(" transcript")[0];
+      // When the user picks a different gene source from the dropdown,
+      // this becomes the 'new' site gene source
+      siteGeneSource = me.geneModel.geneSource;
+      window.geneToLatestTranscript = {};
+      if (window.gene) {
+        genesCard.selectGene(window.gene.gene_name);
+      }
+    });
+  }
+
+  showGeneSummary(theGeneName) {
+    let me = this;
+    if (window.gene == null || theGeneName != window.gene.gene_name) {
+      return;
+    }
+    var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
+    var summary = geneAnnots[theGeneName] ? title + "  " + geneAnnots[theGeneName].summary  : "";
+    if (isLevelBasic && $('#gene-summary').text() != summary ) {
+      $('#gene-summary').html(summary);
+    }
+  }
 
 }

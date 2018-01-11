@@ -1253,7 +1253,7 @@ GenesCard.prototype._promiseGetGeneSummary = function(geneBadgeSelector, geneNam
                   var geneInfo = sumData.result[uid];
 
           geneAnnots[geneName] = geneInfo;
-          showGeneSummary(geneName);
+          geneCard.showGeneSummary(geneName);
 
           d3.select(geneBadgeSelector).data([geneInfo]);
 
@@ -2117,7 +2117,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
 
   // If necessary, switch from gencode to refseq or vice versa if this gene
   // only has transcripts in only one of the gene sets
-  checkGeneSource(geneName);
+  geneCard.checkGeneSource(geneName);
 
   setGeneBloodhoundInputElement(geneName);
   me.setSelectedGene(geneName);

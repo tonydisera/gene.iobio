@@ -115,15 +115,7 @@ VariantCard.prototype.getRelationship = function() {
 
 VariantCard.prototype.promiseSummarizeDanger = function(geneName, data, options, geneCoverageAll) {
   var me = this;
-  return new Promise(function(resolve, reject) {
-    var dangerSummary = VariantModel._summarizeDanger(geneName, data, options, geneCoverageAll);
-    me.model.promiseCacheDangerSummary(dangerSummary, geneName).then(function() {
-      resolve(dangerSummary);
-    },
-    function(error) {
-      reject(error);
-    })
-  })
+  return this.model.promiseSummarizeDanger(geneName, data, options, geneCoverageAll);
 }
 
 VariantCard.prototype.promiseSummarizeError = function(geneName, error) {
@@ -1180,7 +1172,6 @@ VariantCard.prototype._showVariants = function(regionStart, regionEnd, onVariant
            })
         }
 
-        me.populateRecFilters(theVcfData);
         if (!isZoom) {
           filterCard.autoSetFilters();
         }
@@ -1608,15 +1599,6 @@ VariantCard.prototype._promiseFilterVariants = function(dataToFilter) {
 
 
 }
-
-
-VariantCard.prototype.populateEffectFilters = function() {
-  this.model.populateEffectFilters();
-}
-VariantCard.prototype.populateRecFilters = function(theVcfData) {
-  this.model._populateRecFilters(theVcfData.features);
-}
-
 
 
 VariantCard.prototype.promiseCompareVariants = function(theVcfData, compareAttribute,

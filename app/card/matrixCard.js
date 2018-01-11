@@ -933,15 +933,21 @@ MatrixCard.prototype.promiseFillFeatureMatrix = function(theVcfData) {
             $('#zero-variants').addClass("zero-filtered-variants");
             $('#zero-variants').text("No variants passed the filter" );
             $('#zero-variants').removeClass("hide");
-            $('#matrix-panel').addClass("hide");
+            $('#matrix-panel').removeClass("hide");
+            $('#feature-matrix-note').addClass("hide");
+            $('#feature-matrix').addClass("hide");
           } else if (sortedFeatures.length == 0 ) {
             $('#zero-variants').removeClass("zero-filtered-variants");
             $('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
             $('#zero-variants').removeClass("hide");
-            $('#matrix-panel').addClass("hide");
+            $('#feature-matrix').addClass("hide");
+            $('#feature-matrix-note').addClass("hide");
+            $('#matrix-panel').removeClass("hide");
           } else {
             $('#zero-variants').text("");
             $('#zero-variants').addClass("hide");
+            $('#feature-matrix').removeClass("hide");
+            $('#feature-matrix-note').removeClass("hide");
             $('#matrix-panel').removeClass("hide");
           }
 
@@ -1596,7 +1602,7 @@ MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
 }
 
 MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
-  return value && value != "" && +value >= 0 ? round(+value * 100, 2) + "%" : "";
+  return value && value != "" && +value >= 0 ? util.round(+value * 100, 2) + "%" : "";
 }
 
 MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
@@ -1616,7 +1622,7 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
       if (tokens.length == 2) {
         var basicNotation = "p." + tokens[1];
         buf += basicNotation;
-      } else if (tokens.length == 1 && endsWith(tokens[0],"(p.=)")) {
+      } else if (tokens.length == 1 && util.endsWith(tokens[0],"(p.=)")) {
         // If synoymous variants, show p.(=) in cell
         if (variant.vepConsequence && Object.keys(variant.vepConsequence).length > 0) {
           for( consequence in variant.vepConsequence) {

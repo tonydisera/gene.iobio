@@ -1823,10 +1823,16 @@ exports._parseVepAnnot = function(altIdx, isMultiAllelic, annotToken, annot, gen
             var theConsequences = vepTokens[vepFields.Consequence];
             var siftString = vepTokens[vepFields.SIFT];
             var siftDisplay = siftString != null && siftString != "" ? siftString.split("(")[0] : "";
-            var siftScore = siftString != null && siftString != "" ? siftString.split("(")[1].split(")")[0] : 99;
+            var siftScore = "99";
+            if (siftString != null && siftString != "" && siftString.indexOf("(") >= 0) {
+              siftScore = siftString.split("(")[1].split(")")[0];
+            }
             var polyphenString = vepTokens[vepFields.PolyPhen];
             var polyphenDisplay = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[0] : "";
-            var polyphenScore = polyphenString != null && polyphenString != "" ? polyphenString.split("(")[1].split(")")[0] : -99;
+            var polyphenScore = -99;
+            if (polyphenString != null && polyphenString != "" && polyphenString.indexOf("(") >= 0) {
+              polyphenScore = polyphenString.split("(")[1].split(")")[0];
+            }
 
             var consequencesObject = annot.vep.allVep[theImpact];
             if (consequencesObject == null) {

@@ -29,6 +29,10 @@ var regionEnd = null;
 var GENE_REGION_BUFFER = 1000;
 var GENE_REGION_BUFFER_MAX = 50000;
 
+
+// genes card
+var geneModel = new GeneModel();
+
 // Genes
 var gene = '';
 var geneNames = [];
@@ -38,8 +42,6 @@ var geneAnnots = {};
 var geneUserVisits = {};
 var genePhenotypes = {};
 var geneToLatestTranscript = {};
-var refseqOnly = {};
-var gencodeOnly = {};
 var allKnownGeneNames = {};
 
 
@@ -48,7 +50,6 @@ var loadedUrl = false;
 
 // Transcript data and chart
 var selectedTranscript = null;
-var geneSource = "gencode";
 
 
 var hideKnownVariants = true;
@@ -83,7 +84,7 @@ var dataCard = new DataCard();
 var filterCard = new FilterCard();
 
 // genes card
-var geneCard = new GeneCard();
+var geneCard = new GeneCard(geneModel);
 
 // genes card
 var genesCard = new GenesCard();
@@ -539,25 +540,6 @@ function init() {
   $('.sidebar-button.selected').removeClass("selected");
 
 
-  $('#select-gene-source').selectize({});
-  $('#select-gene-source')[0].selectize.on('change', function(value) {
-    geneSource = value.toLowerCase().split(" transcript")[0];
-    // When the user picks a different gene source from the dropdown,
-    // this becomes the 'new' site gene source
-    siteGeneSource = geneSource;
-    geneToLatestTranscript = {};
-    getRelevantVariantCards().forEach(function(vc) {
-      // When switching from gencode->refseq or vice/versa,
-      // the VEP tokens will be formatted in a different order,
-      // so make sure we clear out the token indices
-      vc.model.vcf.clearVepInfoFields();
-    })
-    if (window.gene) {
-      genesCard.selectGene(window.gene.gene_name);
-    }
-  });
-
-
   // Set up the gene search widget
   loadGeneWidgets( function(success) {
     if (success) {
@@ -641,16 +623,7 @@ function showGeneControls() {
   $('#welcome-area #take-app-tour').removeClass("disabled");
 }
 
-function showGeneSummary(theGeneName) {
-  if (window.gene == null || theGeneName != window.gene.gene_name) {
-    return;
-  }
-  var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
-  var summary = geneAnnots[theGeneName] ? title + "  " + geneAnnots[theGeneName].summary  : "";
-  if (isLevelBasic && $('#gene-summary').text() != summary ) {
-    $('#gene-summary').html(summary);
-  }
-}
+
 
 function initKnownVariantsNav() {
 
@@ -737,7 +710,7 @@ function selectGeneInDropdown(theGeneName, select) {
 
   $('#select-gene')[0].selectize.setValue(theGeneName);
 
-  showGeneSummary(theGeneName);
+  geneCard.showGeneSummary(theGeneName);
 
   if (!select) {
     addGeneDropdownListener();
@@ -753,7 +726,7 @@ function addGeneDropdownListener() {
   $('#select-gene')[0].selectize.on('change', function(value) {
     var geneName = value;
     genesCard.selectGene(geneName, function() {
-      showGeneSummary(geneName, true);
+      geneCard.showGeneSummary(geneName, true);
       loadTracksForGene();
     });
   });
@@ -779,70 +752,6 @@ function validateGeneTranscripts() {
     return true;
   }
 
-}
-
-
-function checkGeneSource(geneName) {
-  $('#no-transcripts-badge').addClass("hide");
-
-
-  var switchMsg = null;
-  if (refseqOnly[geneName] && geneSource != 'refseq') {
-    switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
-    switchGeneSource('RefSeq Transcript');
-  } else if (gencodeOnly[geneName] && geneSource != 'gencode') {
-    switchMsg = 'Gene ' + geneName + ' only in Gencode.  Switching to this transcript set.';
-    switchGeneSource('Gencode Transcript');
-  } else {
-    // In the case where the gene is valid in both gene sources,
-    // check to see if the gene source needs to be set back to the preferred setting,
-    // which will be either the site specific source or the  gene source
-    // last selected from the dropdown
-    resetGeneSource();
-  }
-  if (switchMsg) {
-    //var msg = "<span style='font-size:18px'>" + switchMsg + "</span>";
-    //alertify.set('notifier','position', 'top-right');
-    //alertify.error(msg, 6);
-    $('#non-protein-coding #no-transcripts-badge').removeClass("hide");
-    $('#non-protein-coding #no-transcripts-badge').text(switchMsg);
-  }
-}
-
-function resetGeneSource() {
-  // Switch back to the site specific gene source (if provided),
-  // but only if the user hasn't already selected a gene
-  // source from the dropdown, which will override any default setting.
-  if (typeof siteGeneSource !== 'undefined' && siteGeneSource) {
-    if (siteGeneSource != geneSource) {
-      switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
-    }
-  }
-}
-
-
-function switchGeneSource(newGeneSource) {
-
-  // turn off event handling - instead we want to manually set the
-  // gene source value
-  $('#select-gene-source')[0].selectize.off('change');
-
-
-  $('#select-gene-source')[0].selectize.setValue(newGeneSource);
-  geneSource = newGeneSource.toLowerCase().split(" transcript")[0];
-
-
-  // turn on event handling
-  $('#select-gene-source')[0].selectize.on('change', function(value) {
-    geneSource = value.toLowerCase().split(" transcript")[0];
-    // When the user picks a different gene source from the dropdown,
-    // this becomes the 'new' site gene source
-    siteGeneSource = geneSource;
-    geneToLatestTranscript = {};
-    if (window.gene) {
-      genesCard.selectGene(window.gene.gene_name);
-    }
-  });
 }
 
 
@@ -1138,8 +1047,8 @@ function resizeCardWidths() {
   }
 
   $('#container').css('width', windowWidth - sliderWidth - (isLevelEdu || isLevelBasic ? 10 : 0));
-  $('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 20));
-  $('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 0 : 20));
+  $('#matrix-panel').css('max-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 30 : 20));
+  $('#matrix-panel').css('min-width', windowWidth - sliderWidth - (isLevelEdu  || isLevelBasic ? 30 : 20));
 
   if (windowHeight < 700) {
     matrixCard.setCellSize('small');
@@ -1713,7 +1622,7 @@ function promiseGetGeneModel(geneName) {
     $('#build-link').text(buildName);
 
 
-    url += "?source="  + geneSource;
+    url += "?source="  + geneModel.geneSource;
     url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
     url += "&build="   + buildName;
 
@@ -1808,7 +1717,7 @@ function loadGeneWidgets(callback) {
 
     // If necessary, switch from gencode to refseq or vice versa if this gene
     // only has transcripts in only one of the gene sets
-    checkGeneSource(theGeneName);
+    geneCard.checkGeneSource(theGeneName);
 
     promiseGetGeneModel(data.name).then( function(geneModel) {
         // We have successfully return the gene model data.
@@ -1920,7 +1829,7 @@ function loadFullGeneSet(callback) {
   $.ajax({url: 'genes.json',
       data_type: 'json',
             success: function( data ) {
-              var sortedGenes = getRidOfDuplicates(data);
+              var sortedGenes = geneModel.getRidOfDuplicates(data);
               allKnownGeneNames = {};
               sortedGenes.forEach(function(geneObject) {
                 if (geneObject && geneObject.name && geneObject.name.length > 0) {
@@ -1943,45 +1852,7 @@ function loadFullGeneSet(callback) {
   })
 }
 
-function getRidOfDuplicates(genes) {
-  var sortedGenes = genes.sort( function(g1, g2) {
-    if (g1.gene_name < g2.gene_name) {
-      return -1;
-    } else if (g1.gene_name > g2.gene_name) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-  // Flag gene objects with same name
-  for (var i =0; i < sortedGenes.length - 1; i++) {
-        var gene = sortedGenes[i];
 
-
-        var nextGene = sortedGenes[i+1];
-        if (i == 0) {
-          gene.dup = false;
-        }
-        nextGene.dup = false;
-
-        if (gene.gene_name == nextGene.gene_name && gene.refseq == nextGene.refseq && gene.gencode == nextGene.gencode) {
-          nextGene.dup = true;
-      }
-
-      // Some more processing to gather unique gene sets and add field 'name'
-        gene.name = gene.gene_name;
-      if (gene.refseq != gene.gencode) {
-        if (gene.refseq) {
-          refseqOnly[gene.gene_name] = gene;
-        } else {
-          gencodeOnly[gene.gene_name] = gene;
-        }
-      }
-  }
-  return sortedGenes.filter(function(gene) {
-    return gene.dup == false;
-  });
-}
 
 
 
@@ -2068,7 +1939,7 @@ function loadTracksForGene(bypassVariantCards, callback) {
   // ??????  TODO:  Need to figure out the cannonical transcript.
   var transcript = [];
   if (window.gene.transcripts && window.gene.transcripts.length > 0 ) {
-    transcript = geneCard.getCanonicalTranscript();
+    transcript = geneModel.getCanonicalTranscript();
   }
 
   // Load the read coverage and variant charts.  If a bam hasn't been
@@ -2239,7 +2110,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
       return promiseGetCachedGeneCoverage(window.gene, window.selectedTranscript, true)
     })
     .then(function() {
-      return geneCard.promiseMarkCodingRegions(window.gene, window.selectedTranscript);
+      return geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript);
     })
     .then(function() {
 
@@ -2573,6 +2444,17 @@ function promiseJointCallVariants(geneObject, theTranscript, loadedTrioVcfData, 
       }
     }
 
+    var endCallProgress = function() {
+      if (!options.isBackground) {
+        window.hideCircleRelatedVariants();
+        getRelevantVariantCards().forEach( function(vc) {
+          // Show the counts
+          vc.showCallVariantsProgress('counting');
+          vc.showCallVariantsProgress('done');
+        });
+
+      }
+    }
     var refreshClinvarAnnots = function(trioFbData) {
       for (var rel in trioFbData) {
         trioFbData[rel].features.forEach(function (fbVariant) {
@@ -2683,7 +2565,7 @@ function promiseJointCallVariants(geneObject, theTranscript, loadedTrioVcfData, 
           geneObject,
           theTranscript,
           bams,
-          window.geneSource == 'refseq' ? true : false,
+          geneModel.geneSource == 'refseq' ? true : false,
           fbSettings.arguments,
           global_vepAF, // vep af
           function(theData, trRefName) {
@@ -2696,50 +2578,56 @@ function promiseJointCallVariants(geneObject, theTranscript, loadedTrioVcfData, 
 
             // Parse the joint called variants back to variant models
             var data = me._parseCalledVariants(geneObject, theTranscript, trRefName, jointVcfRecs, trioVcfData, options)
-            trioFbData = data.trioFbData;
 
-            // Annotate called variants with clinvar
-            promiseAnnotateWithClinvar(trioFbData, geneObject, theTranscript, true)
-            .then(function() {
+            if (data == null) {
+              endCallProgress();
+            } else {
+              trioFbData = data.trioFbData;
 
-              refreshClinvarAnnots(trioFbData);
-
-              // Determine inheritance across union of loaded and called variants
-              promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, {isBackground: options.isBackground, cacheData: true})
-              .then( function() {
-                  getRelevantVariantCards().forEach(function(vc) {
-                    vc.model.loadCalledTrioGenotypes(trioVcfData[vc.getRelationship()], trioFbData[vc.getRelationship()]);
-                  })
-                  // Summarize danger for gene
-                 return promiseSummarizeDanger(geneObject, theTranscript, trioVcfData.proband, {'CALLED': true});
-              })
+              // Annotate called variants with clinvar
+              promiseAnnotateWithClinvar(trioFbData, geneObject, theTranscript, true)
               .then(function() {
-                showCalledVariants();
 
-                var refreshedSourceVariant = null;
-                if (options.sourceVariant) {
-                  trioVcfData.proband.features.forEach(function(variant) {
-                    if (!refreshedSourceVariant &&
-                      variant.chrom == options.sourceVariant.chrom &&
-                      variant.start == options.sourceVariant.start &&
-                      variant.ref == options.sourceVariant.ref &&
-                      variant.alt == options.sourceVariant.alt) {
+                refreshClinvarAnnots(trioFbData);
 
-                      refreshedSourceVariant = variant;
-                    }
-                  })
-                }
+                // Determine inheritance across union of loaded and called variants
+                promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, {isBackground: options.isBackground, cacheData: true})
+                .then( function() {
+                    getRelevantVariantCards().forEach(function(vc) {
+                      vc.model.loadCalledTrioGenotypes(trioVcfData[vc.getRelationship()], trioFbData[vc.getRelationship()]);
+                    })
+                    // Summarize danger for gene
+                   return promiseSummarizeDanger(geneObject, theTranscript, trioVcfData.proband, {'CALLED': true});
+                })
+                .then(function() {
+                  showCalledVariants();
 
-                resolve({
-                  'gene': geneObject,
-                  'transcript': theTranscript,
-                  'jointVcfRecs': jointVcfRecs,
-                  'trioVcfData': trioVcfData,
-                  'trioFbData': trioFbData,
-                  'refName': trRefName,
-                  'sourceVariant': refreshedSourceVariant});
-              })
-            });
+                  var refreshedSourceVariant = null;
+                  if (options.sourceVariant) {
+                    trioVcfData.proband.features.forEach(function(variant) {
+                      if (!refreshedSourceVariant &&
+                        variant.chrom == options.sourceVariant.chrom &&
+                        variant.start == options.sourceVariant.start &&
+                        variant.ref == options.sourceVariant.ref &&
+                        variant.alt == options.sourceVariant.alt) {
+
+                        refreshedSourceVariant = variant;
+                      }
+                    })
+                  }
+
+                  resolve({
+                    'gene': geneObject,
+                    'transcript': theTranscript,
+                    'jointVcfRecs': jointVcfRecs,
+                    'trioVcfData': trioVcfData,
+                    'trioFbData': trioFbData,
+                    'refName': trRefName,
+                    'sourceVariant': refreshedSourceVariant});
+                })
+              });
+            }
+
           }
         );
 
@@ -2754,58 +2642,68 @@ function _parseCalledVariants(geneObject, theTranscript, translatedRefName, join
   var trioFbData  = {'proband': null, 'mother': null, 'father': null};
   var fbPromises = [];
   var idx = 0;
+  var emptyVcfData = false;
 
   getRelevantVariantCards().forEach(function(vc) {
 
     var sampleNamesToGenotype = vc.getSampleNamesToGenotype();
 
     var theVcfData = trioVcfData[vc.getRelationship()];
-    theVcfData.loadState['called'] = true;
+    if (emptyVcfData || theVcfData == null) {
+      emptyVcfData = true;
+    } else {
 
-    var data = vc.model.vcf.parseVcfRecordsForASample(jointVcfRecs, translatedRefName, geneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), idx, global_vepAF);
+      theVcfData.loadState['called'] = true;
+      var data = vc.model.vcf.parseVcfRecordsForASample(jointVcfRecs, translatedRefName, geneObject, theTranscript, matrixCard.clinvarMap, true, (sampleNamesToGenotype ? sampleNamesToGenotype.join(",") : null), idx, global_vepAF);
 
-    var theFbData = data.results;
-    theFbData.loadState['called'] = true;
-    theFbData.features.forEach(function(variant) {
-      variant.extraAnnot = true;
-      variant.fbCalled = "Y";
-      variant.extraAnnot = true;
-    })
+      var theFbData = data.results;
+      theFbData.loadState['called'] = true;
+      theFbData.features.forEach(function(variant) {
+        variant.extraAnnot = true;
+        variant.fbCalled = "Y";
+        variant.extraAnnot = true;
+      })
 
-    if (options.isBackground) {
-      var pileupObject = vc.model._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
-      theFbData.maxLevel = pileupObject.maxLevel + 1;
-      theFbData.featureWidth = pileupObject.featureWidth;
+      if (options.isBackground) {
+        var pileupObject = vc.model._pileupVariants(theFbData.features, geneObject.start, geneObject.end);
+        theFbData.maxLevel = pileupObject.maxLevel + 1;
+        theFbData.featureWidth = pileupObject.featureWidth;
+      }
+
+
+      // Flag the called variants
+      theFbData.features.forEach( function(feature) {
+        feature.fbCalled = 'Y';
+        feature.extraAnnot = true;
+      });
+
+      // Filter the freebayes variants to only keep the ones
+      // not present in the vcf variant set.
+      vc.model._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
+
+
+      // Show the snpEff effects / vep consequences in the filter card
+      vc.model.populateEffectFilters(theFbData.features);
+
+      // Determine the unique values in the VCF filter field
+      vc.model.populateRecFilters(theFbData.features);
+
+
+      if (!options.isBackground) {
+        vc.model.fbData = theFbData;
+        vc.model.vcfData = theVcfData;
+      }
+      trioFbData[vc.getRelationship()]  = theFbData;
     }
-
-
-    // Flag the called variants
-    theFbData.features.forEach( function(feature) {
-      feature.fbCalled = 'Y';
-      feature.extraAnnot = true;
-    });
-
-    // Filter the freebayes variants to only keep the ones
-    // not present in the vcf variant set.
-    vc.model._determineUniqueFreebayesVariants(geneObject, theTranscript, theVcfData, theFbData);
-
-
-    // Show the snpEff effects / vep consequences in the filter card
-    vc.model._populateEffectFilters(theFbData.features);
-
-    // Determine the unique values in the VCF filter field
-    vc.model._populateRecFilters(theFbData.features);
-
-
-    if (!options.isBackground) {
-      vc.model.fbData = theFbData;
-      vc.model.vcfData = theVcfData;
-    }
-    trioFbData[vc.getRelationship()]  = theFbData;
     idx++;
   });
 
-  return {'trioVcfData': trioVcfData, 'trioFbData': trioFbData};
+  if (emptyVcfData) {
+    alertify.alert("Make sure selected gene has loaded before calling variants.")
+    return null;
+  } else {
+    return {'trioVcfData': trioVcfData, 'trioFbData': trioFbData};
+  }
 }
 
 
@@ -2971,19 +2869,6 @@ function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, opti
         }
       }
 
-      var calcMaxAlleleCount = function(theVcfData) {
-        if (theVcfData && theVcfData.features) {
-          theVcfData.features.forEach(function(theVariant) {
-            if (theVariant.genotypeDepth) {
-              if ((+theVariant.genotypeDepth) > maxAlleleCount) {
-                maxAlleleCount = +theVariant.genotypeDepth;
-              }
-            }
-          })
-        }
-      }
-
-
       if (dataCard.mode == 'single') {
         promiseCacheTrioVcfData(geneObject, theTranscript, CacheHelper.VCF_DATA, trioVcfData, options.cacheData)
         .then(function() {
@@ -2996,11 +2881,9 @@ function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, opti
         // the allele counts bars in the tooltip
         maxAlleleCount = 0;
         for(var rel in trioVcfData) {
-          calcMaxAlleleCount(trioVcfData[rel]);
+          maxAlleleCount = VariantModel.calcMaxAlleleCount(trioVcfData[rel], maxAlleleCount);
         }
-        //for(var rel in trioFbData) {
-        //  calcMaxAlleleCount(trioFbData[rel]);
-        //}
+
 
         // Enable inheritance filters
         filterCard.enableInheritanceFilters(trioVcfData.proband);
