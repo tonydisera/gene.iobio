@@ -570,42 +570,41 @@ BookmarkCard.prototype.refreshBookmarkList = function() {
 
 
   container.selectAll(".bookmark")
-           .append("i")
-           .attr("class", "material-icons bookmark-info-glyph")
-           .text("info")
-       .on('mouseover', function(entry,i) {
-          var currentBookmark = d3.select(this.parentNode);
+   .append("i")
+   .attr("class", "material-icons bookmark-info-glyph")
+   .text("info")
+   .on('mouseover', function(entry,i) {
+      var currentBookmark = d3.select(this.parentNode);
 
-            currentBookmark.classed("current", true);
+      currentBookmark.classed("current", true);
 
-          me.selectedBookmarkKey = entry.key;
+      me.selectedBookmarkKey = entry.key;
 
-            var geneName     = me.parseKey(entry.key).gene;
-            var transcriptId = me.parseKey(entry.key).transcriptId;
-            var theTranscript = {transcript_id: transcriptId};
-        var screenX = window.pageXOffset + currentBookmark.select('.variant-label .coord').node().offsetLeft + currentBookmark.select('.variant-label').node().offsetWidth;
-            var screenY = window.pageYOffset + currentBookmark.node().offsetTop + $('.navbar-fixed-top').outerHeight();
+      var geneName     = me.parseKey(entry.key).gene;
+      var transcriptId = me.parseKey(entry.key).transcriptId;
+      var theTranscript = {transcript_id: transcriptId};
+      var screenX = window.pageXOffset + currentBookmark.select('.variant-label .coord').node().offsetLeft + currentBookmark.select('.variant-label').node().offsetWidth;
+      var screenY = window.pageYOffset + currentBookmark.node().offsetTop + $('.navbar-fixed-top').outerHeight();
 
-            if (entry.value.isProxy && entry.value.freebayesCalled == 'Y') {
-          me.showTooltip("Click 'Call variants' button analyze this bookmarked variant.", screenX, screenY, 100);
-            } else {
-          me.promiseResolveBookmarkedVariant(entry.key, entry.value, geneObjects[geneName], theTranscript)
-           .then(function(variant) {
-                  unpinAll();
-            if (variant) {
-                    me._showVariantTooltip(variant, screenX, screenY, geneObjects[geneName], theTranscript);
-            } else {
-              me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
-            }
-           })
+      if (entry.value.isProxy && entry.value.freebayesCalled == 'Y') {
+        me.showTooltip("Click 'Call variants' button analyze this bookmarked variant.", screenX, screenY, 100);
+      } else {
+        me.promiseResolveBookmarkedVariant(entry.key, entry.value, geneModel.geneObjects[geneName], theTranscript)
+        .then(function(variant) {
+          unpinAll();
+          if (variant) {
+            me._showVariantTooltip(variant, screenX, screenY, geneModel.geneObjects[geneName], theTranscript);
+          } else {
+            me.showTooltip("Click on bookmark to analyze variant for this gene.", screenX, screenY, 100);
+          }
+        })
+      }
 
-            }
-
-            })
-            .on('mouseout', function(entry,i) {
-              me.hideTooltip();
-              d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
-            });
+    })
+    .on('mouseout', function(entry,i) {
+        me.hideTooltip();
+        d3.select('#bookmark-card #bookmark-panel a.current').classed("current", false);
+    });
 
   container.selectAll(".bookmark")
        .append("span")
@@ -1015,7 +1014,7 @@ BookmarkCard.prototype.hideTooltip = function() {
 
 BookmarkCard.prototype._setPhenotypeGlyph = function(container, geneName) {
   var me = this;
-  genesCard.promiseGetGenePhenotypes(geneName).then(function(data) {
+  geneModel.promiseGetGenePhenotypes(geneName).then(function(data) {
 
       var phenotypes = data[0];
       var theGeneName = data[1];
@@ -1088,7 +1087,7 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
               unpinAll();
               var geneName = entry.key;
               var bookmarkKeys = entry.value;
-              promiseGetCachedGeneModel(geneName).then(function(geneObject) {
+              geneModel.promiseGetCachedGeneObject(geneName).then(function(geneObject) {
 
                 for(var transcriptId in entry.transcriptsToCall) {
                   var isReady = entry.transcriptsToCall[transcriptId];
@@ -1144,7 +1143,7 @@ BookmarkCard.prototype.addPhenotypeList = function(container) {
           .attr("class", function(entry, i) {
             var geneName = entry.key;
             var html = "";
-            var phenotypes = genePhenotypes[geneName];
+            var phenotypes = geneModel.genePhenotypes[geneName];
             if (phenotypes == null || phenotypes.length == 0) {
               return "phenotypes-container hide";
             } else if (phenotypes.length > 6) {
@@ -1159,7 +1158,7 @@ BookmarkCard.prototype.addPhenotypeList = function(container) {
           .html( function(entry,i) {
             var geneName = entry.key;
             var html = "";
-            var phenotypes = genePhenotypes[geneName];
+            var phenotypes = geneModel.genePhenotypes[geneName];
             if (phenotypes && phenotypes.length > 0) {
               phenotypes.forEach(function(phenotype) {
 
@@ -1337,14 +1336,7 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
   var promises = []
   importRecords.forEach( function(ir) {
     if (!ir.transcript || ir.transcript == '') {
-      var promise = promiseGetCachedGeneModel(ir.gene, true)
-      .then( function(theGeneObject) {
-        if (theGeneObject) {
-          window.geneObjects[theGeneObject.gene_name] = theGeneObject;
-        } else {
-          //  If a gene isn't found, just ignore and keep importing
-        }
-      });
+      var promise = geneModel.promiseGetCachedGeneObject(ir.gene, true);
       promises.push(promise);
     }
   })
@@ -1354,7 +1346,7 @@ BookmarkCard.prototype.importBookmarksImpl = function(importSource, data) {
   Promise.all(promises).then(function() {
     importRecords.forEach( function(ir) {
       if (!ir.transcript || ir.transcript == '') {
-        var geneObject = window.geneObjects[ir.gene];
+        var geneObject = geneModel.geneObjects[ir.gene];
         var tx = geneObject ? geneModel.getCanonicalTranscript(geneObject) : null;
         if (tx) {
           ir.transcript = tx.transcript_id;
@@ -1395,15 +1387,11 @@ BookmarkCard.prototype.showImportedBookmarks = function(callback) {
   var promises = []
   for (var geneName in me.bookmarkedGenes) {
 
-    var promisePheno = genesCard.promiseGetGenePhenotypes(geneName).then(function() {
+    var promisePheno = geneModel.promiseGetGenePhenotypes(geneName).then(function() {
     });
     promises.push(promisePheno);
 
-    var promiseModel = promiseGetCachedGeneModel(geneName, true).then(function(geneModel) {
-      if (geneModel) {
-        window.geneObjects[geneModel.gene_name] = geneModel;
-      }
-    });
+    var promiseModel = geneModel.promiseGetCachedGeneObject(geneName, true);
     promises.push(promiseModel);
 
   }

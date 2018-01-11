@@ -1697,8 +1697,8 @@ VariantModel.prototype.promiseAnnotateVariants = function(theGene, theTranscript
 
             // Associate the correct gene with the data
             var theGeneObject = null;
-            for( var key in window.geneObjects) {
-              var geneObject = geneObjects[key];
+            for( var key in geneModel.geneObjects) {
+              var geneObject = geneModel.geneObjects[key];
               if (me.getVcfRefName(geneObject.chr) == data.ref &&
                 geneObject.start == data.start &&
                 geneObject.end == data.end &&

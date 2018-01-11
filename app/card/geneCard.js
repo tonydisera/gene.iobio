@@ -4,6 +4,8 @@ class GeneCard {
     this.transcriptMenuChart  = null;
     this.transcriptViewMode = "single";
     this.geneModel = geneModel;
+
+
   }
 
   init() {
@@ -116,7 +118,7 @@ class GeneCard {
       // When the user picks a different gene source from the dropdown,
       // this becomes the 'new' site gene source
       siteGeneSource = me.geneModel.geneSource;
-      geneToLatestTranscript = {};
+      me.geneModel.geneToLatestTranscript = {};
       getRelevantVariantCards().forEach(function(vc) {
         // When switching from gencode->refseq or vice/versa,
         // the VEP tokens will be formatted in a different order,
@@ -182,7 +184,7 @@ class GeneCard {
       }
         me.geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
           .then(function() {
-          geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+          me.geneModel.geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
           me.geneModel.getCodingRegions(window.selectedTranscript);
           });
     }
@@ -273,7 +275,7 @@ class GeneCard {
     let me = this;
     me.geneModel.promiseMarkCodingRegions(window.gene, window.selectedTranscript)
       .then(function() {
-        geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+        me.geneModel.geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
         d3.selectAll("#gene-viz .transcript rect").remove();
         geneModel.getCodingRegions(window.selectedTranscript);
         loadTracksForGene();
@@ -341,7 +343,7 @@ class GeneCard {
       // When the user picks a different gene source from the dropdown,
       // this becomes the 'new' site gene source
       siteGeneSource = me.geneModel.geneSource;
-      window.geneToLatestTranscript = {};
+      me.geneModel.geneToLatestTranscript = {};
       if (window.gene) {
         genesCard.selectGene(window.gene.gene_name);
       }
@@ -353,11 +355,12 @@ class GeneCard {
     if (window.gene == null || theGeneName != window.gene.gene_name) {
       return;
     }
-    var title = geneAnnots[theGeneName] ? "<span class='gene-title'>" + geneAnnots[theGeneName].description + ".</span>" : "";
-    var summary = geneAnnots[theGeneName] ? title + "  " + geneAnnots[theGeneName].summary  : "";
+    var title = me.geneModel.geneNCBISummaries[theGeneName] ? "<span class='gene-title'>" + me.geneModel.geneNCBISummaries[theGeneName].description + ".</span>" : "";
+    var summary = me.geneModel.geneNCBISummaries[theGeneName] ? title + "  " + me.geneModel.geneNCBISummaries[theGeneName].summary  : "";
     if (isLevelBasic && $('#gene-summary').text() != summary ) {
       $('#gene-summary').html(summary);
     }
   }
+
 
 }

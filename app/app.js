@@ -35,13 +35,6 @@ var geneModel = new GeneModel();
 
 // Genes
 var gene = '';
-var geneNames = [];
-var phenolyzerGenes = [];
-var geneObjects = {};
-var geneAnnots = {};
-var geneUserVisits = {};
-var genePhenotypes = {};
-var geneToLatestTranscript = {};
 var allKnownGeneNames = {};
 
 
@@ -1262,13 +1255,13 @@ function isKnownGene(geneName) {
 }
 
 function loadGeneNamesFromUrl(geneNameToSelect) {
-  geneNames = [];
+  genesCard.geneNames = [];
   var unknownGeneNames = {};
 
   // Add the gene to select to the gene list
   if (geneNameToSelect && geneNameToSelect.length > 0) {
     if (isKnownGene(geneNameToSelect)) {
-      geneNames.push(geneNameToSelect.toUpperCase());
+      genesCard.geneNames.push(geneNameToSelect.toUpperCase());
     } else {
       unknownGeneNames[geneNameToSelect] = true;
       geneNameToSelect = null;
@@ -1280,8 +1273,8 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
   var geneList = util.getUrlParameter("geneList");
   if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
     genesCard.ACMG_GENES.sort().forEach(function(geneName) {
-      if ( geneNames.indexOf(geneName.toUpperCase()) < 0 ) {
-        geneNames.push(geneName.toUpperCase());
+      if ( genesCard.geneNames.indexOf(geneName.toUpperCase()) < 0 ) {
+        genesCard.geneNames.push(geneName.toUpperCase());
       }
     });
   }
@@ -1291,9 +1284,9 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
   var genes = util.getUrlParameter("genes");
   if (genes != null && genes.length > 0) {
     genes.split(",").forEach( function(geneName) {
-      if ( geneNames.indexOf(geneName) < 0 ) {
+      if ( genesCard.geneNames.indexOf(geneName) < 0 ) {
         if (isKnownGene(geneName.toUpperCase())) {
-          geneNames.push(geneName.toUpperCase());
+          genesCard.geneNames.push(geneName.toUpperCase());
         } else {
           unknownGeneNames[geneName] = true;
         }
@@ -1301,11 +1294,11 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
     });
   }
 
-  if (geneNames.length > 0) {
+  if (genesCard.geneNames.length > 0) {
     if (!geneNameToSelect) {
-      geneNameToSelect = geneNames[0];
+      geneNameToSelect = genesCard.geneNames[0];
     }
-    $('#genes-to-copy').val(geneNames.join(","));
+    $('#genes-to-copy').val(genesCard.geneNames.join(","));
     genesCard.copyPasteGenes(geneNameToSelect, true);
   }
   if (Object.keys(unknownGeneNames).length > 0) {
@@ -1589,74 +1582,6 @@ function switchToBasicMode() {
 }
 
 
-
-function promiseGetCachedGeneModel(geneName, resolveOnError=false) {
-  return new Promise( function(resolve, reject) {
-    var theGeneObject = window.geneObjects[geneName];
-    if (theGeneObject) {
-      resolve(theGeneObject);
-    } else {
-      promiseGetGeneModel(geneName).then(function(geneObject) {
-        resolve(geneObject);
-      },
-      function(error) {
-        if (resolveOnError) {
-          resolve(null);
-        } else {
-          reject(error);
-        }
-      });
-    }
-
-  });
-}
-
-
-function promiseGetGeneModel(geneName) {
-  return new Promise(function(resolve, reject) {
-
-    var url = geneInfoServer + 'api/gene/' + geneName;
-
-    // If current build not specified, default to GRCh37
-    var buildName = genomeBuildHelper.getCurrentBuildName() ? genomeBuildHelper.getCurrentBuildName() : "GRCh37";
-    $('#build-link').text(buildName);
-
-
-    url += "?source="  + geneModel.geneSource;
-    url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
-    url += "&build="   + buildName;
-
-
-    $.ajax({
-        url: url,
-        jsonp: "callback",
-        type: "GET",
-        dataType: "jsonp",
-        success: function( response ) {
-          if (response.length > 0 && response[0].hasOwnProperty('gene_name')) {
-            var geneModel = response[0];
-            resolve(geneModel);
-          } else {
-          console.log("Gene model for " + geneName + " not found.  Empty results returned from " + url);
-            reject("Gene model for " + geneName + " not found.");
-          }
-        },
-      error: function( xhr, status, errorThrown ) {
-
-            console.log("Gene model for " +  geneName + " not found.  Error occurred.");
-            console.log( "Error: " + errorThrown );
-            console.log( "Status: " + status );
-            console.log( xhr );
-          reject("Error " + errorThrown + " occurred when attempting to get gene model for gene " + geneName);
-
-        }
-    });
-
-  });
-}
-
-
-
 function loadGeneWidgets(callback) {
   // kicks off the loading/processing of `local` and `prefetch`
   gene_engine.initialize();
@@ -1719,10 +1644,10 @@ function loadGeneWidgets(callback) {
     // only has transcripts in only one of the gene sets
     geneCard.checkGeneSource(theGeneName);
 
-    promiseGetGeneModel(data.name).then( function(geneModel) {
+    geneModel.promiseGetGeneObject(data.name).then( function(theGeneObject) {
         // We have successfully return the gene model data.
         // Load all of the tracks for the gene's region.
-        window.gene = geneModel;
+        window.gene = theGeneObject;
 
         adjustGeneRegion(window.gene);
 
@@ -1730,8 +1655,6 @@ function loadGeneWidgets(callback) {
         genesCard.addGene(window.gene.gene_name);
         cacheHelper.showAnalyzeAllProgress();
 
-
-        window.geneObjects[window.gene.gene_name] = window.gene;
 
         // if the gene name was entered on the data dialog, enable/disable
         // the load button
@@ -1745,7 +1668,7 @@ function loadGeneWidgets(callback) {
 
         // set all searches to correct gene
         setGeneBloodhoundInputElement(window.gene.gene_name);
-        window.selectedTranscript = geneToLatestTranscript[window.gene.gene_name];
+        window.selectedTranscript = geneModel.geneToLatestTranscript[window.gene.gene_name];
 
 
         if (data.loadFromUrl) {
@@ -2114,7 +2037,7 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
     })
     .then(function() {
 
-      geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
+      geneModel.geneToLatestTranscript[window.gene.gene_name] = window.selectedTranscript;
 
 
       if (isAlignmentsOnly() && autocall && !hasCalledVariants) {

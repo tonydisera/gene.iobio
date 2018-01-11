@@ -394,7 +394,7 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
     var trioFbData = null;
     var shouldCallVariants = analyzeCalledVariants;
 
-    promiseGetGeneModel(geneName)
+    geneModel.promiseGetGeneObject(geneName)
     .then( function(data) {
       // Get the gene model
       geneObject = data;
@@ -402,7 +402,6 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
       me.geneBadgeLoaderDisplay.addGene(geneName, genesCard.pageNumberForGene(geneName));
       adjustGeneRegion(geneObject);
       transcript = geneModel.getCanonicalTranscript(geneObject);
-      window.geneObjects[geneObject.gene_name.toUpperCase()] = geneObject;
 
       return geneModel.promiseMarkCodingRegions(geneObject, transcript);
     })
@@ -699,7 +698,7 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
             if (keyObject.dataKind == CacheHelper.VCF_DATA && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
               counts.geneCount++;
 
-              var geneObject   = window.geneObjects[keyObject.gene];
+              var geneObject   = geneModel.geneObjects[keyObject.gene];
               var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript}).then(function(data) {
                 var geneCoverageAll = data.geneCoverage;
 
@@ -808,7 +807,7 @@ CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback)
     me.promiseGetDataThreaded(key, keyObject).then(function(cachedData) {
       var theVcfData    = cachedData.data;
       var theKeyObject  = cachedData.keyObject;
-      var theGeneObject = window.geneObjects[theKeyObject.gene];
+      var theGeneObject = geneModel.geneObjects[theKeyObject.gene];
 
       var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), theGeneObject.start, theGeneObject.end, true);
 

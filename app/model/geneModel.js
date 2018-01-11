@@ -3,7 +3,16 @@ class GeneModel {
     this.geneSource = null;
     this.refseqOnly = {};
     this.gencodeOnly = {};
+
     this.transcriptCodingRegions = {};
+
+    this.geneNCBISummaries = {};
+
+    this.genePhenotypes = {};
+
+    this.geneObjects = {};
+
+    this.geneToLatestTranscript = {};
   }
 
   getRidOfDuplicates(genes) {
@@ -300,6 +309,57 @@ class GeneModel {
   }
 
 
+  promiseGetNCBIGeneSummary(geneName) {
+    let me = this;
+    return new Promise( function(resolve, reject) {
+
+      var geneInfo = me.geneNCBISummaries[geneName];
+      if (geneInfo != null) {
+        resolve(geneInfo);
+      } else {
+          // Search NCBI based on the gene name to obtain the gene ID
+        var url = NCBI_GENE_SEARCH_URL + "&term=" + "(" + geneName + "[Gene name]" + " AND 9606[Taxonomy ID]";
+        $.ajax( url )
+        .done(function(data) {
+
+          // Now that we have the gene ID, get the NCBI gene summary
+          var webenv = data["esearchresult"]["webenv"];
+          var queryKey = data["esearchresult"]["querykey"];
+          var summaryUrl = NCBI_GENE_SUMMARY_URL + "&query_key=" + queryKey + "&WebEnv=" + webenv;
+          $.ajax( summaryUrl )
+          .done(function(sumData) {
+
+              if (sumData.result == null || sumData.result.uids.length == 0) {
+                if (sumData.esummaryresult && sumData.esummaryresult.length > 0) {
+                  sumData.esummaryresult.forEach( function(message) {
+                    console.log(message);
+                  });
+                }
+                reject("No NCBI gene summary returned for gene " + geneName);
+
+              } else {
+
+                var uid = sumData.result.uids[0];
+                var geneInfo = sumData.result[uid];
+
+                me.geneNCBISummaries[geneName] = geneInfo;
+                resolve(geneInfo)
+              }
+          })
+          .fail(function() {
+            reject("Unable to get NCBI Gene Summary for gene " + geneName);
+          })
+
+        })
+        .fail(function() {
+          reject("Unable to get NCBI Gene Summary for gene with gene search " + geneName);
+        })
+      }
+    });
+
+  }
+
+
   _setTranscriptExonNumbers(transcript, sortedExons) {
     // Set the exon number on each UTR and CDS within the corresponding exon
     transcript.features.forEach(function(feature) {
@@ -312,5 +372,135 @@ class GeneModel {
       }
     })
   }
+
+  clearGene(geneName) {
+    let me = this;
+    if (me.geneObjects && me.geneObjects.hasOwnProperty(geneName)) {
+      delete me.geneObjects[geneName];
+    }
+
+    if (me.geneNCBISummaries && me.geneNCBISummaries.hasOwnProperty(geneName)) {
+      delete me.geneNCBISummaries[geneName];
+    }
+
+    if (me.geneToLatestTranscript && me.geneToLatestTranscript.hasOwnProperty(geneName)) {
+      delete me.geneToLatestTranscript[geneName];
+    }
+    if (me.geneToLatestTranscript && me.geneToLatestTranscript[geneName]) {
+      delete me.geneToLatestTranscript[geneName];
+    }
+  }
+
+  promiseGetGenePhenotypes(geneName) {
+    var me = this;
+
+    return new Promise( function(resolve, reject) {
+
+      var phenotypes = me.genePhenotypes[geneName];
+      if (phenotypes != null) {
+        resolve([phenotypes, geneName]);
+      } else {
+        var url = geneToPhenoServer + "api/gene/" + geneName;
+        $.ajax({
+        url: url,
+        jsonp: "callback",
+        type: "GET",
+        dataType: "jsonp",
+        success: function( response ) {
+
+          var phenotypes = response.sort(function(a,b) {
+            if (a.hpo_term_name < b.hpo_term_name) {
+              return -1;
+            } else if (a.hpo_term_name > b.hpo_term_name) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+          me.genePhenotypes[geneName] = phenotypes;
+
+          resolve([response, geneName]);
+        },
+        fail: function() {
+          reject("unable to get phenotypes for gene " + geneName);
+        }
+       });
+      }
+
+    });
+  }
+
+
+
+  promiseGetCachedGeneObject(geneName, resolveOnError=false) {
+    var me = this;
+    return new Promise( function(resolve, reject) {
+      var theGeneObject = me.geneObjects[geneName];
+      if (theGeneObject) {
+        resolve(theGeneObject);
+      } else {
+        promiseGetGeneObject(geneName).then(function(geneObject) {
+          resolve(geneObject);
+        },
+        function(error) {
+          if (resolveOnError) {
+            resolve(null);
+          } else {
+            reject(error);
+          }
+        });
+      }
+
+    });
+  }
+
+
+  promiseGetGeneObject(geneName) {
+    var me = this;
+    return new Promise(function(resolve, reject) {
+
+      var url = geneInfoServer + 'api/gene/' + geneName;
+
+      // If current build not specified, default to GRCh37
+      var buildName = genomeBuildHelper.getCurrentBuildName() ? genomeBuildHelper.getCurrentBuildName() : "GRCh37";
+      $('#build-link').text(buildName);
+
+
+      url += "?source="  + geneModel.geneSource;
+      url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
+      url += "&build="   + buildName;
+
+
+      $.ajax({
+        url: url,
+        jsonp: "callback",
+        type: "GET",
+        dataType: "jsonp",
+        success: function( response ) {
+          if (response.length > 0 && response[0].hasOwnProperty('gene_name')) {
+            var theGeneObject = response[0];
+            me.geneObjects[theGeneObject.gene_name] = theGeneObject;
+            resolve(theGeneObject);
+          } else {
+          console.log("Gene model for " + geneName + " not found.  Empty results returned from " + url);
+            reject("Gene model for " + geneName + " not found.");
+          }
+        },
+        error: function( xhr, status, errorThrown ) {
+
+          console.log("Gene model for " +  geneName + " not found.  Error occurred.");
+          console.log( "Error: " + errorThrown );
+          console.log( "Status: " + status );
+          console.log( xhr );
+          reject("Error " + errorThrown + " occurred when attempting to get gene model for gene " + geneName);
+
+        }
+      });
+
+    });
+  }
+
+
+
 
 }

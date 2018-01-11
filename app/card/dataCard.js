@@ -235,7 +235,7 @@ DataCard.prototype.loadDemoData = function() {
     genomeBuildHelper.setCurrentBuild(me.demoBuild);
 
     theGenes.forEach(function(geneName) {
-      geneNames.push(geneName);
+      genesCard.geneNames.push(geneName);
       genesCard.addGeneBadge(geneName, true);
     })
 

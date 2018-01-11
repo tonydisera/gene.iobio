@@ -310,7 +310,7 @@ VariantExporter.prototype._promiseCreateExportRecord = function(variantEntry, ex
   var me = this;
 
   return new Promise( function(resolve, reject) {
-    promiseGetCachedGeneModel(exportRec.gene).then(function(theGeneObject) {
+    geneModel.promiseGetCachedGeneObject(exportRec.gene).then(function(theGeneObject) {
       var theTranscript = null;
       if (theGeneObject == null || theGeneObject.transcripts == null) {
         var msg = "Unable to export variant.  Invalid gene. " + exportRec.gene;
