@@ -1,4 +1,5 @@
 function WelcomePanel() {
+  this.videoPlayer = null;
 
   this.videoStyle = "position:absolute;width:100%;height:100%;left:0";
 
@@ -70,7 +71,7 @@ WelcomePanel.prototype.playVideo = function(videoName) {
   // Load the video if the iframe doesn't exist
   if (videoContainer.find("iframe").length == 0) {
 
-    videoPlayer = new YT.Player(videoFrame, {
+    me.videoPlayer = new YT.Player(videoFrame, {
       height: config.height,
       width: config.width,
       videoId: config.videoId,
@@ -85,8 +86,8 @@ WelcomePanel.prototype.playVideo = function(videoName) {
       }
     });
   } else {
-    videoPlayer.seekTo(0);
-    videoPlayer.playVideo();
+    me.videoPlayer.seekTo(0);
+    me.videoPlayer.playVideo();
   }
 
 
@@ -110,7 +111,7 @@ WelcomePanel.onPlayerStateChange = function() {
 WelcomePanel.prototype.stopVideo = function(videoName) {
   var me = this;
 
-  videoPlayer.pauseVideo();
+  me.videoPlayer.pauseVideo();
   $('#welcome-area').removeClass('hide');
   $('#screencast-panel').addClass('hide');
 

@@ -11,8 +11,7 @@ var gene_engine = new Bloodhound({
   limit: 200
 });
 
-// the video (embedded youtube) that is currently playing
-var videoPlayer = null;
+
 
 var siteConfig = {};
 
