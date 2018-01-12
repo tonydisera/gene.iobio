@@ -24,7 +24,6 @@ module.exports = function(config) {
         'app/util/*.js',
         'app/partials/geneSearch.js',
         'app/bam.iobio.js',
-        'app/eduTour.js',
         'app/exhibit.js',
         'app/legend.js',
         'app/timeout.js',

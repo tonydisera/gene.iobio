@@ -1719,7 +1719,7 @@ VariantCard.prototype.showTooltip = function(tooltip, variant, sourceVariantCard
   if (lock) {
     matrixCard.unpin(true);
     if (isLevelEdu) {
-      eduTourCheckVariant(variant);
+      edutour.checkVariant(variant);
     }
   }
 

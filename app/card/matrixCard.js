@@ -621,7 +621,7 @@ MatrixCard.prototype.showTooltip = function(variant, lock) {
     })
 
     if (isLevelEdu) {
-      eduTourCheckVariant(variant);
+      edutour.checkVariant(variant);
     }
   }
 

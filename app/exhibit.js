@@ -1,3 +1,5 @@
+let util = new Util();
+
 $(document).ready(function() {
   $.material.init();
   $("#exhibit-video").on("ended", function() {
@@ -5,8 +7,8 @@ $(document).ready(function() {
   });
 
   // Encapsulate logic for animate.css into a jquery function
-    $.fn.extend({
-    animateIt: function (animationName, customClassName) {
+  $.fn.extend({
+      animateIt: function (animationName, customClassName) {
         $(this).removeClass("hide");
         var additionalClass = customClassName ? ' ' + customClassName : '';
           var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
@@ -17,8 +19,8 @@ $(document).ready(function() {
   });
 
   // Encapsulate logic for animate.css into a jquery function
-    $.fn.extend({
-  animateVideoDone: function (animationName, customClassName) {
+  $.fn.extend({
+    animateVideoDone: function (animationName, customClassName) {
       $(this).removeClass("hide");
       var additionalClass = customClassName ? ' ' + customClassName : '';
           var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
@@ -28,13 +30,13 @@ $(document).ready(function() {
         //hideVideo();
         showCaseStudies();
           });
-      }
+    }
   });
 
-    if (hasTimeout) {
-      var timeout = new Timeout("exhibit.html", startOver);
-      timeout.checkForInactivity();
-    }
+  if (hasTimeout) {
+    var timeout = new Timeout("exhibit.html", startOver);
+    timeout.checkForInactivity();
+  }
 
 });
 
@@ -83,31 +85,7 @@ function showCaseStudies() {
   window.location.href = url;
 
 }
-function startOver() {
+function exhibitStartOver() {
   window.location.href = EXHIBIT_URL;
 }
 
-function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    var hits = {};
-    for (var i = 0; i < sURLVariables.length; i++)
-    {
-        var sParameterName = sURLVariables[i].split('=');
-        if (typeof sParam == 'string' || sParam instanceof String) {
-          if (sParameterName[0] == sParam)
-          {
-              return sParameterName[1];
-          }
-      } else {
-        var matches = sParameterName[0].match(sParam);
-        if ( matches != undefined && matches.length > 0 ) {
-          hits[sParameterName[0]] = sParameterName[1];
-        }
-      }
-    }
-    if (Object.keys(hits).length == 0)
-      return undefined;
-    else
-      return hits;
-}

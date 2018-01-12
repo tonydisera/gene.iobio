@@ -228,7 +228,7 @@ GenesCard.prototype.init = function() {
 
 
   if (isLevelEdu || isLevelBasic) {
-    eduTourCheckPhenolyzer();
+    edutour.checkPhenolyzer();
   }
   cacheHelper.showAnalyzeAllProgress();
 

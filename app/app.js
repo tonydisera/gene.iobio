@@ -98,6 +98,8 @@ var freebayesSettings = new FreebayesSettings();
 
 var feedback = null;
 
+var edutour = null;
+
 
 $(document).ready(function(){
 
@@ -342,7 +344,8 @@ function init() {
   }
 
 
-  initializeTours();
+  edutour = new EduTour();
+  edutour.init();
 
   // Encapsulate logic for animate.css into a jquery function
   $.fn.extend({
