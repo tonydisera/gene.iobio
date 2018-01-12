@@ -3,15 +3,6 @@
 //
 
 
-// Engine for gene search suggestions
-var gene_engine = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  local: [],
-  limit: 200
-});
-
-
 
 var siteConfig = {};
 
@@ -28,6 +19,7 @@ var regionEnd = null;
 var GENE_REGION_BUFFER = 1000;
 var GENE_REGION_BUFFER_MAX = 50000;
 
+var geneSearch = new GeneSearch();
 
 // genes card
 var geneModel = new GeneModel();
@@ -420,28 +412,19 @@ function init() {
 
   $('.sidebar-button.selected').removeClass("selected");
 
+  // Initialize gene search widget
+  geneSearch.init();
 
-  // Set up the gene search widget
-  loadGeneWidgets( function(success) {
-    if (success) {
-      showGeneControls();
-      loadGeneFromUrl();
-    }
-  });
-  getGeneBloodhoundElement().focus();
+  // Load the gene search widget with all of the gene names
+  geneSearch.promiseLoad().then(function() {
+    showGeneControls();
+    loadGeneFromUrl();
+  },
+  function(error) {
+    alertify.alert("Unable to load gene search with genes.");
+  })
 
-  if (isLevelBasic) {
-    $('#select-gene').selectize(
-      {
-        create: false,
-        valueField: 'value',
-          labelField: 'value',
-          searchField: ['value'],
-          maxOptions: 5000
-        }
-    );
-    addGeneDropdownListener();
-  }
+
 
   // In cases where timeout=true, restart app after n seconds of inactivity
   // (e.g. no mouse move, button click, etc.).
@@ -505,36 +488,6 @@ function showGeneControls() {
 }
 
 
-
-function selectGeneInDropdown(theGeneName, select) {
-  if (!select) {
-    removeGeneDropdownListener();
-  }
-
-  $('#select-gene')[0].selectize.setValue(theGeneName);
-
-  geneCard.showGeneSummary(theGeneName);
-
-  if (!select) {
-    addGeneDropdownListener();
-  }
-
-}
-
-function removeGeneDropdownListener() {
-  $('#select-gene')[0].selectize.off('change');
-}
-
-function addGeneDropdownListener() {
-  $('#select-gene')[0].selectize.on('change', function(value) {
-    var geneName = value;
-    genesCard.selectGene(geneName, function() {
-      geneCard.showGeneSummary(geneName, true);
-      loadTracksForGene();
-    });
-  });
-
-}
 
 
 function validateGeneTranscripts() {
@@ -960,29 +913,6 @@ function clearMotherFatherData() {
 
 }
 
-function getGeneBloodhoundElementForDataDialog() {
-  return $('#bloodhound-data-dialog .typeahead');
-}
-function getGeneBloodhoundInputElementForDataDialog() {
-  return $('#bloodhound-data-dialog .typeahead.tt-input');
-}
-
-function getGeneBloodhoundElement() {
-  return isLevelBasic ? $('#bloodhound-sidebar .typeahead') : $('#bloodhound .typeahead');
-}
-
-function getGeneBloodhoundInputElement() {
-  return isLevelBasic ? $('#bloodhound-sidebar .typeahead.tt-input') : $('#bloodhound .typeahead.tt-input');
-}
-function setGeneBloodhoundInputElement(geneName, loadFromUrl, trigger) {
-  if (!isLevelBasic) {
-    getGeneBloodhoundInputElement().val(geneName);
-  }
-  if (trigger) {
-    getGeneBloodhoundInputElement().trigger('typeahead:selected', {"name": geneName, loadFromUrl: loadFromUrl});
-  }
-}
-
 function loadGeneFromUrl() {
   // Get the species
   var species = util.getUrlParameter('species');
@@ -1036,7 +966,7 @@ function loadGeneFromUrl() {
       // trigger the event to get the gene info and then call loadUrlSources()
       if (genomeBuildHelper.getCurrentSpecies() && genomeBuildHelper.getCurrentBuild()) {
         if (geneModel.isKnownGene(geneName)) {
-          setGeneBloodhoundInputElement(geneName, true, true);
+          geneSearch.setValue(geneName, true, true);
         }
       } else {
         // The build wasn't specified in the URL parameters, so force the user
@@ -1125,7 +1055,7 @@ function reloadGeneFromUrl() {
   loadGeneNamesFromUrl(gene);
 
   if (geneModel.isKnownGene(gene)) {
-    setGeneBloodhoundInputElement(gene, true, true);
+    geneSearch.setValue(gene, true, true);
     genesCard._geneBadgeLoading(gene, true, true);
   }
 }
@@ -1354,7 +1284,7 @@ function adjustGeneRegionBuffer() {
     alert("Up to 50 kb upstream/downstream regions can be displayed.")
   } else {
     GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
-    setGeneBloodhoundInputElement(gene.gene_name, false, true);
+    geneSearch.setValue(gene.gene_name, false, true);
   }
   cacheHelper.promiseClearCache();
 
@@ -1388,176 +1318,6 @@ function switchToBasicMode() {
   util.updateUrl("mode",     "basic");
   location.reload();
 }
-
-
-function loadGeneWidgets(callback) {
-  // kicks off the loading/processing of `local` and `prefetch`
-  gene_engine.initialize();
-
-
-  var typeahead = getGeneBloodhoundElement().typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1
-  },
-  {
-    name: 'name',
-    displayKey: 'name',
-    templates: {
-      empty: [
-        '<div class="empty-message">',
-        'no genes match the current query',
-        '</div>'
-      ].join('\n'),
-      suggestion: Handlebars.compile('<p><strong>{{name}}</strong></p>')
-    },
-    // `ttAdapter` wraps the suggestion engine in an adapter that
-    // is compatible with the typeahead jQuery plugin
-    source: gene_engine.ttAdapter()
-  });
-
-  var typeaheadDataDialog = getGeneBloodhoundElementForDataDialog().typeahead({
-    hint: true,
-    highlight: true,
-    minLength: 1
-  },
-  {
-    name: 'name',
-    displayKey: 'name',
-    templates: {
-      empty: [
-        '<div class="empty-message">',
-        'no genes match the current query',
-        '</div>'
-      ].join('\n'),
-      suggestion: Handlebars.compile('<p><strong>{{name}}</strong></p>')
-    },
-    // `ttAdapter` wraps the suggestion engine in an adapter that
-    // is compatible with the typeahead jQuery plugin
-    source: gene_engine.ttAdapter()
-  });
-
-  var onGeneNameEntered = function(evt,data) {
-    // Ignore second event triggered by loading gene widget from url parameter
-    if (data.loadFromUrl && loadedUrl) {
-      return;
-    } else if (data.loadFromUrl) {
-      loadedUrl = true;
-    }
-
-    var theGeneName = data.name;
-
-
-    // If necessary, switch from gencode to refseq or vice versa if this gene
-    // only has transcripts in only one of the gene sets
-    geneCard.checkGeneSource(theGeneName);
-
-    geneModel.promiseGetGeneObject(data.name).then( function(theGeneObject) {
-        // We have successfully return the gene model data.
-        // Load all of the tracks for the gene's region.
-        window.gene = theGeneObject;
-
-        adjustGeneRegion(window.gene);
-
-        // Add the gene badge
-        genesCard.addGene(window.gene.gene_name);
-        cacheHelper.showAnalyzeAllProgress();
-
-
-        // if the gene name was entered on the data dialog, enable/disable
-        // the load button
-        if (evt.currentTarget.id == 'enter-gene-name-data-dialog') {
-          enableLoadButton();
-        }
-
-        if (!validateGeneTranscripts()) {
-          return;
-        }
-
-        // set all searches to correct gene
-        setGeneBloodhoundInputElement(window.gene.gene_name);
-        window.selectedTranscript = geneModel.geneToLatestTranscript[window.gene.gene_name];
-
-
-        if (data.loadFromUrl) {
-
-          var bam  = util.getUrlParameter(/(bam)*/);
-        var vcf  = util.getUrlParameter(/(vcf)*/);
-
-
-        if (bam == null && vcf == null) {
-          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
-          if (isLevelEdu) {
-            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-              showSidebar("Phenolyzer");
-            }
-          } else if (isLevelBasic) {
-            showSidebar("Phenolyzer");
-          }
-        }
-
-
-        if (bam == null && vcf == null) {
-          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
-          if (isLevelEdu) {
-            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-              showSidebar("Phenolyzer");
-            }
-          }
-        }
-
-        if (!isOffline) {
-            genesCard.updateGeneInfoLink(window.gene.gene_name);
-        }
-
-          // Autoload data specified in url
-        loadUrlSources();
-
-        enableCallVariantsButton();
-      } else {
-
-
-        genesCard.setSelectedGene(window.gene.gene_name);
-
-        // Only load the variant data if the gene name was NOT entered
-        // on the data dialog.
-        if (evt.currentTarget.id != 'enter-gene-name-data-dialog') {
-            loadTracksForGene();
-        }
-
-          // add gene to url params
-          util.updateUrl('gene', window.gene.gene_name);
-
-          if (!isOffline) {
-            genesCard.updateGeneInfoLink(window.gene.gene_name);
-          }
-
-          if(data.callback != undefined) data.callback();
-
-        }
-
-
-    }, function(error) {
-      alertify.alert(error);
-      genesCard.removeGeneBadgeByName(theGeneName);
-
-    });
-  }
-
-  typeahead.on('typeahead:selected',function(evt,data){
-    onGeneNameEntered(evt,data);
-  });
-  typeaheadDataDialog.on('typeahead:selected',function(evt,data){
-    onGeneNameEntered(evt,data);
-  });
-
-
-  geneModel.loadFullGeneSet(callback);
-}
-
-
-
-
 
 /*
 * A gene has been selected.  Load all of the tracks for the gene's region.

@@ -149,6 +149,20 @@ class GeneCard {
           me.onCloseTranscriptMenuEvent();
       }
     });
+
+
+    if (isLevelBasic) {
+      $('#select-gene').selectize(
+        {
+          create: false,
+          valueField: 'value',
+            labelField: 'value',
+            searchField: ['value'],
+            maxOptions: 5000
+          }
+      );
+      me.addGeneDropdownListener();
+    }
   }
 
   showTranscripts(regionStart, regionEnd) {
@@ -360,6 +374,56 @@ class GeneCard {
     if (isLevelBasic && $('#gene-summary').text() != summary ) {
       $('#gene-summary').html(summary);
     }
+  }
+
+
+  selectGeneInDropdown(theGeneName, select) {
+    let me = this;
+    if (!select) {
+      me.removeGeneDropdownListener();
+    }
+
+    $('#select-gene')[0].selectize.setValue(theGeneName);
+
+    me.showGeneSummary(theGeneName);
+
+    if (!select) {
+      me.addGeneDropdownListener();
+    }
+
+  }
+
+  addGeneDropdownOption(geneName, bypassSelecting) {
+    let me = this;
+    $('#select-gene')[0].selectize.addOption({value:geneName});
+    if (!bypassSelecting) {
+      me.selectGeneInDropdown(geneName);
+    }
+
+  }
+
+  resetGeneDropdown() {
+    let me = this;
+    if (isLevelBasic) {
+      $('#select-gene')[0].selectize.clearOptions();
+    }
+  }
+
+  removeGeneDropdownListener() {
+    let me = this;
+    $('#select-gene')[0].selectize.off('change');
+  }
+
+  addGeneDropdownListener() {
+    let me = this;
+    $('#select-gene')[0].selectize.on('change', function(value) {
+      var geneName = value;
+      genesCard.selectGene(geneName, function() {
+        geneCard.showGeneSummary(geneName, true);
+        loadTracksForGene();
+      });
+    });
+
   }
 
 

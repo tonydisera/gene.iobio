@@ -882,12 +882,12 @@ DataCard.prototype.init = function() {
 
 
       if (theGeneName) {
-        setGeneBloodhoundInputElement(theGeneName, false, true);
+        geneSearch.setValue(theGeneName, false, true);
       } else if (util.getUrlParameter("gene")) {
         // If the genome build was missing, the user was forced into the data dialog to select
         // the genome build.  Now we want to load the gene if it was provided in the URL parameter
         // list.
-        setGeneBloodhoundInputElement(util.getUrlParameter("gene"), true, true);
+        geneSearch.setValue(util.getUrlParameter("gene"), true, true);
       } else {
         window.loadTracksForGene();
       }

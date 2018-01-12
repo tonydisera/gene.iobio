@@ -20,32 +20,30 @@ class GeneModel {
 
   }
 
-  loadFullGeneSet(callback) {
+  promiseLoadFullGeneSet(callback) {
     let me = this;
-    $.ajax({url: 'genes.json',
-      data_type: 'json',
-      success: function( data ) {
-        var sortedGenes = me.getRidOfDuplicates(data);
-        me.allKnownGeneNames = {};
-        sortedGenes.forEach(function(geneObject) {
-          if (geneObject && geneObject.name && geneObject.name.length > 0) {
-            me.allKnownGeneNames[geneObject.name.toUpperCase()] = true;
-          }
-        })
-        gene_engine.clear();
-        gene_engine.add(sortedGenes);
-        if (callback) {
-          callback(true);
+    return new Promise(function(resolve, reject) {
+      $.ajax({url: 'genes.json',
+        data_type: 'json',
+        success: function( data ) {
+          var sortedGenes = me.getRidOfDuplicates(data);
+          me.allKnownGeneNames = {};
+          sortedGenes.forEach(function(geneObject) {
+            if (geneObject && geneObject.name && geneObject.name.length > 0) {
+              me.allKnownGeneNames[geneObject.name.toUpperCase()] = true;
+            }
+          })
+          resolve(sortedGenes);
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          var msg = "failed to get genes.json " + thrownError;
+          console.log(msg);
+          console.log(xhr.status);
+          reject(msg);
         }
-      },
-      error: function(xhr, ajaxOptions, thrownError) {
-        console.log("failed to get genes.json " + thrownError);
-        console.log(xhr.status);
-        if (callback) {
-          callback(false);
-        }
-      }
+      })
     })
+
   }
 
 

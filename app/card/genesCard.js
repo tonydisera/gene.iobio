@@ -664,9 +664,7 @@ GenesCard.prototype.editGenes = function() {
 GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, genesString) {
   var me = this;
 
-  if (isLevelBasic) {
-    $('#select-gene')[0].selectize.clearOptions();
-  }
+  geneCard.resetGeneDropdown();
 
   if (genesString == null) {
     genesString = $('#genes-to-copy').val();
@@ -773,7 +771,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
     var geneBadge = me._getGeneBadge(geneNameToSelect);
     geneBadge.addClass("selected");
     if (isLevelBasic) {
-      selectGeneInDropdown(geneNameToSelect, selectTheGene);
+      geneCard.selectGeneInDropdown(geneNameToSelect, selectTheGene);
     } else if (isMygene2 || isLevelEdu ) {
       me.selectGene(geneNameToSelect);
     }
@@ -781,7 +779,7 @@ GenesCard.prototype.copyPasteGenes = function(geneNameToSelect, selectTheGene, g
   } else if (me.geneNames.length > 0 && geneNameToSelect == null) {
     me.selectGene(me.geneNames[0]);
     if (isLevelBasic) {
-      selectGeneInDropdown(me.geneNames[0], selectTheGene);
+      geneCard.selectGeneInDropdown(me.geneNames[0], selectTheGene);
     }
   }
 
@@ -1428,10 +1426,7 @@ GenesCard.prototype.addGeneBadge = function(geneName, bypassSelecting) {
 
 
   if (isLevelBasic) {
-    $('#select-gene')[0].selectize.addOption({value:geneName});
-    if (!bypassSelecting) {
-      selectGeneInDropdown(geneName);
-    }
+    geneCard.addGeneDropdownOption(geneName, bypassSelecting);
   }
 
   var gb = me._getGeneBadge(geneName);
@@ -2081,7 +2076,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
   // only has transcripts in only one of the gene sets
   geneCard.checkGeneSource(geneName);
 
-  setGeneBloodhoundInputElement(geneName);
+  geneSearch.setValue(geneName);
   me.setSelectedGene(geneName);
 
   geneModel.promiseGetGeneObject(geneName).then(function(theGeneObject) {
