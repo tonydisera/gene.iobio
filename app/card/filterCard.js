@@ -41,6 +41,13 @@ function FilterCard() {
 }
 
 
+FilterCard.prototype.onGeneLoading = function() {
+  d3.select('#impact-scheme').classed("current", true);
+  d3.select('#effect-scheme' ).classed("current", false);
+  d3.selectAll(".impact").classed("nocolor", false);
+  d3.selectAll(".effect").classed("nocolor", true);
+}
+
 FilterCard.prototype.clearDataGeneratedFilters = function() {
   this.snpEffEffects = new Object();
   this.vepConsequences = new Object();

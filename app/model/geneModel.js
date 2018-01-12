@@ -582,5 +582,20 @@ class GeneModel {
   }
 
 
+  adjustGeneRegion(geneObject) {
+    let me = this;
+    if (geneObject.startOrig == null) {
+      geneObject.startOrig = geneObject.start;
+    }
+    if (geneObject.endOrig == null) {
+      geneObject.endOrig = geneObject.end;
+    }
+    // Open up gene region to include upstream and downstream region;
+    geneObject.start = geneObject.startOrig < GENE_REGION_BUFFER ? 0 : geneObject.startOrig - GENE_REGION_BUFFER;
+    // TODO: Don't go past length of reference
+    geneObject.end   = geneObject.endOrig + GENE_REGION_BUFFER;
+
+  }
+
 
 }

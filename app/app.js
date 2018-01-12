@@ -92,17 +92,10 @@ var variantCardsSibs = {'affected': [], 'unaffected': []};
 
 var variantExporter = null;
 
-// freebayes settings
-var fbSettings = {
-  'visited': false,
-  'arguments': {
-    'useSuggestedVariants':     {value: true,  defaultValue: true},
-    'limitToSuggestedVariants': {value: false, defaultValue: false, argName: '-l',                    isFlag: true},
-    'minMappingQual':           {value: 0,     defaultValue: 0,     argName: '--min-mapping-quality'},
-    'minCoverage':              {value: 0,     defaultValue: 0,     argName: '--min-coverage'},
-    'useDupReads':              {value: false, defaultValue: false, argName: '--use-duplicate-reads', isFlag: true}
-  }
-}
+var freebayesSettings = new FreebayesSettings();
+
+
+var feedback = null;
 
 
 $(document).ready(function(){
@@ -433,9 +426,8 @@ function init() {
   }
 
   if (feedbackEmails != undefined && feedbackEmails != "") {
-    $('#feedback-link').removeClass("hide");
-    $('#feedback-link').on('click', showFeedback);
-      $('#report-feedback-button').on('click', emailFeedback);
+    feedback = new Feedback();
+    feedback.init();
   }
 
 }
@@ -510,26 +502,6 @@ function validateGeneTranscripts() {
 
 }
 
-
-
-// Function from David Walsh: http://davidwalsh.name/css-animation-callback
-function whichTransitionEvent(){
-  var t,
-      el = document.createElement("fakeelement");
-
-  var transitions = {
-    "transition"      : "transitionend",
-    "OTransition"     : "oTransitionEnd",
-    "MozTransition"   : "transitionend",
-    "WebkitTransition": "webkitTransitionEnd"
-  }
-
-  for (t in transitions){
-    if (el.style[t] !== undefined){
-      return transitions[t];
-    }
-  }
-}
 
 function sidebarAdjustX(x, isRelative) {
   if (!$("#slider-left").hasClass("hide")) {
@@ -694,7 +666,7 @@ function showSidebar(sidebar) {
     $('#container').toggleClass('slide-left');
     $('#gene-track').css("left", "0px");
 
-    var transitionEvent = whichTransitionEvent();
+    var transitionEvent = util.whichTransitionEvent();
     $('.slide-left').one(transitionEvent, function(event) {
       $('#slider-left').trigger("open");
     });
@@ -745,37 +717,6 @@ function showDataDialogExportBookmarks() {
   $('#dataModal').modal('show');
 }
 
-function showFreebayesSettingsDialog(onClose) {
-  if (allowFreebayesSettings) {
-    fbSettings.onClose = onClose;
-    fbSettings.visited = true;
-    $('#fb-use-suggested-variants-cb').prop('checked', fbSettings.arguments.useSuggestedVariants.value);
-    $('#fb-limit-to-suggested-variants-cb').prop('checked', fbSettings.arguments.limitToSuggestedVariants.value);
-    $('#fb-min-mapping-qual'     ).val(fbSettings.arguments.minMappingQual.value);
-    $('#fb-min-coverage'         ).val(fbSettings.arguments.minCoverage.value);
-    $('#fb-use-dup-reads-cb'     ).prop('checked', fbSettings.arguments.useDupReads.value);
-
-    $('#freebayes-settings-modal').modal("show");
-  } else  {
-    if (onClose) {
-      onClose();
-    }
-  }
-}
-
-function saveFreebayesSettings() {
-  fbSettings.arguments.useSuggestedVariants.value     = $('#fb-use-suggested-variants-cb').is(":checked");
-  fbSettings.arguments.limitToSuggestedVariants.value = $('#fb-limit-to-suggested-variants-cb').is(":checked");
-  fbSettings.arguments.minMappingQual.value           = $('#fb-min-mapping-qual').val();
-  fbSettings.arguments.minCoverage.value              = $('#fb-min-coverage').val();
-  fbSettings.arguments.useDupReads.value              = $('#fb-use-dup-reads-cb').is(":checked");
-
-  if (fbSettings.onClose) {
-    fbSettings.onClose();
-  }
-
-  $('#freebayes-settings-modal').modal("hide");
-}
 
 function detectWindowResize() {
   $(window).resize(function() {
@@ -831,7 +772,7 @@ function closeSlideLeft() {
 
   resizeCardWidths();
 
-  var transitionEvent = whichTransitionEvent();
+  var transitionEvent = util.whichTransitionEvent();
   $('#container').one(transitionEvent, function(event) {
     $('#slider-left').trigger("close");
   });
@@ -859,59 +800,6 @@ function getVariantCard(relationship) {
 }
 
 
-function toggleSampleTrio(show) {
-  if (show) {
-    dataCard.mode = 'trio';
-    $('#mother-data').removeClass("hide");
-    $('#father-data').removeClass("hide");
-    if (Object.keys($('#proband-data #vcf-sample-select')[0].selectize.options).length > 0) {
-      $('#unaffected-sibs-box').removeClass("hide");
-      $('#affected-sibs-box').removeClass("hide");
-    } else {
-      $('#unaffected-sibs-box').addClass("hide");
-      $('#affected-sibs-box').addClass("hide");
-    }
-  } else {
-    dataCard.mode = 'single';
-    $('#mother-data').addClass("hide");
-    $('#father-data').addClass("hide");
-    $('#unaffected-sibs-box').addClass("hide");
-    $('#affected-sibs-box').addClass("hide");
-    var motherCard = null;
-    var fatherCard = null;
-  }
-  enableLoadButton();
-
-}
-
-function clearMotherFatherData() {
-  var motherCard = null;
-  var fatherCard = null;
-  if (dataCard.mode == 'single') {
-    variantCards.forEach( function(variantCard) {
-      if (variantCard.getRelationship() == 'mother') {
-        motherCard = variantCard;
-        motherCard.clearVcf();
-        motherCard.clearBam();
-        motherCard.hide();
-        $('#mother-data').find('#vcf-file-info').val('');
-        $('#mother-data').find('#vcf-url-input').val('');
-        util.removeUrl("vcf1");
-        util.removeUrl("bam1");
-      } else if (variantCard.getRelationship() == 'father') {
-        fatherCard = variantCard;
-        fatherCard.clearVcf();
-        fatherCard.clearBam();
-        fatherCard.hide();
-        $('#father-data').find('#vcf-file-info').val('');
-        $('#father-data').find('#vcf-url-input').val('');
-        util.removeUrl("vcf2");
-        util.removeUrl("bam2");
-      }
-    });
-  }
-
-}
 
 function loadGeneFromUrl() {
   // Get the species
@@ -1104,7 +992,7 @@ function loadUrlSources() {
 
   if ((bam != null && Object.keys(bam).length > 1) || (vcf != null && Object.keys(vcf).length > 1)) {
     if (!isLevelEdu) {
-      toggleSampleTrio(true);
+      dataCard.toggleSampleTrio(true);
     }
   }
 
@@ -1279,33 +1167,6 @@ function hasDataSources() {
 
 
 
-function adjustGeneRegionBuffer() {
-  if (+$('#gene-region-buffer-input').val() > GENE_REGION_BUFFER_MAX) {
-    alert("Up to 50 kb upstream/downstream regions can be displayed.")
-  } else {
-    GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
-    geneSearch.setValue(gene.gene_name, false, true);
-  }
-  cacheHelper.promiseClearCache();
-
-}
-
-
-function adjustGeneRegion(geneObject) {
-  if (geneObject.startOrig == null) {
-    geneObject.startOrig = geneObject.start;
-  }
-  if (geneObject.endOrig == null) {
-    geneObject.endOrig = geneObject.end;
-  }
-  // Open up gene region to include upstream and downstream region;
-  geneObject.start = geneObject.startOrig < GENE_REGION_BUFFER ? 0 : geneObject.startOrig - GENE_REGION_BUFFER;
-  // TODO: Don't go past length of reference
-  geneObject.end   = geneObject.endOrig + GENE_REGION_BUFFER;
-
-}
-
-
 function switchToAdvancedMode() {
   util.changeSiteStylesheet("css/assets/site-mygene2-advanced.css");
   util.updateUrl("mygene2", "true");
@@ -1325,13 +1186,10 @@ function switchToBasicMode() {
 function loadTracksForGene(bypassVariantCards, callback) {
 
   toggleIntroCard(true);
+
   if (window.gene == null || window.gene == "" && !isLevelBasic) {
-    //$('.bloodhound .twitter-typeahead').animateIt('tada');
     return;
   }
-
-
-  $('#gene-track').removeClass("hide");
 
   genesCard.showGeneBadgeLoading(window.gene.gene_name);
 
@@ -1342,64 +1200,24 @@ function loadTracksForGene(bypassVariantCards, callback) {
     $('#add-data-button').removeClass("attention");
   }
 
-  regionStart = null;
-  regionEnd = null;
-
-  $("#region-flag").addClass("hide");
-
-  $("#coordinate-frame").css("opacity", 0);
-
-  $('#gene-region-buffer-input').removeClass("hide");
-  $('#gene-plus-minus-label').removeClass("hide");
-
-  $('#gene-track').removeClass("hide");
-  $('#view-finder-track').removeClass("hide");
-  $('#transcript-btn-group').removeClass("hide");
-  $('#feature-matrix .tooltip').css("opacity", 0);
-
-  $('#recall-card .call-variants-count').addClass("hide");
-  $('#recall-card .call-variants-count').text("");
-  $('#recall-card .covloader').addClass("hide");
-
-
-  d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
-
-
-  d3.select('#impact-scheme').classed("current", true);
-  d3.select('#effect-scheme' ).classed("current", false);
-  d3.selectAll(".impact").classed("nocolor", false);
-  d3.selectAll(".effect").classed("nocolor", true);
-
-  gene.regionStart = util.formatRegion(window.gene.start);
-  gene.regionEnd   = util.formatRegion(window.gene.end);
-
-    $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
-    $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);
-    $('#gene-region').text(util.addCommas(window.gene.startOrig) + "-" + util.addCommas(window.gene.endOrig));
-
-
-  if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
-    $('#non-protein-coding #gene-type-badge').addClass("hide");
-  } else {
-    $('#non-protein-coding #gene-type-badge').removeClass("hide");
-    $('#non-protein-coding #gene-type-badge').text(window.gene.gene_type);
-  }
-
-  if (window.gene.strand == '-') {
-    $('#minus_strand').removeClass("hide");
-  } else {
-    $('#minus_strand').addClass("hide");
-  }
-
-
-
+  window.regionStart = null;
+  window.regionEnd = null;
+  window.gene.regionStart = util.formatRegion(window.gene.start);
+  window.gene.regionEnd   = util.formatRegion(window.gene.end);
   window.regionStart = window.gene.start;
   window.regionEnd   = window.gene.end;
 
+  $("#region-flag").addClass("hide");
+  $("#coordinate-frame").css("opacity", 0);
 
-    // This will be the view finder, allowing the user to select
+
+  filterCard.onGeneLoading();
+  geneCard.onGeneLoading();
+  matrixCard.onGeneLoading();
+
+
+  // This will be the view finder, allowing the user to select
   // a subregion of the gene to zoom in on the tracks.
-  // ??????  TODO:  Need to figure out the cannonical transcript.
   var transcript = [];
   if (window.gene.transcripts && window.gene.transcripts.length > 0 ) {
     transcript = geneModel.getCanonicalTranscript();
@@ -1410,19 +1228,6 @@ function loadTracksForGene(bypassVariantCards, callback) {
   // not rendered.  If the vcf file hasn't been loaded, the vcf variant
   // chart is not rendered.
   geneCard.showTranscripts();
-
-
-  //$('#filter-nd-rank-card').removeClass("hide");
-  //$('#matrix-track').removeClass("hide");
-  if (isLevelEdu) {
-    $('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
-  } else if (isLevelBasic) {
-    $('#rank-variants-title').text('Table of Variants');
-  }
-  //mat $("#matrix-panel .loader").removeClass("hide");
-  $("#feature-matrix").addClass("hide");
-  $("#feature-matrix-note").addClass("hide");
-  $('#matrix-track .warning').addClass("hide");
 
   filterCard.disableFilters();
 
@@ -1991,7 +1796,7 @@ function promiseJointCallVariants(geneObject, theTranscript, loadedTrioVcfData, 
           theTranscript,
           bams,
           geneModel.geneSource == 'refseq' ? true : false,
-          fbSettings.arguments,
+          freebayesSettings.arguments,
           global_vepAF, // vep af
           function(theData, trRefName) {
 
@@ -2523,58 +2328,6 @@ function isDataLoaded() {
   return hasData;
 }
 
-function enableLoadButton() {
-  var enable = false;
-
-  var cards = {};
-  variantCards.forEach(function(vc) {
-    cards[vc.getRelationship()] = vc;
-  });
-
-  if (dataCard.mode == 'single') {
-    if (cards['proband'].isReadyToLoad()) {
-      if (window.gene) {
-        $('#gene-name-data-dialog-box').removeClass("attention");
-        if (genomeBuildHelper.getCurrentBuild()) {
-          $('#select-build-box').removeClass("attention");
-          enable = true;
-        } else {
-          $('#select-build-box').addClass("attention");
-        }
-      } else {
-        $('#gene-name-data-dialog-box').addClass("attention");
-      }
-    }
-  } else if (dataCard.mode == 'trio') {
-    if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
-      if (window.gene) {
-        $('#gene-name-data-dialog-box').removeClass("attention");
-        if (genomeBuildHelper.getCurrentBuild()) {
-          $('#select-build-box').removeClass("attention");
-          enable = true;
-        } else {
-          $('#select-build-box').addClass("attention");
-        }
-      } else {
-        $('#gene-name-data-dialog-box').addClass("attention");
-      }
-    }
-  }
-  if (enable) {
-    $('#data-card').find('#ok-button').removeClass("disabled");
-  } else {
-    $('#data-card').find('#ok-button').addClass("disabled");
-  }
-
-
-}
-
-function disableLoadButton() {
-  $('#data-card').find('#ok-button').addClass("disabled");
-
-}
-
-
 
 
 
@@ -2672,103 +2425,6 @@ function toggleIntroCard(forceHide) {
     }
   }
 
-}
-
-
-
-function showFeedback() {
-
-  $('#feedback-note').val("");
-
-  if (feedbackAttachScreenCapture) {
-    $('#feedback-screen-capture-area').removeClass("hide");
-    $('#feedback-screen-capture').empty();
-    $('#feedback-screen-capture').append(  "<div id='feedback-container' class='"       + "'></div>"  );
-
-    $('#feedback-screen-capture #feedback-container').append(  $('#gene-track').html() );
-    $('#feedback-screen-capture #feedback-container').append(  $('#track-section').html() );
-    $('#feedback-screen-capture #feedback-container').append(  $('#proband-variant-card').html() );
-    $('#feedback-screen-capture #feedback-container').append(  $('#other-variant-cards').html() );
-
-    if (!$('#slider-left').hasClass('hide')) {
-      $('#feedback-screen-capture').append(  "<div style='width:5px'></div>"  );
-      $('#feedback-screen-capture').append(  "<div id='slider-left-content' class='"     + $('#slider-left-content').attr("class") + "'>"       + $('#slider-left-content').html()     + "</div");
-    }
-    $('#feedback-screen-capture').append(  $('#svg-glyphs-placeholder').html() );
-
-    // Take out identifiers
-    $('#feedback-screen-capture #variant-card-label').text("");
-
-
-  } else {
-    $('#feedback-screen-capture-area').addClass("hide");
-  }
-}
-
-function emailFeedback() {
-
-  // Change newlines to html breaks
-  $.valHooks.textarea = {
-      get: function(elem) {
-          return elem.value.replace(/\r?\n/g, "<br>");
-      }
-  };
-
-  var name = $('#feedback-name').val();
-  var email = $('#feedback-email').val();
-  var note  = $('#feedback-note').val();
-
-  if (email == null || email.trim().length == 0) {
-    $('#feedback-warning').text("Please specify an email");
-    $('#feedback-warning').removeClass("hide");
-    return;
-  } else if (note == null || note.trim().length == 0) {
-    $('#feedback-warning').text("Please fill in the description");
-    $('#feedback-warning').removeClass("hide");
-    return;
-  } else {
-    $('#feedback-warning').addClass("hide");
-  }
-
-  var htmlAttachment = null;
-
-  if (feedbackAttachScreenCapture) {
-    htmlAttachment    = '<html>';
-
-    htmlAttachment    += '<head>';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap-material-design.css" type="text/css">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/bootstrap.css" type="text/css">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/gene.d3.css" type="text/css">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/google-fonts.css" type="text/css">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/material-icons.css" type="text/css">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/selectize.css" type="text/css">';
-    htmlAttachment    += '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">';
-    htmlAttachment    += '<link rel="stylesheet" href="http://localhost/gene.iobio/assets/css/site.css" type="text/css">';
-    htmlAttachment    += '</head>';
-
-    htmlAttachment    += "<body style='margin-bottom:0px'>";
-
-
-    $('#feedback-screen-capture .pagination.bootpag .prev a').text("<<");
-    $('#feedback-screen-capture .pagination.bootpag .next a').text(">>");
-    $('#feedback-screen-capture #container').attr("width", "initial");
-
-    htmlAttachment    += '<div id="feedback-screen-capture">';
-    htmlAttachment    += $('#feedback-screen-capture').html();
-    htmlAttachment    += '</div>'
-    htmlAttachment    += '</body>'
-
-    htmlAttachment    += '</html>';
-  }
-
-  util.util.sendFeedbackEmail(name, email, note, htmlAttachment);
-  util.util.sendFeedbackReceivedEmail(email);
-
-  if (feedbackAttachScreenCapture) {
-    $('#feedback-screen-capture').empty();
-  }
-
-  $('#feedback-modal').modal('hide');
 }
 
 /*

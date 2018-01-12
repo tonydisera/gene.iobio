@@ -111,7 +111,7 @@ class GeneSearch {
       // Load all of the tracks for the gene's region.
       window.gene = theGeneObject;
 
-      adjustGeneRegion(window.gene);
+      geneModel.adjustGeneRegion(window.gene);
 
       // Add the gene badge
       genesCard.addGene(window.gene.gene_name);
@@ -121,7 +121,7 @@ class GeneSearch {
       // if the gene name was entered on the data dialog, enable/disable
       // the load button
       if (evt.currentTarget.id == 'enter-gene-name-data-dialog') {
-        enableLoadButton();
+        dataCard.enableLoadButton();
       }
 
       if (!validateGeneTranscripts()) {

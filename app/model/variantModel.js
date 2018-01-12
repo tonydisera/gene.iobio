@@ -28,10 +28,16 @@ function VariantModel() {
   this.lastVcfAlertify = null;
   this.lastBamAlertify = null;
 
+
+
+
+
   this.debugMe = false;
 
 
 }
+
+
 
 
 VariantModel.prototype.getSampleIdentifier = function(theSampleName) {

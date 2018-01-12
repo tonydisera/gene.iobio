@@ -267,7 +267,7 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
   // yet been visited.   Note:  showFreebayesSettingsDialog() is a
   // pass-through if global settings allowFreebayesSettings is set
   // to false.
-  if (analyzeCalledVariants && !fbSettings.visited) {
+  if (analyzeCalledVariants && !freebayesSettings.visited) {
     showFreebayesSettingsDialog(function() {
       me._analyzeAllImpl(analyzeCalledVariants)
     })
@@ -400,7 +400,7 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
       geneObject = data;
       me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
       me.geneBadgeLoaderDisplay.addGene(geneName, genesCard.pageNumberForGene(geneName));
-      adjustGeneRegion(geneObject);
+      geneModel.adjustGeneRegion(geneObject);
       transcript = geneModel.getCanonicalTranscript(geneObject);
 
       return geneModel.promiseMarkCodingRegions(geneObject, transcript);

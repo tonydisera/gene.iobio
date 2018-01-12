@@ -522,18 +522,18 @@ DataCard.prototype.addBuildListener = function() {
           if (success) {
             $('#select-build-box').removeClass("attention");
             $('#species-build-warning').addClass("hide");
-            window.enableLoadButton();
+            me.enableLoadButton();
           } else {
             $('#species-build-warning').html(message);
             $('#species-build-warning').removeClass("hide");
-            window.disableLoadButton();
+            me.disableLoadButton();
           }
         });
       } else {
         genomeBuildHelper.currentBuild = null;
         util.removeUrl("build");
         $('#build-link').text("?");
-        window.disableLoadButton();
+        me.disableLoadButton();
         setTimeout( function() {
           //$('#select-build-box .selectize-input').animateIt('tada');
           $('#select-build-box').addClass("attention");
@@ -554,10 +554,10 @@ DataCard.prototype.setDefaultBuildFromData = function() {
       if (buildsInData.length == 0) {
         $('#species-build-warning').addClass("hide");
         if (genomeBuildHelper.getCurrentBuild() == null) {
-          window.disableLoadButton();
+          me.disableLoadButton();
           $('#select-build')[0].selectize.clear();
         } else {
-          window.enableLoadButton();
+          me.enableLoadButton();
         }
 
       } else if (buildsInData.length == 1) {
@@ -574,12 +574,12 @@ DataCard.prototype.setDefaultBuildFromData = function() {
         me.addBuildListener();
 
         $('#species-build-warning').addClass("hide");
-        window.enableLoadButton();
+        me.enableLoadButton();
       } else {
         var message = genomeBuildHelper.formatIncompatibleBuildsMessage(buildsInData);
         $('#species-build-warning').html(message);
         $('#species-build-warning').removeClass("hide");
-        window.disableLoadButton();
+        me.disableLoadButton();
       }
     });
   }
@@ -854,7 +854,7 @@ DataCard.prototype.init = function() {
        // If we switched from a trio back to a single, clear out the mother and father
       // data
       if (me.mode == 'single') {
-        window.clearMotherFatherData();
+        me.clearMotherFatherData();
       }
 
       // Create variant cards for the affected and unaffected sibs.
@@ -946,6 +946,7 @@ DataCard.prototype.onBookmarkImportSource = function(radio) {
 
 
 DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
+  let me = this;
   if (!panelSelector) {
     panelSelector = $('#datasource-dialog');
   }
@@ -956,7 +957,7 @@ DataCard.prototype.onBamFileButtonClicked = function(panelSelector) {
   panelSelector.find('#bai-url-input').addClass('hide');
   panelSelector.find('#bai-url-input').val('');
 
-  window.disableLoadButton();
+  me.disableLoadButton();
 }
 
 DataCard.prototype.onBamFilesSelected = function(event) {
@@ -979,14 +980,15 @@ DataCard.prototype.onBamFilesSelected = function(event) {
 }
 
 DataCard.prototype.enableLoadButtonIfBuildSet = function(wiggleWhenEmpty) {
+  let me = this;
   if (genomeBuildHelper.getCurrentBuild()) {
-    window.enableLoadButton();
+    me.enableLoadButton();
   } else {
     if (wiggleWhenEmpty) {
       //$('#select-build-box .selectize-input').animateIt('tada');
       $('#select-build-box').addClass('attention');
     }
-    window.disableLoadButton();
+    me.disableLoadButton();
   }
 }
 
@@ -1033,7 +1035,7 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
       me.setDefaultBuildFromData();
       me.enableLoadButtonIfBuildSet(true);
     } else {
-      window.disableLoadButton();
+      me.disableLoadButton();
     }
 
     if (callback) {
@@ -1109,7 +1111,7 @@ DataCard.prototype.clearBamUrl = function(panelSelector) {
   panelSelector.find("#bam-file-info").val("");
   this.onBamUrlEntered(panelSelector);
 
-  window.enableLoadButton();
+  me.enableLoadButton();
 
 }
 
@@ -1183,10 +1185,11 @@ DataCard.prototype.clearUrl = function(panelSelector) {
   $('#unaffected-sibs-box').addClass('hide');
   $('#affected-sibs-box').addClass('hide');
   variantCard.clearVcf();
-  window.enableLoadButton();
+  me.enableLoadButton();
 }
 
 DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
+  let me = this;
   if (!panelSelector) {
     panelSelector = $('#datasource-dialog');
   }
@@ -1198,7 +1201,7 @@ DataCard.prototype.onVcfFileButtonClicked = function(panelSelector) {
   panelSelector.find('#url-tbi-input').val('');
 
 
-  window.disableLoadButton();
+  me.disableLoadButton();
 }
 
 DataCard.prototype.onVcfFilesSelected = function(event) {
@@ -1321,7 +1324,7 @@ DataCard.prototype.populateSampleDropdowns = function(variantCard, panelSelector
   } else {
     panelSelector.find('#vcf-sample-select-box').addClass("attention");
 
-    window.disableLoadButton();
+    me.disableLoadButton();
   }
 
   // When the sample name dropdown is selected
@@ -1409,7 +1412,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
         }
 
       } else {
-        window.disableLoadButton();
+        me.disableLoadButton();
       }
 
       if (callback) {
@@ -1495,5 +1498,116 @@ DataCard.prototype.setDataSourceRelationship = function(panelSelector) {
   var dsRelationship = panelSelector.find('#datasource-relationship').val();
   variantCard.setRelationship(dsRelationship);
   window.util.updateUrl('rel' + cardIndex, dsRelationship);
+}
+
+
+
+DataCard.prototype.enableLoadButton = function() {
+  let me = this;
+  var enable = false;
+
+  var cards = {};
+  variantCards.forEach(function(vc) {
+    cards[vc.getRelationship()] = vc;
+  });
+
+  if (dataCard.mode == 'single') {
+    if (cards['proband'].isReadyToLoad()) {
+      if (window.gene) {
+        $('#gene-name-data-dialog-box').removeClass("attention");
+        if (genomeBuildHelper.getCurrentBuild()) {
+          $('#select-build-box').removeClass("attention");
+          enable = true;
+        } else {
+          $('#select-build-box').addClass("attention");
+        }
+      } else {
+        $('#gene-name-data-dialog-box').addClass("attention");
+      }
+    }
+  } else if (dataCard.mode == 'trio') {
+    if (cards['proband'].isReadyToLoad() && cards['mother'].isReadyToLoad() && cards['father'].isReadyToLoad()) {
+      if (window.gene) {
+        $('#gene-name-data-dialog-box').removeClass("attention");
+        if (genomeBuildHelper.getCurrentBuild()) {
+          $('#select-build-box').removeClass("attention");
+          enable = true;
+        } else {
+          $('#select-build-box').addClass("attention");
+        }
+      } else {
+        $('#gene-name-data-dialog-box').addClass("attention");
+      }
+    }
+  }
+  if (enable) {
+    $('#data-card').find('#ok-button').removeClass("disabled");
+  } else {
+    $('#data-card').find('#ok-button').addClass("disabled");
+  }
+
+
+}
+
+DataCard.prototype.disableLoadButton = function() {
+  $('#data-card').find('#ok-button').addClass("disabled");
+}
+
+
+DataCard.prototype.toggleSampleTrio = function(show) {
+  let me = this;
+  if (show) {
+    me.mode = 'trio';
+    $('#mother-data').removeClass("hide");
+    $('#father-data').removeClass("hide");
+    if (Object.keys($('#proband-data #vcf-sample-select')[0].selectize.options).length > 0) {
+      $('#unaffected-sibs-box').removeClass("hide");
+      $('#affected-sibs-box').removeClass("hide");
+    } else {
+      $('#unaffected-sibs-box').addClass("hide");
+      $('#affected-sibs-box').addClass("hide");
+    }
+  } else {
+    me.mode = 'single';
+    $('#mother-data').addClass("hide");
+    $('#father-data').addClass("hide");
+    $('#unaffected-sibs-box').addClass("hide");
+    $('#affected-sibs-box').addClass("hide");
+    var motherCard = null;
+    var fatherCard = null;
+  }
+  me.enableLoadButton();
+
+}
+
+
+DataCard.prototype.clearMotherFatherData = function() {
+  let me = this;
+  var motherCard = null;
+  var fatherCard = null;
+  if (me.mode == 'single') {
+    variantCards.forEach( function(variantCard) {
+      if (variantCard.getRelationship() == 'mother') {
+        motherCard = variantCard;
+        motherCard.clearVcf();
+        motherCard.clearBam();
+        motherCard.hide();
+        $('#mother-data').find('#vcf-file-info').val('');
+        $('#mother-data').find('#vcf-url-input').val('');
+        util.removeUrl("vcf1");
+        util.removeUrl("bam1");
+      } else if (variantCard.getRelationship() == 'father') {
+        fatherCard = variantCard;
+        fatherCard.clearVcf();
+        fatherCard.clearBam();
+        fatherCard.hide();
+        $('#father-data').find('#vcf-file-info').val('');
+        $('#father-data').find('#vcf-url-input').val('');
+        util.removeUrl("vcf2");
+        util.removeUrl("bam2");
+      }
+    });
+  }
+
 }
 

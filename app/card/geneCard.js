@@ -165,6 +165,33 @@ class GeneCard {
     }
   }
 
+  onGeneLoading() {
+    let me = this;
+    $('#gene-track').removeClass("hide");
+    $('#gene-region-buffer-input').removeClass("hide");
+    $('#gene-plus-minus-label').removeClass("hide");
+    $('#transcript-btn-group').removeClass("hide");
+    d3.select("#region-chart .x.axis .tick text").style("text-anchor", "start");
+
+    $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
+    $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);
+    $('#gene-region').text(util.addCommas(window.gene.startOrig) + "-" + util.addCommas(window.gene.endOrig));
+
+
+    if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
+      $('#non-protein-coding #gene-type-badge').addClass("hide");
+    } else {
+      $('#non-protein-coding #gene-type-badge').removeClass("hide");
+      $('#non-protein-coding #gene-type-badge').text(window.gene.gene_type);
+    }
+
+    if (window.gene.strand == '-') {
+      $('#minus_strand').removeClass("hide");
+    } else {
+      $('#minus_strand').addClass("hide");
+    }
+  }
+
   showTranscripts(regionStart, regionEnd) {
     let me = this;
 
@@ -374,6 +401,20 @@ class GeneCard {
     if (isLevelBasic && $('#gene-summary').text() != summary ) {
       $('#gene-summary').html(summary);
     }
+  }
+
+
+
+  adjustGeneRegionBuffer() {
+    let me = this;
+    if (+$('#gene-region-buffer-input').val() > GENE_REGION_BUFFER_MAX) {
+      alert("Up to 50 kb upstream/downstream regions can be displayed.")
+    } else {
+      GENE_REGION_BUFFER = +$('#gene-region-buffer-input').val();
+      geneSearch.setValue(gene.gene_name, false, true);
+    }
+    cacheHelper.promiseClearCache();
+
   }
 
 

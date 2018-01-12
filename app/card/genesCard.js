@@ -2089,7 +2089,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
         return;
       }
 
-      adjustGeneRegion(window.gene);
+      geneModel.adjustGeneRegion(window.gene);
 
       window.selectedTranscript = geneModel.geneToLatestTranscript[window.gene.gene_name];
 

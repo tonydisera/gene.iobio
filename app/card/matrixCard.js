@@ -150,6 +150,18 @@ function MatrixCard() {
 
 }
 
+MatrixCard.prototype.onGeneLoading = function() {
+  $('#feature-matrix .tooltip').css("opacity", 0);
+  if (isLevelEdu) {
+    $('#rank-variants-title').text('Evaluated variants for ' + getProbandVariantCard().model.getName() );
+  } else if (isLevelBasic) {
+    $('#rank-variants-title').text('Table of Variants');
+  }
+  $("#feature-matrix").addClass("hide");
+  $("#feature-matrix-note").addClass("hide");
+  $('#matrix-track .warning').addClass("hide");
+}
+
 MatrixCard.prototype.setCellSize = function(sizeEnum) {
   var toggle = false;
   if (sizeEnum == 'small' && this.CELL_SIZE != this.CELL_SIZE_SMALL) {
