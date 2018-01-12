@@ -113,19 +113,6 @@ var fbSettings = {
 }
 
 
-
-// The smaller the region, the wider we can
-// make the rect of each variant
-var widthFactors = [
-  {'regionStart':     0, 'regionEnd':    8000,  'factor': 6},
-  {'regionStart':  8001, 'regionEnd':   10000,  'factor': 5},
-  {'regionStart': 10001, 'regionEnd':   15000,  'factor': 4},
-  {'regionStart': 15001, 'regionEnd':   20000,  'factor': 3},
-  {'regionStart': 20001, 'regionEnd':   30000,  'factor': 2},
-  {'regionStart': 30001, 'regionEnd': 90000000,  'factor': 1},
-];
-
-
 $(document).ready(function(){
 
 
