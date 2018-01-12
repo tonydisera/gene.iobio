@@ -517,7 +517,7 @@ class GeneModel {
       if (theGeneObject) {
         resolve(theGeneObject);
       } else {
-        promiseGetGeneObject(geneName).then(function(geneObject) {
+        me.promiseGetGeneObject(geneName).then(function(geneObject) {
           resolve(geneObject);
         },
         function(error) {
@@ -544,7 +544,7 @@ class GeneModel {
       $('#build-link').text(buildName);
 
 
-      url += "?source="  + geneModel.geneSource;
+      url += "?source="  + (me.geneSource ? me.geneSource : siteGeneSource);
       url += "&species=" + genomeBuildHelper.getCurrentSpeciesLatinName();
       url += "&build="   + buildName;
 
@@ -577,6 +577,7 @@ class GeneModel {
 
     });
   }
+
   isKnownGene(geneName) {
     return this.allKnownGeneNames[geneName] || this.allKnownGeneNames[geneName.toUpperCase()]
   }

@@ -1095,6 +1095,7 @@ GenesCard.prototype._parsePhenolyzerData = function(data, selectedEnd, numberPhe
 }
 
 GenesCard.prototype.isPhenolyzerGene = function(geneName) {
+  let me = this;
   var foundGenes = me.phenolyzerGenes.filter( function(phenGene) {
     return phenGene.selected && phenGene.geneName == geneName;
   });

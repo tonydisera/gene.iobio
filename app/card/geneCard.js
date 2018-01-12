@@ -192,6 +192,99 @@ class GeneCard {
     }
   }
 
+  onGeneNameSelected(geneName, currentTarget, loadFromUrl, callback) {
+    let me = this;
+
+    me.geneModel.promiseGetGeneObject(geneName)
+    .then( function(theGeneObject) {
+      // We have successfully return the gene model data.
+      // Load all of the tracks for the gene's region.
+      window.gene = theGeneObject;
+
+      me.geneModel.adjustGeneRegion(window.gene);
+
+      // Add the gene badge
+      genesCard.addGene(window.gene.gene_name);
+      cacheHelper.showAnalyzeAllProgress();
+
+
+      // if the gene name was entered on the data dialog, enable/disable
+      // the load button
+      if (currentTarget == 'enter-gene-name-data-dialog') {
+        dataCard.enableLoadButton();
+      }
+
+      if (!validateGeneTranscripts()) {
+        return;
+      }
+
+      window.selectedTranscript = me.geneModel.geneToLatestTranscript[window.gene.gene_name];
+
+
+      if (loadFromUrl) {
+
+        var bam  = util.getUrlParameter(/(bam)*/);
+        var vcf  = util.getUrlParameter(/(vcf)*/);
+
+
+        if (bam == null && vcf == null) {
+          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
+          if (isLevelEdu) {
+            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+              showSidebar("Phenolyzer");
+            }
+          } else if (isLevelBasic) {
+            showSidebar("Phenolyzer");
+          }
+        }
+
+
+        if (bam == null && vcf == null) {
+          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
+          if (isLevelEdu) {
+            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
+              showSidebar("Phenolyzer");
+            }
+          }
+        }
+
+        if (!isOffline) {
+            genesCard.updateGeneInfoLink(window.gene.gene_name);
+        }
+
+          // Autoload data specified in url
+        loadUrlSources();
+
+        enableCallVariantsButton();
+
+      } else {
+
+        genesCard.setSelectedGene(window.gene.gene_name);
+
+        // Only load the variant data if the gene name was NOT entered
+        // on the data dialog.
+        if (currentTarget != 'enter-gene-name-data-dialog') {
+            loadTracksForGene();
+        }
+
+        // add gene to url params
+        util.updateUrl('gene', window.gene.gene_name);
+
+        if (!isOffline) {
+          genesCard.updateGeneInfoLink(window.gene.gene_name);
+        }
+
+        if(callback != undefined) callback();
+      }
+
+
+    }, function(error) {
+      alertify.alert(error);
+      genesCard.removeGeneBadgeByName(geneName);
+
+    });
+  }
+
   showTranscripts(regionStart, regionEnd) {
     let me = this;
 

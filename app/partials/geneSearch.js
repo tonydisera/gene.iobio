@@ -10,11 +10,14 @@ class GeneSearch {
       limit: 200
     });
 
+    this.onSelectFunc = null;
+
 
   }
 
-  init(callback) {
+  init() {
     let me = this;
+
 
     // kicks off the loading/processing of `local` and `prefetch`
     me.geneTypeahead.initialize();
@@ -63,16 +66,45 @@ class GeneSearch {
     });
 
     typeahead.on('typeahead:selected',function(evt,data){
-      me.onGeneNameEntered(evt,data);
+      me._onSelection(evt,data);
     });
     typeaheadDataDialog.on('typeahead:selected',function(evt,data){
-      me.onGeneNameEntered(evt,data);
+      me._onSelection(evt,data);
     });
 
 
     me.getGeneBloodhoundElement().focus();
 
   }
+
+  onSelect(func) {
+    let me = this;
+    me.onSelectFunc = func;
+  }
+
+  _onSelection(evt, data) {
+    let me = this;
+
+    // Ignore second event triggered by loading gene widget from url parameter
+    if (data.loadFromUrl && loadedUrl) {
+      return;
+    } else if (data.loadFromUrl) {
+      loadedUrl = true;
+    }
+
+    var theGeneName = data.name;
+
+    if (me.onSelectFunc) {
+      me.onSelectFunc(data.name, evt.currentTarget.id, data.loadFromUrl, function() {
+        me.setValue(data.name);
+        if (data.callback) {
+          data.callback();
+        }
+      } );
+    }
+
+  }
+
 
   promiseLoad() {
     let me = this;
@@ -90,110 +122,7 @@ class GeneSearch {
   }
 
 
-  onGeneNameEntered(evt,data) {
-    let me = this;
-    // Ignore second event triggered by loading gene widget from url parameter
-    if (data.loadFromUrl && loadedUrl) {
-      return;
-    } else if (data.loadFromUrl) {
-      loadedUrl = true;
-    }
 
-    var theGeneName = data.name;
-
-    // If necessary, switch from gencode to refseq or vice versa if this gene
-    // only has transcripts in only one of the gene sets
-    geneCard.checkGeneSource(theGeneName);
-
-    geneModel.promiseGetGeneObject(data.name)
-    .then( function(theGeneObject) {
-      // We have successfully return the gene model data.
-      // Load all of the tracks for the gene's region.
-      window.gene = theGeneObject;
-
-      geneModel.adjustGeneRegion(window.gene);
-
-      // Add the gene badge
-      genesCard.addGene(window.gene.gene_name);
-      cacheHelper.showAnalyzeAllProgress();
-
-
-      // if the gene name was entered on the data dialog, enable/disable
-      // the load button
-      if (evt.currentTarget.id == 'enter-gene-name-data-dialog') {
-        dataCard.enableLoadButton();
-      }
-
-      if (!validateGeneTranscripts()) {
-        return;
-      }
-
-      // set all searches to correct gene
-      me.setValue(window.gene.gene_name);
-      window.selectedTranscript = geneModel.geneToLatestTranscript[window.gene.gene_name];
-
-
-      if (data.loadFromUrl) {
-
-        var bam  = util.getUrlParameter(/(bam)*/);
-        var vcf  = util.getUrlParameter(/(vcf)*/);
-
-
-        if (bam == null && vcf == null) {
-          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
-          if (isLevelEdu) {
-            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-              showSidebar("Phenolyzer");
-            }
-          } else if (isLevelBasic) {
-            showSidebar("Phenolyzer");
-          }
-        }
-
-
-        if (bam == null && vcf == null) {
-          // Open the 'About' sidebar by default if there is no data loaded when gene is launched
-          if (isLevelEdu) {
-            if (!isLevelEdu || eduTourShowPhenolyzer[+eduTourNumber-1]) {
-              showSidebar("Phenolyzer");
-            }
-          }
-        }
-
-        if (!isOffline) {
-            genesCard.updateGeneInfoLink(window.gene.gene_name);
-        }
-
-          // Autoload data specified in url
-        loadUrlSources();
-
-        enableCallVariantsButton();
-      } else {
-          genesCard.setSelectedGene(window.gene.gene_name);
-
-          // Only load the variant data if the gene name was NOT entered
-          // on the data dialog.
-          if (evt.currentTarget.id != 'enter-gene-name-data-dialog') {
-              loadTracksForGene();
-          }
-
-            // add gene to url params
-            util.updateUrl('gene', window.gene.gene_name);
-
-            if (!isOffline) {
-              genesCard.updateGeneInfoLink(window.gene.gene_name);
-            }
-
-            if(data.callback != undefined) data.callback();
-      }
-
-
-    }, function(error) {
-      alertify.alert(error);
-      genesCard.removeGeneBadgeByName(theGeneName);
-
-    });
-  }
 
   setValue(geneName, loadFromUrl, trigger) {
     let me = this;

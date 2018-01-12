@@ -9,6 +9,7 @@ var siteConfig = {};
 
 var util = new Util();
 var templateUtil = new TemplateUtil();
+
 var exhibitTimeout = new Timeout("exhibit.html", exhibitStartOver);
 
 
@@ -407,6 +408,9 @@ function init() {
 
   // Initialize gene search widget
   geneSearch.init();
+  geneSearch.onSelect(function(geneName, currentTarget, loadFromUrl, callback) {
+    geneCard.onGeneNameSelected(geneName, currentTarget, loadFromUrl, callback)
+  });
 
   // Load the gene search widget with all of the gene names
   geneSearch.promiseLoad().then(function() {
@@ -490,12 +494,12 @@ function validateGeneTranscripts() {
     $('#gene-viz svg').remove();
     $('#transcript-menu svg').remove();
     $('#transcript-dropdown-button').html("&nbsp;");
-      $('#gene-chr').text(window.gene.chr);
-      $('#gene-name').text(window.gene.gene_name);
-      $('#gene-region').text(util.addCommas(window.gene.start) + "-" + util.addCommas(window.gene.end));
-      genesCard.hideGeneBadgeLoading(window.gene.gene_name);
-      genesCard.setGeneBadgeError(window.gene.gene_name);
-      return false;
+    $('#gene-chr').text(window.gene.chr);
+    $('#gene-name').text(window.gene.gene_name);
+    $('#gene-region').text(util.addCommas(window.gene.start) + "-" + util.addCommas(window.gene.end));
+    genesCard.hideGeneBadgeLoading(window.gene.gene_name);
+    genesCard.setGeneBadgeError(window.gene.gene_name);
+    return false;
   } else {
     return true;
   }
@@ -824,7 +828,9 @@ function loadGeneFromUrl() {
   var theGeneSource = util.getUrlParameter("geneSource");
   if (theGeneSource != null && theGeneSource != "") {
     siteGeneSource = theGeneSource;
-    switchGeneSource(theGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+    geneCard.switchGeneSource(theGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
+  } else {
+    geneCard.switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
   }
 
   var batchSize = util.getUrlParameter("batchSize");
