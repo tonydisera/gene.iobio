@@ -32,7 +32,8 @@ $(document).ready(function() {
   });
 
     if (hasTimeout) {
-    checkForInactivity();
+      var timeout = new Timeout("exhibit.html", startOver);
+      timeout.checkForInactivity();
     }
 
 });
@@ -81,6 +82,9 @@ function showCaseStudies() {
   var url = "exhibit-cases.html"
   window.location.href = url;
 
+}
+function startOver() {
+  window.location.href = EXHIBIT_URL;
 }
 
 function getUrlParameter(sParam) {

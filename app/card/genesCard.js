@@ -618,11 +618,11 @@ GenesCard.prototype._goToPage = function(pageNumber, theGeneNames) {
 
 }
 
-GenesCard.prototype._initPaging = function(theGeneNames, startOver) {
+GenesCard.prototype._initPaging = function(theGeneNames, exhibitStartOver) {
   var me = this;
   var pageCount = Math.ceil(theGeneNames.length / this.GENES_PER_PAGE);
   if (theGeneNames.length > this.GENES_PER_PAGE) {
-    this.currentPageNumber = startOver ? 1 : Math.min(me.currentPageNumber, pageCount);
+    this.currentPageNumber = exhibitStartOver ? 1 : Math.min(me.currentPageNumber, pageCount);
     $('#gene-page-control').removeClass("hide");
     $('#gene-paging-links').removeClass("hide");
     $('#gene-badge-container').addClass("page-control")

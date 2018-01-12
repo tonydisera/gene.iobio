@@ -18,6 +18,7 @@ var siteConfig = {};
 
 var util = new Util();
 var templateUtil = new TemplateUtil();
+var exhibitTimeout = new Timeout("exhibit.html", exhibitStartOver);
 
 
 // The selected (sub-) region of the gene.  Null
@@ -458,7 +459,7 @@ function init() {
   // In cases where timeout=true, restart app after n seconds of inactivity
   // (e.g. no mouse move, button click, etc.).
   if (hasTimeout) {
-    checkForInactivity();
+    exhibitTimeout.checkForInactivity();
   }
 
   if (feedbackEmails != undefined && feedbackEmails != "") {
@@ -3077,3 +3078,6 @@ findRareVariants = function() {
     xhr.send(formData);  // multipart/form-data
 }
 
+function exhibitStartOver() {
+  window.location.href = EXHIBIT_URL;
+}
