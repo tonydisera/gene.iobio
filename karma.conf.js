@@ -22,6 +22,7 @@ module.exports = function(config) {
         'app/globalsDeployment.js',
         'app/globals.js',
         'app/util/*.js',
+        'app/partials/geneSearch.js',
         'app/bam.iobio.js',
         'app/eduTour.js',
         'app/exhibit.js',
