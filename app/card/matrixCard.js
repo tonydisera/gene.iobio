@@ -1614,11 +1614,11 @@ MatrixCard.prototype.getImpactRank = function(variant, highestImpactVep) {
 }
 
 MatrixCard.prototype.formatAlleleFrequencyPercentage = function(variant, value) {
-  return value && value != "" && +value >= 0 ? util.round(+value * 100, 2) + "%" : "";
+  return value && value != "" && +value >= 0 ? utility.round(+value * 100, 2) + "%" : "";
 }
 
 MatrixCard.prototype.formatCanonicalTranscript = function(variant, value) {
-  return util.stripTranscriptPrefix(selectedTranscript.transcript_id);
+  return utility.stripTranscriptPrefix(selectedTranscript.transcript_id);
 }
 
 MatrixCard.prototype.formatHgvsP = function(variant, value) {
@@ -1634,7 +1634,7 @@ MatrixCard.prototype.formatHgvsP = function(variant, value) {
       if (tokens.length == 2) {
         var basicNotation = "p." + tokens[1];
         buf += basicNotation;
-      } else if (tokens.length == 1 && util.endsWith(tokens[0],"(p.=)")) {
+      } else if (tokens.length == 1 && utility.endsWith(tokens[0],"(p.=)")) {
         // If synoymous variants, show p.(=) in cell
         if (variant.vepConsequence && Object.keys(variant.vepConsequence).length > 0) {
           for( consequence in variant.vepConsequence) {
@@ -1670,7 +1670,7 @@ MatrixCard.prototype.formatHgvsC = function(variant, value) {
 }
 
 MatrixCard.prototype.formatAfHighest = function(variant, afField) {
-  return afField && afField.length > 0 && +variant[afField] < .1 ? util.percentage(variant[afField], false) : "";
+  return afField && afField.length > 0 && +variant[afField] < .1 ? utility.percentage(variant[afField], false) : "";
 }
 
 MatrixCard.prototype.formatInheritance = function(variant, value) {

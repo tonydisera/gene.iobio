@@ -98,8 +98,8 @@ class Feedback {
       htmlAttachment    += '</html>';
     }
 
-    util.sendFeedbackEmail(name, email, note, htmlAttachment);
-    util.sendFeedbackReceivedEmail(email);
+    utility.sendFeedbackEmail(name, email, note, htmlAttachment);
+    utility.sendFeedbackReceivedEmail(email);
 
     if (feedbackAttachScreenCapture) {
       $('#feedback-screen-capture').empty();

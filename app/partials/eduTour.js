@@ -554,7 +554,7 @@ class EduTour {
   completeTour() {
     let me = this;
     if (isLevelEdu) {
-      var completedTour = util.getUrlParameter("completedTour");
+      var completedTour = utility.getUrlParameter("completedTour");
       var url = null;
       if (completedTour != null && completedTour != "") {
         url = EXHIBIT_URL2;

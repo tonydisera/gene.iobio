@@ -7,7 +7,7 @@
 var siteConfig = {};
 
 
-var util = new Util();
+var utility = new Util();
 var templateUtil = new TemplateUtil();
 
 var exhibitTimeout = new Timeout("exhibit.html", exhibitStartOver);
@@ -110,10 +110,10 @@ $(document).ready(function(){
 
   determineStyle();
 
-  if (util.detectIE() != false) {
+  if (utility.detectIE() != false) {
     alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
     alertify.alert("Warning. Gene.iobio has not been tested and verified on Internet Explorer.  Use the Google Chrome browser for the best performance of gene.iobio.");
-  } else if (!util.isChrome()) {
+  } else if (!utility.isChrome()) {
     alertify.alert("Use the Google Chrome browser for the best performance of gene.iobio.");
   }
 
@@ -146,7 +146,7 @@ $(document).ready(function(){
    })
    .then(function() {
     // Instantiate helper class than encapsulates IOBIO commands
-    endpoint = new EndpointCmd(useSSL, IOBIO, cacheHelper.launchTimestamp, genomeBuildHelper, util.getHumanRefNames)
+    endpoint = new EndpointCmd(useSSL, IOBIO, cacheHelper.launchTimestamp, genomeBuildHelper, utility.getHumanRefNames)
 
     return cacheHelper.promiseCheckCacheSize();
    })
@@ -242,34 +242,34 @@ function promiseLoadSiteConfig() {
 function appendHubFileNamesToURL(res) {
   res.data.forEach(function(file) {
     var {uri, name, type } = file;
-    util.updateUrl(type+"0", uri);
-    util.updateUrl("name0", name.split(".")[0]);
-    util.updateUrl("sample0", name.split(".")[0]);
-    util.updateUrl("genes","RAI1,AIRE,MYLK2,PDGFB,PDHA1");
-    util.updateUrl("gene","RAI1");
-    util.updateUrl("build","GRCh37");
+    utility.updateUrl(type+"0", uri);
+    utility.updateUrl("name0", name.split(".")[0]);
+    utility.updateUrl("sample0", name.split(".")[0]);
+    utility.updateUrl("genes","RAI1,AIRE,MYLK2,PDGFB,PDHA1");
+    utility.updateUrl("gene","RAI1");
+    utility.updateUrl("build","GRCh37");
   })
 }
 
 
 function determineStyle() {
 
-  var mygene2Parm = util.getUrlParameter("mygene2");
+  var mygene2Parm = utility.getUrlParameter("mygene2");
   if ( mygene2Parm && mygene2Parm != "" ) {
     isMygene2   = mygene2Parm == "false" || mygene2Parm.toUpperCase() == "N" ? false : true;
   }
-  var modeParm = util.getUrlParameter("mode");
+  var modeParm = utility.getUrlParameter("mode");
   if (modeParm && modeParm != "") {
     isLevelBasic     = modeParm == "basic" ? true : false;
     isLevelEdu       = (modeParm == "edu" || modeParm == "edutour") ? true : false;
   }
 
   if (isLevelEdu) {
-    util.changeSiteStylesheet("assets/css/site-edu.css");
+    utility.changeSiteStylesheet("assets/css/site-edu.css");
   } else if (isMygene2 && isLevelBasic) {
-    util.changeSiteStylesheet("assets/css/site-mygene2-basic.css");
+    utility.changeSiteStylesheet("assets/css/site-mygene2-basic.css");
   } else if (isMygene2) {
-    util.changeSiteStylesheet("assets/css/site-mygene2-advanced.css");
+    utility.changeSiteStylesheet("assets/css/site-mygene2-advanced.css");
   }
 
 }
@@ -320,7 +320,7 @@ function init() {
 
   // If we are using the gene.iobio education tour edition, automatically load
   // exhibit.html. Only do this automatically if the tour parameter hasn't been provided.
-  if (isLevelEdu && !util.getUrlParameter("tour")) {
+  if (isLevelEdu && !utility.getUrlParameter("tour")) {
     var exhibitUrl = window.location.protocol + "\/\/" + window.location.hostname + window.location.pathname + "exhibit.html";
     window.location.assign(exhibitUrl);
     return;
@@ -335,7 +335,7 @@ function init() {
   // Set version number on About menu and the Version dialog
   $('.version-number').text(version);
 
-  eduTourNumber = util.getUrlParameter("tour");
+  eduTourNumber = utility.getUrlParameter("tour");
   if (eduTourNumber == null || eduTourNumber == "") {
     eduTourNumber = "0";
   }
@@ -499,7 +499,7 @@ function validateGeneTranscripts() {
     $('#transcript-dropdown-button').html("&nbsp;");
     $('#gene-chr').text(window.gene.chr);
     $('#gene-name').text(window.gene.gene_name);
-    $('#gene-region').text(util.addCommas(window.gene.start) + "-" + util.addCommas(window.gene.end));
+    $('#gene-region').text(utility.addCommas(window.gene.start) + "-" + utility.addCommas(window.gene.end));
     genesCard.hideGeneBadgeLoading(window.gene.gene_name);
     genesCard.setGeneBadgeError(window.gene.gene_name);
     return false;
@@ -673,7 +673,7 @@ function showSidebar(sidebar) {
     $('#container').toggleClass('slide-left');
     $('#gene-track').css("left", "0px");
 
-    var transitionEvent = util.whichTransitionEvent();
+    var transitionEvent = utility.whichTransitionEvent();
     $('.slide-left').one(transitionEvent, function(event) {
       $('#slider-left').trigger("open");
     });
@@ -779,7 +779,7 @@ function closeSlideLeft() {
 
   resizeCardWidths();
 
-  var transitionEvent = util.whichTransitionEvent();
+  var transitionEvent = utility.whichTransitionEvent();
   $('#container').one(transitionEvent, function(event) {
     $('#slider-left').trigger("close");
   });
@@ -810,25 +810,25 @@ function getVariantCard(relationship) {
 
 function loadGeneFromUrl() {
   // Get the species
-  var species = util.getUrlParameter('species');
+  var species = utility.getUrlParameter('species');
   if (species != null && species != "") {
     dataCard.setCurrentSpecies(species);
   }
 
   // Get the genome build
-  var build = util.getUrlParameter('build');
+  var build = utility.getUrlParameter('build');
   if (build != null && build != "") {
     dataCard.setCurrentBuild(build);
   }
 
 
   // Get the gene parameter
-  var geneName = util.getUrlParameter('gene');
+  var geneName = utility.getUrlParameter('gene');
   if (geneName) {
     geneName = geneName.toUpperCase();
   }
 
-  var theGeneSource = util.getUrlParameter("geneSource");
+  var theGeneSource = utility.getUrlParameter("geneSource");
   if (theGeneSource != null && theGeneSource != "") {
     siteGeneSource = theGeneSource;
     geneCard.switchGeneSource(theGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
@@ -836,7 +836,7 @@ function loadGeneFromUrl() {
     geneCard.switchGeneSource(siteGeneSource.toLowerCase() == 'refseq' ? "RefSeq Transcript" : "Gencode Transcript");
   }
 
-  var batchSize = util.getUrlParameter("batchSize");
+  var batchSize = utility.getUrlParameter("batchSize");
   if (batchSize != null && batchSize != "") {
     DEFAULT_BATCH_SIZE = batchSize;
   }
@@ -905,7 +905,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 
 
   // If a gene list name was provided (e.g. ACMG, load these genes)
-  var geneList = util.getUrlParameter("geneList");
+  var geneList = utility.getUrlParameter("geneList");
   if (geneList != null && geneList.length > 0 && geneList == 'ACMG56') {
     genesCard.ACMG_GENES.sort().forEach(function(geneName) {
       if ( genesCard.geneNames.indexOf(geneName.toUpperCase()) < 0 ) {
@@ -916,7 +916,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 
   // Get the gene list from the url.  Add the gene badges, selecting
   // the gene that was passed in the url parameter
-  var genes = util.getUrlParameter("genes");
+  var genes = utility.getUrlParameter("genes");
   if (genes != null && genes.length > 0) {
     genes.split(",").forEach( function(geneName) {
       if ( genesCard.geneNames.indexOf(geneName) < 0 ) {
@@ -945,7 +945,7 @@ function loadGeneNamesFromUrl(geneNameToSelect) {
 function reloadGeneFromUrl() {
 
   // Get the gene parameger
-  var gene = util.getUrlParameter('gene');
+  var gene = utility.getUrlParameter('gene');
 
   // Get the gene list from the url.  Add the gene badges, selecting
   // the gene that was passed in the url parameter
@@ -959,8 +959,8 @@ function reloadGeneFromUrl() {
 
 function showWelcomePanel() {
 
-  var bam  = util.getUrlParameter(/(bam)*/);
-  var vcf  = util.getUrlParameter(/(vcf)*/);
+  var bam  = utility.getUrlParameter(/(bam)*/);
+  var vcf  = utility.getUrlParameter(/(vcf)*/);
 
   var bamCount = bam != null ? Object.keys(bam).length : 0;
   var vcfCount = vcf != null ? Object.keys(vcf).length : 0;
@@ -976,16 +976,16 @@ function showWelcomePanel() {
 
 function loadUrlSources() {
 
-  var bam      = util.getUrlParameter(/(bam)*/);
-  var bai      = util.getUrlParameter(/(bai)*/);
-  var vcf      = util.getUrlParameter(/(vcf)*/);
-  var tbi      = util.getUrlParameter(/(tbi)*/);
-  var rel      = util.getUrlParameter(/(rel)*/);
-  var affected = util.getUrlParameter(/(affectedStatus)*/);
-  var dsname   = util.getUrlParameter(/(name)*/);
-  var sample   = util.getUrlParameter(/(sample)*/);
-  var affectedSibsString = util.getUrlParameter("affectedSibs");
-  var unaffectedSibsString = util.getUrlParameter("unaffectedSibs");
+  var bam      = utility.getUrlParameter(/(bam)*/);
+  var bai      = utility.getUrlParameter(/(bai)*/);
+  var vcf      = utility.getUrlParameter(/(vcf)*/);
+  var tbi      = utility.getUrlParameter(/(tbi)*/);
+  var rel      = utility.getUrlParameter(/(rel)*/);
+  var affected = utility.getUrlParameter(/(affectedStatus)*/);
+  var dsname   = utility.getUrlParameter(/(name)*/);
+  var sample   = utility.getUrlParameter(/(sample)*/);
+  var affectedSibsString = utility.getUrlParameter("affectedSibs");
+  var unaffectedSibsString = utility.getUrlParameter("unaffectedSibs");
 
 
   // Initialize transcript chart and variant cards, but hold off on displaying
@@ -1075,7 +1075,7 @@ function loadUrlSources() {
             // When vcf Url was entered, sample dropdown was cleared and resulted
             // in the url parameter sample# getting clear.  Re-establish the
             // url to the pre- onVcfUrlUpdated parameters
-            util.updateUrl('sample'+cardIndex, sampleName);
+            utility.updateUrl('sample'+cardIndex, sampleName);
           });
 
         }
@@ -1104,12 +1104,12 @@ function loadUrlSources() {
   if (vcf != null) {
     Object.keys(vcf).forEach(function(urlParameter) {
       var cardIndex = urlParameter.substring(3);
-      var tbiUrl    = tbi && Object.keys(tbi).length > 0 ? util.decodeUrl(tbi["tbi"+cardIndex]) : null;
+      var tbiUrl    = tbi && Object.keys(tbi).length > 0 ? utility.decodeUrl(tbi["tbi"+cardIndex]) : null;
       var variantCard      = variantCards[+cardIndex];
       if (variantCard) {
         var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
         var panelSelector    = $(panelSelectorStr);
-        var vcfUrl = util.decodeUrl(vcf[urlParameter]);
+        var vcfUrl = utility.decodeUrl(vcf[urlParameter]);
         panelSelector.find('#url-input').val(vcfUrl);
         panelSelector.find('#url-input').removeClass("hide");
         if (tbiUrl && tbiUrl != "") {
@@ -1131,12 +1131,12 @@ function loadUrlSources() {
   if (bam != null) {
     Object.keys(bam).forEach(function(urlParameter) {
       var cardIndex = urlParameter.substring(3);
-      var baiUrl    = bai && Object.keys(bai).length > 0 ? util.decodeUrl(bai["bai"+cardIndex]) : null;
+      var baiUrl    = bai && Object.keys(bai).length > 0 ? utility.decodeUrl(bai["bai"+cardIndex]) : null;
       var variantCard      = variantCards[+cardIndex];
       if (variantCard) {
         var panelSelectorStr = '#' + variantCard.getRelationship() +  "-data";
         var panelSelector    = $(panelSelectorStr);
-        panelSelector.find('#bam-url-input').val(util.decodeUrl(bam[urlParameter]));
+        panelSelector.find('#bam-url-input').val(utility.decodeUrl(bam[urlParameter]));
         panelSelector.find('#bam-url-input').removeClass("hide");
         if (baiUrl && baiUrl != "") {
           panelSelector.find('#bai-url-input').val(baiUrl);
@@ -1177,15 +1177,15 @@ function hasDataSources() {
 
 
 function switchToAdvancedMode() {
-  util.changeSiteStylesheet("css/assets/site-mygene2-advanced.css");
-  util.updateUrl("mygene2", "true");
-  util.updateUrl("mode",    "advanced");
+  utility.changeSiteStylesheet("css/assets/site-mygene2-advanced.css");
+  utility.updateUrl("mygene2", "true");
+  utility.updateUrl("mode",    "advanced");
   location.reload();
 }
 function switchToBasicMode() {
-  util.changeSiteStylesheet("css/assets/mygene2-basic.css");
-  util.updateUrl("mygene2",  "true");
-  util.updateUrl("mode",     "basic");
+  utility.changeSiteStylesheet("css/assets/mygene2-basic.css");
+  utility.updateUrl("mygene2",  "true");
+  utility.updateUrl("mode",     "basic");
   location.reload();
 }
 
@@ -1211,8 +1211,8 @@ function loadTracksForGene(bypassVariantCards, callback) {
 
   window.regionStart = null;
   window.regionEnd = null;
-  window.gene.regionStart = util.formatRegion(window.gene.start);
-  window.gene.regionEnd   = util.formatRegion(window.gene.end);
+  window.gene.regionStart = utility.formatRegion(window.gene.start);
+  window.gene.regionEnd   = utility.formatRegion(window.gene.end);
   window.regionStart = window.gene.start;
   window.regionEnd   = window.gene.end;
 

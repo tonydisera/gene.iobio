@@ -175,50 +175,50 @@ DataCard.prototype.loadDemoData = function() {
   window.loadSibs(affectedSibIds, 'affected');
   window.loadSibs(unaffectedSibIds, 'unaffected');
 
-  window.util.updateUrl("build", me.demoBuild);
+  window.utilility.updateUrl("build", me.demoBuild);
   genomeBuildHelper.setCurrentBuild(me.demoBuild);
   $('#select-build-box').removeClass("attention");
 
 
-  window.util.updateUrl('rel0', "proband");
-  window.util.updateUrl('rel1', "mother");
-  window.util.updateUrl('rel2', "father");
+  window.utility.updateUrl('rel0', "proband");
+  window.utility.updateUrl('rel1', "mother");
+  window.utility.updateUrl('rel2', "father");
 
-  window.util.updateUrl('name0', this.demoNames.proband);
-  window.util.updateUrl('vcf0',  this.demoUrls.proband);
-  window.util.updateUrl("tbi0", "");
+  window.utility.updateUrl('name0', this.demoNames.proband);
+  window.utility.updateUrl('vcf0',  this.demoUrls.proband);
+  window.utility.updateUrl("tbi0", "");
   if (!window.isLevelEdu) {
-    window.util.updateUrl('bam0',  this.demoBamUrls.proband);
-    window.util.updateUrl('bai0',  "");
+    window.utility.updateUrl('bam0',  this.demoBamUrls.proband);
+    window.utility.updateUrl('bai0',  "");
   }
-  window.util.updateUrl('sample0',  this.demoSampleNames.proband);
+  window.utility.updateUrl('sample0',  this.demoSampleNames.proband);
 
   if (this.demoCards.mother) {
-    window.util.updateUrl('name1', this.demoNames.mother);
-    window.util.updateUrl('vcf1',  this.demoUrls.mother);
-    window.util.updateUrl('tbi1',  "");
+    window.utility.updateUrl('name1', this.demoNames.mother);
+    window.utility.updateUrl('vcf1',  this.demoUrls.mother);
+    window.utility.updateUrl('tbi1',  "");
     if (!window.isLevelEdu) {
-      window.util.updateUrl('bam1',  this.demoBamUrls.mother);
-      window.util.updateUrl('bai1',  "");
+      window.utility.updateUrl('bam1',  this.demoBamUrls.mother);
+      window.utility.updateUrl('bai1',  "");
     }
-    window.util.updateUrl('sample1',  this.demoSampleNames.mother);
+    window.utility.updateUrl('sample1',  this.demoSampleNames.mother);
   }
 
   if (this.demoNames.father) {
-    window.util.updateUrl('name2', this.demoNames.father);
-    window.util.updateUrl('vcf2',  this.demoUrls.father);
-    window.util.updateUrl('tbi2',  "");
+    window.utility.updateUrl('name2', this.demoNames.father);
+    window.utility.updateUrl('vcf2',  this.demoUrls.father);
+    window.utility.updateUrl('tbi2',  "");
     if (!window.isLevelEdu) {
-      window.util.updateUrl('bam2',  this.demoBamUrls.father);
-      window.util.updateUrl('bai2',  "");
+      window.utility.updateUrl('bam2',  this.demoBamUrls.father);
+      window.utility.updateUrl('bai2',  "");
     }
-    window.util.updateUrl('sample2',  this.demoSampleNames.father);
+    window.utility.updateUrl('sample2',  this.demoSampleNames.father);
   }
 
 
   if (!window.isLevelEdu) {
-    window.util.updateUrl("gene", me.demoGenes[0]);
-    window.util.updateUrl("genes", me.demoGenes.join(","));
+    window.utility.updateUrl("gene", me.demoGenes[0]);
+    window.utility.updateUrl("genes", me.demoGenes.join(","));
 
     cacheHelper.promiseClearCache()
     .then(function() {
@@ -228,8 +228,8 @@ DataCard.prototype.loadDemoData = function() {
     })
   } else if (window.isLevelEdu && this.eduTourGenes[+eduTourNumber].length > 0) {
     var theGenes       = me.eduTourGenes[+eduTourNumber];
-    window.util.updateUrl("gene", theGenes[0]);
-    window.util.updateUrl("genes", theGenes.join(",") );
+    window.utility.updateUrl("gene", theGenes[0]);
+    window.utility.updateUrl("genes", theGenes.join(",") );
 
     me.mode = "single";
     genomeBuildHelper.setCurrentBuild(me.demoBuild);
@@ -277,7 +277,7 @@ DataCard.prototype.loadMygene2Data = function() {
       validationMsg += "<br>&nbsp;&nbsp;Missing site configuration field 'xAuthToken'. ";
     }
   }
-  var fileId = util.getUrlParameter("fileId");
+  var fileId = utility.getUrlParameter("fileId");
   if (fileId == null || fileId == "") {
     validationMsg += "<br>&nbsp;&nbsp;Missing request parameter 'fileId'."
   }
@@ -487,7 +487,7 @@ DataCard.prototype.addSpeciesListener = function() {
             return;
           }
           genomeBuildHelper.setCurrentSpecies(value);
-          util.updateUrl("species", value);
+          utility.updateUrl("species", value);
           var selectizeBuild = $('#select-build')[0].selectize;
           selectizeBuild.disable();
           selectizeBuild.clearOptions();
@@ -516,7 +516,7 @@ DataCard.prototype.addBuildListener = function() {
       $('#select-build')[0].selectize.on('change', function(value) {
       if (value.length) {
         genomeBuildHelper.setCurrentBuild(value);
-        util.updateUrl("build", value);
+        utility.updateUrl("build", value);
         $('#build-link').text(value);
         me.validateBuildFromData(function(success, message) {
           if (success) {
@@ -531,7 +531,7 @@ DataCard.prototype.addBuildListener = function() {
         });
       } else {
         genomeBuildHelper.currentBuild = null;
-        util.removeUrl("build");
+        utility.removeUrl("build");
         $('#build-link').text("?");
         me.disableLoadButton();
         setTimeout( function() {
@@ -866,8 +866,8 @@ DataCard.prototype.init = function() {
       window.loadSibs(affectedSibIds, 'affected');
       window.loadSibs(unaffectedSibIds, 'unaffected');
 
-      window.util.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
-      window.util.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
+      window.utility.updateUrl('affectedSibs',   affectedSibIds && affectedSibIds.length > 0   ? affectedSibIds.join(",") : "");
+      window.utility.updateUrl('unaffectedSibs', unaffectedSibIds && unaffectedSibIds.length > 0 ? unaffectedSibIds.join(",") : "");
 
       window.getAffectedInfo(true);
       filterCard.displayAffectedFilters();
@@ -883,11 +883,11 @@ DataCard.prototype.init = function() {
 
       if (theGeneName) {
         geneSearch.setValue(theGeneName, false, true);
-      } else if (util.getUrlParameter("gene")) {
+      } else if (utility.getUrlParameter("gene")) {
         // If the genome build was missing, the user was forced into the data dialog to select
         // the genome build.  Now we want to load the gene if it was provided in the URL parameter
         // list.
-        geneSearch.setValue(util.getUrlParameter("gene"), true, true);
+        geneSearch.setValue(utility.getUrlParameter("gene"), true, true);
       } else {
         window.loadTracksForGene();
       }
@@ -1030,8 +1030,8 @@ DataCard.prototype.onBamUrlEntered = function(panelSelector, callback) {
 
     if (success) {
       variantCard.setName(variantCard.getName());
-      window.util.updateUrl('bam' + cardIndex, encodeURIComponent(bamUrl));
-      window.util.updateUrl('bai' + cardIndex, encodeURIComponent(baiUrl));
+      window.utility.updateUrl('bam' + cardIndex, encodeURIComponent(bamUrl));
+      window.utility.updateUrl('bai' + cardIndex, encodeURIComponent(baiUrl));
       me.setDefaultBuildFromData();
       me.enableLoadButtonIfBuildSet(true);
     } else {
@@ -1101,7 +1101,7 @@ DataCard.prototype.clearBamUrl = function(panelSelector) {
   var cardIndex = panelSelector.find('#card-index').val();
   var variantCard = variantCards[+cardIndex];
 
-  window.util.removeUrl('bam'+cardIndex);
+  window.utility.removeUrl('bam'+cardIndex);
 
 
 
@@ -1148,7 +1148,7 @@ DataCard.prototype.displayPlatinumUrlBox = function(panelSelector) {
   var variantCard = variantCards[+cardIndex];
 
   variantCard.setDefaultSampleName(this.defaultSampleNames[variantCard.getRelationship()]);
-  window.util.updateUrl('sample' + cardIndex, this.defaultSampleNames[variantCard.getRelationship()]);
+  window.utility.updateUrl('sample' + cardIndex, this.defaultSampleNames[variantCard.getRelationship()]);
 
   panelSelector.find('#url-input').val(this.defaultUrls[variantCard.getRelationship()]);
   panelSelector.find('#datasource-name').val(this.defaultNames[variantCard.getRelationship()]);
@@ -1170,7 +1170,7 @@ DataCard.prototype.clearUrl = function(panelSelector) {
   var cardIndex = panelSelector.find('#card-index').val();
   var variantCard = variantCards[+cardIndex];
 
-  window.util.removeUrl('vcf'+cardIndex);
+  window.utility.removeUrl('vcf'+cardIndex);
   panelSelector.find("#url-input").val("");
   panelSelector.find("#url-tbi-input").val("");
   panelSelector.find("#vcf-file-info").val("");
@@ -1226,8 +1226,8 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
 
   // We cannot load a vcf local file from a URL (must be choosen by user), so we just
   // need to clear out any previously selected vcf url.
-  window.util.removeUrl('vcf'+cardIndex);
-  window.util.removeUrl('sample'+cardIndex);
+  window.utility.removeUrl('vcf'+cardIndex);
+  window.utility.removeUrl('sample'+cardIndex);
 
 
   me.panelSelectorFilesSelected.find('#vcf-sample-box').addClass('hide');
@@ -1259,7 +1259,7 @@ DataCard.prototype.onVcfFilesSelected = function(event) {
         }
         me.panelSelectorFilesSelected.find('#vcf-sample-select-box').removeClass("attention");
 
-        window.util.removeUrl('sample'+cardIndex);
+        window.utility.removeUrl('sample'+cardIndex);
 
         me.enableLoadButtonIfBuildSet(true);
       }
@@ -1345,8 +1345,8 @@ DataCard.prototype.onVcfSampleSelected = function(panelSelector) {
   panelSelector.find('#vcf-sample-select-box').removeClass("attention");
 
 
-  window.util.updateUrl('sample' + cardIndex, sampleName);
-  window.util.updateUrl('name' + cardIndex, sampleName);
+  window.utility.updateUrl('sample' + cardIndex, sampleName);
+  window.utility.updateUrl('name' + cardIndex, sampleName);
   if (variantCard.isReadyToLoad()) {
     me.enableLoadButtonIfBuildSet(true);
   }
@@ -1383,8 +1383,8 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
   panelSelector.find('#vcf-sample-box').addClass('hide');
   panelSelector.find('.vcf-sample.loader').removeClass('hide');
 
-  window.util.updateUrl('vcf'+cardIndex, encodeURIComponent(vcfUrl));
-  window.util.updateUrl('tbi'+cardIndex, encodeURIComponent(tbiUrl));
+  window.utility.updateUrl('vcf'+cardIndex, encodeURIComponent(vcfUrl));
+  window.utility.updateUrl('tbi'+cardIndex, encodeURIComponent(tbiUrl));
 
   variantCard.onVcfUrlEntered(vcfUrl, tbiUrl, function(success, sampleNames) {
     if (vcfUrl && vcfUrl != "") {
@@ -1405,7 +1405,7 @@ DataCard.prototype.onVcfUrlEntered = function(panelSelector, callback) {
             variantCard.setDefaultSampleName(null);
           }
           panelSelector.find('#vcf-sample-select-box').removeClass("attention");
-          window.util.removeUrl('sample'+cardIndex);
+          window.utility.removeUrl('sample'+cardIndex);
 
 
           me.enableLoadButtonIfBuildSet(true);
@@ -1459,7 +1459,7 @@ DataCard.prototype.setDataSourceName = function(panelSelector) {
   variantCard.showDataSources(dsName);
 
   //  $('#variant-card-button-' + cardIndex ).text(dsName);
-  window.util.updateUrl('name' + cardIndex, dsName);
+  window.utility.updateUrl('name' + cardIndex, dsName);
 
 }
 
@@ -1481,7 +1481,7 @@ DataCard.prototype.setAffected = function(panelSelector) {
   } else {
     var isAffected = panelSelector.find('#affected-cb').is(":checked");
     variantCard.setAffectedStatus(isAffected ? "affected" : "unaffected");
-    window.util.updateUrl('affectedStatus' + cardIndex, isAffected);
+    window.utility.updateUrl('affectedStatus' + cardIndex, isAffected);
 
   }
 
@@ -1497,7 +1497,7 @@ DataCard.prototype.setDataSourceRelationship = function(panelSelector) {
 
   var dsRelationship = panelSelector.find('#datasource-relationship').val();
   variantCard.setRelationship(dsRelationship);
-  window.util.updateUrl('rel' + cardIndex, dsRelationship);
+  window.utility.updateUrl('rel' + cardIndex, dsRelationship);
 }
 
 
@@ -1594,8 +1594,8 @@ DataCard.prototype.clearMotherFatherData = function() {
         motherCard.hide();
         $('#mother-data').find('#vcf-file-info').val('');
         $('#mother-data').find('#vcf-url-input').val('');
-        util.removeUrl("vcf1");
-        util.removeUrl("bam1");
+        utility.removeUrl("vcf1");
+        utility.removeUrl("bam1");
       } else if (variantCard.getRelationship() == 'father') {
         fatherCard = variantCard;
         fatherCard.clearVcf();
@@ -1603,8 +1603,8 @@ DataCard.prototype.clearMotherFatherData = function() {
         fatherCard.hide();
         $('#father-data').find('#vcf-file-info').val('');
         $('#father-data').find('#vcf-url-input').val('');
-        util.removeUrl("vcf2");
-        util.removeUrl("bam2");
+        utility.removeUrl("vcf2");
+        utility.removeUrl("bam2");
       }
     });
   }

@@ -1048,9 +1048,9 @@ VariantModel.prototype.clearVcf = function(cardIndex) {
   this.vcfUrlEntered = false;
   this.vcfFileOpened = false;
   this.sampleName = null;
-  window.util.removeUrl('sample'+ cardIndex);
-  window.util.removeUrl('vcf' + cardIndex);
-  window.util.removeUrl('name'+ cardIndex);
+  window.utility.removeUrl('sample'+ cardIndex);
+  window.utility.removeUrl('vcf' + cardIndex);
+  window.utility.removeUrl('name'+ cardIndex);
   this.vcf.clear();
 }
 
@@ -1059,7 +1059,7 @@ VariantModel.prototype.clearBam = function(cardIndex) {
   this.bamData = null;
   this.bamUrlEntered = false;
   this.bamFileOpened = false;
-  window.util.removeUrl('bam' + cardIndex);
+  window.utility.removeUrl('bam' + cardIndex);
   if (this.bam) {
     this.bam.clear();
   }

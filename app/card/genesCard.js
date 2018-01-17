@@ -1207,7 +1207,7 @@ GenesCard.prototype._onGeneBadgeUpdate = function(updateUrlParm) {
 
   // Update the url with the gene list
   if (updateUrlParm) {
-    util.updateUrl('genes', me.geneNames.join(","));
+    utility.updateUrl('genes', me.geneNames.join(","));
   }
 
 }
@@ -2094,7 +2094,7 @@ GenesCard.prototype.selectGene = function(geneName, callback, callbackVariantsLo
 
       window.selectedTranscript = geneModel.geneToLatestTranscript[window.gene.gene_name];
 
-      util.updateUrl('gene', window.gene.gene_name);
+      utility.updateUrl('gene', window.gene.gene_name);
 
       if (!isLevelBasic) {
         loadTracksForGene(false, function() {
@@ -2264,7 +2264,7 @@ GenesCard.prototype.formatPhenotypesHTML = function(phenotypes) {
     });
     return {width: 200, html: html};
   } else {
-    var phenotypeCols = util.splitArray(phenotypes, 4);
+    var phenotypeCols = utility.splitArray(phenotypes, 4);
     phenotypeCols.forEach(function(phenotypeElements) {
       html += "<div style='float:left;max-width:130px;margin-right:5px;font-size:11px;'>";
         phenotypeElements.forEach(function(phenotype) {

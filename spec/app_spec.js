@@ -1,22 +1,22 @@
 describe('app', function() {
 
-  describe('#util.getRsId', function() {
+  describe('#utility.getRsId', function() {
     it('returns an id string based on the vepVariationIds of a variant', function() {
       var variant = {
         vepVariationIds: { '1&rs123&3': {} }
       };
-      expect(util.getRsId(variant)).toEqual('rs123');
+      expect(utility.getRsId(variant)).toEqual('rs123');
     });
 
     it('returns null when the vepVariationIds of the variant are not present', function() {
-      expect(util.getRsId({})).toBeNull();
+      expect(utility.getRsId({})).toBeNull();
     });
   });
 
-  describe('#util.stripTranscriptPrefix', function() {
+  describe('#utility.stripTranscriptPrefix', function() {
     it('returns the prefix from a transcript id', function() {
       var transcriptId = "ENST00000265849.7";
-      expect(util.stripTranscriptPrefix(transcriptId)).toEqual('ENST00000265849');
+      expect(utility.stripTranscriptPrefix(transcriptId)).toEqual('ENST00000265849');
     });
   });
 

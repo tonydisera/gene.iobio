@@ -177,11 +177,11 @@ CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field
   var analyzedPassed          = filterCard.hasFilters() && counts.analyzed > 0 ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 1;
   var analyzedNotPassed       = filterCard.hasFilters() ? 1 - analyzedPassed : 0;
 
-  progressBar.find('#analyzed-bar'           ).css("width", util.percentage(analyzed));
-  progressBar.find('#not-analyzed-bar'       ).css("width", util.percentage(notAnalyzed));
+  progressBar.find('#analyzed-bar'           ).css("width", utility.percentage(analyzed));
+  progressBar.find('#not-analyzed-bar'       ).css("width", utility.percentage(notAnalyzed));
 
-  progressBar.find('#passed-filter-bar'      ).css("width", util.percentage(analyzedPassed));
-  progressBar.find('#not-passed-filter-bar'  ).css("width", util.percentage(analyzedNotPassed));
+  progressBar.find('#passed-filter-bar'      ).css("width", utility.percentage(analyzedPassed));
+  progressBar.find('#not-passed-filter-bar'  ).css("width", utility.percentage(analyzedNotPassed));
 
   if (geneCount > counts.analyzed && counts.analyzed > 0) {
     progressBar.find('#not-analyzed-bar'       ).text(notAnalyzedCount);
@@ -1118,7 +1118,7 @@ CacheHelper.prototype.refreshDialog = function() {
       var sortedDates = Object.keys(otherSessions).sort();
       sortedDates.forEach(function(theDate) {
         var size = otherSessions[theDate];
-        html += '<div><span style="display:inline-block;width:140px">' + util.formatDate(new Date(theDate * 1)) + '</span><span style="display:inline-block;width:100px">' + CacheHelper._sizeMB(size, 1) + " MB</span>" + "<a href='javascript:void(0)' + onclick='cacheHelper.clearCache(" + theDate + ",true)'>Clear</a></div>";
+        html += '<div><span style="display:inline-block;width:140px">' + utility.formatDate(new Date(theDate * 1)) + '</span><span style="display:inline-block;width:100px">' + CacheHelper._sizeMB(size, 1) + " MB</span>" + "<a href='javascript:void(0)' + onclick='cacheHelper.clearCache(" + theDate + ",true)'>Clear</a></div>";
       });
       return html;
     }

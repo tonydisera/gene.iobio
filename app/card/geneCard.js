@@ -74,7 +74,7 @@ class GeneCard {
           tooltip.transition()
                      .duration(200)
                      .style("opacity", .9);
-          tooltip.html(feature.feature_type + ': ' + util.addCommas(feature.start) + ' - ' + util.addCommas(feature.end))
+          tooltip.html(feature.feature_type + ': ' + utility.addCommas(feature.start) + ' - ' + utility.addCommas(feature.end))
                  .style("left", coord.x  + "px")
                  .style("text-align", 'left')
                  .style("top", coord.y + "px");
@@ -175,7 +175,7 @@ class GeneCard {
 
     $('#gene-chr').text(isLevelEdu ? ' is located on chromosome ' + window.gene.chr.replace('chr', '') : window.gene.chr);
     $('#gene-name').text((isLevelEdu ? 'GENE ' : '') + window.gene.gene_name);
-    $('#gene-region').text(util.addCommas(window.gene.startOrig) + "-" + util.addCommas(window.gene.endOrig));
+    $('#gene-region').text(utility.addCommas(window.gene.startOrig) + "-" + utility.addCommas(window.gene.endOrig));
 
 
     if (window.gene.gene_type == 'protein_coding'  || window.gene.gene_type == 'gene') {
@@ -223,8 +223,8 @@ class GeneCard {
 
       if (loadFromUrl) {
 
-        var bam  = util.getUrlParameter(/(bam)*/);
-        var vcf  = util.getUrlParameter(/(vcf)*/);
+        var bam  = utility.getUrlParameter(/(bam)*/);
+        var vcf  = utility.getUrlParameter(/(vcf)*/);
 
 
         if (bam == null && vcf == null) {
@@ -268,7 +268,7 @@ class GeneCard {
         }
 
         // add gene to url params
-        util.updateUrl('gene', window.gene.gene_name);
+        utility.updateUrl('gene', window.gene.gene_name);
 
         if (!isOffline) {
           genesCard.updateGeneInfoLink(window.gene.gene_name);

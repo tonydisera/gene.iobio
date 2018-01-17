@@ -160,6 +160,7 @@ class Util {
   *  that is the snapshop of vcfiobio.
   */
   sendFeedbackEmail(name, email, note, htmlAttachment) {
+    var me = this;
     var client = BinaryClient(emailServer);
 
     // Strip of the #modal-report-problem from the URL
@@ -186,7 +187,7 @@ class Util {
         'body':     htmlBody
      };
      if (feedbackAttachScreenCapture && htmlAttachment) {
-      emailObject.filename = 'gene.iobio.screencapture.' + util.formatCurrentDateTime('.') + '.html';
+      emailObject.filename = 'gene.iobio.screencapture.' + me.formatCurrentDateTime('.') + '.html';
      } else {
       emailObject.filename = '';
      }
