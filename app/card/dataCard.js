@@ -175,7 +175,7 @@ DataCard.prototype.loadDemoData = function() {
   window.loadSibs(affectedSibIds, 'affected');
   window.loadSibs(unaffectedSibIds, 'unaffected');
 
-  window.utilility.updateUrl("build", me.demoBuild);
+  window.utility.updateUrl("build", me.demoBuild);
   genomeBuildHelper.setCurrentBuild(me.demoBuild);
   $('#select-build-box').removeClass("attention");
 
