@@ -343,8 +343,6 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
   }
   var startingPos = me.cacheQueue.length == 0 ? 0 : me.cacheQueue.length;
 
-  console.log("cacheQueue.length=" +me.cacheQueue.length + " sizeToQueue=" + sizeToQueue + "startingPos=" + startingPos);
-
   // Place next batch of genes in caching queue
   for (var i = 0; i < sizeToQueue; i++) {
     me.cacheQueue.push(me.genesToCache[i]);

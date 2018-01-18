@@ -2199,7 +2199,6 @@ function promiseCacheTrioVcfData(geneObject, theTranscript, dataKind, trioVcfDat
       var cachedPromises = [];
       getRelevantVariantCards().forEach(function(vc) {
         if (trioVcfData[vc.getRelationship()]) {
-          console.log("caching " + geneObject.gene_name + " for " + vc.getRelationship());
           var p = vc.model._promiseCacheData(trioVcfData[vc.getRelationship()], dataKind, geneObject.gene_name, theTranscript);
           cachedPromises.push(p);
         }
