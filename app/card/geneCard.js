@@ -425,7 +425,7 @@ class GeneCard {
     var switchMsg = null;
     if (me.geneModel.refseqOnly[geneName] && me.geneModel.geneSource != 'refseq') {
       switchMsg = 'Gene ' + geneName + ' only in RefSeq.  Switching to this transcript set.';
-      switchGeneSource('RefSeq Transcript');
+      me.switchGeneSource('RefSeq Transcript');
     } else if (me.geneModel.gencodeOnly[geneName] && me.geneModel.geneSource != 'gencode') {
       switchMsg = 'Gene ' + geneName + ' only in Gencode.  Switching to this transcript set.';
       me.switchGeneSource('Gencode Transcript');
