@@ -352,9 +352,9 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
     me.genesToCache.shift();
   }
   // Make sure we are still showing the genes as 'loading...' that are still in the cache
-  for (var idx = 0; idx < startingPos; idx++) {
-     genesCard._geneBadgeLoading(me.cacheQueue[idx], true);
-  }
+  //for (var idx = 0; idx < startingPos; idx++) {
+  //   genesCard._geneBadgeLoading(me.cacheQueue[idx], true);
+  //}
 
   // Invoke method to cache each of the genes in the queue
   var count = 0;
