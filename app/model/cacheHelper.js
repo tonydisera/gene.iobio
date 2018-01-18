@@ -1,12 +1,11 @@
 var recordedCacheErrors = {};
 var cacheErrorTypes = {};
 
-function CacheHelper(loaderDisplay) {
+function CacheHelper() {
 
   this.genesToCache = [];
   this.cacheQueue = [];
   this.batchSize = null;
-  this.geneBadgeLoaderDisplay = loaderDisplay;
   this.showCallAllProgress = false;
   this.KEY_DELIM = "^";
   this.start = null;

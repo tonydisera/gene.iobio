@@ -278,8 +278,7 @@ function determineStyle() {
 function promiseInitCache() {
 
   return new Promise(function(resolve, reject) {
-    var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
-    cacheHelper = new CacheHelper(loaderDisplay);
+    cacheHelper = new CacheHelper();
     cacheHelper.promiseInit()
      .then(function() {
       cacheHelper.isolateSession();
@@ -330,6 +329,10 @@ function init() {
 
   // Initialize material bootstrap
   $.material.init();
+
+
+  var loaderDisplay = new geneBadgeLoaderDisplay('#gene-badge-loading-display');
+  cacheHelper.setLoaderDisplay(loaderDisplay);
 
 
   // Set version number on About menu and the Version dialog
