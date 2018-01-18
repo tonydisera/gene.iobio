@@ -1094,6 +1094,7 @@ DataCard.prototype.displayPlatinumBamUrlBox = function(panelSelector) {
 }
 
 DataCard.prototype.clearBamUrl = function(panelSelector) {
+  var me = this;
   if (!panelSelector) {
     panelSelector = $('#datasource-dialog');
   }
