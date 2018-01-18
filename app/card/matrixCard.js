@@ -722,6 +722,8 @@ MatrixCard.prototype.promiseFillFeatureMatrix = function(theVcfData) {
 
   return new Promise(function(resolve, reject) {
 
+    var unfilteredVcfData = theVcfData;
+
     if (theVcfData == null) {
       resolve();
     } else {
@@ -938,33 +940,30 @@ MatrixCard.prototype.promiseFillFeatureMatrix = function(theVcfData) {
         me.featureMatrix(selection, {showColumnLabels: true, simpleColumnLabels: true});
 
 
-        getProbandVariantCard().model.promiseGetVcfData(window.gene, window.selectedTranscript)
-        .then(function(data) {
-          var unfilteredVcfData = data.vcfData;
-          if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
-            $('#zero-variants').addClass("zero-filtered-variants");
-            $('#zero-variants').text("No variants passed the filter" );
-            $('#zero-variants').removeClass("hide");
-            $('#matrix-panel').removeClass("hide");
-            $('#feature-matrix-note').addClass("hide");
-            $('#feature-matrix').addClass("hide");
-          } else if (sortedFeatures.length == 0 ) {
-            $('#zero-variants').removeClass("zero-filtered-variants");
-            $('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
-            $('#zero-variants').removeClass("hide");
-            $('#feature-matrix').addClass("hide");
-            $('#feature-matrix-note').addClass("hide");
-            $('#matrix-panel').removeClass("hide");
-          } else {
-            $('#zero-variants').text("");
-            $('#zero-variants').addClass("hide");
-            $('#feature-matrix').removeClass("hide");
-            $('#feature-matrix-note').removeClass("hide");
-            $('#matrix-panel').removeClass("hide");
-          }
+        if (sortedFeatures.length == 0 && filterCard.hasFilters() &&  unfilteredVcfData && unfilteredVcfData.features.length > 0) {
+          $('#zero-variants').addClass("zero-filtered-variants");
+          $('#zero-variants').text("No variants passed the filter" );
+          $('#zero-variants').removeClass("hide");
+          $('#matrix-panel').removeClass("hide");
+          $('#feature-matrix-note').addClass("hide");
+          $('#feature-matrix').addClass("hide");
+        } else if (sortedFeatures.length == 0 ) {
+          $('#zero-variants').removeClass("zero-filtered-variants");
+          $('#zero-variants').text("0 variants found for gene " + window.gene.gene_name );
+          $('#zero-variants').removeClass("hide");
+          $('#feature-matrix').addClass("hide");
+          $('#feature-matrix-note').addClass("hide");
+          $('#matrix-panel').removeClass("hide");
+        } else {
+          $('#zero-variants').text("");
+          $('#zero-variants').addClass("hide");
+          $('#feature-matrix').removeClass("hide");
+          $('#feature-matrix-note').removeClass("hide");
+          $('#matrix-panel').removeClass("hide");
+        }
 
-          resolve();
-        })
+        resolve();
+
 
       })
     }
