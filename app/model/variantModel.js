@@ -1441,10 +1441,11 @@ VariantModel.prototype.promiseGetVariantExtraAnnotations = function(theGene, the
             if (theVcfData != null && theVcfData.features != null && theVcfData.features.length > 0) {
               // Now update the hgvs notation on the variant
               var matchingVariants = theVcfData.features.filter(function(aVariant) {
-                return variant.chrom == aVariant.chrom &&
-                     variant.start == aVariant.start &&
-                     variant.alt   == aVariant.alt &&
-                     variant.ref   == aVariant.ref
+                var matches =
+                     ( variant.start == aVariant.start &&
+                       variant.alt   == aVariant.alt &&
+                       variant.ref   == aVariant.ref );
+                return matches;
               });
               if (matchingVariants.length > 0) {
                 var v = matchingVariants[0];
