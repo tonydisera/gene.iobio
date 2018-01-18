@@ -295,7 +295,6 @@ BookmarkCard.prototype.promiseResolveBookmarkedVariant = function(key, bookmarkE
     if (bookmarkEntry.hasOwnProperty("isProxy") && bookmarkEntry.isProxy) {
       getProbandVariantCard().promiseGetBookmarkedVariant(me.reviseCoord(bookmarkEntry, geneObject), null, geneObject, theTranscript)
        .then(function(variant) {
-        var variant = null;
         if (variant) {
           variant.isBookmark = "Y";
           variant.isProxy = false;
@@ -306,7 +305,7 @@ BookmarkCard.prototype.promiseResolveBookmarkedVariant = function(key, bookmarkE
         resolve(variant);
        })
     } else {
-      variant = bookmarkEntry;
+      var variant = bookmarkEntry;
       variant.isBookmark = "Y";
       variant.isProxy = false;
       resolve(variant);
@@ -1100,17 +1099,21 @@ BookmarkCard.prototype.addCallVariantsButton = function(container) {
                     });
                     if (theTranscript) {
                       genesCard.selectGene(geneName,
-                         function() {
+                       function() {
 
-                         }, function() {
+                       },
+                       function() {
 
-                          jointCallVariants( true, function() {
-                            button.classed("hide", true);
-                            button.select(".call-variants-loader").classed("hide", true);
-                            me.refreshBookmarkList();
-                            me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, geneObject, theTranscript);
-                          })
-                         });
+                        promiseJointCallVariants(window.gene, window.selectedTranscript, getCurrentTrioVcfData(), {checkCache: false, isBackground: true})
+                        .then(function() {
+                          button.classed("hide", true);
+                          button.select(".call-variants-loader").classed("hide", true);
+                          me.refreshBookmarkList();
+                          me._validateBookmarksFound(currentBookmarkDiv, bookmarkKeys, geneObject, theTranscript);
+
+                        })
+
+                      });
 
                     }
 
