@@ -2109,6 +2109,28 @@ function loadSibs(sibs, affectedStatus) {
 function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, options={isBackground: false, cacheData: true}) {
   var me = this;
 
+  var resolveIt = function(resolve, trioVcfData, geneObject, theTranscript, options) {
+
+    // Now that inheritance mode has been determined, we can assess each variant's impact
+    getRelevantVariantCards().forEach(function(vc) {
+      if (trioVcfData[vc.getRelationship()]) {
+        vc.model.assessVariantImpact(trioVcfData[vc.getRelationship()], theTranscript);
+      }
+    })
+
+    if (!options.isBackground) {
+      $("#matrix-panel .loader").addClass("hide");
+      $("#matrix-panel .loader .loader-label").text("Ranking variants");
+      $("#feature-matrix-note").removeClass("hide");
+    }
+
+    promiseCacheTrioVcfData(geneObject, theTranscript, CacheHelper.VCF_DATA, trioVcfData, options.cacheData)
+    .then(function() {
+      resolve({'trioVcfData': trioVcfData, 'gene': geneObject, 'transcript': theTranscript});
+    })
+
+  }
+
   return new Promise(function(resolve,reject) {
 
     if (isAlignmentsOnly() && !autocall && (trioVcfData == null || trioVcfData.proband == null)) {
@@ -2126,11 +2148,8 @@ function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, opti
       }
 
       if (dataCard.mode == 'single') {
-        promiseCacheTrioVcfData(geneObject, theTranscript, CacheHelper.VCF_DATA, trioVcfData, options.cacheData)
-        .then(function() {
-          //resolve({'trioVcfData': trioVcfData, 'trioFbData': trioFbData, 'gene': geneObject, 'transcript': theTranscript});
-          resolve({'trioVcfData': trioVcfData,'gene': geneObject, 'transcript': theTranscript});
-        })
+        // Determine harmful variants, cache data, etc.
+        resolveIt(resolve, trioVcfData, geneObject, theTranscript, options);
       } else {
 
         // Set the max allele count across all variants in the trio.  We use this to properly scale
@@ -2159,25 +2178,11 @@ function promiseAnnotateInheritance(geneObject, theTranscript, trioVcfData, opti
           // Now set the affected status for the family on each variant of the proband
           getProbandVariantCard().model.determineAffectedStatus(trioVcfData.proband, geneObject, theTranscript, affectedInfo, function() {
 
-            // Now that inheritance mode has been determined, we can assess each variant's impact
-            getRelevantVariantCards().forEach(function(vc) {
-              if (trioVcfData[vc.getRelationship()]) {
-                vc.model.assessVariantImpact(trioVcfData[vc.getRelationship()], theTranscript);
-              }
-            })
+            // Determine harmful variants, cache data, etc.
+            resolveIt(resolve, trioVcfData, geneObject, theTranscript, options);
 
-            if (!options.isBackground) {
-              $("#matrix-panel .loader").addClass("hide");
-              $("#matrix-panel .loader .loader-label").text("Ranking variants");
-              $("#feature-matrix-note").removeClass("hide");
-            }
-
-            promiseCacheTrioVcfData(geneObject, theTranscript, CacheHelper.VCF_DATA, trioVcfData, options.cacheData)
-            .then(function() {
-              //resolve({'trioVcfData': trioVcfData, 'trioFbData': trioFbData, 'gene': geneObject, 'transcript': theTranscript});
-              resolve({'trioVcfData': trioVcfData, 'gene': geneObject, 'transcript': theTranscript});
-            })
           });
+
 
         })
       }
