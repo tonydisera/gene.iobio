@@ -271,7 +271,7 @@ CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
   // pass-through if global settings allowFreebayesSettings is set
   // to false.
   if (analyzeCalledVariants && !freebayesSettings.visited) {
-    showFreebayesSettingsDialog(function() {
+    freebayesSettings.showDialog(function() {
       me._analyzeAllImpl(analyzeCalledVariants)
     })
   } else {
