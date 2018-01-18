@@ -139,10 +139,10 @@ CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCount
   me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
 
 
-  if (me.showCallAllProgress || counts.called.analyzed > 0 || counts.called.error > 0 ) {
+  if (!filterCard.applyLowCoverageFilter && (me.showCallAllProgress || counts.called.analyzed > 0 || counts.called.error > 0) ) {
     me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
   } else {
-    $('#called-progress-bar').addClass("hide");
+    $('#call-all-progress').addClass("hide");
   }
 
 }
@@ -710,30 +710,43 @@ CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnl
               counts.geneCount++;
 
               var geneObject   = geneModel.geneObjects[keyObject.gene];
-              var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript}).then(function(data) {
+              var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript})
+              .then(function(data) {
                 var geneCoverageAll = data.geneCoverage;
 
-                var dp = getProbandVariantCard().promiseGetDangerSummary(data.gene.gene_name).then(function(dangerObject) {
+                var dp = getProbandVariantCard().promiseGetDangerSummary(data.gene.gene_name)
+                .then(function(dangerObject) {
                   if (geneCoverageAll && dangerObject) {
                     var clearOtherDanger = refreshOnly ? false : true;
+
                     VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
 
-                      counts.all.analyzed++;
-                      counts.loaded.analyzed++;
+                    counts.all.analyzed++;
+                    if (isAlignmentsOnly()) {
                       counts.called.analyzed++;
+                    } else {
+                      counts.loaded.analyzed++;
+                    }
+
                     if (dangerObject.geneCoverageProblem) {
-                        counts.all.pass++;
-                        counts.loaded.pass++;
+                      counts.all.pass++;
+                      if (isAlignmentsOnly()) {
                         counts.called.pass++;
+                      } else {
+                        counts.loaded.pass++;
                       }
+                    }
 
                     getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name).then(function() {
                       genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
                     })
                   } else {
                     counts.all.unanalyzed++;
-                    counts.loaded.unanalyzed++;
-                    counts.called.unanalyzed++;
+                    if (isAlignmentsOnly()) {
+                      counts.called.unanalyzed++;
+                    } else {
+                      counts.loaded.unanalyzed++;
+                    }
 
                   }
                 })

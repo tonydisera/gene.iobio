@@ -2382,7 +2382,7 @@ function filterVariantsImpl() {
 
   filterCard.displayFilterSummary();
   variantCards.forEach( function(variantCard) {
-    if (variantCard.isViewable()) {
+    if (variantCard.isViewable() && variantCard.getRelationship() != 'known-variants') {
 
       variantCard.unpin();
       if (window.gene) {
