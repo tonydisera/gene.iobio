@@ -14,12 +14,16 @@ function CacheHelper() {
 
 }
 
+
 CacheHelper.VCF_DATA            = "vcfData";
 CacheHelper.BAM_DATA            = "bamData";
 CacheHelper.FB_DATA             = "fbData";
 CacheHelper.DANGER_SUMMARY_DATA = "dangerSummary";
 CacheHelper.GENE_COVERAGE_DATA  = "geneCoverage";
 
+CacheHelper.prototype.setLoaderDisplay = function(loaderDisplay) {
+  this.geneBadgeLoaderDisplay = loaderDisplay;
+}
 
 CacheHelper.prototype.promiseInit = function() {
   return this.cacheIndexStore.promiseInit();
@@ -339,6 +343,8 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
   }
   var startingPos = me.cacheQueue.length == 0 ? 0 : me.cacheQueue.length;
 
+  console.log("cacheQueue.length=" +me.cacheQueue.length + " sizeToQueue=" + sizeToQueue + "startingPos=" + startingPos);
+
   // Place next batch of genes in caching queue
   for (var i = 0; i < sizeToQueue; i++) {
     me.cacheQueue.push(me.genesToCache[i]);
@@ -347,30 +353,35 @@ CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
   for (var i = 0; i < sizeToQueue; i++) {
     me.genesToCache.shift();
   }
+  // Make sure we are still showing the genes as 'loading...' that are still in the cache
+  for (var idx = 0; idx < startingPos; idx++) {
+     genesCard._geneBadgeLoading(me.cacheQueue[idx], true);
+  }
+
   // Invoke method to cache each of the genes in the queue
   var count = 0;
   for (var i = startingPos; i < DEFAULT_BATCH_SIZE && count < sizeToQueue; i++) {
     me.promiseCacheGene(me.cacheQueue[i], analyzeCalledVariants)
     .then(function(theGeneObject) {
-       me.cacheNextGene(theGeneObject.gene_name, analyzeCalledVariants, callback);
+      me.cacheNextGene(theGeneObject.gene_name, analyzeCalledVariants, callback);
     },
     function(error) {
       // An error occurred.  Set the gene badge with an error glyph
       // and move on to analyzing the next gene
-      genesCard.setGeneBadgeError(error.gene.gene_name);
-      console.log("problem caching data for gene " + error.gene.gene_name + ". " + error.message);
-      genesCard._geneBadgeLoading(error.gene.gene_name, false);
+      genesCard.setGeneBadgeError(error.geneName);
+      console.log("problem caching data for gene " + error.geneName + ". " + error.message);
+      genesCard._geneBadgeLoading(error.geneName, false);
 
-      getProbandVariantCard().promiseSummarizeError(error.gene.gene_name, error.message)
+      getProbandVariantCard().promiseSummarizeError(error.geneName, error.message)
       .then(function(dangerObject) {
         // take this gene off of the queue and see
         // if next batch of genes should be analyzed
-        me.cacheNextGene(error.gene.gene_name, analyzeCalledVariants, callback);
+        me.cacheNextGene(error.geneName, analyzeCalledVariants, callback);
       },
       function(error) {
         var msg = "A problem ocurred while summarizing error in CacheHelper.prototype.cacheGene(): " + error;
         console.log(msg);
-        me.cacheNextGene(error.gene.gene_name, analyzeCalledVariants, callback);
+        me.cacheNextGene(error.geneName, analyzeCalledVariants, callback);
       })
     })
     count++;
@@ -385,6 +396,7 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
   var me = this;
 
   return new Promise(function(cacheResolve, cacheReject) {
+    var theGeneName = geneName;
     var geneObject = null;
     var transcript = null;
     var geneCoverageAll = null;
@@ -479,7 +491,7 @@ CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariant
 
     },
     function(error) {
-      cacheReject({'gene': geneObject, 'message': error});
+      cacheReject({'geneName': theGeneName, 'message': error});
     });
   })
 
@@ -494,16 +506,18 @@ CacheHelper.prototype.isGeneInProgress = function(geneName) {
 CacheHelper.prototype.cacheNextGene = function(geneName, analyzeCalledVariants, callback) {
   this.showAnalyzeAllProgress();
 
-  this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
-                             .removeGene(geneName);
   // Take the analyzed (and cached) gene off of the cache queue
   var idx = this.cacheQueue.indexOf(geneName);
   if (idx >= 0) {
     this.cacheQueue.splice(idx,1);
+    this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+                               .removeGene(geneName);
   } else {
     idx = this.cacheQueue.indexOf(geneName.toUpperCase());
     if (idx >= 0) {
       this.cacheQueue.splice(idx,1);
+      this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+                                 .removeGene(geneName);
     } else {
       console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
       if (callback) {

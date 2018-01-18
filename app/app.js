@@ -1514,7 +1514,7 @@ function promiseSummarizeDanger(geneObject, theTranscript, probandVcfData, optio
       })
       .then(function(theDangerSummary) {
 
-        genesCard.setGeneBadgeGlyphs(geneObject.gene_name, theDangerSummary, true);
+        genesCard.setGeneBadgeGlyphs(geneObject.gene_name, theDangerSummary, false);
         resolve();
       },
       function(error) {
