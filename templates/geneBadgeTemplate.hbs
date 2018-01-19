@@ -1,8 +1,8 @@
 <div id="gene-badge"  >
 
-	<a id="gene-badge-button" style="display:inline-block" onclick="genesCard.selectGeneBadge(this)" 
-		rel="tooltip"   data-html="true" href="#"
-		data-placement="bottom">
+  <a id="gene-badge-button" style="display:inline-block" onclick="genesCard.selectGeneBadge(this)"
+    rel="tooltip"   data-html="true" href="#"
+    data-placement="bottom">
 
         <i id="gene-badge-loaded" class="material-icons glyph">done</i>
         <i id="gene-badge-called" class="level-edu material-icons glyph">done</i>
@@ -10,10 +10,10 @@
 
 
         <i id="gene-badge-warning" class="material-icons glyph">warning</i>
-        <i id="gene-badge-error" class="material-icons glyph">error</i>
-        
+        <i id="gene-badge-error" class="material-icons glyph">report_problem</i>
+
         <span id="gene-badge-bookmark" class="glyph" style="float:left"></span>
-        
+
         <span id="gene-badge-name" style="float:left;margin-left:2px;margin-right:2px"></span>
         <span id="gene-badge-phenotype-symbol" class="glyph" style="float:left;height:14px;"></span>
 
@@ -21,7 +21,7 @@
 
         <svg id="gene-badge-harmful1-variant" class="gene-badge-harmful-variant" width="13" height="14" class="level-edu glyph">
             <g transform="translate(0,2)">
-                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lightning-symbol" width="11.5"   height="11.5" style="pointer-events: none;">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#clinvar-symbol" width="11.5"   height="11.5" style="pointer-events: none;">
                 </use>
             </g>
         </svg>
@@ -36,8 +36,8 @@
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#error-symbol" width="14"   height="14" style="pointer-events: none;">
                 </use>
             </g>
-        </svg>        
-  		<span id="gene-badge-symbols" class="glyph"></span>
+        </svg>
+      <span id="gene-badge-symbols" class="glyph"></span>
 
         <svg id="gene-badge-coverage-problem" class="gene-badge-coverage-problem" width="14" height="14" class="level-edu glyph">
             <g transform="translate(1,2)">
@@ -46,13 +46,13 @@
             </g>
         </svg>
 
-	</a>	
+  </a>
 
-	<div id="gene-badge-remove" href="javascript:void(0)" 
-		onclick="genesCard.removeGeneBadge(this)" 
-		style="display: inline-block;cursor: pointer;float:right">
-	  	<i style="vertical-align:middle" class="material-icons">close</i>
+  <div id="gene-badge-remove" href="javascript:void(0)"
+    onclick="genesCard.removeGeneBadge(this)"
+    style="display: inline-block;cursor: pointer;float:right">
+      <i style="vertical-align:middle" class="material-icons">close</i>
 
-	</div>
-	
+  </div>
+
 </div>

@@ -13,7 +13,7 @@ module.exports = {
     clickFilter: function() {
       return this.click('@filter');
     },
-    
+
     clickGenes: function() {
       return this.click('@genes');
     },

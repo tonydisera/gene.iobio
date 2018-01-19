@@ -16,9 +16,9 @@ module.exports = {
   },
 
   'Analyzing all with a gene with > 500 variants (exonic-only filter turned on) should not filter by exonic only on subsequent genes': function(client) {
-    indexPage.load();    
+    indexPage.load();
     nav.clickGenes();
-    findGenesPanel.importGeneSet(['RYR1', 'RYR2', 'STK11']);    
+    findGenesPanel.importGeneSet(['RYR1', 'RYR2', 'STK11']);
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild();

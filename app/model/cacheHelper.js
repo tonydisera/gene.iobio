@@ -1,1300 +1,1675 @@
 var recordedCacheErrors = {};
 var cacheErrorTypes = {};
 
-function CacheHelper(loaderDisplay) {
+function CacheHelper() {
 
-	this.genesToCache = [];
-	this.cacheQueue = [];
-	this.batchSize = null;
-	this.geneBadgeLoaderDisplay = loaderDisplay;
-	this.showCallAllProgress = false;
-	this.KEY_DELIM = "^";
-	this.start = null;
+  this.genesToCache = [];
+  this.cacheQueue = [];
+  this.batchSize = null;
+  this.showCallAllProgress = false;
+  this.KEY_DELIM = "^";
+  this.start = null;
+  this.cacheIndexStore = new CacheIndexStore();
+
+
 }
+
+
+CacheHelper.VCF_DATA            = "vcfData";
+CacheHelper.BAM_DATA            = "bamData";
+CacheHelper.FB_DATA             = "fbData";
+CacheHelper.DANGER_SUMMARY_DATA = "dangerSummary";
+CacheHelper.GENE_COVERAGE_DATA  = "geneCoverage";
+
+CacheHelper.prototype.setLoaderDisplay = function(loaderDisplay) {
+  this.geneBadgeLoaderDisplay = loaderDisplay;
+}
+
+CacheHelper.prototype.promiseInit = function() {
+  return this.cacheIndexStore.promiseInit();
+}
+
 
 CacheHelper.prototype.isolateSession = function() {
-	this.launchTimestamp = Date.now().valueOf();	
+  this.launchTimestamp = Date.now().valueOf();
 }
 
-CacheHelper.prototype.checkCacheSize = function() {
-	var me = this;
+CacheHelper.prototype.promiseClearStaleCache = function() {
+  var me = this;
+  return new Promise(function(resolve, reject) {
 
-	var counts = this.getCacheSize(false);
-	$('#cache-alert1').addClass("hide");
-	$("#other-app-cache-panel").removeClass("attention");
+    var staleSessions = localStorage["gene.iobio.stale"];
+    if (staleSessions && staleSessions.length > 0) {
+      var promises = [];
+      staleSessions.split(",").forEach(function(timestamp) {
+        var p = me._promiseClearCache(timestamp, false, false);
+        promises.push(p);
+      });
+      Promise.all(promises).then(function() {
+        localStorage["gene.iobio.stale"] = "";
+        resolve();
+      },
+      function(error) {
+        reject();
+      })
+    } else {
+      resolve();
+    }
+  })
+}
 
-	$('#cache-alert2').addClass("hide");
-	$("#other-cache-panel").removeClass("attention-warning");
-	if (counts.other > 0) {
-		$('#cache-alert2').removeClass("hide");
-		$("#other-cache-panel").addClass("attention-warning");
-		$("#other-cache-detail-link").attr("aria-expanded", true);
-		$("#other-cache-detail").attr("aria-expanded", true);
-		$("#other-cache-detail").addClass("in");
-	} 
+CacheHelper.prototype.promiseCheckCacheSize = function() {
+  var me = this;
 
-	if (counts.otherApp > 0) {
-		$('#cache-alert1').removeClass("hide");
-		$("#other-app-cache-panel").addClass("attention");
-		$("#other-app-cache-detail-link").attr("aria-expanded", true);
-		$("#other-app-cache-detail").attr("aria-expanded", true);
-		$("#other-app-cache-detail").addClass("in");
-	} 
+  var clearCacheAndResolve = function(resolve, reject, counts) {
+      if (counts.otherSessions > 0) {
+        me._promiseClearCache(null, true, false)
+         .then(function() {
+          resolve();
+         },
+         function(error) {
+          reject(error);
+         })
+      }
+      if (counts.otherUse > 0) {
+        me._promiseClearCache(null, false, true)
+         .then(function() {
+          resolve();
+         },
+         function(error) {
+          reject(error);
+         })
+      }
+  }
 
-	if (counts.other > 0 || counts.otherApp > 0) {
-		alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
-		    if (e) {
-				// user clicked "ok", clear the cache for other, and other app
-				if (counts.other > 0) {
-					me._clearCache(null, true, false);
-				}
-				if (counts.otherApp > 0) {
-					me._clearCache(null, false, true);
-				}
-		        
-		    } 
-		}, function() {
-			// user clicked cancel
-			me.openDialog();
-		})
-		.set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});   		;
-	}
+  return new Promise(function(resolve, reject) {
+    me.promiseGetCacheSize(false)
+     .then(function(counts) {
 
+      if (counts.otherSessions > 0 || counts.otherUse > 0) {
+        if (isLevelEdu || (isMygene2 && isLevelBasic)) {
+          clearCacheAndResolve(resolve, reject, counts);
+        } else {
+          alertify.confirm("Before proceeding, it is recommended that the browser's cache be cleared.", function (e) {
+              if (e) {
+                // user clicked "ok", clear the cache for other, and other app
+                clearCacheAndResolve(resolve, reject, counts);
+              }
+          }, function() {
+            // user clicked cancel
+            me.openDialog();
+            resolve();
+          })
+          .set('labels', {ok:'Yes, clear cache', cancel:'No, show me more details'});
+
+        }
+      } else {
+        resolve();
+      }
+
+     })
+
+
+  })
 
 }
 
 CacheHelper.prototype.showAnalyzeAllProgress = function(clearStandardFilterCounts) {
-	var me = this;
+  var me = this;
 
-	me.getAnalyzeAllCounts(function(counts) {
-		me.showGeneCounts(counts, clearStandardFilterCounts)
-	});	
+  me.getAnalyzeAllCounts(function(counts) {
+    me.showGeneCounts(counts, clearStandardFilterCounts)
+  });
 }
 
 CacheHelper.prototype.showGeneCounts = function(counts, clearStandardFilterCounts) {
-	var me = this;
-	if (counts.geneCount == 0) {
-		$('#analyzed-progress-bar').addClass("hide");
-		$('#total-genes-label').addClass("hide");
-		return;
-	} 
-	$('#analyzed-progress-bar').removeClass("hide");
+  var me = this;
+  if (counts.geneCount == 0) {
+    $('#analyzed-progress-bar').addClass("hide");
+    $('#total-genes-label').addClass("hide");
+    return;
+  }
+  $('#analyzed-progress-bar').removeClass("hide");
 
 
-	$('#total-genes-label').removeClass("hide");
-	$('#total-genes-label').text(counts.geneCount + " genes");
+  $('#total-genes-label').removeClass("hide");
+  $('#total-genes-label').text(counts.geneCount + " genes");
 
 
-	me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
+  me.fillProgressBar($("#analyze-all-progress"), counts, 'loaded', clearStandardFilterCounts);
 
 
-	if (me.showCallAllProgress && (counts.called.analyzed > 0 || counts.called.error > 0) ) {
-		me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
-	} else {
-		$('#called-progress-bar').addClass("hide");			
-	}
+  if (!filterCard.applyLowCoverageFilter && (me.showCallAllProgress || counts.called.analyzed > 0 || counts.called.error > 0) ) {
+    me.fillProgressBar($("#call-all-progress"), counts, 'called', clearStandardFilterCounts);
+  } else {
+    $('#call-all-progress').addClass("hide");
+  }
 
 }
 
 CacheHelper.prototype.fillProgressBar = function(progressBar, countObject, field, clearStandardFilterCounts) {
-	var geneCount = countObject.geneCount;
-	var counts    = countObject[field];
- 
-	progressBar.removeClass("hide");
-	if (counts.analyzed == 0) {
-		progressBar.find(".text").removeClass("hide");
-		progressBar.find(".text").text("0 analyzed");
-	} else {
-		progressBar.find(".text").html("&nbsp;");
-	}
+  var me = this;
+  var geneCount = countObject.geneCount;
+  var counts    = countObject[field];
+
+  progressBar.removeClass("hide");
+  if (counts.analyzed == 0) {
+    progressBar.find(".text").removeClass("hide");
+    progressBar.find(".text").text("0 analyzed");
+  } else {
+    progressBar.find(".text").html("&nbsp;");
+  }
 
 
-	if (counts.analyzed == geneCount) {
-		progressBar.addClass("done");
-		progressBar.find(".text").text(counts.analyzed + " analyzed");
-	} else {
-		progressBar.removeClass("done");			
-	}
+  if (counts.analyzed == geneCount) {
+    progressBar.addClass("done");
+    progressBar.find(".text").text(counts.analyzed + " analyzed");
+    if (me.geneBadgeLoaderDisplay) {
+      me.geneBadgeLoaderDisplay.clearAll();
+    }
+  } else {
+    progressBar.removeClass("done");
+  }
 
-	var notAnalyzedCount        = geneCount - counts.analyzed;
-	var analyzedNotPassedCount  = counts.analyzed - counts.pass;
+  var notAnalyzedCount        = geneCount - counts.analyzed;
+  var analyzedNotPassedCount  = counts.analyzed - counts.pass;
 
-	var analyzed                = Math.round(counts.analyzed / geneCount * 100) / 100;		
-	var notAnalyzed             = 1 - analyzed;
+  var analyzed                = Math.round(counts.analyzed / geneCount * 100) / 100;
+  var notAnalyzed             = 1 - analyzed;
 
-	var analyzedPassed          = filterCard.hasFilters() && counts.analyzed > 0 ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 1;
-	var analyzedNotPassed       = filterCard.hasFilters() ? 1 - analyzedPassed : 0;
+  var analyzedPassed          = filterCard.hasFilters() && counts.analyzed > 0 ? Math.round(counts.pass / counts.analyzed * 100) / 100 : 1;
+  var analyzedNotPassed       = filterCard.hasFilters() ? 1 - analyzedPassed : 0;
 
-	progressBar.find('#analyzed-bar'           ).css("width", percentage(analyzed));
-	progressBar.find('#not-analyzed-bar'       ).css("width", percentage(notAnalyzed));
+  progressBar.find('#analyzed-bar'           ).css("width", utility.percentage(analyzed));
+  progressBar.find('#not-analyzed-bar'       ).css("width", utility.percentage(notAnalyzed));
 
-	progressBar.find('#passed-filter-bar'      ).css("width", percentage(analyzedPassed));
-	progressBar.find('#not-passed-filter-bar'  ).css("width", percentage(analyzedNotPassed));
+  progressBar.find('#passed-filter-bar'      ).css("width", utility.percentage(analyzedPassed));
+  progressBar.find('#not-passed-filter-bar'  ).css("width", utility.percentage(analyzedNotPassed));
 
-	if (geneCount > counts.analyzed && counts.analyzed > 0) {
-		progressBar.find('#not-analyzed-bar'       ).text(notAnalyzedCount);
+  if (geneCount > counts.analyzed && counts.analyzed > 0) {
+    progressBar.find('#not-analyzed-bar'       ).text(notAnalyzedCount);
 
-	} else {
-		progressBar.find('#not-analyzed-bar'       ).text("");
-	}
+  } else {
+    progressBar.find('#not-analyzed-bar'       ).text("");
+  }
 
-	// Show analyze progress counts on hover
-	progressBar.find('#passed-filter-bar').attr("data-toggle", "tooltip");
-	progressBar.find('#passed-filter-bar').attr("data-placement", "top");
+  // Show analyze progress counts on hover
+  progressBar.find('#passed-filter-bar').attr("data-toggle", "tooltip");
+  progressBar.find('#passed-filter-bar').attr("data-placement", "top");
 
-	progressBar.find('#not-passed-filter-bar').attr("data-toggle", "tooltip");
-	progressBar.find('#not-passed-filter-bar').attr("data-placement", "top");
+  progressBar.find('#not-passed-filter-bar').attr("data-toggle", "tooltip");
+  progressBar.find('#not-passed-filter-bar').attr("data-placement", "top");
 
-	progressBar.find('#not-analyzed-bar').attr("data-toggle", "tooltip");
-	progressBar.find('#not-analyzed-bar').attr("data-placement", "top");
-
-
-	if (counts.analyzed > 0) {
-		if (filterCard.hasFilters()) {
-			progressBar.find('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
-		
-			
-			progressBar.find('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "");
-
-			progressBar.find('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
-			progressBar.find('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount +  " fail filter" : "");
-			
-			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");		
-			progressBar.find('.text').html("&nbsp;");
-			
-
-		} else {
-			progressBar.find('#not-passed-filter-bar'    ).text("");
-			progressBar.find('#not-passed-filter-bar'    ).attr("title", "");
-			
-			if (geneCount > counts.analyzed) {
-				progressBar.find('#passed-filter-bar'  ).text(counts.analyzed);
-			} else {
-				progressBar.find('#passed-filter-bar'  ).text("");
-				progressBar.find("#analyze-all-progress .text").text(counts.analyzed + " analyzed");
-			}
-
-			progressBar.find('#passed-filter-bar').attr("title", counts.analyzed  + " analyzed");
-			progressBar.find('#not-analyzed-bar' ).attr("title", notAnalyzedCount + " not analyzed");		
-
-		}
-	} else {
-			progressBar.find('#passed-filter-bar').text("");
-			progressBar.find('#passed-filter-bar'    ).attr("title", "");
-
-			progressBar.find('#not-passed-filter-bar').text("");
-			progressBar.find('#not-passed-filter-bar').attr("title", "");
-
-			progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");		
-	}
+  progressBar.find('#not-analyzed-bar').attr("data-toggle", "tooltip");
+  progressBar.find('#not-analyzed-bar').attr("data-placement", "top");
 
 
+  if (counts.analyzed > 0) {
+    if (filterCard.hasFilters()) {
+      progressBar.find('#passed-filter-bar'      ).text(counts.pass > 0 ? counts.pass : "");
 
-	// Refresh the standard filter count if it applies
-	filterCard.setStandardFilterCount(field, counts, notAnalyzedCount, clearStandardFilterCounts);
-	
+
+      progressBar.find('#not-passed-filter-bar'  ).text(analyzedNotPassedCount > 0 ? analyzedNotPassedCount : "");
+
+      progressBar.find('#passed-filter-bar'    ).attr("title", counts.pass > 0             ? counts.pass + " pass filter" : "");
+      progressBar.find('#not-passed-filter-bar').attr("title", analyzedNotPassedCount > 0  ? analyzedNotPassedCount +  " fail filter" : "");
+
+      progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount > 0        ? notAnalyzedCount + " not analyzed" : "");
+      progressBar.find('.text').html("&nbsp;");
+
+
+    } else {
+      progressBar.find('#not-passed-filter-bar'    ).text("");
+      progressBar.find('#not-passed-filter-bar'    ).attr("title", "");
+
+      if (geneCount > counts.analyzed) {
+        progressBar.find('#passed-filter-bar'  ).text(counts.analyzed);
+      } else {
+        progressBar.find('#passed-filter-bar'  ).text("");
+        progressBar.find("#analyze-all-progress .text").text(counts.analyzed + " analyzed");
+      }
+
+      progressBar.find('#passed-filter-bar').attr("title", counts.analyzed  + " analyzed");
+      progressBar.find('#not-analyzed-bar' ).attr("title", notAnalyzedCount + " not analyzed");
+
+    }
+  } else {
+      progressBar.find('#passed-filter-bar').text("");
+      progressBar.find('#passed-filter-bar'    ).attr("title", "");
+
+      progressBar.find('#not-passed-filter-bar').text("");
+      progressBar.find('#not-passed-filter-bar').attr("title", "");
+
+      progressBar.find('#not-analyzed-bar'     ).attr("title", notAnalyzedCount + " not analyzed");
+  }
+
+
+
+  // Refresh the standard filter count if it applies
+  filterCard.setStandardFilterCount(field, counts, notAnalyzedCount, clearStandardFilterCounts);
+
 
 }
 
 CacheHelper.prototype.hideAnalyzeAllProgress = function() {
-	$("#analyze-all-progress .bar").css("width", "0%");	
+  $("#analyze-all-progress .bar").css("width", "0%");
 
-	$("#call-all-progress .bar").css("width", "0%");	
-	$("#call-all-progress #not-analyzed-bar").text("");	
+  $("#call-all-progress .bar").css("width", "0%");
+  $("#call-all-progress #not-analyzed-bar").text("");
 }
 
 
 CacheHelper.prototype.analyzeAll = function(analyzeCalledVariants = false) {
-	var me = this;
+  var me = this;
 
-	if (isAlignmentsOnly()) {
-		analyzeCalledVariants = true;
-	}
+  if (isAlignmentsOnly()) {
+    analyzeCalledVariants = true;
+  }
 
-	// Show the freebayes runtime args dialog first if dialog has not
-	// yet been visited.   Note:  showFreebayesSettingsDialog() is a
-	// pass-through if global settings allowFreebayesSettings is set
-	// to false.
-	if (analyzeCalledVariants && !fbSettings.visited) {
-		showFreebayesSettingsDialog(function() {
-			me._analyzeAllImpl(analyzeCalledVariants)
-		})
-	} else {
-		me._analyzeAllImpl(analyzeCalledVariants)
-	}
+  // Show the freebayes runtime args dialog first if dialog has not
+  // yet been visited.   Note:  showFreebayesSettingsDialog() is a
+  // pass-through if global settings allowFreebayesSettings is set
+  // to false.
+  if (analyzeCalledVariants && !freebayesSettings.visited) {
+    freebayesSettings.showDialog(function() {
+      me._analyzeAllImpl(analyzeCalledVariants)
+    })
+  } else {
+    me._analyzeAllImpl(analyzeCalledVariants)
+  }
 }
 
 CacheHelper.prototype._analyzeAllImpl = function(analyzeCalledVariants) {
-	var me = this;
+  var me = this;
 
-	this.start = new Date();
-	
-	if (analyzeCalledVariants) {
-		me.showCallAllProgress = true;
-	}
+  this.start = new Date();
 
-	me.showAnalyzeAllProgress();
+  if (analyzeCalledVariants) {
+    me.showCallAllProgress = true;
+  }
 
-	// Start over with a new queue of genes to be analyzed
-	// is all of the genes that need to be analyzed (and cached.)
-	me.genesToCache = [];
-	me.cacheQueue = [];
+  me.showAnalyzeAllProgress();
 
-	genesCard.getGeneNames().forEach(function(geneName) {		
-		me.genesToCache.push(geneName);
-	});
-	me.cacheGenes(analyzeCalledVariants, function() {
+  // Start over with a new queue of genes to be analyzed
+  // is all of the genes that need to be analyzed (and cached.)
+  me.genesToCache = [];
+  me.cacheQueue = [];
 
-		console.log("");
-		console.log("******   ANALYZE ALL ELAPSED TIME *******");
-		console.log((new Date() - me.start) / 10000 + " seconds ");
-		console.log("*******************************************")
-		console.log("");
+  genesCard.getGeneNames().forEach(function(geneName) {
+    me.genesToCache.push(geneName);
+  });
+  me.cacheGenes(analyzeCalledVariants, function() {
 
-		// After all genes have been cached, refresh the gene badges in case
-		// filters were applied while genes were still in the process of being
-		// analyzed.
-		filterCard.filterGenes();
-	});
+    console.log("");
+    console.log("******   ANALYZE ALL ELAPSED TIME *******");
+    console.log((new Date() - me.start) / 1000 + " seconds ");
+    console.log("*******************************************")
+    console.log("");
+
+    // After all genes have been cached, refresh the gene badges in case
+    // filters were applied while genes were still in the process of being
+    // analyzed.
+    filterCard.filterGenes();
+  });
 
 }
 
 
 
 CacheHelper.prototype.cacheGenes = function(analyzeCalledVariants, callback) {
-	var me = this;
+  var me = this;
 
-	// If there are no more genes to cache, 
-	if (me.genesToCache.length == 0 && me.cacheQueue.length == 0) {
-		if (callback) {
-			callback();
-		}
-	}
-
-
-
-	// If we still have genes in the cache queue, exit. (Wait to kick off next batch 
-	// of genes to analyze until all genes in last batch are analyzed.)
-	if (me.cacheQueue.length > 0) {
-		return;
-	}
+  // If there are no more genes to cache,
+  if (me.genesToCache.length == 0 && me.cacheQueue.length == 0) {
+    if (callback) {
+      callback();
+    }
+  }
 
 
-	// Determine the batch size.  (It will be smaller that the
-	// default batch size if the genes remaining to be cached is
-	// smaller than the batch size.)
-	me.batchSize = Math.min(me.genesToCache.length, DEFAULT_BATCH_SIZE);
+  // If we are already have the max size of genes in the queue, don't
+  // queue anymore.
+  if (me.cacheQueue.length >= DEFAULT_BATCH_SIZE) {
+    return;
+  }
 
-	// Place next batch of genes in caching queue 
-	for (var i = 0; i < me.batchSize; i++) {
-		me.cacheQueue.push(me.genesToCache[i]);
-	}
-	// Remove this batch of genes from the list of all genes to be cached
-	for (var i = 0; i < me.batchSize; i++) {
-		me.genesToCache.shift();
-	}
-	// Invoke method to cache each of the genes in the queue
-	for (var i = 0; i < me.batchSize; i++) {
-		me.cacheGene(me.cacheQueue[i], analyzeCalledVariants, callback);
-	}
+
+  // Figure out how much to replinish in the cache queue
+  var sizeToQueue = DEFAULT_BATCH_SIZE - me.cacheQueue.length;
+
+  // Just queue genes to the end of the (unanalyzed) genes list
+  if (sizeToQueue > me.genesToCache.length) {
+    sizeToQueue = me.genesToCache.length;
+  }
+  var startingPos = me.cacheQueue.length == 0 ? 0 : me.cacheQueue.length;
+
+  // Place next batch of genes in caching queue
+  for (var i = 0; i < sizeToQueue; i++) {
+    me.cacheQueue.push(me.genesToCache[i]);
+  }
+  // Remove this batch of genes from the list of all genes to be cached
+  for (var i = 0; i < sizeToQueue; i++) {
+    me.genesToCache.shift();
+  }
+  // Make sure we are still showing the genes as 'loading...' that are still in the cache
+  //for (var idx = 0; idx < startingPos; idx++) {
+  //   genesCard._geneBadgeLoading(me.cacheQueue[idx], true);
+  //}
+
+  // Invoke method to cache each of the genes in the queue
+  var count = 0;
+  for (var i = startingPos; i < DEFAULT_BATCH_SIZE && count < sizeToQueue; i++) {
+    me.promiseCacheGene(me.cacheQueue[i], analyzeCalledVariants)
+    .then(function(theGeneObject) {
+      me.cacheNextGene(theGeneObject.gene_name, analyzeCalledVariants, callback);
+    },
+    function(error) {
+      // An error occurred.  Set the gene badge with an error glyph
+      // and move on to analyzing the next gene
+      genesCard.setGeneBadgeError(error.geneName);
+      console.log("problem caching data for gene " + error.geneName + ". " + error.message);
+      genesCard._geneBadgeLoading(error.geneName, false);
+
+      getProbandVariantCard().promiseSummarizeError(error.geneName, error.message)
+      .then(function(dangerObject) {
+        // take this gene off of the queue and see
+        // if next batch of genes should be analyzed
+        me.cacheNextGene(error.geneName, analyzeCalledVariants, callback);
+      },
+      function(error) {
+        var msg = "A problem ocurred while summarizing error in CacheHelper.prototype.cacheGene(): " + error;
+        console.log(msg);
+        me.cacheNextGene(error.geneName, analyzeCalledVariants, callback);
+      })
+    })
+    count++;
+  }
 
 
 }
 
 
 
-CacheHelper.prototype.cacheGene = function(geneName, analyzeCalledVariants, callback) {
-	var me = this;
+CacheHelper.prototype.promiseCacheGene = function(geneName, analyzeCalledVariants, callback) {
+  var me = this;
 
-	promiseGetGeneModel(geneName).then( function(geneModel) {
-	    var geneObject = geneModel;
-    	// Now that we have the gene model,
-    	// load and annotate the variants for each
-    	// sample (e.g. each variant card)
-		me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
-														 .addGene(geneName, genesCard.pageNumberForGene(geneName));
+  return new Promise(function(cacheResolve, cacheReject) {
+    var theGeneName = geneName;
+    var geneObject = null;
+    var transcript = null;
+    var geneCoverageAll = null;
+    var isCached = false;
+    var trioVcfData = null;
+    var trioFbData = null;
+    var shouldCallVariants = analyzeCalledVariants;
 
+    geneModel.promiseGetGeneObject(geneName)
+    .then( function(data) {
+      // Get the gene model
+      geneObject = data;
+      me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+      me.geneBadgeLoaderDisplay.addGene(geneName, genesCard.pageNumberForGene(geneName));
+      geneModel.adjustGeneRegion(geneObject);
+      transcript = geneModel.getCanonicalTranscript(geneObject);
 
-    	adjustGeneRegion(geneObject);
-    	var transcript = getCanonicalTranscript(geneObject);
-    	markCodingRegions(geneObject, transcript);
-    	window.geneObjects[geneObject.gene_name.toUpperCase()] = geneObject;
+      return geneModel.promiseMarkCodingRegions(geneObject, transcript);
+    })
+    .then(function() {
+      // Find out if this gene has already been analyzed
+      return me.promiseIsCachedForProband(geneObject, transcript, analyzeCalledVariants)
+    })
+    .then(function(data) {
+      isCached = data.isCached;
+      if (isCached) {
+        // if the gene has already been analyzed, move on to next gene
+        cacheResolve(geneObject);
+      } else {
+        // Get the gene coverage stats
+        return promiseGetCachedGeneCoverage(geneObject, transcript, false);
+      }
+    })
+    .then(function(data) {
+      // Load and annotate the variants
+      geneCoverageAll = data.geneCoverage;
 
+      // Show that we are working on this gene
+      genesCard._geneBadgeLoading(geneObject.gene_name, true);
 
-		// This function will be performed once all loaded variants have been
-		// analyzed and cached.  Joint call the variants for
-		// the cached gene (if alignments provided and 'analyze all' 
-		// included calling variants) and then determine the inheritance 
-		// (if this is a trio)
-    	var analyzeVariantsForGene = function(geneObject, transcript, analyzeCalledVariants, callback) {
-			if (analyzeCalledVariants) {					
-				// If 'analyze all' including calling variants from alignments, perform
-				// joint calling, then add clinvar annotations and determine the
-				// 'delta' (new) variants that are not present in the gene's loaded variants
-				cacheJointCallVariants(geneObject, transcript, false,  
-					function(theGeneObject, theTranscript) {
-						me._diffAndAnnotateCalledVariants(theGeneObject, theTranscript, analyzeCalledVariants, 
-							function(theGeneObject1, theTranscript1) {
-		    					me.processCachedTrio(theGeneObject1, theTranscript1, analyzeCalledVariants, true, callback);
-		    					if (window.gene && window.gene.gene_name == theGeneObject1.gene_name) {
-		    						genesCard.selectGene(theGeneObject1.gene_name);
-		    					}
-							})
-					});
-			} else {
-				// Determine inheritance for the trio
-				me.processCachedTrio(geneObject, transcript, analyzeCalledVariants, true, callback);
-				if (window.gene && window.gene.gene_name == geneObject.gene_name) {
-					genesCard.selectGene(geneObject.gene_name);
-				}
-			}
-    	}
+      // The gene is ready to be analyzed. Annotate the variants
+      if (isAlignmentsOnly()) {
+        return Promise.resolve(trioVcfData);
+      } else {
+        return promiseAnnotateVariants(geneObject, transcript, dataCard.mode == 'trio' && samplesInSingleVcf(), true)
+      }
+    })
+    .then(function(data) {
+      trioVcfData = data;
 
-    	
+      // Joint call variants if we are calling variants for all genes in 'Analyze All'
+      if (analyzeCalledVariants) {
+        return promiseJointCallVariants(geneObject, transcript, trioVcfData, {checkCache: true, isBackground: true})
+      } else {
+        return Promise.resolve({'trioFbData': trioFbData, 'trioVcfData': trioVcfData});
+      }
+    })
+    .then(function(data) {
 
-	    if (me.isCachedForProband(geneObject, transcript, analyzeCalledVariants)) {
+      // Now determine inheritance and cache the annotated loaded and called variants
+      trioFbData = data.trioFbData;
+      trioVcfData = data.trioVcfData;
 
-	    	// This gene has already been analyzed. Take this gene off of the queue and see
-	    	// if next batch of genes should be analyzed
-	    	genesCard._geneBadgeLoading(geneObject.gene_name, false);
-	    	me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-	    
-		
-		} else {
+      return promiseAnnotateInheritance(geneObject, transcript, trioVcfData, {isBackground: true, cacheData: true})
 
-			// The gene is ready to be analyzed.  Annotate the variants in the vcf for
-			// this gene and if 'analyze all' includes calling variants, perform
-			// joint calling as well.
+    })
+    .then(function(data) {
 
-			// Show that we are working on this gene
-			genesCard._geneBadgeLoading(geneObject.gene_name, true);
+      // Now summarize the danger for the  gene
+      return promiseSummarizeDanger(geneObject, transcript, trioVcfData.proband, {'CALLED': analyzeCalledVariants})
+    })
+    .then(function() {
+      // Now clear out mother and father from cache (localStorage browser cache only)
+      if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
+        if (CacheHelper.useLocalStorage()) {
+          getVariantCard("mother" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
+          getVariantCard("father" ).model.clearCacheItem(CacheHelper.VCF_DATA, geneObject.gene_name, transcript);
+        }
+      }
+      // Clear out the called variants cache since this is now cached in vcf data
+      if (analyzeCalledVariants) {
+        getVariantCard("proband" ).model.clearCacheItem(CacheHelper.FB_DATA, geneObject.gene_name, transcript);
+      }
 
-			if (me.isCachedForCards(geneObject.gene_name, transcript) || isAlignmentsOnly()) {
+      // We have analyzed the gene, now move on to another gene
+      if (window.gene && window.gene.gene_name == geneObject.gene_name) {
+        genesCard.selectGene(geneObject.gene_name);
+      }
 
-				// If the 'analyze all' will include calling variants, the gene may already have loaded
-				// variants (user has clicked on the gene).  In this case, we only want to invoke the
-				// code to joint call the variants for the trio (and determine inheritance) once.  					
-				analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback);
+      // We are done analyzing this gene.  Move on to the next one.
+      cacheResolve(geneObject);
 
-			} else {
+    },
+    function(error) {
+      cacheReject({'geneName': theGeneName, 'message': error});
+    });
+  })
 
-
-				if (dataCard.mode == 'trio' && samplesInSingleVcf()) {
-					// We have a multi-sample vcf, so we only need to retrieve the vcf records once for
-					// the proband and then obtain the genotypes for the mother/father and affected/unaffected
-					// sibs.
-					getProbandVariantCard().model.promiseGetVariantsMultipleSamples(geneObject, transcript, getRelevantVariantCards())
-					  .then( function() {
-					  	analyzeVariantsForGene(geneObject, transcript, analyzeCalledVariants, callback)
-
-					  }, function(error) {
-						// An error occurred.  Set the gene badge with an error glyph
-		    			// and move on to analyzing the next gene
-		    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-	    				var message = error.hasOwnProperty("message") ? error.message : error;
-		    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-		    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
-
-						getProbandVariantCard().summarizeError(geneObject.gene_name, error);
-    					// take this gene off of the queue and see
-    					// if next batch of genes should be analyzed
-			    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);										  	
-
-					  })
-				} else {
-					// This is the time this gene's variants have been cached.
-				    // For each sample, get and annotate the genes and
-				    // cache the variants
-			    	getRelevantVariantCards().forEach(function(variantCard) {
-
-			    		if (dataCard.mode == 'trio' || variantCard == getProbandVariantCard()) {
-				    		variantCard.model.promiseCacheVariants(
-				    			geneObject.chr,
-				    			geneObject, 
-							 	transcript)
-				    		.then( function(vcfData) {
-								if (me.isCachedForCards(vcfData.gene.gene_name, vcfData.transcript)) {
-									// Once all analysis of the gene variants for each of
-									// the samples is complete, call variants (optional) and
-									// process the trio to determine inheritance
-					    			analyzeVariantsForGene(vcfData.gene, vcfData.transcript, analyzeCalledVariants, callback);
-					    		}
-
-				    		}, function(error) {
-
-				    			// An error occurred.  Set the gene badge with an error glyph
-				    			// and move on to analyzing the next gene
-				    			genesCard.setGeneBadgeError(geneObject.gene_name);			    				
-			    				var message = error.hasOwnProperty("message") ? error.message : error;
-				    			console.log("problem caching data for gene " + geneObject.gene_name + ". " + message);
-				    			genesCard._geneBadgeLoading(geneObject.gene_name, false);
-
-								getVariantCard("proband").summarizeError(geneObject.gene_name, error);
-		    					// take this gene off of the queue and see
-		    					// if next batch of genes should be analyzed
-					    		me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);					
-				    		});
-
-			    		}
-
-			    	});							
-				}
-		    }				
-		}
-	    	
-
-	},
-	function(error) {
-		genesCard.setGeneBadgeError(geneName);			    				
-		console.log("problem caching data for gene " + geneName + ".");
-		genesCard._geneBadgeLoading(geneName, false);
-		getVariantCard("proband").summarizeError(geneName, error);
-    	me.cacheNextGene(geneName, analyzeCalledVariants, callback);
-	});
-
-				
-}
-
-CacheHelper.prototype._diffAndAnnotateCalledVariants = function(geneObject, transcript, analyzeCalledVariants, callback) {
-	var processedCount = 0;
-	if (analyzeCalledVariants) {
-		getRelevantVariantCards().forEach(function(vc) {
-			vc.model.processCachedFreebayesVariants(geneObject, transcript, function(theFbData, theVcfData, theGeneObject, theTranscript) {
-
-				// Cache the called variants now that they are fully annotated
-				if (!vc.model._cacheData(theFbData, "fbData", theGeneObject.gene_name, theTranscript)) {
-					console.log("unable to cache fb data for gene " + theGeneObject.gene_name);
-					return;
-				}
-
-				// Re-cache the vcf data now that it has the called (and annotated) variants merged in
-				if (!vc.model._cacheData(theVcfData, "vcfData", theGeneObject.gene_name, theTranscript)) {
-					console.log("unable to cache vcf data for gene " + theGeneObject.gene_name);
-					return;
-				}
-
-				processedCount++;
-				if (processedCount == getRelevantVariantCards().length) {
-					if (callback) {
-						callback(theGeneObject, theTranscript);
-					}
-				}
-			})
-		})		
-	} else {
-		if (callback) {
-			callback();
-		}
-	}
 
 }
 
-CacheHelper.prototype.processCachedTrio = function(geneObject, transcript, analyzeCalledVariants, cacheNext, callback) {
-	var me = this;
-
-	var trioVcfData = {proband: null, mother: null, father: null};
-	var trioFbData  = {proband: null, mother: null, father: null};
-	getRelevantVariantCards().forEach(function(vc) {
-		var theVcfData = vc.model.getVcfDataForGene(geneObject, transcript);
-		var theFbData  = vc.model.getFbDataForGene(geneObject, transcript);
-
-		if (theVcfData == null && analyzeCalledVariants && theFbData != null) {
-			theVcfData = {features: []};
-		}
-
-		if (theVcfData == null) {
-			console.log("Unable to processCachedTrio for gene " + geneObject.gene_name + " because full proband data not available");
-			genesCard.clearGeneGlyphs(geneObject.gene_name);
-			genesCard.setGeneBadgeError(geneObject.gene_name);	
-			if (cacheNext) {
-				me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-			} else {
-				callback();
-			}
-			return;
-		}
-
-		trioVcfData[vc.getRelationship()] = theVcfData;
-
-		if (analyzeCalledVariants) {
-			trioFbData[vc.getRelationship()] = theFbData;
-		}
-	});
-
-	var trioModel = new VariantTrioModel(trioVcfData.proband, trioVcfData.mother, trioVcfData.father);
-	trioModel.compareVariantsToMotherFather(function() {
-
-		// Re-cache the vcf data and fb for the trio
-		for (var relationship in trioVcfData) {
-			if (analyzeCalledVariants) {
-				// If we are calling variants during 'analyze all', then we need to refresh the called variants
-				// with inheritance mode, allele counts and genotypes when inheritance for the trio was performed.
-				// This method will re-cache the called variants.
-				if (trioFbData[relationship]) {
-					getVariantCard(relationship).model.loadCalledTrioGenotypes(trioVcfData[relationship], trioFbData[relationship], geneObject, transcript);
-				}
-			}
-
-			if (!getVariantCard(relationship).model._cacheData(trioVcfData[relationship], "vcfData", geneObject.gene_name, transcript)) {
-				console.log("unable to cache vcf data after inheritance determined for gene " + geneObject.gene_name);
-				return;
-			}
-			
-		}
-
-		getRelevantVariantCards().forEach(function(vc) {
-			if (trioVcfData[vc.getRelationship()]) {
-				vc.model.performAdditionalParsing(trioVcfData[vc.getRelationship()], transcript);
-			}
-		})
-
-		getProbandVariantCard().model.postInheritanceParsing(trioVcfData.proband, geneObject, transcript, getAffectedInfo(), function() {
-
-			//
-			// Now that inheritance has been determined,  analyze the alignments 
-			// in the gene coding regions to get coverage metrics
-			//
-			promiseGetGeneCoverage(geneObject, transcript).then(function(geneCoverageAll) {
-
-				//
-				// Summarize the variants for the proband to create the gene badges, 
-				// representing the most pathogenic variants for this gene
-				//
-				var filteredVcfData = getVariantCard('proband').model.filterVariants(trioVcfData.proband, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-				var options = {};
-				if (analyzeCalledVariants) {
-					options.CALLED = true;
-				}
-
-
-		  		var dangerObject = getVariantCard("proband").summarizeDanger(geneObject.gene_name, filteredVcfData, options, geneCoverageAll);
-				getVariantCard('proband').model.cacheDangerSummary(dangerObject, geneObject.gene_name);
-
-				genesCard._geneBadgeLoading(geneObject.gene_name, false);
-				if (trioVcfData.proband.features.length == 0) {
-					//genesCard.setGeneBadgeWarning(geneObject.gene_name);
-				} else {
-					genesCard.setGeneBadgeGlyphs(geneObject.gene_name, dangerObject, false);
-				}
-
-				
-				// Now clear out mother and father from cache.  
-				if (analyzeCalledVariants) {
-					// Clear out the loaded variants for mom and dad.  (Keep called variants for mother
-					// and father in cache as we need these to show allele counts and genotypes for trio
-					// with determineInheritance() on selected gene is invoked)
-					getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-					getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-
-					// For alignments only analysis, the called variants were cached in as "vcfData" to process
-					// the trio.  Now that the data is cached as "fbData", clear out the duplicate data 
-					// for the proband.
-					//if (getVariantCard("proband" ).model.isAlignmentsOnly()) {
-					//	getVariantCard("proband").model.clearCacheItem("vcfData", geneObject.gene_name, transcript);	
-					//}
-
-					getVariantCard("proband" ).model.clearCacheItem("fbData", geneObject.gene_name, transcript);					
-
-
-				} else if (window.gene == null || window.gene.gene_name != geneObject.gene_name) {
-					// Don't clear cache for currently selected
-					// gene though as this will result in no inheritance mode being detected.
-					getVariantCard("mother" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-					getVariantCard("father" ).model.clearCacheItem("vcfData", geneObject.gene_name, transcript);					
-				}
-
-
-				// We are done analyzing this gene. Take this gene off of the queue and see
-				// if next batch of genes should be analyzed
-				if (cacheNext) {
-					me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants, callback);
-				} else {
-					callback();
-				}
-			});
-
-		});
-
-
-
-
-
-	}, 
-	function(error) {
-		console.log("problem determining inheritance for " + geneObject.gene_name + ". " + error);
-		// take this gene off of the queue and see
-		// if next batch of genes should be analyzed
-		if (cacheNext) {
-			me.cacheNextGene(geneObject.gene_name, analyzeCalledVariants,callback);
-		} else {
-			callback();
-		}
-	});
-}
 
 CacheHelper.prototype.isGeneInProgress = function(geneName) {
-	return this.cacheQueue.indexOf(geneName) >= 0;
+  return this.cacheQueue.indexOf(geneName) >= 0;
 }
 
 CacheHelper.prototype.cacheNextGene = function(geneName, analyzeCalledVariants, callback) {
-	this.showAnalyzeAllProgress();
+  this.showAnalyzeAllProgress();
 
-	this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
-														 .removeGene(geneName);
-	// Take the analyzed (and cached) gene off of the cache queue
-	var idx = this.cacheQueue.indexOf(geneName);
-	if (idx >= 0) {
-		this.cacheQueue.splice(idx,1);
-	} else {
-		idx = this.cacheQueue.indexOf(geneName.toUpperCase());
-		if (idx >= 0) {
-			this.cacheQueue.splice(idx,1);
-		} else {
-			console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
-			if (callback) {
-				callback();
-			}
-			return;
-		}
-	}
-	// Invoke cacheGenes, which will kick off the next batch
-	// of genes to analyze once all of the genes in
-	// the current batch have been analyzed.
-	this.cacheGenes(analyzeCalledVariants, callback);
+  // Take the analyzed (and cached) gene off of the cache queue
+  var idx = this.cacheQueue.indexOf(geneName);
+  if (idx >= 0) {
+    this.cacheQueue.splice(idx,1);
+    this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+                               .removeGene(geneName);
+  } else {
+    idx = this.cacheQueue.indexOf(geneName.toUpperCase());
+    if (idx >= 0) {
+      this.cacheQueue.splice(idx,1);
+      this.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+                                 .removeGene(geneName);
+    } else {
+      console.log("Unexpected error occurred during caching of genes.  Could not remove " + geneName + " from cache queue");
+      if (callback) {
+        callback();
+      }
+      return;
+    }
+  }
+  // Invoke cacheGenes, which will kick off the next batch
+  // of genes to analyze once all of the genes in
+  // the current batch have been analyzed.
+  this.cacheGenes(analyzeCalledVariants, callback);
 }
 
-CacheHelper.prototype.isCachedForProband = function(geneObject, transcript, checkForCalledVariants) {
-	// If we are analyzing loaded variants, return true if the vcf data is cached (and inheritance loaded)
-	// and we have danger summary for this gene.  If we are also analyzing called variants return true
-	// if the above condition is met plus we have cached the called variants for this gene.
-	return getProbandVariantCard().model.isCachedAndInheritanceDetermined(geneObject, transcript, checkForCalledVariants)
-		|| (!checkForCalledVariants && getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name));
-}
-
-CacheHelper.prototype.isCachedForCards = function(geneName, transcript) {
-	var me = this;
-	var count = 0;
-	getRelevantVariantCards().forEach( function(variantCard) {
-		if (variantCard.isCached(geneName, transcript)) {
-			count++;
-		}
-	});
-	if (dataCard.mode == 'single') {
-		return count == 1;
-	} else {
-		return count == getRelevantVariantCards().length;
-	}
+CacheHelper.prototype.promiseIsCachedForProband = function(geneObject, transcript, checkForCalledVariants) {
+  return new Promise(function(resolve, reject) {
+    getProbandVariantCard().promiseGetDangerSummary(geneObject.gene_name)
+    .then(function(dangerSummary) {
+      var isCached = dangerSummary == null ? false : (checkForCalledVariants ? dangerSummary.CALLED : true);
+      resolve({geneObject: geneObject, transcript: transcript, shouldCallVariants: checkForCalledVariants, 'isCached': isCached})
+    })
+  })
 }
 
 
 CacheHelper.prototype.getAnalyzeAllCounts = function(callback) {
-	var counts = {
-		geneCount: 0,
-		all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
-		loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
-		called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
-	}
+  var me = this;
+  var counts = {
+    geneCount: 0,
+    all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+    loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+    called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
+  }
 
-	var incrementLoadedVsCalled = function(danger, counts, field) {
-		if (danger) {
-			counts.all[field]++;
-			if (!isAlignmentsOnly() ) {
-				counts.loaded[field]++;
-			}
-			if (danger.CALLED) {
-				counts.called[field]++;
-			}		
-		}
-	}
+  // Clone the array of gene names
+  var genesToCount = genesCard.getGeneNames().slice(0);
 
-	genesCard.getGeneNames().forEach(function(geneName) {
-		
-    	counts.geneCount++;
+  // Sequentially examine the danger summary for each gene (recursive).
+  // When all genes have been examined, the callback will be invoked
+  // with the counts object.
+  me.getNextGeneCounts(genesToCount, counts, callback);
 
-		var key = getProbandVariantCard().model._getCacheKey("dangerSummary", geneName);
-    	var danger = CacheHelper.getCachedData(key);
-
-		if (danger != null) {
-			
-			incrementLoadedVsCalled(danger, counts, 'analyzed');
-
-			if (danger.featureCount && danger.featureCount > 0) {
-				counts.all.pass++;
-				if (!isAlignmentsOnly() && danger.loadedCount && danger.loadedCount > 0) {
-					counts.loaded.pass++;
-				}
-				if (danger.calledCount && danger.calledCount > 0) {
-					counts.called.pass++;
-				}
-			}
-
-		} else {
-			incrementLoadedVsCalled(danger, counts, 'unanalyzed');		
-		}
-
-	});
-	callback(counts);
 
 }
 
 
-CacheHelper.prototype.refreshGeneBadges = function(callback) {  
-	var me = this;
-	var geneCount = {total: 0, pass: 0};
+CacheHelper.prototype.getNextGeneCounts = function(genesToCount, counts, callback) {
+  var me = this;
 
-	$('#gene-badges-loader').removeClass("hide");
 
-	var theGeneNames = {};
-	genesCard.getGeneNames().forEach(function(geneName) {
-		theGeneNames[geneName] = true;
-	});
+  var incrementLoadedVsCalled = function(danger, counts, field) {
+    if (danger) {
+      counts.all[field]++;
+      if (!isAlignmentsOnly() ) {
+        counts.loaded[field]++;
+      }
+      if (danger.CALLED) {
+        counts.called[field]++;
+      }
+    }
+  }
 
-	//var dataKind = getProbandVariantCard().model.isAlignmentsOnly() ? "fbData" : "vcfData";
-	var dataKind = "vcfData";
+  if (genesToCount.length == 0) {
+    callback(counts);
+  } else {
+    // Remove the next gene from the list
+    var geneName = genesToCount.splice(0,1);
 
-	var keys = [];
-	for (var i=0; i<=localStorage.length-1; i++) {  
-		var key = localStorage.key(i);  
-		keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+    counts.geneCount++;
 
-		  	if (keyObject.dataKind == dataKind && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
-		  		keys.push({'key': key, 'keyObject': keyObject});
-		  	}
-		 }
-	}
+    var key = getProbandVariantCard().model._getCacheKey(CacheHelper.DANGER_SUMMARY_DATA, geneName);
 
-	me.refreshNextGeneBadge(keys, geneCount, function() {
-		genesCard.sortGenes();
+    // Get danger summary for gene
+      me.promiseGetData(key)
+        .then(function(danger) {
+        if (danger != null) {
 
-		$('#gene-badges-loader').addClass("hide");
+          // Increment the loaded variants count for the gene
+          incrementLoadedVsCalled(danger, counts, 'analyzed');
 
-		callback();
+          // Increment the called variant count for the gene
+          if (danger.featureCount && danger.featureCount > 0) {
+            counts.all.pass++;
+            if (!isAlignmentsOnly() && danger.loadedCount && danger.loadedCount > 0) {
+              counts.loaded.pass++;
+            }
+            if (danger.calledCount && danger.calledCount > 0) {
+              counts.called.pass++;
+            }
+          }
 
-	});
+
+        } else {
+          // We don't have a danger summary for the gene.  Increment the unanlyzed count
+          incrementLoadedVsCalled(danger, counts, 'unanalyzed');
+        }
+
+        // Now get the counts for the next gene in the list
+        me.getNextGeneCounts(genesToCount, counts, callback);
+
+        },
+        function(error) {
+          console.log("An error occurred in getAnalyzeAllCounts when calling promiseGetData: " + error);
+          callback(counts);
+        });
+  }
+
 
 }
 
 
-CacheHelper.prototype.refreshGeneBadgesGeneCoverage = function(refreshOnly=false) {  
-	var me = this;
+CacheHelper.prototype.refreshGeneBadges = function(callback) {
+  var me = this;
+  var geneCount = {total: 0, pass: 0};
 
+  $('#gene-badges-loader').removeClass("hide");
 
-	var counts = {
-		geneCount: 0,
-		all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
-		loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
-		called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
-	}	
+  var theGeneNames = {};
+  genesCard.getGeneNames().forEach(function(geneName) {
+    theGeneNames[geneName] = true;
+  });
 
-	$('#gene-badges-loader').removeClass("hide");
+  var dataKind = CacheHelper.VCF_DATA;
 
-	var theGeneNames = {};
-	genesCard.getGeneNames().forEach(function(geneName) {
-		theGeneNames[geneName] = true;
-	});
+  me.promiseGetKeys()
+   .then(function(allKeys) {
+    var keys = [];
 
-	for (var i=0; i<=localStorage.length-1; i++)  
-	{  
-		key = localStorage.key(i);  
-		keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+    allKeys.forEach(function(key) {
+      keyObject = CacheHelper._parseCacheKey(key);
+      if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
 
-		  	if (keyObject.dataKind == 'vcfData' && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
-		  		counts.geneCount++;
+          if (keyObject.dataKind == dataKind && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
+            keys.push({'key': key, 'keyObject': keyObject});
+          }
+       }
+    })
 
-				var geneObject   = window.geneObjects[keyObject.gene];
-				var geneCoverageAll = getCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript});					
-				var dangerObject = getProbandVariantCard().model.getDangerSummaryForGene(geneObject.gene_name);
-		 		
-			 	if (geneCoverageAll && dangerObject) {
-			 		var clearOtherDanger = refreshOnly ? false : true;
-			 		VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
+    me.refreshNextGeneBadge(keys, geneCount, function() {
+      genesCard.sortGenes();
 
-			  		counts.all.analyzed++;
-			  		counts.loaded.analyzed++;
-			  		counts.called.analyzed++;
-			 		if (dangerObject.geneCoverageProblem) {
-			  			counts.all.pass++;
-			  			counts.loaded.pass++;
-			  			counts.called.pass++;
-			  		}
-					
-			 		getProbandVariantCard().model.cacheDangerSummary(dangerObject, keyObject.gene);
-					genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
-		 		} else {
-			  		counts.all.unanalyzed++;
-			  		counts.loaded.unanalyzed++;
-			  		counts.called.unanalyzed++;
+      $('#gene-badges-loader').addClass("hide");
 
-		 		}
+      if (callback) {
+        callback();
+      }
 
+    });
 
-		  	} 
-		} 
-	}  
-	if (!refreshOnly) {
-		genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
-	}
+   },
+   function(error) {
+    var msg = "A problem occurred in CacheHelper.refreshGeneBadges(): " + error;
+    console.log(msg);
+    if (callback) {
+      callback();
+    }
+   })
 
-	$('#gene-badges-loader').addClass("hide");
-	return counts;
 }
 
-CacheHelper.prototype.clearCache = function(launchTimestampToClear) {
-	var me = this;
-	if (keepLocalStorage) {
-		
-	} else {
-		me._clearCache(launchTimestampToClear, false, false);
-		me.genesToCache = [];
-	}
+
+CacheHelper.prototype.promiseRefreshGeneBadgesGeneCoverage = function(refreshOnly=false) {
+  var me = this;
+
+  return new Promise(function(resolve, reject) {
+    var counts = {
+      geneCount: 0,
+      all:    {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+      loaded: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0},
+      called: {analyzed: 0, unanalyzed: 0, error: 0, pass: 0}
+    }
+
+    $('#gene-badges-loader').removeClass("hide");
+
+    var theGeneNames = {};
+    genesCard.getGeneNames().forEach(function(geneName) {
+      theGeneNames[geneName] = true;
+    });
+
+
+    me.promiseGetKeys()
+     .then(function(allKeys) {
+
+      var thePromises = [];
+      var dangerPromises = [];
+
+      allKeys.forEach(function(key) {
+        keyObject = CacheHelper._parseCacheKey(key);
+        if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+
+            if (keyObject.dataKind == CacheHelper.VCF_DATA && keyObject.relationship == "proband" && theGeneNames[keyObject.gene]) {
+              counts.geneCount++;
+
+              var geneObject   = geneModel.geneObjects[keyObject.gene];
+              var p = promiseGetCachedGeneCoverage(geneObject, {transcript_id: keyObject.transcript})
+              .then(function(data) {
+                var geneCoverageAll = data.geneCoverage;
+
+                var dp = getProbandVariantCard().promiseGetDangerSummary(data.gene.gene_name)
+                .then(function(dangerObject) {
+                  if (geneCoverageAll && dangerObject) {
+                    var clearOtherDanger = refreshOnly ? false : true;
+
+                    VariantModel.summarizeDangerForGeneCoverage(dangerObject, geneCoverageAll, clearOtherDanger, refreshOnly);
+
+                    counts.all.analyzed++;
+                    if (isAlignmentsOnly()) {
+                      counts.called.analyzed++;
+                    } else {
+                      counts.loaded.analyzed++;
+                    }
+
+                    if (dangerObject.geneCoverageProblem) {
+                      counts.all.pass++;
+                      if (isAlignmentsOnly()) {
+                        counts.called.pass++;
+                      } else {
+                        counts.loaded.pass++;
+                      }
+                    }
+
+                    getProbandVariantCard().model.promiseCacheDangerSummary(dangerObject, data.gene.gene_name).then(function() {
+                      genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
+                    })
+                  } else {
+                    counts.all.unanalyzed++;
+                    if (isAlignmentsOnly()) {
+                      counts.called.unanalyzed++;
+                    } else {
+                      counts.loaded.unanalyzed++;
+                    }
+
+                  }
+                })
+                dangerPromises.push(dp);
+
+              }, function(error) {
+                var msg = "Problem encountered in CacheHelper.refreshGeneBadgesGeneCoverage() " + error;
+                console.log(msg);
+                reject(msg);
+
+              });
+
+              thePromises.push(p);
+            }
+        }
+
+      })
+
+      Promise.all(thePromises).then(function() {
+        Promise.all(dangerPromises).then(function() {
+          if (!refreshOnly) {
+            genesCard.sortGenes(genesCard.LOW_COVERAGE_OPTION, true);
+          }
+
+          $('#gene-badges-loader').addClass("hide");
+          resolve(counts);
+
+        },
+        function(error) {
+          reject(error);
+        })
+      },
+      function(error) {
+        reject(error);
+      })
+     },
+     function(error) {
+      var msg = "A problem occurred in CacheHelper.promiseRefreshGeneBadgesGeneCoverage(): " + error;
+      console.log(msg);
+      reject(msg);
+
+    });
+
+
+  })
+
+
+}
+
+
+
+CacheHelper.prototype.promiseClearCache = function(launchTimestampToClear) {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+    if (keepLocalStorage) {
+      resolve();
+
+    } else {
+      me._promiseClearCache(launchTimestampToClear, false, false)
+       .then(function() {
+        me.genesToCache = [];
+        resolve();
+       },
+       function(error) {
+        reject(error);
+       })
+    }
+  })
+
 }
 
 CacheHelper.prototype.refreshNextGeneBadge = function(keys, geneCount, callback) {
-	var me = this;
-	if (keys.length == 0) {
-		callback();
-	} else {
-		var theKey    = keys.splice(0,1)[0];
-		var key       = theKey.key;
-		var keyObject = theKey.keyObject;
-	  	var geneObject = window.geneObjects[keyObject.gene];
+  var me = this;
+  if (keys.length == 0) {
+    callback();
+  } else {
+    var theKey    = keys.splice(0,1)[0];
+    var key       = theKey.key;
+    var keyObject = theKey.keyObject;
 
-  		CacheHelper.getCachedDataMultithread(key, function(theVcfData) {
-	  		var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), geneObject.start, geneObject.end, true);
-	  		
-	  		geneCount.total++;
-	  		if (filteredVcfData.features.length > 0) {
-	  			geneCount.pass++;
-	  		}
 
-	  		var theFbData = null;
-			var ds = getVariantCard("proband").model.getDangerSummaryForGene(geneObject.gene_name);
-			if (theVcfData && theVcfData.features && ds && ds.CALLED) {
-				theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
-			}
+    me.promiseGetDataThreaded(key, keyObject).then(function(cachedData) {
+      var theVcfData    = cachedData.data;
+      var theKeyObject  = cachedData.keyObject;
+      var theGeneObject = geneModel.geneObjects[theKeyObject.gene];
 
-			var options = {};
-			if (theFbData) {
-				options.CALLED = true;
-			}
+      var filteredVcfData = getVariantCard('proband').model.filterVariants(theVcfData, filterCard.getFilterObject(), theGeneObject.start, theGeneObject.end, true);
 
-			var geneCoverageAll = getCachedGeneCoverage(geneObject,{ transcript_id: keyObject.transcript});
+      geneCount.total++;
+      if (filteredVcfData.features.length > 0) {
+        geneCount.pass++;
+      }
 
-	  		var dangerObject = getVariantCard("proband").summarizeDanger(keyObject.gene, filteredVcfData, options, geneCoverageAll);
+      var theFbData = null;
+      getVariantCard("proband").promiseGetDangerSummary(theGeneObject.gene_name).then(function(ds) {
+        if (theVcfData && theVcfData.features && ds && ds.CALLED) {
+          theFbData = getVariantCard("proband").model.reconstituteFbData(theVcfData);
+        }
 
-			getVariantCard('proband').model.cacheDangerSummary(dangerObject, keyObject.gene);
-			
-			genesCard.setGeneBadgeGlyphs(keyObject.gene, dangerObject, false);
+        var options = {};
+        if (theFbData) {
+          options.CALLED = true;
+        }
 
-			me.refreshNextGeneBadge(keys, geneCount, callback);	
-  		});
-	}
+        promiseGetCachedGeneCoverage(theGeneObject, {transcript_id: theKeyObject.transcript}).then(function(data) {
+          var geneCoverageAll = data.geneCoverage;
+          getVariantCard("proband").promiseSummarizeDanger(data.gene.gene_name, filteredVcfData, options, geneCoverageAll).then(function(dangerObject) {
+            genesCard.setGeneBadgeGlyphs(data.gene.gene_name, dangerObject, false);
+            me.refreshNextGeneBadge(keys, geneCount, callback);
+          })
+        })
+      })
+     });
+
+  }
 }
 
 CacheHelper.prototype.getCacheKey = function(cacheObject) {
-	var key =  "gene.iobio"  
-		+ cacheHelper.KEY_DELIM + this.launchTimestamp
-	    + cacheHelper.KEY_DELIM + cacheObject.relationship 
-		+ cacheHelper.KEY_DELIM + cacheObject.sample
-		+ cacheHelper.KEY_DELIM + cacheObject.gene
-		+ cacheHelper.KEY_DELIM + cacheObject.transcript
-		+ cacheHelper.KEY_DELIM + cacheObject.dataKind;
-	if (cacheObject.dataKind != 'coverageData') {
-	    key += cacheHelper.KEY_DELIM + cacheObject.annotationScheme;
-	}
-	return key;
+  var key =  "gene.iobio"
+    + cacheHelper.KEY_DELIM + this.launchTimestamp
+    + cacheHelper.KEY_DELIM + cacheObject.relationship
+    + cacheHelper.KEY_DELIM + cacheObject.sample
+    + cacheHelper.KEY_DELIM + cacheObject.gene
+    + cacheHelper.KEY_DELIM + cacheObject.transcript
+    + cacheHelper.KEY_DELIM + cacheObject.dataKind;
+  if (cacheObject.dataKind != CacheHelper.GENE_COVERAGE_DATA) {
+      key += cacheHelper.KEY_DELIM + cacheObject.annotationScheme;
+  }
+  return key;
 }
 
 
-CacheHelper.prototype.getCacheSize = function(format=true) {  // provide the size in bytes of the data currently stored
-	var me = this;
-	var size = 0;
-	var otherSize = 0;
-	var coverageSize = 0;
-	var otherAppSize = 0;
-	for (var i=0; i<=localStorage.length-1; i++)  
-	{  
-		key = localStorage.key(i);  
-		var keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject) {			
-			if (keyObject.launchTimestamp == me.launchTimestamp) {
-			  	var dataSize = localStorage.getItem(key).length;
-			  	size     += dataSize;
+CacheHelper.prototype.promiseGetCacheSize = function(format=true) {  // provide the size in bytes of the data currently stored
+  var me = this;
 
-			  	if (keyObject.dataKind == 'bamData') {
-			  		coverageSize +=  dataSize;
-			  	}
-			  	
-			} else {
-				var dataSize = localStorage.getItem(key).length;
-				otherSize += dataSize;
-			}
-		} else {
-			otherAppSize += localStorage.getItem(key).length;
-		}
-	}  
-	if (format) {
-		return {total:     (CacheHelper._sizeMB(size) + " MB"), 
-		        coverage:  (CacheHelper._sizeMB(coverageSize) + " MB"),
-		        other:     (CacheHelper._sizeMB(otherSize) + " MB"),
-		        otherApp:  (CacheHelper._sizeMB(otherAppSize) + " MB")
-		    };
-	} else {
-		return {total:     (CacheHelper._sizeMB(size)), 
-		        coverage:  (CacheHelper._sizeMB(coverageSize)),
-		        other:     (CacheHelper._sizeMB(otherSize)),
-		        otherApp:  (CacheHelper._sizeMB(otherAppSize))
-		    };
+  return new Promise(function(resolve, reject) {
+    var size = 0;
+    var coverageSize = 0;
 
-	}
+    var otherSessionsSize = 0;
+    var otherSessionsInfo = {};
+
+    var otherUseSize = 0;
+    me.promiseGetAllKeys()
+     .then(function(allKeys) {
+      var promises = []
+      allKeys.forEach(function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        if (keyObject) {
+            var p = me.promiseGetData(key, false)
+             .then(function(data) {
+              if (data != null) {
+              if (keyObject.launchTimestamp == me.launchTimestamp) {
+                size += data.length;
+                  if (keyObject.dataKind == CacheHelper.BAM_DATA) {
+                    coverageSize +=  data.length;
+                  }
+
+              } else {
+                otherSessionsSize += data.length;
+
+
+                var sessionTotal = otherSessionsInfo[keyObject.launchTimestamp];
+                if (sessionTotal == null) {
+                  sessionTotal = 0;
+                }
+                sessionTotal += data.length;
+                otherSessionsInfo[keyObject.launchTimestamp] = sessionTotal;
+              }
+              }
+          });
+            promises.push(p);
+        } else {
+          // TODO - How to determine size of cache items for other apps?
+          otherUseSize += 0;
+        }
+      })
+      Promise.all(promises).then(function() {
+
+          resolve({ total:           format ? (CacheHelper._sizeMB(size) + " MB") : size,
+                    coverage:        format ? (CacheHelper._sizeMB(coverageSize) + " MB") : coverageSize,
+                    otherSessions:   format ? (CacheHelper._sizeMB(otherSessionsSize) + " MB") : otherSessionsSize,
+                    otherUse:        format ? (CacheHelper._sizeMB(otherUseSize) + " MB") : otherUseSize,
+                    'otherSessionsInfo':  otherSessionsInfo
+                  });
+
+
+
+      },
+      function(error) {
+        var msg = "A problem ocurred in CacheHelper.promiseGetCacheSize(): +  " + error;
+        console.log(msg);
+        reject(msg);
+      })
+
+     },
+     function(error) {
+      reject(error);
+     })
+
+
+  })
 
 }
 
-CacheHelper._logCacheSize = function() {
-	var cacheInfo = {};
-	for (var i=0; i<=localStorage.length-1; i++)  
-	{  
-		var key = localStorage.key(i); 
-		var keyPart = "";
-		if (key.indexOf(cacheHelper.KEY_DELIM)) {
-			keyPart = key.split(cacheHelper.KEY_DELIM)[0];
-		} else {
-			keyPart = key;
-		}
-			
-		var size = cacheInfo[keyPart];
-		if (size == null) {
-			size = 0;
-		}
-		size += localStorage.getItem(key).length;
-		cacheInfo[keyPart] = size;			
-	}
-	console.log(cacheInfo);
-	var totalSize = 0;
-	Object.keys(cacheInfo).forEach(function(key) {
-		totalSize += cacheInfo[key];
-	})
-	console.log(totalSize);	
+CacheHelper.prototype.cleanupCacheOnClose = function(launchTimestampToClear) {
+  var me = this;
+  if (launchTimestampToClear == null) {
+    launchTimestampToClear = me.launchTimestamp;
+  }
+  if (CacheHelper.useLocalStorage() && localStorage) {
+    var keys = [];
+    for (var i=0; i<=localStorage.length-1; i++)  {
+      var key = localStorage.key(i);
+      var keyObject = CacheHelper._parseCacheKey(key);
+      if (keyObject && keyObject.launchTimestamp == launchTimestampToClear) {
+        keys.push(key);
+      }
+    }
+
+    keys.forEach(function(key) {
+      localStorage.removeItem(key);
+    })
+  } else {
+    var key = 'gene.iobio.stale';
+    var staleSessions = localStorage[key];
+    if (staleSessions == null || staleSessions == "") {
+      staleSessions = launchTimestampToClear;
+    } else {
+      staleSessions += "," + launchTimestampToClear;
+    }
+    localStorage[key] = staleSessions;
+  }
 }
 
-CacheHelper._logCacheContents = function() {
-	var x, xLen, log=[],total=0;
-	for (x in localStorage){
-		xLen =  ((localStorage[x].length * 1 + x.length * 1)/1024); 
-		log.push(x + " = " +  xLen.toFixed(2) + " KB"); 
-		total+= xLen}; 
-		if (total > 1024){
-			log.unshift("Total = " + (total/1024).toFixed(2)+ " MB");
-		} else{
-			log.unshift("Total = " + total.toFixed(2)+ " KB");}; 
-			console.log(log.join("\n")
-	);	
-}
 
-CacheHelper.prototype.clearCacheItem = function(key) {
-	var me = this;
-	if (localStorage) {
-		localStorage.removeItem(key);			
-	}
-}
+CacheHelper.prototype._promiseClearCache = function(launchTimestampToClear, clearOther, clearOtherApp) {
+  var me = this;
 
-CacheHelper.prototype._clearCache = function(launchTimestampToClear, clearOther, clearOtherApp) {
-	var me = this;
-	var clearCurrentSessionCache = false;
-	if (launchTimestampToClear == me.launchTimestamp) {
-		clearCurrentSessionCache = true;
-	}
-	var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
-	if (localStorage) {
-		//CacheHelper._logCacheSize();
-		var keysToRemove = [];
-		for (var i=0; i<=localStorage.length-1; i++)  {  
-			var key = localStorage.key(i); 	
-			var keyObject = CacheHelper._parseCacheKey(key);
-			if (keyObject) {
-				if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther && !clearOtherApp) {
-					keysToRemove.push(key);
-					if (keyObject.gene && keyObject.relationship == 'proband') {
-						genesCard.clearGeneGlyphs(keyObject.gene);
-						genesCard.clearGeneInfo(keyObject.gene);
+  return new Promise(function(resolve, reject) {
 
-					}
-				} else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther && !clearOtherApp) {
-					keysToRemove.push(key);
-				}				
-			} else if (clearOtherApp) {
-				keysToRemove.push(key);
-			}
-		}	
-		keysToRemove.forEach( function(key) {
-			localStorage.removeItem(key);			
-		})
-		if (clearCurrentSessionCache) {
-			window.gene = null;
-			genesCard._hideCurrentGene();
 
-			filterCard.clearFilters();
-			if (window.variantCards && window.variantCards.length > 0) {
-				filterVariants();
-			}
-			filterCard.resetStandardFilterCounts();
+    var clearCurrentSessionCache = false;
+    if (launchTimestampToClear == me.launchTimestamp) {
+      clearCurrentSessionCache = true;
+    }
+    var theLaunchTimeStamp = launchTimestampToClear ? launchTimestampToClear : me.launchTimestamp;
+    var keysToRemove = [];
+    me.promiseGetAllKeys()
+     .then(function(allKeys) {
+      allKeys.forEach(function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        if (keyObject) {
+          if (keyObject.launchTimestamp == theLaunchTimeStamp && !clearOther && !clearOtherApp) {
+            keysToRemove.push(key);
+            if (keyObject.gene && keyObject.relationship == 'proband') {
+              genesCard.clearGeneGlyphs(keyObject.gene);
+              genesCard.clearGeneInfo(keyObject.gene);
 
-			me.hideAnalyzeAllProgress();			
-		}
+            }
+          } else if (keyObject.launchTimestamp != theLaunchTimeStamp && clearOther && !clearOtherApp) {
+            keysToRemove.push(key);
+          }
+        } else if (clearOtherApp) {
+          keysToRemove.push(key);
+        }
+      })
 
-		if (clearOther || clearOtherApp) {
-			me.checkCacheSize();
-		}
-	}
+      var promises = [];
+      keysToRemove.forEach( function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);
+        promises.push(p);
+      })
+
+      Promise.all(promises).then(function() {
+        if (clearCurrentSessionCache) {
+          window.gene = null;
+          genesCard._hideCurrentGene();
+
+          filterCard.clearFilters();
+          if (window.variantCards && window.variantCards.length > 0) {
+            filterVariants();
+          }
+          filterCard.resetStandardFilterCounts();
+
+          me.hideAnalyzeAllProgress();
+        }
+
+        //if (clearOther || clearOtherApp) {
+        //  me.checkCacheSize();
+        //}
+        resolve();
+
+      })
+
+     },
+     function(error) {
+      reject(error);
+     })
+
+  });
+
 }
 
 CacheHelper.prototype.clearAll = function() {
-	var me = this;
-	// confirm dialog
-	alertify.confirm("Clear all cached data for this session?", function (e) {
-	    if (e) {
-			// user clicked "ok"
-			me._clearCache(me.launchTimestampToClear, false, false);
-			cacheHelper.showAnalyzeAllProgress();
-  			me.refreshDialog();
-	        
-	    } 
-	}, function() {
-		// user clicked "cancel"
-	})
-	.set('labels', {ok:'OK', cancel:'Cancel'});   		;
+  var me = this;
+  // confirm dialog
+  alertify.confirm("Clear all cached data for this session?", function (e) {
+      if (e) {
+      // user clicked "ok"
+      me._promiseClearCache(me.launchTimestampToClear, false, false)
+       .then(function() {
+        cacheHelper.showAnalyzeAllProgress();
+          me.refreshDialog();
+       });
+
+      }
+  }, function() {
+    // user clicked "cancel"
+  })
+  .set('labels', {ok:'OK', cancel:'Cancel'});       ;
 }
 CacheHelper.prototype.clearOther = function() {
-	var me = this;
-	// confirm dialog
-	alertify.confirm("Clear all cached data for other gene.iobio sessions?  IMPORTANT: To save analysis, bookmark any variants of interest in other browser tabs before clearing the cache.", function (e) {
-	    if (e) {
-			// user clicked "ok"
-			me._clearCache(null, true, false);
-  			me.refreshDialog();
-	        
-	    } 
-	    		
-	})
-	.set('labels', {ok:'OK', cancel:'Cancel'});   
+  var me = this;
+  // confirm dialog
+  alertify.confirm("Clear all cached data for other gene.iobio sessions?  IMPORTANT: To save analysis, bookmark any variants of interest in other browser tabs before clearing the cache.", function (e) {
+      if (e) {
+      // user clicked "ok"
+      me._promiseClearCache(null, true, false)
+       .then(function() {
+          me.refreshDialog();
+       })
+
+      }
+
+  })
+  .set('labels', {ok:'OK', cancel:'Cancel'});
 }
 CacheHelper.prototype.clearOtherApp = function() {
-	var me = this;
-	// confirm dialog
-	alertify.confirm("Clear all cached data for other web applications?", function (e) {
-	    if (e) {
-			// user clicked "ok"
-			me._clearCache(null, false, true);
-  			me.refreshDialog();
-	        
-	    }
-	   
-	}) .set('labels', {ok:'OK', cancel:'Cancel'});   		
+  var me = this;
+  // confirm dialog
+  alertify.confirm("Clear all cached data for other web applications?", function (e) {
+      if (e) {
+      // user clicked "ok"
+      me._promiseClearCache(null, false, true)
+       .then(function() {
+          me.refreshDialog();
+
+       })
+
+      }
+
+  }) .set('labels', {ok:'OK', cancel:'Cancel'});
 }
 
-CacheHelper.prototype.clearCoverageCache = function() {
-	var me = this;
-	for (var i=0; i<=localStorage.length-1; i++)  {  
-  		var key = localStorage.key(i); 	
-		var keyObject = CacheHelper._parseCacheKey(key);
-	  		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
-				if (keyObject.dataKind == "bamData") {
-					localStorage[key] = "";
-				}
-	  		}
-	}
-	me.refreshDialog();
+CacheHelper.prototype.promiseClearCoverageCache = function() {
+  var me = this;
+
+  return new Promise(function(resolve, reject) {
+    me.promiseGetKeys()
+     .then(function(allKeys) {
+      var promises = [];
+      allKeys.forEach(function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+          if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+          if (keyObject.dataKind == CacheHelper.BAM_DATA) {
+            var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);
+            promises.push(p);
+          }
+          }
+
+      })
+      Promise.all(promises).then(function() {
+        me.refreshDialog();
+        resolve();
+      })
+
+     },
+     function(error) {
+      reject(error);
+     })
+
+  })
 }
-CacheHelper.prototype.clearNonBadgeCache = function() {
-	var me = this;
-	for (var i=0; i<=localStorage.length-1; i++)  {  
-  		var key = localStorage.key(i); 	
-  		var keyObject = CacheHelper._parseCacheKey(key);
-  		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
-			if (me._isProbandVariantCache(key) && !me._hasBadgeOfInterest(key)) {
-				me.clearCacheForGene(keyObject.gene);
-			}  			
-  		}
-	}
-	me.refreshDialog();
-}
+
 
 CacheHelper.prototype.refreshDialog = function() {
-	var sizes = this.getCacheSize();
-	$("#cache-size").text(sizes.total);
-	$("#coverage-size").text(sizes.coverage);
-	$("#other-cache-size").text(sizes.other);
-	$("#other-app-cache-size").text(sizes.otherApp);
+  var me = this;
+  return new Promise(function(resolve, reject) {
+    var formatOtherSessions = function(otherSessions) {
+      var html = "";
+      var sortedDates = Object.keys(otherSessions).sort();
+      sortedDates.forEach(function(theDate) {
+        var size = otherSessions[theDate];
+        html += '<div><span style="display:inline-block;width:140px">' + utility.formatDate(new Date(theDate * 1)) + '</span><span style="display:inline-block;width:100px">' + CacheHelper._sizeMB(size, 1) + " MB</span>" + "<a href='javascript:void(0)' + onclick='cacheHelper.clearCache(" + theDate + ",true)'>Clear</a></div>";
+      });
+      return html;
+    }
+
+    me.promiseGetCacheSize(false)
+     .then(function(counts) {
+      $('#other-use-cache-alert').addClass("hide");
+      $("#other-use-cache-panel").removeClass("attention");
+
+      $('#other-sessions-cache-alert').addClass("hide");
+      $("#other-sessions-cache-panel").removeClass("attention-warning");
+
+      if (counts.otherSessions > 0) {
+        $('#other-sessions-cache-alert').removeClass("hide");
+        $("#other-sessions-cache-panel").addClass("attention-warning");
+        $("#other-sessions-cache-detail-link").attr("aria-expanded", true);
+        $("#other-sessions-cache-detail").attr("aria-expanded", true);
+        $("#other-sessions-cache-detail").addClass("in");
+      }
+
+      if (counts.otherUse > 0) {
+        $('#other-use-cache-alert').removeClass("hide");
+        $("#other-app-use-cache-panel").addClass("attention");
+        $("#other-app-use-cache-detail-link").attr("aria-expanded", true);
+        $("#other-app-use-cache-detail").attr("aria-expanded", true);
+        $("#other-app-use-cache-detail").addClass("in");
+      }
+
+
+      $("#cache-size").text(CacheHelper._sizeMB(counts.total) + " MB");
+      $("#coverage-size").text(CacheHelper._sizeMB(counts.coverage) + " MB");
+      $("#other-sessions-cache-size").text(CacheHelper._sizeMB(counts.otherSessions) + " MB");
+      $('#other-sessions-cache-info').html(formatOtherSessions(counts.otherSessionsInfo));
+      $("#other-use-cache-size").text(CacheHelper._sizeMB(counts.otherUse) + " MB");
+      resolve();
+     })
+  })
+
 }
 
 CacheHelper.prototype.openDialog = function() {
-	this.refreshDialog();
-	$('#manage-cache-modal').modal('show');
+  this.refreshDialog()
+   .then(function() {
+    $('#manage-cache-modal').modal('show');
+   })
 }
 
 
 
 CacheHelper.prototype.clearCacheForGene = function(geneName) {
-	var me = this;
-	var keys = me._getKeysForGene(geneName);
-	keys.forEach( function(key) {
-		localStorage[key] = "";
-	});
+  var me = this;
 
-	// Clear out the loading message by the page control for this gene
-	me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
-							 .removeGene(geneName);
+  return new Promise(function(resolve, reject) {
+    me.promiseGetKeys()
+     .then(function(allKeys) {
+      var keys = [];
+      allKeys.forEach(function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
+          if (keyObject.gene == geneName) {
+            keys.push(key);
+          }
+        }
+      })
 
-	// Clear the gene out from the cache 'analyze all' queue
-	if (me.isGeneInProgress(geneName)) {
-		me.cacheNextGene(geneName);
-	}
+      var promises = [];
+      keys.forEach( function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        var p = me.promiseRemoveCacheItem(keyObject.dataKind, key);
+        promises.push(p);
+      });
+
+      Promise.all(promises).then(function() {
+        // Clear out the loading message by the page control for this gene
+        me.geneBadgeLoaderDisplay.setPageCount(genesCard.getPageCount())
+                     .removeGene(geneName);
+
+        // Clear the gene out from the cache 'analyze all' queue
+        if (me.isGeneInProgress(geneName)) {
+          me.cacheNextGene(geneName);
+        }
+
+        resolve();
+
+      })
+
+     },
+     function(error) {
+      reject(error);
+     })
+
+  })
+
+
 }
 
-
-CacheHelper.prototype._getKeysForGene = function(geneName) {
-	var me = this;
-	var keys = [];
-	for (var i=0; i<=localStorage.length-1; i++)  {  
-  		var key = localStorage.key(i); 	
-		var keyObject = CacheHelper._parseCacheKey(key);
-		if (keyObject && keyObject.launchTimestamp == me.launchTimestamp) {
-			if (keyObject.gene == geneName) {
-				keys.push(key);
-			}			
-		}
-	}
-	return keys;
-}
 
 
 CacheHelper.prototype._isProbandVariantCache = function(key) {
-	var cacheObject = CacheHelper._parseCacheKey(key);
-	return (cacheObject 
-		&& cacheObject.launchTimestamp == this.launchTimestamp 
-		&& ( cacheObject.dataKind == "vcfData"  || cacheObject.dataKind == "fbData")
-		&& cacheObject.relationship == "proband");
+  var cacheObject = CacheHelper._parseCacheKey(key);
+  return (cacheObject
+    && cacheObject.launchTimestamp == this.launchTimestamp
+    && ( cacheObject.dataKind == CacheHelper.VCF_DATA  || cacheObject.dataKind == CacheHelper.FB_DATA)
+    && cacheObject.relationship == "proband");
 
 }
 
 
 
 
-CacheHelper._sizeMB = function(size) {
-	var _sizeMB = size / (1024*1024);
-	return  Math.round(_sizeMB * 100) / 100;
+CacheHelper._sizeMB = function(size, decimalPlaces=1) {
+  var multiplier = Math.pow(10, decimalPlaces+1);
+  var _sizeMB = size / (1024*1024);
+  return  Math.round(_sizeMB * multiplier) / multiplier;
 }
+
 
 
 CacheHelper._parseCacheKey = function(cacheKey) {
-	if (cacheKey.indexOf(cacheHelper.KEY_DELIM) > 0) {
-		var tokens = cacheKey.split(cacheHelper.KEY_DELIM);
-		if (tokens.length >= 7 && tokens[0] == "gene.iobio") {
-			var keyObject = { 
-			     app: tokens[0],
-			     launchTimestamp: tokens[1],
-			     relationship: tokens[2], 
-			     sample: tokens[3], 
-			     gene: tokens[4], 
-			     transcript: tokens[5], 
-			     dataKind: tokens[6]
-			};
-			if (tokens.length == 8) {
-				keyObject.annotationScheme = tokens[7]; 
-			}
-			return keyObject;
+  if (cacheKey.indexOf(cacheHelper.KEY_DELIM) > 0) {
+    var tokens = cacheKey.split(cacheHelper.KEY_DELIM);
+    if (tokens.length >= 7 && tokens[0] == "gene.iobio") {
+      var keyObject = {
+           app: tokens[0],
+           launchTimestamp: tokens[1],
+           relationship: tokens[2],
+           sample: tokens[3],
+           gene: tokens[4],
+           transcript: tokens[5],
+           dataKind: tokens[6]
+      };
+      if (tokens.length == 8) {
+        keyObject.annotationScheme = tokens[7];
+      }
+      return keyObject;
 
-		} else {
-			return null;
-		}
+    } else {
+      return null;
+    }
 
-	} else {
-		return null;
-	}
+  } else {
+    return null;
+  }
 
 }
-
-CacheHelper.getCachedData = function(key) {
-	var data = null;
-	if (localStorage) {
-      	var dataCompressed = localStorage.getItem(key);
-      	if (dataCompressed != null) {
-			var dataString = null;
-			try {
-				 dataString = LZString.decompressFromUTF16(dataCompressed);
-	 			 data =  JSON.parse(dataString);      		
-			} catch(e) {
-				console.log("an error occurred when uncompressing vcf data for key " + key);
-			}
-      	} 
-	} 
-	return data;	
-}
-
-
-CacheHelper.getCachedDataMultithread = function(key, callback) {
-	if (localStorage) {
-      	var dataCompressed = localStorage.getItem(key);
-      	if (dataCompressed != null) {
-
-			var worker = new Worker('./app/model/cacheHelperWorker.js');	
-			
-			worker.onmessage = function(e) { 
-				callback(e.data);
-			};
-
-			// We will also want to be notified if the worker runs into trouble
-			worker.onerror = function(e) { 
-				console.log('An error occurred while decompressing cached data:', e) 
-				console.log("An error occurred when uncompressing data for key " + key);
-				callback(null);
-			};
-
-			// Start the worker!
-			worker.postMessage( { cmd: 'start', compressedData: dataCompressed });
-		}
-
-	} 
-}
-
 
 CacheHelper.showError = function(key, cacheError) {
-	var cacheObject = CacheHelper._parseCacheKey(key);
-	if (cacheObject) {
+  var cacheObject = CacheHelper._parseCacheKey(key);
+  if (cacheObject) {
 
-		var errorCount = cacheErrorTypes[cacheError.name];
-		if (errorCount == null) {
-			errorCount = 0;
-		}
-		errorCount++;
-		cacheErrorTypes[cacheError.name] = errorCount;
+    var errorCount = cacheErrorTypes[cacheError.name];
+    if (errorCount == null) {
+      errorCount = 0;
+    }
+    errorCount++;
+    cacheErrorTypes[cacheError.name] = errorCount;
 
-		var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
-		var errorKey = cacheObject.gene + cacheHelper.KEY_DELIM + errorType;
+    var errorType = cacheError.name && cacheError.name.length > 0 ? cacheError.name : "A problem";
+    var errorKey = cacheObject.gene + cacheHelper.KEY_DELIM + errorType;
 
-		var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
-	    console.log(consoleMessage);
-	    console.log(cacheError.toString());
-	    
-	    // Only show the error once
-	    if (!recordedCacheErrors[errorKey] ) {
-	    	recordedCacheErrors[errorKey] = message;
-		    var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes.  Click on 'Clear cache...' link to clear cache.";
-		    // If we have shown this kind of cache error 2 times already, just show in right hand corner instead
-		    // of showning dialog with ok/cancel.
-			if (errorCount < 3) {
-				alertify.alert(message, function() {
-					recordedCacheErrors[errorKey] = null;			
-				});					
-			} else if (errorCount < 8) { 
-		    	var msg = "<span style='font-size:12px'>" + message + "</span>";
-		    	alertify.set('notifier','position', 'top-right');
-		    	alertify.error(msg,  5);				
-				recordedCacheErrors[errorKey] = null;			
-			}
-	    }		
-	}
+    var consoleMessage = errorType + " occurred when caching analyzed " + cacheObject.dataKind + " data for gene " + cacheObject.gene + ". Click on 'Clear cache...' link to clear cache."
+      console.log(consoleMessage);
+      console.log(cacheError.toString());
+
+      // Only show the error once
+      if (!recordedCacheErrors[errorKey] ) {
+        recordedCacheErrors[errorKey] = message;
+        var message = errorType + " occurred when caching analyzed data for gene " + cacheObject.gene + ". Unable to analyze remaining genes.  Click on 'Clear cache...' link to clear cache.";
+        // If we have shown this kind of cache error 2 times already, just show in right hand corner instead
+        // of showning dialog with ok/cancel.
+      if (errorCount < 3) {
+        alertify.alert(message, function() {
+          recordedCacheErrors[errorKey] = null;
+        });
+      } else if (errorCount < 8) {
+          var msg = "<span style='font-size:12px'>" + message + "</span>";
+          alertify.set('notifier','position', 'top-right');
+          alertify.error(msg,  5);
+        recordedCacheErrors[errorKey] = null;
+      }
+      }
+  }
 
 }
+
+
+CacheHelper.useLocalStorage = function() {
+  return window.global_browserCache == BROWSER_CACHE_LOCAL_STORAGE;
+}
+CacheHelper.useIndexedDB = function() {
+  return window.global_browserCache == BROWSER_CACHE_INDEXED_DB;
+}
+
+CacheHelper.promiseCompressData = function(data) {
+  return new Promise(function(resolve, reject) {
+    if (data && data != "") {
+      var dataString = JSON.stringify(data);
+      var dataStringCompressed = null;
+      try {
+        dataStringCompressed = LZString.compressToUTF16(dataString);
+        resolve(dataStringCompressed);
+      }   catch(error) {
+        reject("Unable to compress data: " + error);
+      }
+    } else {
+      resolve(null);
+    }
+  });
+
+}
+
+CacheHelper.promiseDecompressData = function(dataCompressed, decompressIt) {
+  return new Promise(function(resolve, reject) {
+    if (decompressIt && dataCompressed != null && dataCompressed != "") {
+      var dataString = null;
+      var data = null;
+      try {
+         dataString = LZString.decompressFromUTF16(dataCompressed);
+         data =  JSON.parse(dataString);
+         resolve(data);
+      } catch(e) {
+        var errorMsg = "an error occurred when uncompressing data";
+        console.log(errorMsg);
+        reject(errorMsg);
+      }
+    } else {
+      resolve(dataCompressed);
+    }
+  });
+}
+
+CacheHelper.prototype.promiseCacheData = function(key, data) {
+  var me = this;
+
+  return new Promise(function(resolve, reject) {
+
+    if (CacheHelper.useLocalStorage()) {
+      if (localStorage) {
+
+          CacheHelper.promiseCompressData(data)
+           .then(function(dataStringCompressed) {
+          localStorage.setItem(key, dataStringCompressed);
+          resolve();
+           },
+           function(error) {
+            reject(error);
+           });
+      } else {
+        reject("no local storage found")
+      }
+    } else if (CacheHelper.useIndexedDB()) {
+      CacheHelper.promiseCompressData(data)
+         .then(function(dataStringCompressed) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        return me.cacheIndexStore.promiseSetData(keyObject.dataKind, keyObject.gene, key, dataStringCompressed)
+         })
+         .then(function() {
+          resolve();
+         },
+         function(error) {
+          var msg = "A problem occurred in CacheHelper.promiseCacheData() when calling cacheIndexStore.promiseSetData(): " + error;
+        console.log(msg);
+        reject(msg);
+         });
+    } else {
+      reject("Unable to determine browser cache method")
+    }
+
+  })
+
+}
+
+CacheHelper.prototype.promiseGetData = function(key, decompressIt=true) {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+
+    if (CacheHelper.useLocalStorage()) {
+      if (localStorage) {
+            var dataCompressed = localStorage.getItem(key);
+            CacheHelper.promiseDecompressData(dataCompressed, decompressIt).then(function(data) {
+              resolve(data);
+            },
+            function(error) {
+              var errorMsg = "an error occurred when uncompressing data for key " + key;
+              console.log(errorMsg);
+              reject(errorMsg);
+            });
+        }
+    } else if (CacheHelper.useIndexedDB()) {
+      var keyObject = CacheHelper._parseCacheKey(key);
+      me.cacheIndexStore.promiseGetData(keyObject.dataKind, key, decompressIt)
+       .then(function(dataCompressed) {
+            CacheHelper.promiseDecompressData(dataCompressed, decompressIt)
+             .then(function(data) {
+              resolve(data);
+             },
+             function(error) {
+          var errorMsg = "an error occurred when uncompressing data for key " + key;
+          console.log(errorMsg);
+          reject(errorMsg);
+             });
+       })
+    } else {
+      reject("Unable to determine browser cache method")
+    }
+  })
+
+}
+
+
+CacheHelper.prototype.promiseGetDataThreaded = function(key, keyObject) {
+  var me = this;
+
+  return new Promise(function(resolve, reject) {
+    cacheHelper.promiseGetData(key, false)
+     .then(function(dataCompressed) {
+
+          if (dataCompressed != null) {
+
+        var worker = new Worker('./app/model/cacheHelperWorker.js');
+
+        worker.onmessage = function(e) {
+          resolve(e.data);
+        };
+
+        // We will also want to be notified if the worker runs into trouble
+        worker.onerror = function(e) {
+          console.log("An error occurred when uncompressing data for key " + key);
+          var msg = 'An error occurred while decompressing cached data:' + e;
+          console.log(msg)
+          reject(msg);
+        };
+
+        // Start the worker!
+        worker.postMessage( { 'cmd': 'start', 'compressedData': dataCompressed, 'keyObject': keyObject });
+      } else {
+        resolve(null);
+      }
+
+     },
+     function(error) {
+      var msg = "An error occurred in CacheHelper.promiseGetDataThreaded(): " + error;
+      console.log(msg);
+      reject(msg);
+     });
+  })
+
+}
+
+CacheHelper.prototype.promiseRemoveCacheItem = function(dataKind, key) {
+  var me = this;
+
+  return new Promise(function(resolve, reject) {
+
+    if (CacheHelper.useLocalStorage()) {
+      if (localStorage) {
+        localStorage.removeItem(key);
+        }
+    } else if (CacheHelper.useIndexedDB()) {
+      me.cacheIndexStore.promiseRemoveData(dataKind, key)
+       .then(function() {
+        resolve();
+       },
+       function(error) {
+        reject(error);
+       })
+    } else {
+      reject("Unknown caching method")
+    }
+  });
+}
+
+
+CacheHelper.prototype.promiseGetKeys = function() {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+
+    me.promiseGetAllKeys()
+     .then(function(allKeys) {
+
+      var filteredKeys = allKeys.filter(function(key) {
+        var keyObject = CacheHelper._parseCacheKey(key);
+        return keyObject && (keyObject.launchTimestamp == me.launchTimestamp);
+      })
+      resolve(filteredKeys);
+     },
+     function(error) {
+      reject(error);
+     })
+
+  });
+
+}
+
+
+CacheHelper.prototype.promiseGetAllKeys = function() {
+  var me = this;
+  return new Promise(function(resolve, reject) {
+
+    if (CacheHelper.useLocalStorage()) {
+      if (localStorage) {
+        var keys = [];
+        for (var i=0; i<=localStorage.length-1; i++)  {
+          var key = localStorage.key(i);
+          keys.push(key);
+        }
+        resolve(keys);
+      } else {
+        reject("No local storage found");
+      }
+
+    } else if (CacheHelper.useIndexedDB()) {
+      me.cacheIndexStore.promiseGetAllKeys()
+       .then(function(allKeys) {
+        resolve(allKeys);
+       },
+       function(error) {
+        reject(error);
+       });
+    }
+  });
+
+}
+
+CacheHelper.prototype.logCacheContents = function(filterObject, showData=false) {
+  var me = this;
+  me.promiseGetKeys()
+   .then(function(keys) {
+    me._logCacheContents(keys, filterObject, showData);
+   });
+}
+
+CacheHelper.prototype.logAllCacheContents = function(filterObject, showData=false) {
+  var me = this;
+  me.promiseGetAllKeys()
+   .then(function(allKeys) {
+    me._logCacheContents(allKeys, filterObject, showData);
+   });
+}
+
+
+CacheHelper.prototype._logCacheContents = function(keys, filterObject, showData=false) {
+  var me = this;
+
+  var itemSize = 0;
+  var recs = [];
+  var totalKb = 0;
+
+  var promises = [];
+  keys.forEach(function(key) {
+    var keyObject = CacheHelper._parseCacheKey(key);
+    var keep = true;
+    if (filterObject && Object.keys(filterObject).length > 0) {
+      keep = false;
+      var matchesRel = true;
+      if (filterObject.hasOwnProperty('relationship')) {
+        if (keyObject.relationship != filterObject.relationship) {
+          matchesRel = false;
+        }
+      }
+      var matchesGene = true;
+      if (filterObject.hasOwnProperty('gene')) {
+        if (keyObject.gene != filterObject.gene) {
+          matchesGene = false;
+        }
+      }
+      var matchesDataKind = true;
+      if (filterObject.hasOwnProperty('dataKind')) {
+        if (keyObject.dataKind != filterObject.dataKind) {
+          matchesDataKind = false;
+        }
+      }
+      keep = matchesRel && matchesGene && matchesDataKind;
+    }
+    if (keep) {
+      var p = me.promiseGetData(key, false)
+       .then(function(dataCompressed) {
+
+        if (dataCompressed) {
+
+          var dataSize = dataCompressed.length + key.length;
+          itemSize =  (dataSize/1024);
+          totalKb += itemSize;
+
+          var rec = {'key': key, 'size': itemSize.toFixed(2) + " KB"};
+          if (showData) {
+            CacheHelper.promiseDecompressData(dataCompressed, true).then(function(data) {
+              rec.data = data;
+            });
+          }
+
+          recs.push(rec);
+        } else {
+          recs.push({'key': key, 'size': '0 KB'});
+        }
+       })
+       promises.push(p);
+
+    }
+
+  })
+  Promise.all(promises).then(function() {
+    recs.forEach(function(rec) {
+      if (showData) {
+        console.log(rec.key);
+        console.log(rec.data);
+      } else {
+        console.log(rec.key + "=" + rec.size);
+      }
+
+    });
+    if (totalKb > 1024){
+      console.log("Total = " + (totalKb/1024).toFixed(2)+ " MB");
+    } else {
+      console.log("Total = " + totalKb.toFixed(2)+ " KB");
+    }
+  });
+}
+
+CacheHelper.prototype.logData = function(key) {
+  var me = this;
+  me.promiseGetData(key)
+   .then(function(data) {
+    console.log(data);
+   })
+}
+
+
+
+

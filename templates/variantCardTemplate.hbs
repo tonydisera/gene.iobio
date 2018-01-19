@@ -2,26 +2,30 @@
 
 
   <div style="text-align:center;margin-bottom: 6px;">
+    <div id="too-many-variants-alert" class="hide alert alert-warning" style="width: 320px;display: inline-block;">
+      Over <span id="count"></span> variants.  Show anyways?
+      <button class="btn btn-sm btn-raised btn-default" style="margin-left: 10px;margin-bottom: 3px;margin-top: 4px;">Show</button>
+    </div>
     <span id="variant-heading">
       <span id="card-relationship-label"  class="level-edu card-label heading" style="float:left;">
         Sample
       </span>
-                  
+
       <span id="variant-card-label" class="card-label keep-case" style="float:left;margin-left:3px;margin-right:10px;"></span>
       </span>
 
-    
+
     <ul class="nav nav-pills" id="variant-badges" style="float:left;margin-left:4px;margin-top:2px">
-      <li class="level-edu level-basic">                       
+      <li class="level-edu level-basic">
         <span id="vcf-variant-count-label" class="level-edu level-basic badge-label hide">Variants Loaded
         </span>
         <span id="vcf-variant-count" class="badge"></span>
       </li>
 
 
-      <li>           
+      <li>
         <span id="displayed-variant-count-label" class="level-edu level-basic badge-label hide" style="margin-left:2px">Displayed</span>
-         <span id="displayed-variant-count-label-simple" class="level-edu  hide badge-label" style="margin-left:2px">Number of variants</span>            
+         <span id="displayed-variant-count-label-simple" class="level-edu  hide badge-label" style="margin-left:2px">Number of variants</span>
          <span id="displayed-variant-count-label-basic" class="hide level-basic" >Variants in clinvar with < 1% population frequency</span>
 
         <span id="displayed-variant-count" class="badge hide"></span>
@@ -33,7 +37,7 @@
         </span>
         <span id="called-variant-count" class="hide badge"></span>
       </li>
-      <li>           
+      <li>
         <span id="displayed-called-variant-count-label" class="hide level-edu level-basic badge-label" style="margin-left:2px">Displayed</span>
         <span id="displayed-called-variant-count" class="badge hide"></span>
       </li>
@@ -59,7 +63,7 @@
             <span id="clinvar-flag" class="filter-flag hide label label-primary">ClinVar</span>
             <span id="coverage-flag" class="filter-flag hide label label-primary">Coverage</span>
             <span id="region-flag" class="hide label label-info">Zoom into region</span>
-            <span id="recfilter-flag" class="level-edu level-basic hide label label-info">VCF Filter status</span>            
+            <span id="recfilter-flag" class="level-edu level-basic hide label label-info">VCF Filter status</span>
 
       </li>
 
@@ -79,14 +83,14 @@
     <a href="javascript:void(0)" class="level-edu level-basic" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">remove</i>
     </a>
-    <a href="javascript:void(0)" class="level-edu level-basic" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">  
+    <a href="javascript:void(0)" class="level-edu level-basic" id="shrink-button" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">crop_7_5</i>
     </a>
     <a href="javascript:void(0)" class="level-edu level-basic" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
       <i class="material-icons">crop_3_2</i>
     </a>
 
-   
+
 
 
 
@@ -100,58 +104,58 @@
       <img src="assets/images/wheel.gif">
     </div>
     <div class="loader fbloader hide" style="display: inline-block;padding-left: 20px;">
-      <span class="loader-label">Calling Variants</span>      
+      <span class="loader-label">Calling Variants</span>
       <img src="assets/images/wheel.gif">
     </div>
     <div class="loader covloader hide" style="display: inline-block;padding-left: 20px;">
-      <span class="loader-label"></span>      
+      <span class="loader-label"></span>
       <img src="assets/images/wheel.gif">
     </div>
   </div>
 
 
-    
+
 
   <div id="variant-panel" style="clear:both;">
-     <div id="multiple-sample-warning" class="hide alert alert-dismissable alert-info" 
+     <div id="multiple-sample-warning" class="hide alert alert-dismissable alert-info"
       >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong>The variant file contains multiple samples. Defaulting to first sample in file.
     </div>
-    <div id="no-variants-warning" class="hide alert alert-dismissable alert-info" 
+    <div id="no-variants-warning" class="hide alert alert-dismissable alert-info"
        >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> No variants found.  Make sure that the variant file is a valid URL or file.
                                     <br>The variant file must be gzipped compressed (.vcf.gz) and accompanied with a tabix (.vcf.gz.tbi) file.
     </div>
-    <div id="no-ref-found-warning" class="hide alert alert-dismissable alert-info" 
+    <div id="no-ref-found-warning" class="hide alert alert-dismissable alert-info"
        >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> <span id="message"></span>
     </div>
-    <div id="clinvar-warning" class="hide alert alert-dismissable alert-info" 
+    <div id="clinvar-warning" class="hide alert alert-dismissable alert-info"
        >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>Warning:  </strong> Error accessing ClinVar.
     </div>
-    <div id="freebayes-error" class="hide alert alert-dismissable alert-danger" 
+    <div id="freebayes-error" class="hide alert alert-dismissable alert-danger"
        >
 
         <button type="button" class="close" data-dismiss="alert">×</button>
        An error occurred while calling variants.
     </div>
-    <div id="error-warning" class="hide alert  alert-danger" 
+    <div id="error-warning" class="hide alert  alert-danger"
       >
          <span id="message"></span>
     </div>
 
 
     <div id="vcf-track" class="track hide" >
-             
+
       <div class="track-chart">
           <div>
             <div  id="fb-chart-label" class="chart-label hide" style="margin-bottom: -10px;">
@@ -162,7 +166,7 @@
             <hr id="fb-separator" class="hide" style="margin-top: 0px;margin-bottom: 0px;">
           </div>
           <div >
-            <div id="vcf-chart-label" class="level-edu level-basic chart-label hide" 
+            <div id="vcf-chart-label" class="level-edu level-basic chart-label hide"
              style="display:inline-block;margin-top: 0px;margin-bottom: -10px;">
               Variants loaded
             </div>
@@ -175,17 +179,17 @@
     <div id="bam-track" class="track hide level-edu level-basic">
       <div class="track-chart">
 
-      
+
           <div >
 
             <div id="bam-chart-label" class="chart-label" style="visibility: visible; margin-bottom: -12px;">
-              
+
               <span style="display: inline-block;vertical-align: top;">Coverage</span>
-              <i id="gene-badge-coverage-problem" class="hide material-icons glyph level-edu" 
+              <i id="gene-badge-coverage-problem" class="hide material-icons glyph level-edu"
               style="display: inline-block;float: none;font-size: 17px;">
                 announcement
               </i>
-              
+
             </div>
 
 
@@ -202,9 +206,9 @@
 
     <div id="gene-box" class="level-edu hide" >
     </div>
-    
 
 
-  
+
+
   </div>
 </div>

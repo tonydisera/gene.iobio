@@ -10,7 +10,7 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;  
+    matrixTrack = indexPage.section.matrixTrack;
     probandVariantCard = indexPage.section.probandVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
@@ -23,8 +23,8 @@ module.exports = {
     indexPage.load();
 
     nav.clickGenes();
-    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);   
-    nav.searchGene("RAI1"); 
+    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);
+    nav.searchGene("RAI1");
 
     nav.clickData();
     dataCard.selectTrio();
@@ -34,14 +34,14 @@ module.exports = {
     dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
-    client.pause(2000);
+    client.pause(10000);
     dataCard.clickLoad();
 
     client.pause(1000);
     indexPage.waitForAlertify();
     indexPage.clickAlertifyCancel();
     client.pause(3000);
-    
+
   },
 
 
@@ -51,7 +51,7 @@ module.exports = {
     appTitleSection.assertCallAllProgressLabel("5 analyzed");
 
   },
-  
+
 
   'Click denovo inheritance (custom) filter': function(client) {
     nav.clickFilter();
@@ -63,7 +63,7 @@ module.exports = {
     client.pause(1000);
     appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
   },
-  
+
 
   'Known causative filter': function(client) {
     nav.clickFilter();
@@ -123,14 +123,14 @@ module.exports = {
     client.pause(1000);
     appTitleSection.assertAnalyzeAllCounts(0,0,3,2);
   },
-  
+
 
   'Click on MYLK2 and evaluate tooltip for called variant': function(client) {
 
     filterPanel.clickClearAll();
     nav.searchGene('MYLK2');
-    
-    client.pause(1000);
+
+    client.pause(5000);
     matrixTrack.waitForMatrixLoaded();
     probandVariantCard.assertLoadedVariantCountEquals(0);
     probandVariantCard.assertCalledVariantCountEquals(3);
@@ -174,7 +174,7 @@ module.exports = {
     tooltip.waitForTooltip();
     evaluateTooltip(tooltip);
 
-    
+
   },
 
 
@@ -182,5 +182,5 @@ module.exports = {
     client.end();
   }
 
-  
+
 }

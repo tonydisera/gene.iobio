@@ -1,0 +1,159 @@
+<div id="genes-control-track" class="hide app-panel level-basic shadow-z-2">
+
+  <div  class="nav-stretch level-basic" style="margin-top:-13px;">
+      <div class="card-label level-edu" style="float:left;padding-top:8px;margin-right:10px;">Selected Genes</div>
+      <!-- gene badges for navigation -->
+      <div id="genes-panel" class="hide nav-center">
+
+        <div>
+
+          <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
+            Analyze all genes
+          </button>
+
+          <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2">
+            <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
+              Call Variants
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+
+              <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="promiseJointCallVariants(window.gene, window.selectedTranscript, getCurrentTrioVcfData(), {checkCache: false, isBackground: false})">selected gene</a></li>
+
+              <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">all genes</a></li>
+
+              <li id="show-fb-settings" class="hide">
+                <a href="javascript:void(0)" onclick="showFreebayesSettingsDialog()">settings</a>
+              </li>
+            </ul>
+          </div>
+
+
+          <div id="analyze-genes-progress" class="level-edu level-basic">
+
+
+
+              <div id="analyzed-progress-bar" >
+
+
+                <div >
+                  <span class='progress-bar-label'>Loaded</span>
+
+                  <div id="analyze-all-progress" class="analysis-progress-bar">
+                    <div class="text">0 analyzed</div>
+                    <div style="float:left;margin-top:-17px;width:100%">
+                      <div id="analyzed-bar" class="bar" width="0%" >
+                        <div id="passed-filter-bar" class="bar" width="0%"></div>
+                        <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                      </div>
+
+                      <div id="not-analyzed-bar" class="bar" width="100%">
+                      </div>
+                    </div>
+
+                   </div>
+                </div>
+
+
+                <div style='margin-top:-1px;float:left'>
+                  <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
+
+                  <div id="call-all-progress" class="analysis-progress-bar">
+                    <div class="text" >0 analyzed</div>
+                    <div style="float:left;margin-top:-17px;width:100%">
+                      <div id="analyzed-bar" class="bar" width="0%" >
+                        <div id="passed-filter-bar" class="bar" width="0%"></div>
+                        <div id="not-passed-filter-bar" class="bar" width="0%"></div>
+                      </div>
+
+                      <div id="not-analyzed-bar"class="bar" width="100%">
+                      </div>
+                    </div>
+
+                   </div>
+
+                </div>
+
+              </div>
+
+
+              <div id="total-genes-label"></div>
+
+
+          </div>
+
+          <div id="manage-genes-box">
+            <div id="manage-genes-dropdown" class="level-edu level-basic" >
+              <div class="btn-toolbar">
+                <div class="btn-group" style="display:inline;margin-bottom:0px">
+
+                  <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                      Manage genes
+                      <span style="margin-left:6px" class="caret"></span>
+                  </button>
+
+                  <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
+                    <li style="margin-bottom: 10px">
+                        <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
+                          Manage cache of analyzed genes...
+                      </a>
+                    </li>
+
+                     <li  style="margin-bottom: 10px">
+                        <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
+                          href="javascript:void(0)" onclick="genesCard.clearGenes()">
+                            Remove all genes
+                       </a>
+                    </li>
+
+                    <li id="edit-list-li">
+                       <div >Edit gene list</div>
+                       <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
+                          <textarea  id="genes-to-edit"></textarea>
+                          <div style="text-align:right">
+                            <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
+                              Done
+                            </button>
+                          </div>
+                      </div>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="float:right">
+            <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
+            <div id="select-gene-container">
+                <select id="select-gene-sort" class="level-edu">
+                </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div id="gene-badge-container" class="level-basic" style="clear:both;">
+          <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
+          <div id="gene-page-control" class="hide level-edu level-basic">
+            <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
+
+            <div id="gene-page-selection" class="level-basic"></div>
+
+            <div id="gene-paging-links" class="hide">
+              <a href="javascript:void(0)" id="view-50-genes"
+                 class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
+                    View 40
+              </a>
+              <a href="javascript:void(0)" id="view-all-genes"
+                 class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
+                | all
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
+</div>

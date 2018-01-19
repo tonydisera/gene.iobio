@@ -25,7 +25,7 @@ function geneD3() {
   // dimensions
   var margin = {top: 30, right: 0, bottom: 20, left: 110};
   var geneD3_width = 800,
-      geneD3_height = 400;  
+      geneD3_height = 400;
 
 
   // scales
@@ -36,7 +36,7 @@ function geneD3() {
     .scale(x)
     .orient("top")
     .tickFormat(tickFormatter);
-  // variables 
+  // variables
   var geneD3_trackHeight = 20,
       borderRadius = 1,
       minFtWidth = 0.5;
@@ -44,10 +44,10 @@ function geneD3() {
       geneD3_cdsHeight = undefined,
       geneD3_arrowHeight = undefined,
       geneD3_regionStart = undefined,
-      geneD3_regionEnd = undefined,      
+      geneD3_regionEnd = undefined,
       geneD3_widthPercent = undefined,
       geneD3_heightPercent = undefined;
-      
+
 
 
   //  options
@@ -61,8 +61,8 @@ function geneD3() {
   };
 
   var featureGlyphHeight = +0;
-      
-      
+
+
   function chart(selection, options) {
     // merge options and defaults
     options = $.extend(defaults,options);
@@ -82,18 +82,18 @@ function geneD3() {
        var innerHeight = geneD3_height - margin.top - margin.bottom;
 
        // set svg element
-       container = d3.select(this).classed('ibo-gene', true);    
+       container = d3.select(this).classed('ibo-gene', true);
 
       // Update the x-scale.
       if (geneD3_regionStart && geneD3_regionEnd) {
         x.domain([geneD3_regionStart, geneD3_regionEnd]);
       } else {
-        x.domain([ d3.min(data, function(d) { 
-                     return d3.min(d.features, function(f) { return parseInt(f.start); }) 
+        x.domain([ d3.min(data, function(d) {
+                     return d3.min(d.features, function(f) { return parseInt(f.start); })
                    }),
-                   d3.max(data, function(d) { 
-                     return d3.max(d.features, function(f) { return parseInt(f.end); }) 
-                   }) 
+                   d3.max(data, function(d) {
+                     return d3.max(d.features, function(f) { return parseInt(f.end); })
+                   })
                 ]);
 
       }
@@ -118,25 +118,25 @@ function geneD3() {
         .append("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
         .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom)
-       
+
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       if (geneD3_widthPercent && geneD3_heightPercent) {
         d3.select(this).selectAll("svg")
-           .filter(function() { 
+           .filter(function() {
               return this.parentNode === container.node();
            })
           .attr('viewBox', "0 0 " + parseInt(geneD3_width+margin.left+margin.right) + " " + parseInt(geneD3_height+margin.top+margin.bottom+featureGlyphHeight))
           .attr("preserveAspectRatio", "none");
-      } 
+      }
 
       container.selectAll("svg")
         .attr("width", geneD3_widthPercent ? geneD3_widthPercent : geneD3_width)
         .attr("height", geneD3_heightPercent ? geneD3_heightPercent : geneD3_height+margin.top+margin.bottom);
 
 
-      // Otherwise, create the skeletal chart.      
-      var gEnter = svg.selectAll("g").data([0]).enter().append('g');    
+      // Otherwise, create the skeletal chart.
+      var gEnter = svg.selectAll("g").data([0]).enter().append('g');
 
       var g = svg.select('g');
       // Update the inner dimensions.
@@ -159,12 +159,12 @@ function geneD3() {
 
 
 
-      var axisEnter = svg.selectAll("g.x.axis").data([0]).enter().append('g');   
+      var axisEnter = svg.selectAll("g.x.axis").data([0]).enter().append('g');
       if (geneD3_showXAxis) {
         axisEnter.attr("class", "x axis")
                  .attr("transform",   "translate(" + margin.left + "," + "0" + ")");
         svg.selectAll("g.x.axis").attr("transform",   "translate(" + margin.left + "," + parseInt(geneD3_height+margin.top+margin.bottom+featureGlyphHeight) + ")");
-      }  
+      }
 
 
       if (geneD3_showBrush) {
@@ -178,15 +178,15 @@ function geneD3() {
             .selectAll("rect")
             .attr("y", brushY)
             .attr("height", brushHeight);
-      }    
+      }
 
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
-          .attr("class", "tooltip")               
+          .attr("class", "tooltip")
           .style("opacity", 0);
 
-               
+
       // Start gene model
       // add elements
       var transcript = g.selectAll('.transcript').data(data);
@@ -198,11 +198,11 @@ function geneD3() {
 
       transcript.selectAll(".selection-box").remove();
       transcript.selectAll(".selection-box")
-        .data(function(d) { 
+        .data(function(d) {
           if (geneD3_regionStart && geneD3_regionEnd) {
             return [[geneD3_regionStart,geneD3_regionEnd]];
           } else {
-            return [[d.start, d.end]] 
+            return [[d.start, d.end]]
 
           }
         })
@@ -219,22 +219,22 @@ function geneD3() {
           })
           .on("mouseout", function(d) {
             d3.select(this.parentNode).classed("selected", false);
-          });      
+          });
 
       transcript.selectAll(".reference").remove();
       transcript.selectAll('.reference')
-        .data(function(d) { 
+        .data(function(d) {
           if (geneD3_regionStart && geneD3_regionEnd) {
             return [[geneD3_regionStart,geneD3_regionEnd]];
           } else {
-            return [[d.start, d.end]] 
+            return [[d.start, d.end]]
 
           }
         })
         .enter().append('line')
           .attr('class', 'reference')
           .attr('x1', function(d) { return d3.round(x(d[0]))})
-          .attr('x2', function(d) { return d3.round(x(d[1]))})                    
+          .attr('x2', function(d) { return d3.round(x(d[1]))})
           .attr('y1', geneD3_trackHeight/2)
           .attr('y2', geneD3_trackHeight/2)
           .on("mouseover", function(d) {
@@ -256,8 +256,8 @@ function geneD3() {
                     .attr('y', 0 )
                     .attr('text-anchor', 'top')
                     .attr('alignment-baseline', 'left')
-                    .text(function(d) { 
-                      return d[1]; 
+                    .text(function(d) {
+                      return d[1];
                     })
                     .style('fill-opacity', 0)
                     .on("mouseover", function(d) {
@@ -275,8 +275,8 @@ function geneD3() {
                     .attr('y', 12 )
                     .attr('text-anchor', 'top')
                     .attr('alignment-baseline', 'left')
-                    .text(function(d) { 
-                      var type =  (d[1] == 'protein_coding' || d[1] == 'mRNA' ? '' : d[1]); 
+                    .text(function(d) {
+                      var type =  (d[1] == 'protein_coding' || d[1] == 'mRNA' ? '' : d[1]);
                       return type + ' ' + d[2] + ' ' + d[3];
                     })
                     .on("mouseover", function(d) {
@@ -286,21 +286,21 @@ function geneD3() {
                     })
                     .on("mouseout", function(d) {
                       d3.select(this.parentNode).classed("selected", false);
-                    });  
+                    });
 
 
       }
-      
+
       transcript.selectAll(".arrow").remove();
       transcript.selectAll('.arrow').data(centerSpan)
         .enter().append('path')
           .attr('class', 'arrow')
-          .attr('d', centerArrow);      
+          .attr('d', centerArrow);
 
 
       var filterFeature = function(feature) {
-          if ( feature.transcript_type == 'protein_coding' 
-              || feature.transcript_type == 'mRNA' 
+          if ( feature.transcript_type == 'protein_coding'
+              || feature.transcript_type == 'mRNA'
               || feature.transcript_type == 'transcript'
               || feature.transcript_type == 'primary_transcript') {
             return feature.feature_type.toLowerCase() == 'utr' || feature.feature_type.toLowerCase() == 'cds';
@@ -310,7 +310,7 @@ function geneD3() {
       }
 
 
-      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) {
         return d['features'].filter( function(d) {
           return filterFeature(d);
         }, function(d) {
@@ -324,11 +324,11 @@ function geneD3() {
           .attr('ry', borderRadius)
 
           /*
-          .attr('x', function(d) { 
+          .attr('x', function(d) {
             return d3.round(x(d.start))
           })
-          .attr('width', function(d) { 
-            return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start))) 
+          .attr('width', function(d) {
+            return Math.max(minFtWidth,d3.round(x(d.end) - x(d.start)))
           })
           .attr('y', geneD3_trackHeight /2)
           .attr('height', 0)
@@ -336,49 +336,49 @@ function geneD3() {
 
           .attr('x', function(d) { return d3.round(x(d.start))})
           .attr('width', function(d) { return Math.max(minFtWidth, d3.round(x(d.end) - x(d.start)))})
-          .attr('y', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2; 
+          .attr('y', function(d) {
+            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2;
             else return (geneD3_trackHeight - geneD3_cdsHeight)/2; })
-          .attr('height', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight; 
-            else return geneD3_cdsHeight; })     
+          .attr('height', function(d) {
+            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight;
+            else return geneD3_cdsHeight; })
 
           .attr("pointer-events", "all")
           .style("cursor", "pointer")
-          .on("mouseover", function(d) {  
+          .on("mouseover", function(d) {
               // show the tooltip
-              var tooltip = container.select('.tooltip');              
+              var tooltip = container.select('.tooltip');
               var featureObject = d3.select(this);
               dispatch.d3featuretooltip(featureObject, d, tooltip);
 
-              // select the transcript  
+              // select the transcript
               d3.selectAll('.transcript.selected').classed("selected", false);
               d3.select(this.parentNode).classed("selected", true);
 
               selectedTranscript = d3.select(this.parentNode)[0][0].__data__;
-           })                  
-           .on("mouseout", function(d) {   
+           })
+           .on("mouseout", function(d) {
              if (container.select('.tooltip.locked').empty()) {
                 chart.hideTooltip();
 
-                // de-select the transcript   
+                // de-select the transcript
                 d3.select(this.parentNode).classed("selected", false);
               }
            })
-           .on("click", function(d) {  
+           .on("click", function(d) {
               // show the tooltip
-              var tooltip = container.select('.tooltip');   
-              tooltip.classed("locked", true);          
+              var tooltip = container.select('.tooltip');
+              tooltip.classed("locked", true);
               var featureObject = d3.select(this);
               dispatch.d3featuretooltip(featureObject, d, tooltip, true, chart.hideTooltip);
-           }) 
+           })
 
 
       // Add any feature glyphs
       transcript.selectAll(".feature_glyph").remove();
-      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) {
         return d['features'].filter( function(d) {
-          return filterFeature(d); 
+          return filterFeature(d);
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -390,30 +390,30 @@ function geneD3() {
       });
 
       transcript.selectAll(".feature_glyph")
-                .on("mouseover", function(d) {  
+                .on("mouseover", function(d) {
                   // show the tooltip
-                  var tooltip = container.select('.tooltip');              
+                  var tooltip = container.select('.tooltip');
                   var featureObject = d3.select(this);
                   dispatch.d3featureglyphtooltip(featureObject, d, tooltip);
-                })                  
-                .on("mouseout", function(d) {  
-                  if (container.select('.tooltip.locked').empty()) { 
+                })
+                .on("mouseout", function(d) {
+                  if (container.select('.tooltip.locked').empty()) {
                     chart.hideTooltip();
                   }
                 })
-                .on("click", function(d) {  
+                .on("click", function(d) {
                   // show the tooltip
-                  var tooltip = container.select('.tooltip');   
-                  tooltip.classed("locked", true);          
+                  var tooltip = container.select('.tooltip');
+                  tooltip.classed("locked", true);
                   var featureObject = d3.select(this);
                   dispatch.d3featureglyphtooltip(featureObject, d, tooltip, true, chart.hideTooltip);
-               }) 
+               })
 
-          
+
       // Update class
-      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) { 
+      transcript.selectAll('.transcript rect.utr, .transcript rect.cds, .transcript rect.exon').data(function(d) {
         return d['features'].filter( function(d) {
-          return filterFeature(d); 
+          return filterFeature(d);
         }, function(d) {
           return d.feature_type + "-" + d.seq_id + "-" + d.start + "-" + d.end;
         });
@@ -421,14 +421,14 @@ function geneD3() {
       .attr('class', function(d,i) {
             return featureClass(d,i);
       });
-    
 
 
-      // update 
+
+      // update
       transcript.transition()
           .duration(700)
           .attr('transform', function(d,i) { return "translate(0," + y(i+1) + ")"});
-      
+
 
       transcript.selectAll('.reference').transition()
         .duration(700)
@@ -443,28 +443,28 @@ function geneD3() {
       transcript.selectAll('.name').transition()
         .duration(700)
         .attr('x', function(d) { return margin.left > 5 ?  5 - margin.left : 0; })
-        .attr('y', function(d) { return margin.left > 5 ? geneD3_trackHeight - (geneD3_trackHeight/2) + 2 : -10; })   
-        .text(function(d) { return d[1]; })                
+        .attr('y', function(d) { return margin.left > 5 ? geneD3_trackHeight - (geneD3_trackHeight/2) + 2 : -10; })
+        .text(function(d) { return d[1]; })
         .style('fill-opacity', 1);
 
 
       transcript.selectAll('.utr,.cds,.exon').sort(function(a,b){ return parseInt(a.start) - parseInt(b.start)})
-        .transition()        
+        .transition()
           .duration(700)
           .attr('x', function(d) { return d3.round(x(d.start))})
           .attr('width', function(d) { return Math.max(minFtWidth, d3.round(x(d.end) - x(d.start)))})
-          .attr('y', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2; 
+          .attr('y', function(d) {
+            if(d.feature_type.toLowerCase() =='utr') return (geneD3_trackHeight - geneD3_utrHeight)/2;
             else return (geneD3_trackHeight - geneD3_cdsHeight)/2; })
-          .attr('height', function(d) { 
-            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight; 
-            else return geneD3_cdsHeight; });     
+          .attr('height', function(d) {
+            if(d.feature_type.toLowerCase() =='utr') return geneD3_utrHeight;
+            else return geneD3_cdsHeight; });
 
       // Update the x-axis.
       svg.select(".x.axis").transition()
           .duration(200)
-          .call(xAxis);  
-        
+          .call(xAxis);
+
     });
 
   }
@@ -476,7 +476,7 @@ function geneD3() {
   }
 
   // updates the hash with the center of the biggest span between features
-  function centerSpan(d) {    
+  function centerSpan(d) {
     var span = 0;
     var center = 0;
     var sorted = d.features
@@ -489,15 +489,15 @@ function geneD3() {
         span = currSpan;
         center = parseInt(sorted[i].end) + span/2;
       }
-    }      
+    }
     d.center = center;
-    return [d]; 
+    return [d];
   }
 
   // generates the arrow path
   function centerArrow(d) {
     var arrowHead = parseInt(d.strand + '5');
-    var pathStr = "M ";            
+    var pathStr = "M ";
     pathStr += x(d.center) + ' ' + (geneD3_trackHeight - geneD3_arrowHeight)/2;
     pathStr += ' L ' + parseInt(x(d.center)+arrowHead) + ' ' + geneD3_trackHeight/2;
     pathStr += ' L ' + x(d.center) + ' ' + parseInt(geneD3_trackHeight + geneD3_arrowHeight)/2;
@@ -510,18 +510,18 @@ function geneD3() {
       d = d / 1000000 + "M";
     else if ((d / 1000) >= 1)
       d = d / 1000 + "K";
-    return d;            
+    return d;
   }
 
   chart.hideTooltip = function() {
-      container.select('.tooltip').classed("locked", false);           
-      container.select('.tooltip').classed("black-arrow-left", false);           
-      container.select('.tooltip').classed("black-arrow-right", false);       
-      container.select('.tooltip').style("pointer-events", "none");       
-      container.select('.tooltip').transition()        
-         .duration(500)      
-         .style("opacity", 0);   
-  }  
+      container.select('.tooltip').classed("locked", false);
+      container.select('.tooltip').classed("black-arrow-left", false);
+      container.select('.tooltip').classed("black-arrow-right", false);
+      container.select('.tooltip').style("pointer-events", "none");
+      container.select('.tooltip').transition()
+         .duration(500)
+         .style("opacity", 0);
+  }
 
 
   chart.featureClass = function(_) {
@@ -571,7 +571,7 @@ function geneD3() {
     geneD3_heightPercent = _;
     return chart;
   };
-  
+
   chart.x = function(_) {
     if (!arguments.length) return x;
     x = _;
@@ -583,18 +583,18 @@ function geneD3() {
     y = _;
     return chart;
   };
-    
+
   chart.xAxis = function(_) {
     if (!arguments.length) return xAxis;
     xAxis = _;
-    return chart; 
+    return chart;
   };
 
   chart.yAxis = function(_) {
     if (!arguments.length) return yAxis;
     yAxis = _;
-    return chart; 
-  };  
+    return chart;
+  };
   chart.trackHeight = function(_) {
     if (!arguments.length) return geneD3_trackHeight;
     geneD3_trackHeight = _;

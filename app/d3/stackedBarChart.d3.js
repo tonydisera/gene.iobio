@@ -18,7 +18,7 @@ function stackedBarChartD3() {
 
   var xValue = null;
   var xValueStart = null;
-  var xValueEnd   = null;   
+  var xValueEnd   = null;
 
   var showXAxis = true;
   var showYAxis = true;
@@ -42,9 +42,9 @@ function stackedBarChartD3() {
   function chart(selection, theOptions) {
 
     options = $.extend( defaults, theOptions);
-    var innerHeight = height - margin.top - margin.bottom;    
+    var innerHeight = height - margin.top - margin.bottom;
     var innerWidth = width - margin.left - margin.right;
-    
+
 
     selection.each(function(data) {
 
@@ -68,7 +68,7 @@ function stackedBarChartD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-        .filter(function() { 
+        .filter(function() {
             return this.parentNode === container.node();
         })
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
@@ -76,11 +76,11 @@ function stackedBarChartD3() {
 
       var tooltip = container.selectAll(".tooltip").data([0])
           .enter().append('div')
-          .attr("class", "tooltip")  
-          .style("pointer-events", "none")             
-          .style("opacity", 0);    
+          .attr("class", "tooltip")
+          .style("pointer-events", "none")
+          .style("opacity", 0);
 
-      
+
       //var x = d3.scale.ordinal()
       //    .rangeBands([0, innerWidth], 0, 0);
       var x = d3.scale.linear()
@@ -97,33 +97,33 @@ function stackedBarChartD3() {
         xAxis.tickValues([]);
       } else if (xTickCount > 1 ) {
         xAxis.ticks(xTickCount);
-      } 
+      }
 
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("right");
       if (yTickCount) {
           yAxis.ticks(yTickCount)
-      } 
+      }
 
       if (xStart && xEnd) {
         x.domain([xStart, xEnd]);
       } else {
         x.domain(d3.extent(data, function(d) { return xValue(d); }));
-      }         
+      }
       var yMax = d3.max(data, function(d) { return d.total; })
-      y.domain([0, yMax]);    
+      y.domain([0, yMax]);
 
       // What is the min y value that will equal a min height (the height of the chart is 0, so subtract min from height)
-      var minY = barHeightMin ? y.invert(y.range()[0] - barHeightMin) : 0;  
+      var minY = barHeightMin ? y.invert(y.range()[0] - barHeightMin) : 0;
       var stackedData = categories.map(function(category) {
         return data.map(function(d) {
-          var stackRow = { x: xValue(d), 
-                           y: +d[category] > 0 ? Math.max(+d[category], minY) : 0, 
-                           values: categories.map(function(cat) { 
+          var stackRow = { x: xValue(d),
+                           y: +d[category] > 0 ? Math.max(+d[category], minY) : 0,
+                           values: categories.map(function(cat) {
                               var v = {};
                               v[cat] = d[cat];
-                              return v; 
+                              return v;
                            })
                          };
           if (xValueStart && xValueEnd) {
@@ -133,7 +133,7 @@ function stackedBarChartD3() {
 
           return stackRow;
         });
-      });        
+      });
 
 
       var layers = d3.layout.stack()(stackedData);
@@ -152,9 +152,9 @@ function stackedBarChartD3() {
 */
 
 
-      
 
-      
+
+
       if (options.transition && options.transition.pushUp) {
         g.selectAll(".layer").remove();
       }
@@ -188,20 +188,20 @@ function stackedBarChartD3() {
                   .append("rect")
                   .attr("class", "stacked-element")
                   .attr("x", function(d) { return 0; })
-                  .attr("y", function(d, i) { 
+                  .attr("y", function(d, i) {
                     return y(d.y + d.y0);
                   })
-                  .attr('height', function(d) { 
-                    return y(d.y0) - y(d.y + d.y0); 
+                  .attr('height', function(d) {
+                    return y(d.y0) - y(d.y + d.y0);
                   })
                   .attr("width", function(d) {
-                    return chart.calcBarWidth(x, d); 
+                    return chart.calcBarWidth(x, d);
                   }).attr("pointer-events", "all")
                   .attr("cursor", "pointer");
       bar.exit().remove();
-      
+
       bar.selectAll('.stacked-bar rect.stacked-element')
-                  .on("mouseover", function(d, i) {  
+                  .on("mouseover", function(d, i) {
 
                       var tooltip = container.selectAll(".tooltip");
                       tooltip.html( tooltipText(d, i) );
@@ -210,26 +210,26 @@ function stackedBarChartD3() {
 
                       var w = tooltip.node().getBoundingClientRect().width;
                       var h = tooltip.node().getBoundingClientRect().height;
-                      tooltip.style("left", (d3.event.pageX - w)+ "px") 
-                             .style("text-align", 'left')    
-                            .style("top", (d3.event.pageY - (h + innerHeight)) + "px");    
+                      tooltip.style("left", (d3.event.pageX - w)+ "px")
+                             .style("text-align", 'left')
+                            .style("top", (d3.event.pageY - (h + innerHeight)) + "px");
 
 
-                      tooltip.transition()        
-                         .duration(200)      
-                         .style("opacity", .9);                              
-                   })                  
-                   .on("mouseout", function(d) {       
-                      container.selectAll(".tooltip").transition()        
-                         .duration(500)      
-                         .style("opacity", 0);   
+                      tooltip.transition()
+                         .duration(200)
+                         .style("opacity", .9);
+                   })
+                   .on("mouseout", function(d) {
+                      container.selectAll(".tooltip").transition()
+                         .duration(500)
+                         .style("opacity", 0);
                    })
                    .on("click", function(d) {
                       var on = d3.select(this).attr("class") != "selected";
 
                       svg.selectAll(".stacked-bar rect.stacked-element").classed("selected", false);
                       d3.select(this).classed("selected", on);
-                      
+
                       dispatch.d3click(d, on);
                    });
 
@@ -241,7 +241,7 @@ function stackedBarChartD3() {
       }
 
       if (options.transition && options.transition.pushRight) {
-        layer.selectAll('g.stacked-bar')           
+        layer.selectAll('g.stacked-bar')
              .transition()
              .duration(700)
              .attr("transform", function(d,i) {
@@ -265,10 +265,10 @@ function stackedBarChartD3() {
         svg.append("g")
             .attr("class", "axis axis--y")
             .attr("transform", "translate(0," + margin.top + ")")
-            .call(yAxis);     
+            .call(yAxis);
 
         d3.selectAll('g.axis--y .tick')
-           .filter(function(d, i) { 
+           .filter(function(d, i) {
               return i == 0;
            })
            .remove();
@@ -276,7 +276,7 @@ function stackedBarChartD3() {
 
 
 
-      
+
     });
   };
 
@@ -286,8 +286,8 @@ function stackedBarChartD3() {
       bw = x(d.end) - x(d.start);
     } else if (barWidth) {
       bw = barWidth;
-    } 
-    
+    }
+
     if (barWidthMin) {
       return Math.max(+bw, +barWidthMin);
     } else {
@@ -354,7 +354,7 @@ function stackedBarChartD3() {
     barHeightMin = _;
     return chart;
   };
-  
+
   chart.x = function(_) {
     if (!arguments.length) return x;
     x = _;
@@ -366,21 +366,21 @@ function stackedBarChartD3() {
     y = _;
     return chart;
   };
-    
+
   chart.xAxis = function(_) {
     if (!arguments.length) return xAxis;
     xAxis = _;
-    return chart; 
+    return chart;
   };
 
   chart.yAxis = function(_) {
     if (!arguments.length) return yAxis;
     yAxis = _;
-    return chart; 
-  };  
+    return chart;
+  };
 
 
-  
+
   chart.xStart = function(_) {
     if (!arguments.length) return xStart;
     xStart = _;
@@ -411,19 +411,19 @@ function stackedBarChartD3() {
     formatXTick = _;
     return chart;
   }
-  
+
   chart.xAxisLabel = function(_) {
     if (!arguments.length) return xAxisLabel;
     xAxisLabel = _;
     return chart;
   }
-  
+
   chart.yAxisLabel = function(_) {
     if (!arguments.length) return yAxisLabel;
     yAxisLabel = _;
     return chart;
   }
-  
+
   chart.showXAxis = function(_) {
     if (!arguments.length) return showXAxis;
     showXAxis = _;

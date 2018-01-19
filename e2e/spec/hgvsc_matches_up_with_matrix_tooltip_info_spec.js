@@ -25,19 +25,19 @@ module.exports = {
     appTitleSection.selectRefSeqTranscript();
     matrixTrack.waitForMatrixLoaded();
     client.pause(2000);
-    
+
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     matrixTrack.clickColumn(1);
-    variantTooltip.waitForTooltip();   
-    
-    client.pause(4000); 
-    
+    variantTooltip.waitForTooltip();
+
+    client.pause(4000);
+
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     variantTooltip.expectVepConsequence('stop gained');
     variantTooltip.expectInheritanceEquals('recessive inheritance');
     variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 rs527236033');
     variantTooltip.expectHGVScEquals('NM_030665.3:c.2273G>A');
-    
+
     client.end();
   },
 }

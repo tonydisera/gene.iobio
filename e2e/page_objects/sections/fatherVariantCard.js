@@ -5,18 +5,18 @@ module.exports = {
       this.waitForElementVisible('@bamDepth');
     },
     assertLoadedVariantCountEquals: function(text) {
-  		this.expect.element('@variantCount').text.to.equal(text);
-  	},
+      this.expect.element('@variantCount').text.to.equal(text);
+    },
     assertCalledVariantCountEquals: function(text) {
       this.expect.element('@calledVariantCount').text.to.equal(text);
     },
 
     assertLoadedVariantSymbolCountEquals: function(count) {
-    	var self = this;
-    	this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2) #vcf-variants svg g.track .variant', function (result) {
-		    self.assert.equal(result.value.length, count);
-		  });
-  	},
+      var self = this;
+      this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2) #vcf-variants svg g.track .variant', function (result) {
+        self.assert.equal(result.value.length, count);
+      });
+    },
     assertCalledVariantSymbolCountEquals: function(count) {
       var self = this;
       this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2) #fb-variants svg g.track .variant', function (result) {
@@ -25,11 +25,11 @@ module.exports = {
     },
 
     assertLoadedSNPSymbolCountEquals: function(count) {
-    	var self = this;
-    	this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2) #vcf-variants svg g.track .variant.snp', function (result) {
-		    self.assert.equal(result.value.length, count);
-		  });
-  	},
+      var self = this;
+      this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2) #vcf-variants svg g.track .variant.snp', function (result) {
+        self.assert.equal(result.value.length, count);
+      });
+    },
     assertCalledSNPSymbolCountEquals: function(count) {
       var self = this;
       this.api.elements('css selector','#other-variant-cards .variant-card:nth-child(2)#fb-variants svg g.track .variant.snp', function (result) {

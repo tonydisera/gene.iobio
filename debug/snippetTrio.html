@@ -17,8 +17,8 @@
         </div>
 
         <script src="../assets/js/iobio.min.js"></script>
-        <script src="../assets/js/d3.min.js"></script> 
-        <script src="../assets/js/jquery.1.11.1.min.js"></script> 
+        <script src="../assets/js/d3.min.js"></script>
+        <script src="../assets/js/jquery.1.11.1.min.js"></script>
 
         <script src="../app/globalsDeployment.js"></script>
         <script src="../app/globals.js"></script>
@@ -26,7 +26,7 @@
         <script src="../app/model/genomeBuildHelper.js"></script>
         <script src="../app/vcf.iobio.js"></script>
 
-        
+
         <script>
 
             var GENE_REGION_BUFFER = 1000;
@@ -34,7 +34,7 @@
             var geneSource = 'gencode';
             var isRefSeq = false;
             var hgvsNotation = false;
-            var getRsId = false;
+            var util.getRsId = false;
             var geneCount = 1;
             var start = 0;
             var end = 0;
@@ -46,7 +46,7 @@
                 proband: 'NA12878',
                 mother:  'NA12892',
                 father:  'NA12891'
-            };                
+            };
             var vcfUrl = "https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz";
             var vcfWorkers = {
 
@@ -57,9 +57,9 @@
 */
 
             var geneNames = [
-              "BCS1L", "COX10", "NDUFS4", "SLC37A4", "PDHA1", "FH", "CACNA1S", "NDUFS3", "SLC25A19", "NDUFV1", "NDUFS1", "NDUFS7", "SDHA", "PC", "G6PC", "DLD", "PDHB", "NDUFV2", "DLAT", "TAZ", "SURF1", "NDUFA2", "NDUFS8", "PDP1", "NDUFA10", "NDUFS2", "NDUFS6", "NDUFB3", "NDUFA1", "COQ2", "NDUFA11", "COX15", "RYR1", "NDUFAF2", "SDHD", "CYC1", "HSD17B10", "YARS2", "PDHX", "COX6B1", "SCO1", "HADHA", "ACAD9", "NDUFAF4", "SLC19A3", "PCCB", "PCCA", "HADHB", "NDUFA7", "TACO1", "NDUFA9", "NDUFB6", "NDUFA12", "NDUFB5", "NDUFA8", "NDUFA5", "NDUFB8", "NDUFA4", "NDUFS5", "NDUFB7", "NDUFV3", "NDUFC2", "NDUFB10", "NDUFB4", "NDUFB2", "NDUFC1", "NDUFAB1", "NDUFA3", "NDUFB1", "NDUFB11", "NDUFA13", "ND6", "ND4", "ND5", "ND3", "ND4L", "ND2", "ND1", "MPC1", "PHKG2", "NDUFAF3", "NDUFAF1", "NUBPL", "SDHAF1", "SLC25A3", "SLC25A4", "SCO2", "PDSS2", "COX20", "RRM2B", "NDUFAF6", "COA5", "MLYCD", "ETS1", "SLC3A1", "SLC25A5", "COX17", "SDHB", "SDHC", "SLC2A4", "TUFM", "SFXN4", "MRPS16", "ADCK3", "LRPPRC", "TSFM", "ELAC2", "UCP1", "SLC2A1", "OGDH", "SLC2A2", "COX11", "GAPDH", "UCP2", "EARS2", "UCP3", "PIK3R5", "CACNA1D", "AKT1", "EP300", "SLC2A5", "PIK3R1", "PIK3CG", "PIK3CB", "PIK3R3", "PIK3R2", "PIK3CD", "PIK3CA", "SLC25A6", "PRKACA", "PKLR", "SLC2A3", "ATP5B", "CREBBP", "ATP5A1", "ATP5G1", "SLC25A13", "SLC25A12", "CACNA1C", "FARS2", "AARS2", "SLC9A1", "UQCRFS1", "NDUFB9", "CALM1", "MPV17", "MDH2", "SLC16A1", "SLC16A8", "SLC16A3", "INS", "PRKACB", "SLC6A11", "UQCRC1", "UQCRB", "UQCRC2", "UQCRH", "UQCRQ", "UQCR11", "UQCR10", "PLCB2", "SLC5A1", "COX6C", "COX5B", "COX5A", "COX6A1", "COX4I1", "COX3", "COX7B", "COX1", "COX2", "COX7C", "COX8A", "SLC18A2", "SLC18A1", "SLC5A6", "PRKACG", "CALM3", "CALM2", "SLC25A10", "SLC25A31", "SP1", "ATP5C1", "LIAS", "NDUFA6", "ATP5F1", "ATP5O", "SLC44A2", "SLC44A3", "SLC44A5", "SLC44A4", "ATP5H", "ATP5D", "PRKAG2", "PRKAB2", "PRKAA2", "ATP8", "ATP5G2", "ATP6", "COX7A2L"            
+              "BCS1L", "COX10", "NDUFS4", "SLC37A4", "PDHA1", "FH", "CACNA1S", "NDUFS3", "SLC25A19", "NDUFV1", "NDUFS1", "NDUFS7", "SDHA", "PC", "G6PC", "DLD", "PDHB", "NDUFV2", "DLAT", "TAZ", "SURF1", "NDUFA2", "NDUFS8", "PDP1", "NDUFA10", "NDUFS2", "NDUFS6", "NDUFB3", "NDUFA1", "COQ2", "NDUFA11", "COX15", "RYR1", "NDUFAF2", "SDHD", "CYC1", "HSD17B10", "YARS2", "PDHX", "COX6B1", "SCO1", "HADHA", "ACAD9", "NDUFAF4", "SLC19A3", "PCCB", "PCCA", "HADHB", "NDUFA7", "TACO1", "NDUFA9", "NDUFB6", "NDUFA12", "NDUFB5", "NDUFA8", "NDUFA5", "NDUFB8", "NDUFA4", "NDUFS5", "NDUFB7", "NDUFV3", "NDUFC2", "NDUFB10", "NDUFB4", "NDUFB2", "NDUFC1", "NDUFAB1", "NDUFA3", "NDUFB1", "NDUFB11", "NDUFA13", "ND6", "ND4", "ND5", "ND3", "ND4L", "ND2", "ND1", "MPC1", "PHKG2", "NDUFAF3", "NDUFAF1", "NUBPL", "SDHAF1", "SLC25A3", "SLC25A4", "SCO2", "PDSS2", "COX20", "RRM2B", "NDUFAF6", "COA5", "MLYCD", "ETS1", "SLC3A1", "SLC25A5", "COX17", "SDHB", "SDHC", "SLC2A4", "TUFM", "SFXN4", "MRPS16", "ADCK3", "LRPPRC", "TSFM", "ELAC2", "UCP1", "SLC2A1", "OGDH", "SLC2A2", "COX11", "GAPDH", "UCP2", "EARS2", "UCP3", "PIK3R5", "CACNA1D", "AKT1", "EP300", "SLC2A5", "PIK3R1", "PIK3CG", "PIK3CB", "PIK3R3", "PIK3R2", "PIK3CD", "PIK3CA", "SLC25A6", "PRKACA", "PKLR", "SLC2A3", "ATP5B", "CREBBP", "ATP5A1", "ATP5G1", "SLC25A13", "SLC25A12", "CACNA1C", "FARS2", "AARS2", "SLC9A1", "UQCRFS1", "NDUFB9", "CALM1", "MPV17", "MDH2", "SLC16A1", "SLC16A8", "SLC16A3", "INS", "PRKACB", "SLC6A11", "UQCRC1", "UQCRB", "UQCRC2", "UQCRH", "UQCRQ", "UQCR11", "UQCR10", "PLCB2", "SLC5A1", "COX6C", "COX5B", "COX5A", "COX6A1", "COX4I1", "COX3", "COX7B", "COX1", "COX2", "COX7C", "COX8A", "SLC18A2", "SLC18A1", "SLC5A6", "PRKACG", "CALM3", "CALM2", "SLC25A10", "SLC25A31", "SP1", "ATP5C1", "LIAS", "NDUFA6", "ATP5F1", "ATP5O", "SLC44A2", "SLC44A3", "SLC44A5", "SLC44A4", "ATP5H", "ATP5D", "PRKAG2", "PRKAB2", "PRKAA2", "ATP8", "ATP5G2", "ATP6", "COX7A2L"
             ];
-            
+
 
             var genomeBuildHelper = null;
             var cacheHelper = null;
@@ -67,7 +67,7 @@
 
             $(document).ready(function(){
                 //$('#data-source').text(new_iobio_services);
-                
+
                 genomeBuildHelper = new GenomeBuildHelper();
                 genomeBuildHelper.promiseInit().then(function() {
                     cacheHelper = new CacheHelper();
@@ -87,17 +87,17 @@
                         duplicatedGeneNames.push(geneName);
                         duplicatedGeneNames.push(geneName);
                     })
-                    geneNames = duplicatedGeneNames;                    
+                    geneNames = duplicatedGeneNames;
                 }
 
 
-                vcfWorkers.proband = vcfiobio();         
+                vcfWorkers.proband = vcfiobio();
                 vcfWorkers.proband.openVcfUrl(vcfUrl, null, function() {
 
-                    vcfWorkers.mother = vcfiobio();         
+                    vcfWorkers.mother = vcfiobio();
                     vcfWorkers.mother.openVcfUrl(vcfUrl, null, function() {
 
-                        vcfWorkers.father = vcfiobio();         
+                        vcfWorkers.father = vcfiobio();
                         vcfWorkers.father.openVcfUrl(vcfUrl, null, function() {
                             runCount++;
 
@@ -106,14 +106,14 @@
                                 start = Date.now();
 
                                 var table = '<table id="result-table" style="width:600px"><tr>';
-                                table += 
+                                table +=
                                       '<td>'  +             '</td>'
                                     + '<td>'  + 'gene'    + '</td>'
                                     + '<td>'  + 'proband' + '</td>'
                                     + '<td>'  + 'mother'  + '</td>'
                                     + '<td>'  + 'father'  + '</td>'
-                                    + '<td>'  + 'sec'     + '</td>'                               
-                                table += '</tr></table>';    
+                                    + '<td>'  + 'sec'     + '</td>'
+                                table += '</tr></table>';
                                 $('#main').append(table);
 
 
@@ -131,7 +131,7 @@
                 if (geneNames.length == 0) {
                     return;
                 }
-                
+
                 var geneName = geneNames[0];
                 geneNames.splice(0,1);
 
@@ -152,10 +152,10 @@
                 var promises = [];
 
 
-                var thePromise =  
-                    vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  [], false, [sampleNames.proband], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, global_vepAF, useCache)
+                var thePromise =
+                    vcfWorkers.proband.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript,
+                                                  [], false, [sampleNames.proband], annotationEngine, {}, isRefSeq,
+                                                  hgvsNotation, util.getRsId, global_vepAF, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -163,10 +163,10 @@
                               });
                 promises.push(thePromise);
 
-                thePromise =  
-                    vcfWorkers.mother.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  [], false, [sampleNames.mother], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, global_vepAF. useCache)
+                thePromise =
+                    vcfWorkers.mother.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript,
+                                                  [], false, [sampleNames.mother], annotationEngine, {}, isRefSeq,
+                                                  hgvsNotation, util.getRsId, global_vepAF. useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -174,10 +174,10 @@
                               });
                 promises.push(thePromise);
 
-                thePromise =  
-                    vcfWorkers.father.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript, 
-                                                  [], false, [sampleNames.father], annotationEngine, {}, isRefSeq, 
-                                                  hgvsNotation, getRsId, global_vepAF, useCache)
+                thePromise =
+                    vcfWorkers.father.promiseGetVariants(geneObject.ref, geneObject, selectedTranscript,
+                                                  [], false, [sampleNames.father], annotationEngine, {}, isRefSeq,
+                                                  hgvsNotation, util.getRsId, global_vepAF, useCache)
                               .then( function(data) {
                                     var annotatedRecs = data[0];
                                     var theVcfData = data[1];
@@ -190,24 +190,24 @@
                     end = Date.now();
                     var sec = round((end - start) / 1000, 2);
                     var row = '<tr>';
-                    row += 
+                    row +=
                           '<td>'  + geneCount               + '</td>'
                         + '<td>'  + geneObject.gene_name    + '</td>'
                         + '<td>'  + geneObject.probandCount + '</td>'
                         + '<td>'  + geneObject.motherCount  + '</td>'
                         + '<td>'  + geneObject.fatherCount  + '</td>'
                         + '<td>'    + sec                   + '</td>'
-                    row += '</tr>';    
+                    row += '</tr>';
                     console.log("***** " + geneCount + ". " + "FINISHED WITH TRIO FOR GENE "  + ' *******');
 
-                    
+
                     $("#main #result-table").append(row);
 
                     geneCount++;
 
                     start = Date.now();
                     runNextGene();
-                });          
+                });
             }
 
 
@@ -227,8 +227,8 @@
                         dataType: "jsonp",
                         success: function( response ) {
 
-                            var geneObject = response[0];  
-                            if (geneObject.hasOwnProperty("gene_name") 
+                            var geneObject = response[0];
+                            if (geneObject.hasOwnProperty("gene_name")
                                 && geneObject.hasOwnProperty("chr")
                                 && geneObject.hasOwnProperty("transcripts")
                                 && geneObject.transcripts.length > 0) {
@@ -238,7 +238,7 @@
                                 } else {
                                     geneObject.ref = geneObject.chr;
                                 }
-                                adjustGeneRegion(geneObject);  
+                                adjustGeneRegion(geneObject);
                                 resolve(geneObject);
                             } else {
                                 reject("error - incomplete gene info for gene " + geneName);
@@ -246,7 +246,7 @@
 
                         },
                         error: function( xhr, status, errorThrown ) {
-                            
+
                             console.log( "Error: " + errorThrown );
                             console.log( "Status: " + status );
                             console.log( xhr );
@@ -264,9 +264,9 @@
 
             function getCanonicalTranscript(theGeneObject) {
                 var geneObject = theGeneObject != null ? theGeneObject : window.gene;
-                var canonical;  
+                var canonical;
 
-                if (geneObject.transcripts == null || geneObject.transcripts.length == 0) {     
+                if (geneObject.transcripts == null || geneObject.transcripts.length == 0) {
                     return null;
                 }
                 var order = 0;
@@ -278,8 +278,8 @@
                             if (feature.feature_type == 'CDS') {
                                 cdsLength += Math.abs(parseInt(feature.end) - parseInt(feature.start));
                             }
-                        })          
-                        transcript.cdsLength = cdsLength;           
+                        })
+                        transcript.cdsLength = cdsLength;
                     } else {
                         transcript.cdsLength = +0;
                     }
@@ -310,10 +310,10 @@
                     if (geneSource.toLowerCase() == 'refseq') {
                         if (a.transcript_id.indexOf("NM_") == 0 ) {
                             aLevel = +0;
-                        } 
+                        }
                         if (b.transcript_id.indexOf("NM_") == 0 ) {
                             bLevel = +0;
-                        } 
+                        }
                     } else {
                         // Don't consider level for gencode as this seems to point to shorter transcripts many
                         // of the times.
@@ -378,14 +378,14 @@
             }
 
 
-            function getHumanRefNames(refName) {
+            function util.getHumanRefNames(refName) {
                 if (refName.indexOf("chr") == 0) {
                   return "chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr20 chr21 chr22 chrX chrY";
                 } else {
                   return "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 X Y";
                 }
             }
-            function switchGenotype(gt) {
+            function util.switchGenotype(gt) {
                 if (gt != null && gt.length == 3) {
                     return gt[2] +  gt[0];
                 } else {
@@ -413,7 +413,7 @@
               return +(Math.round(value + "e+" + places)  + "e-" + places);
             }
 
-            function stripTranscriptPrefix(transcriptId) {
+            function util.stripTranscriptPrefix(transcriptId) {
                 if (transcriptId == null) {
                     console.log("null transcript id")
                     return "";

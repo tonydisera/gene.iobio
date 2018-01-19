@@ -1,0 +1,58 @@
+<div id="matrix-track" style="width:100%;overflow-x:auto" class="track shadow-z-2 hide">
+
+
+    <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
+      <div class="card-label level-edu level-basic" style="float:left">Ranked Variants</div>
+      <a id="show-legend" class="level-edu level-basic"  onclick="showLegend()" href="javascript:void(0)">
+        <i style="font-size:18px" class="material-icons">map</i>
+        Show legend
+      </a>
+    </div>
+
+
+    <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
+
+    <div id="zero-variants" class="warning level-edu hide">
+    </div>
+
+    <div id="matrix-panel"  style="clear:both;min-height:30px"
+      class="fullview" aria-expanded="true">
+        <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
+            <span class="loader-label">Ranking variants</span>
+            <img src="assets/images/wheel.gif"/>
+        </div>
+
+
+      <div id="feature-matrix" style="overflow-x: auto;">
+      </div>
+
+      <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">
+         <i class="material-icons">swap_vert</i>
+        Reorder
+      </a>
+
+      <div id="feature-matrix-note" class="hide" >
+
+        <div style="display:inline-block">
+          <svg style="height: 10px;width:108px">
+            <g transform="translate(8,6)">
+              <line x1="0" y1="0" x2="100" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
+            </g>
+            <g transform="translate(-10,0),rotate(-90,10,0)">
+              <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
+            </g>
+          </svg>
+
+          <div class="matrix-note-text level-edu level-basic">
+            More likely causative
+          </div>
+          <div id="matrix-harmful-note" class="matrix-note-text hide level-basic level-edu">
+            Most harmful
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+</div>

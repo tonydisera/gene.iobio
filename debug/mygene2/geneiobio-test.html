@@ -11,10 +11,10 @@
     <body>
 
         <h1>Testing token based data exchange for gene.iobio in MyGene2.</h1>
-        <script src="http://code.jquery.com/jquery-1.12.4.min.js"   
+        <script src="http://code.jquery.com/jquery-1.12.4.min.js"
             integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
 
-        
+
 
         <script>
             var xauthToken  = "";
@@ -26,12 +26,12 @@
                     alert("Please edit geneiobio-test.html and initialize the xauthToken variable on line 20.");
                     return;
                 }
-                if (getUrlParameter("token") == null || getUrlParameter("token") == "") {
+                if (util.getUrlParameter("token") == null || util.getUrlParameter("token") == "") {
                     alert("Please provide token request parameter on end of this URL (e.g. ?token=xxxx)")
                     return;
                 }
 
-                var endpointUrl = "https://mygene2-dev.gs.washington.edu/MyGene2/geneiobio?token=" + getUrlParameter("token");
+                var endpointUrl = "https://mygene2-dev.gs.washington.edu/MyGene2/geneiobio?token=" + util.getUrlParameter("token");
                 $.ajax({
                     url : endpointUrl,
                     headers: {
@@ -54,15 +54,15 @@
             });
 
 
-            function getUrlParameter(sParam) {
+            function util.getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1);
                 var sURLVariables = sPageURL.split('&');
                 var hits = {};
-                for (var i = 0; i < sURLVariables.length; i++) 
-                {       
-                    var sParameterName = sURLVariables[i].split('=');        
+                for (var i = 0; i < sURLVariables.length; i++)
+                {
+                    var sParameterName = sURLVariables[i].split('=');
                     if (typeof sParam == 'string' || sParam instanceof String) {
-                        if (sParameterName[0] == sParam) 
+                        if (sParameterName[0] == sParam)
                         {
                             return sParameterName[1];
                         }

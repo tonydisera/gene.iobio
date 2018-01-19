@@ -1320,10 +1320,10 @@ vjs.findPosition = function(el) {
 vjs.util = {};
 
 /**
- * Merge two options objects, 
+ * Merge two options objects,
  * recursively merging any plain object properties as well.
  * Previously `deepMerge`
- * 
+ *
  * @param  {Object} obj1 Object to override values in
  * @param  {Object} obj2 Overriding object
  * @return {Object}      New object -- obj1 and obj2 will be untouched

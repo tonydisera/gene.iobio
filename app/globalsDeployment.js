@@ -1,8 +1,8 @@
 /*  These global variables determine which iobio servers the gene.iobio app with interact
-    with for a local deployment.  This entire .js can be replaced or modified to suit the 
+    with for a local deployment.  This entire .js can be replaced or modified to suit the
     specific iobio deployment environment.
 */
-var version               = "2.5.2";
+var version               = "2.6";
 
 var isOffline             = false;          // is there any internet connect to outside services and resources?
 var isClinvarOffline      = false;          // is clinvar offline?  (Pull from clinvar hosted from URL?)
@@ -18,13 +18,12 @@ var offlineUrlTag         = "site:"         // this is the first part if the vcf
 var useSSL                = true;
 var useServerCache        = false;
 
-
-// site config
-var global_siteConfigUrl  = "https://s3.amazonaws.com/gene.iobio.site.config/site-config.json";
-
+// config files
+var global_siteConfigUrl    =  "https://s3.amazonaws.com/gene.iobio.config/site-config.json";
+var global_clinvarGenesUrl  =  "https://s3.amazonaws.com/gene.iobio.config/clinvar-counts.txt";
 
 // Get clinvar annotations from 'eutils' or 'vcf'
-var clinvarSource        = "vcf";
+var clinvarSource         = "vcf";
 
 // Allow freebayes runtime args to be set by user
 var allowFreebayesSettings  = false;
@@ -38,18 +37,23 @@ var global_maxGeneCount         = 100;
 // Should vep retrieve allele frequencies (for gnomad, 1000G, ESP)
 var global_vepAF                = true ;
 
+// What browser cache implementation is used: 'localStorage' or 'indexedDB'
+var BROWSER_CACHE_LOCAL_STORAGE = 'localStorage';
+var BROWSER_CACHE_INDEXED_DB    = 'indexedDB';
+var global_browserCache         = BROWSER_CACHE_INDEXED_DB;
+
 /*
 * This variable controls special behavior for running gene.iobio education edition, with
-* a simplified interface and logic.  
+* a simplified interface and logic.
 * See @import statements for levelEdu  in css/assets/sass.
 */
 var isLevelEdu            = false;   // is gene.iobio educational version, simplified version of app
 
 /*
 * These variables control special behavior for running gene.iobio basic mode, with
-* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode, 
+* a simplified interface and logic.  For running the Mygene2 gene.iobio basic mode,
 * TURN ON BOTH isLevelBasic and isMygene2.  For running Mygene2 gene.iobio advanced mode,
-* TURN ON only isMygene2. 
+* TURN ON only isMygene2.
 * See @import statements for levelEdu and levelEduTour in css/assets/sass.
 */
 var isLevelBasic          = false;    // is gene.iobio basic mode?
@@ -63,4 +67,4 @@ var autocall              = null       // If only alignments provided, should va
 
 
 var siteGeneSource        = isMygene2 ? "refseq" : "gencode";      // what should the gene source default to: refseq or gencode?
-var DEFAULT_BATCH_SIZE    = 5;              // how many genes can be analyzed simultaneously for 'Analyze all'
+var DEFAULT_BATCH_SIZE    = 10;              // how many genes can be analyzed simultaneously for 'Analyze all'

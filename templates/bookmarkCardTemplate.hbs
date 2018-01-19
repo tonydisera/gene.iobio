@@ -2,7 +2,7 @@
 <div class="card-label">Variant Bookmarks</div>
 
 
-	<div style="margin-top:5px;">
+  <div style="margin-top:5px;">
     <button  class="icon-button-standard btn btn-raised btn-default" onclick="showDataDialogImportBookmarks()">
         <i class="material-icons">open_in_browser</i>
         Open
@@ -11,30 +11,30 @@
         <i class="material-icons">save</i>
        Save
     </button>
-	</div>
+  </div>
 
 
 
   <div class="loader hide"  style="margin-top:10px;margin-bottom:10px;">
       <span class="loader-label">Loading bookmarks</span>
       <img src="assets/images/wheel.gif"/>
-  </div>  
-    
+  </div>
 
- 
- 
+
+
+
   <div id="edit-bookmarks-box" class="hide" style="clear:both;text-align:right;clear:both;">
-    <a href="javascript:void(0)" id="edit-bookmarks" 
+    <a href="javascript:void(0)" id="edit-bookmarks"
     onclick="$('#bookmark-card #bookmark-panel').toggleClass('editmode');$('#bookmark-card #edit-bookmarks').toggleClass('hide');$('#bookmark-card #done-edit-bookmarks').toggleClass('hide')">Edit</a>
 
     <a href="javascript:void(0)" id="done-edit-bookmarks"  class="hide"
     onclick="$('#bookmark-card #bookmark-panel').toggleClass('editmode');;$('#bookmark-card #edit-bookmarks').toggleClass('hide');$('#bookmark-card #done-edit-bookmarks').toggleClass('hide')">Done</a>
   </div>
 
-	<div id="bookmark-panel-area" style="clear:both;margin-top:-20px;">
+  <div id="bookmark-panel-area" style="clear:both;margin-top:-20px;">
      <div id="bookmark-panel" style="padding-bottom:20px">
      </div>
-	</div>
+  </div>
 
-	
+
 </div>

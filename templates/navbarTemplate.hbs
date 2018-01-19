@@ -6,9 +6,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      
+
           <div class="navbar-brand" >
-                <a id='home' onclick="goToHome()">
+                <a id='home' onclick="utility.goToHome()">
                   <span class="iobioapp">gene</span><span class="iobio">.iobio</span>
                 </a>
                 <div id="basic-mode-title" class="level-mygene2 hide">
@@ -24,41 +24,41 @@
             <!-- Genome build link -->
             <a href="javascript:void(0)" id="build-link" class="level-edu-tour  level-basic" onclick="showDataDialog()"></a>
 
-        
+
           </div>
 
 
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
 
-      <ul class="nav navbar-nav" >
+      <ul id="main-nav-links" class="hide nav navbar-nav" >
 
 
 
 
-        <li>      
+        <li>
            <a href="javascript:void(0)" id="add-data-button"  class="level-edu mygene2 " onclick="showDataDialog()">
-                  <span class="material-icons">input</span>    
+                  <span class="material-icons">input</span>
                   Files
             </a>
         </li>
 
 
 
-        <li class="vertical-divider level-basic "></li>  
+        <li class="vertical-divider level-basic "></li>
 
         <li class="level-basic">
 
           <form class="navbar-form navbar-left">
            <div id="search-gene-label">
-              <span class="material-icons ">search</span> 
+              <span class="material-icons ">search</span>
               <span class="nav-label">Gene</span>
            </div>
 
 
             <div id="bloodhound" class="form-group" style="vertical-align:top">
               <input id="enter-gene-name" type="text" class="form-control col-sm-8 typeahead" data-toggle="tooltip" style="padding-bottom:1px !important" data-placement="bottom"  placeholder="">
-            </div>           
+            </div>
           </form>
         </li>
 
@@ -68,16 +68,16 @@
 
         <li class="level-basic" >
           <a id="show-select-genes-link" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Phenolyzer')">
-            <span class="material-icons ">explore</span> 
+            <span class="material-icons ">explore</span>
               Genes
           </a>
-        </li > 
+        </li >
 
-        <li id="variant-links-divider" class=" vertical-divider level-basic "></li>  
+        <li id="variant-links-divider" class=" vertical-divider level-basic "></li>
 
         <li class="level-basic">
           <a id="show-filters-link" class="" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Filter')">
-            <span class="material-icons large-screen-only">tune</span> 
+            <span class="material-icons large-screen-only">tune</span>
             Filter
           </a>
         </li>
@@ -85,22 +85,22 @@
 
         <li class="level-basic">
           <a  id="show-bookmarks-link" class="" href="javascript:void(0)" onclick="$('.navbar li.active').removeClass('active');$(this).parent().addClass('active');showSidebar('Bookmarks')">
-            <span class="material-icons large-screen-only">bookmark</span> 
+            <span class="material-icons large-screen-only">bookmark</span>
             Bookmarks
           </a>
-        </li> 
+        </li>
 
 
-        <li class="leve-edu level-basic hide">
+        <li class="leve-edu level-basic hide ">
           <button id="find-rare-variants-button" class="btn btn-default btn-raised navbar-button"  onclick="$('#find-rare-variants-modal').modal('show')">
-            <span class="material-icons large-screen-only">dialpad</span> 
+            <span class="material-icons large-screen-only">dialpad</span>
             <span class="button-label">Find rare variants</span>
           </a>
         </li>
 
 
-         
-       
+
+
       </ul>
 
 
@@ -116,9 +116,9 @@
             <b class="caret"></b></a>
           <ul class="dropdown-menu">
 
-            <!-- 
+            <!--
                  The following line items w class combined-help-about only show for narrow screens when
-                 help and about menus need to be combined 
+                 help and about menus need to be combined
             -->
             <li class="combined-help-about">
               <a href="javascript:void(0)" class=""  onclick="$('#version-modal').modal('show')">Version&nbsp;<span class="version-number"></span></a>
@@ -128,12 +128,12 @@
             </li>
             <li class="combined-help-about">
               <a href="javascript:void(0)" class=""  onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
-            </li> 
+            </li>
             <li class="combined-help-about" class="level-edu level-edu-tour mygene2">
               <a  id="feedback-link" class="hide level-edu level-edu-tour mygene2" data-toggle="modal" data-target="#feedback-modal">
                 Give us feedback
-              </a>              
-            </li>  
+              </a>
+            </li>
             <li class="divider combined-help-about"></li>
             <li class="combined-help-about">
               <a href="http://iobio.io" target="_new">iobio</a>
@@ -141,29 +141,29 @@
             <li class="combined-help-about">
               <a  href="http://iobio.io/support.html" target="_new"  onclick="$('#tourWelcome').removeClass('open');">Support the iobio project
               </a>
-            </li> 
+            </li>
             <li class="divider combined-help-about"></li>
 
 
-            <!-- 
-                These line items always show regardless of screen dimensions 
-            -->        
+            <!--
+                These line items always show regardless of screen dimensions
+            -->
             <li>
               <a id="load-demo-data" style="cursor:pointer" onclick="dataCard.loadDemoData()">
                 <span  style="padding-top: 1px;display: inline-block;" >Load Demo data</span>
               </a>
-            </li> 
+            </li>
             <li>
               <a  style="cursor:pointer" onclick="showLegend()">
                 <span  style="padding-top: 1px;display: inline-block;" >Show legend</span>
               </a>
-            </li>    
-              <li class="divider"></li>     
+            </li>
+              <li class="divider"></li>
             <li >
-              <a 
+              <a
                 href="javascript:void(0)" class="help-link"  onclick="$('#tourWelcome').removeClass('open');window.open('http://iobio.io/tags/gene.iobio', '_new');">
-                Blog 
-              </a> 
+                Blog
+              </a>
             </li>
 
             <li>
@@ -180,17 +180,17 @@
               <a  id="show-phenolyzer-tour" href="javascript:void(0)">Tour phenolyzer </a>
             </li>
             <li>
-              <a  id="show-bookmarks-tour"  href="javascript:void(0)">Tour bookmarks</a>        
+              <a  id="show-bookmarks-tour"  href="javascript:void(0)">Tour bookmarks</a>
             </li>
 
             <li class="divider"></li>
 
             <li>
-              <a  id="show-welcome"  href="javascript:void(0)" onclick="$('.app-panel').addClass('hide');$('#welcome-area').removeClass('hide')"">Welcome</a>        
+              <a  id="show-welcome"  href="javascript:void(0)" onclick="$('.app-panel').addClass('hide');$('#welcome-area').removeClass('hide')"">Welcome</a>
             </li>
 
           </ul>
-        </li> 
+        </li>
 
         <li id="about-link" class="dropdown">
           <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">About
@@ -204,12 +204,12 @@
             </li>
             <li>
               <a href="javascript:void(0)" class=""  onclick="$('#disclaimer-modal').modal('show')">Disclaimer</a>
-            </li> 
+            </li>
             <li class="level-edu level-edu-tour mygene2">
               <a  id="feedback-link" class="hide level-edu level-edu-tour mygene2" data-toggle="modal" data-target="#feedback-modal">
                 Give us feedback
-              </a>              
-            </li>  
+              </a>
+            </li>
 
             <li class="divider"></li>
 
@@ -219,10 +219,10 @@
             <li>
               <a  href="http://iobio.io/support.html" target="_new"  onclick="$('#tourWelcome').removeClass('open');">Support the iobio project
               </a>
-            </li> 
+            </li>
 
           </ul>
-        </li> 
+        </li>
 
 
       </ul>

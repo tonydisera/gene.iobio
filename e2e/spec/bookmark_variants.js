@@ -10,11 +10,11 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;      
+    matrixTrack = indexPage.section.matrixTrack;
     bookmarkPanel = indexPage.section.bookmarkPanel;
     probandVariantCard = indexPage.section.probandVariantCard;
 
-    variantTooltip = indexPage.section.variantTooltip;    
+    variantTooltip = indexPage.section.variantTooltip;
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
   },
 
@@ -59,15 +59,15 @@ module.exports = {
     bookmarkPanel.assertCurrentBookmarkHgvsEquals('p.Trp758Ter');
     bookmarkPanel.assertBookmarkCountEquals(1);
 
-    
+
 
     matrixTrack.clickColumn(2);
     variantTooltip.waitForTooltip();
     variantTooltip.clickBookmark();
     bookmarkPanel.assertBookmarkCountEquals(2);
   },
-    
-    
+
+
   'Click on another gene and bookmark a third variant from variantTooltip': function(client) {
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     client.pause(2000);
@@ -90,7 +90,7 @@ module.exports = {
     variantTooltip.clickBookmark();
     client.pause(1000);
 
-    
+
     bookmarkPanel.assertCurrentBookmarkCoordEquals('19369471 G->T');
     bookmarkPanel.assertCurrentBookmarkRsIdEquals('');
     bookmarkPanel.assertCurrentBookmarkHgvsEquals('p.Gly160Cys');
@@ -102,10 +102,10 @@ module.exports = {
   'Click on a bookmark link in the bookmark panel and show matrix variantTooltip': function(client) {
     client.pause(3000);
     bookmarkPanel.clickBookmark(client, "17698535 G->A");
-    
+
     variantTooltip.selector = variantTooltip.MATRIX_TOOLTIP;
     matrixTrack.waitForMatrixLoaded();
-    
+
     variantTooltip.waitForTooltip();
     client.pause(1000);
     variantTooltip.expectTitleEquals('RAI1 SNP G->A 17:17698535 Exon 3/6 rs527236033');

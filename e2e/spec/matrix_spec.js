@@ -61,7 +61,7 @@ module.exports = {
 
   'Warning appears when no variants passing filter a gene': function(client) {
     nav.clickFilter();
-    client.pause(1000);    
+    client.pause(1000);
     filterPanel.clickClinvarPath();
     matrixTrack.waitForZeroFilteredVariantsWarning();
     client.pause(1000);
@@ -71,17 +71,19 @@ module.exports = {
     filterPanel.clickVepHigh();
     matrixTrack.waitForZeroFilteredVariantsWarning();
 
-  },  
+  },
 
   'Warning appears when no variants found for a gene': function(client) {
     nav.searchGene('NNMT');
+    client.pause(5000);
     matrixTrack.waitForZeroVariantsWarning();
-  },  
+  },
 
   'Allele Frequency <5% row should be accurate': function(client) {
     filterPanel.clickClearAll();
     nav.searchGene("RAI1");
-    matrixTrack.waitForMatrixLoaded();    
+    client.pause(5000);
+    matrixTrack.waitForMatrixLoaded();
     matrixTrack.assertAfHighest([1,2]);
   },
 

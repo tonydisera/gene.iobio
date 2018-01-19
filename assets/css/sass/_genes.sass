@@ -16,25 +16,25 @@
       fill: $sidebar-text-color !important
       font-size: 12px
 
-#zoom-region-chart.ibo-gene 
+#zoom-region-chart.ibo-gene
   .cds.danger
     fill:   $danger-exon-color
     stroke: $danger-exon-border-color
-  .utr.danger 
+  .utr.danger
     fill:   $danger-exon-color
     stroke: $danger-exon-border-color
 
-#gene-viz.ibo-gene 
-  .cds.danger 
+#gene-viz.ibo-gene
+  .cds.danger
     fill:   $danger-exon-color
     stroke: $danger-exon-border-color
-  .utr.danger  
+  .utr.danger
     fill:   $danger-exon-color
     stroke: $danger-exon-border-color
 
 
 #genes-panel
-  margin-bottom: 5px 
+  margin-bottom: 5px
   margin-top: 5px
   margin-bottom: 0px
 
@@ -49,18 +49,18 @@
     overflow: hidden
     margin-top: 1px
     display: inline-block
-    float: left  
+    float: left
     margin-left: 10px
     margin-right: 10px
 
-   
+
 
     #analyzed-progress-bar
       display: inline-block
       margin-top: 2px
       margin-bottom: 6px
       margin-left: 6px
-      float: left  
+      float: left
 
       &.no-alignments
         #called-progress-bar-label
@@ -71,7 +71,7 @@
         height: 17px
         float: left
         width: 0%
-        text-align: center    
+        text-align: center
 
 
       .analysis-progress-bar
@@ -86,43 +86,43 @@
         vertical-align: middle
         height: 18px
         margin-left: 5px
-        margin-bottom: 0px   
+        margin-bottom: 0px
         margin-top: 0px
         display: inline-block
 
         .text
           text-align: center
           width: 100%
-          color: white  
+          color: white
 
         #analyzed-bar
           background-color: transparent
 
           #passed-filter-bar
-            background-color: $loaded-variant-progress-color    
-            height: 16px  
-            color: white       
+            background-color: $loaded-variant-progress-color
+            height: 16px
+            color: white
 
           #not-passed-filter-bar
             background-color: $not-pass-color
-            height: 16px            
+            height: 16px
 
         #not-analyzed-bar
           background-color: transparent
 
 
       #call-all-progress
-        border-top: transparent   
+        border-top: transparent
 
         #analyzed-bar
 
           #passed-filter-bar
             background-color: $called-variant-color
-            height: 17px   
-            color: white      
+            height: 17px
+            color: white
 
           #not-passed-filter-bar
-            height: 17px            
+            height: 17px
 
 
 
@@ -130,7 +130,7 @@
         float: left
         width: 43px
         font-size: 12px
-          
+
 #genes-card
   height: 100%
 
@@ -154,7 +154,7 @@
 
   #phenolyzer-heading
     margin-top: 10px
-    
+
     h5
       display: inline-block
       font-size: 13px
@@ -189,7 +189,7 @@
 textarea#genes-to-copy
   width: 325px
   height: 280px
-  
+
 
 
 #edit-list-li
@@ -208,7 +208,7 @@ textarea#genes-to-copy
     padding-top: 0px
     padding-bottom: 0px
     margin-top: 0px
-    margin-bottom: 1px  
+    margin-bottom: 1px
 
 
 #get-genes-copy-paste-button
@@ -226,12 +226,12 @@ textarea#genes-to-copy
   &.user-visited
     border: 2px solid #c5c4c4
     padding: 2px 1px 0px 1px
-  
+
   #gene-badge-symbols
     height: 14px
     padding-left: 3px
     padding-top: 0px
-    float: left   
+    float: left
 
   #gene-badge-phenotype-symbol
     float: right
@@ -242,7 +242,7 @@ textarea#genes-to-copy
     width: 14px
     height: 14px
     float: left
-    padding-top: 1px  
+    padding-top: 1px
 
 
 #gene-badge
@@ -281,7 +281,6 @@ textarea#genes-to-copy
     &.user-visited
       border: solid 2px #9FC2D0
 
-
 #gene-badge-loaded
   font-size: 14px
   color: $heading-color
@@ -300,7 +299,7 @@ textarea#genes-to-copy
   font-size: 14px
   color: $called-variant-color
   float: left
-  display: none  
+  display: none
 
 #gene-badge-warning
   float: left
@@ -355,7 +354,7 @@ textarea#genes-to-copy
   font-size: 15px
   margin-top: -1px
   margin-left: 2px
-  float: left  
+  float: left
 
 .harmful1-variant
   fill: #9d2024
@@ -368,15 +367,15 @@ textarea#genes-to-copy
 
 
 #gene-badge-harmful1-variant
-  display: none 
+  display: none
   fill: #9d2024
 
 #gene-badge-harmful2-variant
-  display: none 
+  display: none
   fill: #d84d4d
 
 #gene-badge-harmful3-variant
-  display: none 
+  display: none
   fill: #ef9754
 
 
@@ -395,27 +394,27 @@ textarea#genes-to-copy
 
   &.has-called-variants
     #gene-badge-has-called-variants
-      display: inline   
+      display: inline
 
   &.has-coverage-problem
     #gene-badge-coverage-problem
-      display: inline-block 
+      display: inline-block
 
   &.has-harmful-variant
     #gene-badge-harmful-variant
-      display: inline-block 
+      display: inline-block
   &.has-harmful1-variant
     #gene-badge-harmful1-variant
-      display: inline-block 
+      display: inline-block
   &.has-harmful2-variant
     #gene-badge-harmful2-variant
-      display: inline-block 
+      display: inline-block
   &.has-harmful3-variant
     #gene-badge-harmful3-variant
-      display: inline-block       
+      display: inline-block
 
   &:hover #gene-badge-remove
-    visibility: visible 
+    visibility: visible
 
 #gene-badge
   &.visited.error
@@ -438,10 +437,10 @@ textarea#genes-to-copy
       display: inline
   &.called.warning
     #gene-badge-called
-      display: none      
+      display: none
   &.has-called-variants.warning
     #gene-badge-has-called-variants
-      display: none      
+      display: none
 
 
 #call-variants-dropdown
@@ -453,9 +452,9 @@ textarea#genes-to-copy
   a
     padding-top: 5px
     padding-bottom: 5px
-    font-size: 13px  
+    font-size: 13px
     padding-left: 15px
-    padding-right: 15px  
+    padding-right: 15px
 
     &.disabled
       -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12)
@@ -498,7 +497,7 @@ textarea#genes-to-copy
 
   #manage-genes-dropdown
     float: right
-    margin-top: 0px  
+    margin-top: 0px
     margin-left: 20px
 
 
@@ -514,7 +513,7 @@ textarea#genes-to-copy
     visibility: hidden
 
   &.view-all
-    max-height: 150px  
+    max-height: 150px
     overflow-y: auto
 
   &.page-control
@@ -564,15 +563,15 @@ textarea#genes-to-copy
   #gene-paging-links
     display: inline-block
     margin-right: 20px
-    margin-left: 30px    
+    margin-left: 30px
 
   a.gene-paging-link
     color:  $sidebar-text-color !important
     font-size:  12px
     display: inline-block
     vertical-align: top
-    margin-left: 0px   
-    padding-top: 4px 
+    margin-left: 0px
+    padding-top: 4px
 
     &:hover
       text-decoration: underline !important
@@ -581,7 +580,7 @@ textarea#genes-to-copy
   margin-left: 0px
   margin-right: 10px
 
-      
+
 #order-by-label
   margin-left: 5px
   margin-right: 4px
@@ -630,7 +629,7 @@ textarea#genes-to-copy
     color: $app-color
     text-align: right
 
- 
+
 
 #refresh-badges-button
   display: inline-block

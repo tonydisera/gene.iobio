@@ -25,13 +25,13 @@ function stackedAreaChartD3() {
 
   var widthPercent = null;
   var heightPercent = null;
-      
+
   function chart(selection, options) {
 
     options = $.extend(defaults,options);
-    var innerHeight = height - margin.top - margin.bottom;    
+    var innerHeight = height - margin.top - margin.bottom;
     var innerWidth = width - margin.left - margin.right;
-    
+
 
     selection.each(function(data) {
 
@@ -55,7 +55,7 @@ function stackedAreaChartD3() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-        .filter(function() { 
+        .filter(function() {
             return this.parentNode === container.node();
         })
         .attr('viewBox', "0 0 " + parseInt(width+margin.left+margin.right) + " " + parseInt(height+margin.top+margin.bottom));
@@ -63,14 +63,14 @@ function stackedAreaChartD3() {
 
       var tooltip = container.selectAll(".tooltip").data([0])
           .enter().append('div')
-          .attr("class", "tooltip")  
-          .style("pointer-events", "none")             
-          .style("opacity", 0);  
+          .attr("class", "tooltip")
+          .style("pointer-events", "none")
+          .style("opacity", 0);
 
-      
+
       var x = d3.scale.ordinal()
           .rangeBands([0, innerWidth], 0, 0);
-    
+
 
       var y = d3.scale.linear()
           .rangeRound([innerHeight, 0]);
@@ -83,18 +83,18 @@ function stackedAreaChartD3() {
         xAxis.tickValues([]);
       } else if (xTickCount > 1 ) {
         xAxis.ticks(xTickCount);
-      } 
+      }
 
       var yAxis = d3.svg.axis()
           .scale(y)
           .orient("right");
       if (yTickCount) {
           yAxis.ticks(yTickCount)
-      } 
+      }
 
 
       var area = d3.svg.area()
-          .interpolate("monotone")  
+          .interpolate("monotone")
           .x(function(d)  { return x(d.x); })
           .y0(function(d) { return y(d.y0); })
           .y1(function(d) { return y(d.y0 + d.y); });
@@ -116,10 +116,10 @@ function stackedAreaChartD3() {
       var categoryMap = {};
       categories.forEach(function(cat) {
         categoryMap[cat] = true;
-      }) 
+      })
       var maxY = d3.max(data, function(d) {
-        var vals = d3.keys(d).map(function(key){ 
-          return categoryMap.hasOwnProperty(key) ? d[key] : 0 
+        var vals = d3.keys(d).map(function(key){
+          return categoryMap.hasOwnProperty(key) ? d[key] : 0
         });
         return d3.sum(vals);
       });
@@ -130,7 +130,7 @@ function stackedAreaChartD3() {
       y.domain([0, maxY]);
 
 
-   
+
       g.selectAll(".layer").remove();
       var layer = g.selectAll(".layer").data(stacks);
       layer.enter().append("g")
@@ -147,8 +147,8 @@ function stackedAreaChartD3() {
 
       layer.append("path")
            .attr("class", function(d, i) { return "stacked-area stacked-element " + categories[i] })
-           .attr("d", function(d) { 
-             return area(d.values); 
+           .attr("d", function(d) {
+             return area(d.values);
            });
 
 
@@ -174,10 +174,10 @@ function stackedAreaChartD3() {
         svg.append("g")
             .attr("class", "axis axis--y")
             .attr("transform", "translate(0," + margin.top + ")")
-            .call(yAxis);     
+            .call(yAxis);
 
         d3.selectAll('g.axis--y .tick')
-           .filter(function(d, i) { 
+           .filter(function(d, i) {
               return i == 0;
            })
            .remove();
@@ -185,7 +185,7 @@ function stackedAreaChartD3() {
 
 
 
-      
+
     });
   };
 
@@ -218,7 +218,7 @@ function stackedAreaChartD3() {
     return chart;
   };
 
-  
+
   chart.x = function(_) {
     if (!arguments.length) return x;
     x = _;
@@ -230,18 +230,18 @@ function stackedAreaChartD3() {
     y = _;
     return chart;
   };
-    
+
   chart.xAxis = function(_) {
     if (!arguments.length) return xAxis;
     xAxis = _;
-    return chart; 
+    return chart;
   };
 
   chart.yAxis = function(_) {
     if (!arguments.length) return yAxis;
     yAxis = _;
-    return chart; 
-  };  
+    return chart;
+  };
 
   chart.xTickCount = function(_) {
     if (!arguments.length) return xTickCount;
@@ -260,19 +260,19 @@ function stackedAreaChartD3() {
     formatXTick = _;
     return chart;
   }
-  
+
   chart.xAxisLabel = function(_) {
     if (!arguments.length) return xAxisLabel;
     xAxisLabel = _;
     return chart;
   }
-  
+
   chart.yAxisLabel = function(_) {
     if (!arguments.length) return yAxisLabel;
     yAxisLabel = _;
     return chart;
   }
-  
+
   chart.showXAxis = function(_) {
     if (!arguments.length) return showXAxis;
     showXAxis = _;

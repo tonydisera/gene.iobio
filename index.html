@@ -3,18 +3,18 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <head>
-	<title>gene.iobio</title>
+  <title>gene.iobio</title>
 
 
-	<!-- libraries -->
-	<script src="https://www.youtube.com/iframe_api"></script>
+  <!-- libraries -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="assets/js/jquery.1.11.1.min.js"></script>
-	<script src="assets/js/handlebars-v2.0.0.min.js"></script>
-	<script src="assets/js/typeahead.bundle.min.js"></script>
+  <script src="assets/js/handlebars-v2.0.0.min.js"></script>
+  <script src="assets/js/typeahead.bundle.min.js"></script>
 
   <script src="assets/js/bootstrap.min.js"></script>
 
-	<script src="assets/js/d3.min.js"></script>
+  <script src="assets/js/d3.min.js"></script>
 
   <script src="assets/js/colorbrewer.v1.min.js"></script>
 
@@ -230,288 +230,9 @@
 
     </div>
 
-    <div id="genes-control-track" class="hide app-panel level-basic shadow-z-2">
+    <div id="genes-control-card-placeholder"></div>
 
-      <div  class="nav-stretch level-basic" style="margin-top:-13px;">
-          <div class="card-label level-edu" style="float:left;padding-top:8px;margin-right:10px;">Selected Genes</div>
-          <!-- gene badges for navigation -->
-          <div id="genes-panel" class="hide nav-center">
-
-            <div>
-
-              <button  id="analyze-all-genes" class="level-edu hide btn btn-default icon-button-sm btn-raised" href="javascript:void(0)" onclick="cacheHelper.analyzeAll()">
-                Analyze all genes
-              </button>
-
-              <div id="call-variants-dropdown" class="hide btn-group level-edu level-mygene2">
-                <a href="bootstrap-elements.html" data-target="#" class="btn btn-raised dropdown-toggle" data-toggle="dropdown">
-                  Call Variants
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-
-                  <li><a href="javascript:void(0)" id="call-variants-selected-gene" onclick="jointCallVariants(false)">selected gene</a></li>
-
-                  <li><a href="javascript:void(0)" id="call-variants-all-genes" onclick="cacheHelper.analyzeAll(true)">all genes</a></li>
-
-                  <li id="show-fb-settings" class="hide">
-                    <a href="javascript:void(0)" onclick="showFreebayesSettingsDialog()">settings</a>
-                  </li>
-                </ul>
-              </div>
-
-
-              <div id="analyze-genes-progress" class="level-edu level-basic">
-
-
-
-                  <div id="analyzed-progress-bar" >
-
-
-                    <div >
-                      <span class='progress-bar-label'>Loaded</span>
-
-                      <div id="analyze-all-progress" class="analysis-progress-bar">
-                        <div class="text">0 analyzed</div>
-                        <div style="float:left;margin-top:-17px;width:100%">
-                          <div id="analyzed-bar" class="bar" width="0%" >
-                            <div id="passed-filter-bar" class="bar" width="0%"></div>
-                            <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                          </div>
-
-                          <div id="not-analyzed-bar" class="bar" width="100%">
-                          </div>
-                        </div>
-
-                       </div>
-                    </div>
-
-
-                    <div style='margin-top:-1px;float:left'>
-                      <span id="called-progress-bar-label" class='progress-bar-label'>Called</span>
-
-                      <div id="call-all-progress" class="analysis-progress-bar">
-                        <div class="text" >0 analyzed</div>
-                        <div style="float:left;margin-top:-17px;width:100%">
-                          <div id="analyzed-bar" class="bar" width="0%" >
-                            <div id="passed-filter-bar" class="bar" width="0%"></div>
-                            <div id="not-passed-filter-bar" class="bar" width="0%"></div>
-                          </div>
-
-                          <div id="not-analyzed-bar"class="bar" width="100%">
-                          </div>
-                        </div>
-
-                       </div>
-
-                    </div>
-
-                  </div>
-
-
-                  <div id="total-genes-label"></div>
-
-
-              </div>
-
-              <div id="manage-genes-box">
-                <div id="manage-genes-dropdown" class="level-edu level-basic" >
-                  <div class="btn-toolbar">
-                    <div class="btn-group" style="display:inline;margin-bottom:0px">
-
-                      <button type="button" style="padding-top: 1px;padding-bottom: 0px;" class=" icon-button-sm btn btn-default btn-raised dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                          Manage genes
-                          <span style="margin-left:6px" class="caret"></span>
-                      </button>
-
-                      <ul class="dropdown-menu " role="menu" style="right: 0;left: initial;">
-                        <li style="margin-bottom: 10px">
-                            <a href="javascript:void(0)" id="manage-cache-link" class="hide manage-gene-links" onclick="cacheHelper.openDialog()" >
-                              Manage cache of analyzed genes...
-                          </a>
-                        </li>
-
-                         <li  style="margin-bottom: 10px">
-                            <a class="hide manage-gene-links" id="clear-gene-list"  style="cursor:pointer;"
-                              href="javascript:void(0)" onclick="genesCard.clearGenes()">
-                                Remove all genes
-                           </a>
-                        </li>
-
-                        <li id="edit-list-li">
-                           <div >Edit gene list</div>
-                           <div style="padding-left: 5px;padding-right: 5px;padding-top:3px;padding-bottom:3px;">
-                              <textarea  id="genes-to-edit"></textarea>
-                              <div style="text-align:right">
-                                <button id="edit-genes-button" type="submit" onclick="genesCard.editGenes()" class="icon-button-sm btn btn-default btn-raised">
-                                  Done
-                                </button>
-                              </div>
-                          </div>
-                        </li>
-
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div style="float:right">
-                <span id="order-by-label" class="level-edu manage-gene-links">Order by</span>
-                <div id="select-gene-container">
-                    <select id="select-gene-sort" class="level-edu">
-                    </select>
-                </div>
-              </div>
-
-            </div>
-
-            <div id="gene-badge-container" class="level-basic" style="clear:both;">
-              <div id="after-genes" style="display:inline-block;margin-top:5px;"></div>
-              <div id="gene-page-control" class="hide level-edu level-basic">
-                <div id="gene-badge-loading-display" class="level-edu level-basic"></div>
-
-                <div id="gene-page-selection" class="level-basic"></div>
-
-                <div id="gene-paging-links" class="hide">
-                  <a href="javascript:void(0)" id="view-50-genes"
-                     class="gene-paging-link" onclick="genesCard.viewDefaultsGenesPerPage()" >
-                        View 40
-                  </a>
-                  <a href="javascript:void(0)" id="view-all-genes"
-                     class="gene-paging-link" onclick="genesCard.viewAllGenes()" >
-                    | all
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-      </div>
-    </div>
-
-    <div id="nav-section" class="fixed app-panel level-edu hide">
-
-
-      <div id="nav-card" class="shadow-z-2">
-
-
-
-
-
-
-      <div id="transcript-card" class="hide" >
-
-
-
-
-
-          <div id="region-track" class="level-edu level-basic" style="clear:both;">
-              <div class="card-label" style="float:left;">Selected Gene</div>
-
-
-
-
-              <div id="select-gene-box"  class="level-basic hide">
-                <select id="select-gene" class=""  data-placeholder="Choose a gene...">
-                </select>
-              </div>
-              <div id="gene-summary" class="level-basic hide">
-              </div>
-
-              <div style="text-align:center;display:inline-block">
-                <div style="vertical-align:top;display:inline-block">
-                  <a id="gene-name" target="_genecards" class="level-basic gene-card-label heading " data-toggle="tooltip" data-placement="right" ></a>
-                  <span id="gene-chr" class="level-basic gene-card-label keep-case" ></span>
-                  <span id="gene-region" class="level-edu level-basic gene-card-label keep-case"></span>
-                  <span id="minus_strand" class="level-edu level-basic" style="font-size:12px;padding-left: 5px;font-style: italic;">reverse strand</span>
-                  <span  id="gene-plus-minus-label" class="level-edu level-basic fullview hide " style="padding-left: 15px">+  -</span>
-                  <input id="gene-region-buffer-input" class="level-edu level-basic hide fullview" onchange="adjustGeneRegionBuffer()" type="text" value="1000" maxlength="5" style="width: 50px;font-size: 13px;margin-bottom:2px">
-                </div>
-
-                <div id="gene-source-box" class="level-edu level-basic" style="width:130px;display:inline-block;margin-left: 20px;vertical-align:top">
-                  <select id="select-gene-source" class="fullview" data-placeholder="">
-                        <option value="Gencode Transcript">Gencode Transcript</option>
-                        <option value="RefSeq Transcript">RefSeq Transcript</option>
-                   </select>
-                </div>
-
-                <div class="level-edu level-basic fullview" style="margin-top:-10px;display:inline-block">
-                  <div class="btn-toolbar fullview"
-                     style="display: inline-block;margin-left: 5px;padding-top: 0px; ">
-                      <div id="transcript-btn-group" class="btn-group hide" style="display:  inline;">
-                          <button id="transcript-dropdown-button" type="button"
-                          style="width:150px;padding-top:2px;padding-bottom:1px"
-                          class="btn btn-raised btn-default dropdown-toggle icon-button-sm"
-                          data-toggle="dropdown" aria-expanded="false" >
-                            Choose Transcript
-                            <span class="caret" style="margin-left:4px;"></span>
-                          </button>
-                          <ul id="transcript-menu" class="dropdown-menu" role="menu" style="right: 0;left: initial;min-width: 610px">
-                            <li id="transcript-menu-item">
-                            </li>
-                          </ul>
-                      </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <span class="level-edu level-basic" style="float:right;margin-right:14px">
-                  <a href="javascript:void(0)" id="minimize-button" style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="material-icons">remove</i>
-                  </a>
-                  <a href="javascript:void(0)" id="expand-button" class="disabled" style="float:right;margin-top:-2px;text-decoration:none;">
-                    <i class="material-icons">crop_3_2</i>
-                  </a>
-              </span>
-
-          </div>
-
-
-          <!-- Non protein-coding gene badges -->
-          <div id="non-protein-coding" class="level-edu level-basic"  style="clear: both;padding-bottom: 0px;display: block;">
-              <div id="no-gene-selected-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
-                Enter a gene name
-              </div>
-              <div id="gene-type-badge" class="hide label label-warning" style="display:block;margin-bottom:2px;">
-                Pseudogene
-              </div>
-              <div id="transcript-type-badge" class="hide label label-warning" style="display:block;">
-              </div>
-              <div id="no-transcripts-badge" class="hide label label-warning" style="display:block;">
-              </div>
-          </div>
-
-
-
-          <div id="transcript-panel" class="level-edu fullview" >
-            <div id="gene-track" class="track hide">
-
-                <div id="top-coordinate-frame" class="hide">
-                  <svg height="23" width="28">
-                      <g  transform="translate(0,0)">
-                        <rect class="coordinate-arrow" x="9" y="1" width="10" height="8">
-                        </rect>
-                      </g>
-                      <g transform="translate(24,23),rotate(180)">
-                        <polygon class="coordinate-arrow" points="0,14 10,0 20,14" x="0" y="0">
-                        </polygon>
-                      </g>
-                  </svg>
-                </div>
-                <div id="gene-viz" class="track-chart">
-                </div>
-            </div>
-            <span id="zoom-hint" class="level-edu hint todo" style="margin-top: -15px;display: block;text-align: center;">
-                To zoom into region, drag over gene model.
-            </span>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
+    <div id="gene-card-placeholder"></div>
 
     <div id="welcome-panel-placeholder">
     </div>
@@ -519,64 +240,7 @@
 
     <div id="track-section" class="push app-panel" style="display:flex;margin-top:5px;">
 
-        <div id="matrix-track" style="width:100%;overflow-x:auto" class="track shadow-z-2 hide">
-
-
-            <div style="overflow:auto;text-align:left;margin-bottom: 5px;">
-              <div class="card-label level-edu level-basic" style="float:left">Ranked Variants</div>
-              <a id="show-legend" class="level-edu level-basic"  onclick="showLegend()" href="javascript:void(0)">
-                <i style="font-size:18px" class="material-icons">map</i>
-                Show legend
-              </a>
-            </div>
-
-
-            <div id="rank-variants-title" class="hide card-label" style="">Evaluate Variants</div>
-
-            <div id="zero-variants" class="warning level-edu hide">
-            </div>
-
-            <div id="matrix-panel"  style="clear:both;min-height:30px"
-              class="fullview" aria-expanded="true">
-                <div class="loader hide"  style="margin-top:0px;margin-bottom:10px;">
-                    <span class="loader-label">Ranking variants</span>
-                    <img src="assets/images/wheel.gif"/>
-                </div>
-
-
-              <div id="feature-matrix" style="overflow-x: auto;">
-              </div>
-
-              <a id="move-rows" class="level-edu level-basic hide" href="javascript:void(0)" onclick="matrixCard.toogleMoveRows()">
-                 <i class="material-icons">swap_vert</i>
-                Reorder
-              </a>
-
-              <div id="feature-matrix-note" class="hide" >
-
-                <div style="display:inline-block">
-                  <svg style="height: 10px;width:108px">
-                    <g transform="translate(8,6)">
-                      <line x1="0" y1="0" x2="100" y2="0" style="stroke: lightgrey;stroke-width: 4;"></line>
-                    </g>
-                    <g transform="translate(-10,0),rotate(-90,10,0)">
-                      <polygon points="0,8 4,2 8,8" style="fill: lightgrey; stroke: lightgrey; stroke-width: 1px; opacity: 1;"></polygon>
-                    </g>
-                  </svg>
-
-                  <div class="matrix-note-text level-edu level-basic">
-                    More likely causative
-                  </div>
-                  <div id="matrix-harmful-note" class="matrix-note-text hide level-basic level-edu">
-                    Most harmful
-                  </div>
-
-                </div>
-
-
-              </div>
-            </div>
-        </div>
+        <div id="matrix-card-placeholder"></div>
 
         <div id="legend-track" style="width:50%;margin-left:5px" class="hide track shadow-z-2 level-basic level-edu">
           <div style="overflow:auto">
@@ -612,14 +276,6 @@
     <div id="other-variant-cards" class="app-panel">
     </div>
 
-
-
-
-    <div id="splash" class="hide horizontal-center push" style="padding-top:70px;height: calc(100vh - 70px);">
-      <div class="vertical-center">
-        <img id="splash-image" height="400px" class="hide" src="assets/images/gene.iobio.v2.png"   >
-      </div>
-    </div>
 
   </div>
 
@@ -657,36 +313,6 @@
 
 
 
-  <div id="footer" class="footer text-center" >
-    <div class="poweredbyheader">gene.iobio is powered by</div>
-    <div>
-        <a class="poweredby" href="http://phenolyzer.usc.edu/" target="_poweredby">Phenolyzer</a>
-        <a class="poweredby" href="http://human-phenotype-ontology.github.io/about.html" target="_poweredby">Human Phenotype Ontology</a>
-        <a class="poweredby" href="http://snpeff.sourceforge.net/" target="_poweredby">SnpEff</a>
-        <a class="poweredby"  href="http://uswest.ensembl.org/info/docs/tools/vep/index.html?redirect=nop" target="_poweredby">Variant Effect Predictor</a>
-        <a class="poweredby" href="http://genetics.bwh.harvard.edu/pph/index.html" target="_poweredby">PolyPhen</a>
-        <a class="poweredby" href="http://sift.jcvi.org/" target="_poweredby">SIFT</a>
-
-        <a class="poweredby" href="https://github.com/ekg/freebayes" target="_poweredby">FreeBayes</a>
-        <a class="poweredby" href="http://www.ncbi.nlm.nih.gov/clinvar/" target="_poweredby">ClinVar</a>
-        <a class="poweredby" href="http://samtools.sourceforge.net/" target="_poweredby">samtools</a>
-        <a class="poweredby" href="https://github.com/pezmaster31/bamtools" target="_poweredby">bamtools</a>
-        <a class="poweredby" href="http://genome.sph.umich.edu/wiki/Vt" target="_poweredby">VT</a>
-        <a class="poweredby" href="http://exac.broadinstitute.org/" target="_poweredby">ExAC</a>
-        <a class="poweredby" href="http://www.1000genomes.org/home" target="_poweredby">1000G</a>
-        <span class="icon-credit" >
-            <a  id="icon-credit" href="javascript:void(0)" onclick="$('#freepik-info').toggleClass('hide')">Freepik icons...</a>
-            <span id="freepik-info" class="hide" >
-              <a  href="http://www.freepik.com" title="Freepik"  >Freepik icons</a>
-              from <a   href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
-            </span>
-        </span>
-
-    </div>
-
-  </div>
-
-
 
 </body>
 
@@ -704,7 +330,9 @@
 </script>
 
 <!-- All global variables that are configurable -->
-
+<script src="app/util/util.js"></script>
+<script src="app/util/timeout.js"></script>
+<script src="app/util/templateUtil.js"></script>
 
 <script src="app/d3/geneList.d3.js"></script>
 <script src="app/d3/histogram.d3.js"></script>
@@ -715,10 +343,12 @@
 <script src="app/d3/variant.d3.js"></script>
 <script src="app/d3/featureMatrix.d3.js"></script>
 
-<script src="app/bam.iobio.js"></script>
-<script src="app/vcf.iobio.js?ver=2.5.2"></script>
+<script src="app/model/endpointCmd.js"></script>
+<script src="app/model/bam.iobio.js"></script>
+<script src="app/model/vcf.iobio.js"></script>
 
 <script src="app/model/geneBadgeLoaderDisplay.js"></script>
+<script src="app/model/cacheIndexStore.js"></script>
 <script src="app/model/cacheHelper.js"></script>
 <script src="app/model/stringCompress.js"></script>
 <script src="app/model/variantModel.js"></script>
@@ -727,20 +357,26 @@
 <script src="app/model/variantExporter.js"></script>
 <script src="app/model/variantImporter.js"></script>
 <script src="app/model/genericAnnotation.js"></script>
+<script src="app/model/geneModel.js"></script>
 
-<script src="app/legend.js"></script>
-<script src="app/variantTooltip.js"></script>
-<script src="app/welcomePanel.js"></script>
+<script src="app/partials/legend.js"></script>
+<script src="app/partials/variantTooltip.js"></script>
+<script src="app/partials/welcomePanel.js"></script>
+<script src="app/partials/eduTour.js"></script>
 
+<script src="app/partials/geneSearch.js"></script>
+<script src="app/partials/freebayesSettings.js"></script>
+<script src="app/partials/feedback.js"></script>
+
+<script src="app/card/knownVariantsCard.js"></script>
 <script src="app/card/dataCard.js"></script>
 <script src="app/card/matrixCard.js"></script>
 <script src="app/card/filterCard.js"></script>
 <script src="app/card/genesCard.js"></script>
+<script src="app/card/geneCard.js"></script>
 <script src="app/card/bookmarkCard.js"></script>
 <script src="app/card/variantCard.js"></script>
 
-<script src="app/timeout.js"></script>
-<script src="app/eduTour.js"></script>
 
 <script src="app/app.js"></script>
 

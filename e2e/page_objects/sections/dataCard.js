@@ -26,7 +26,7 @@ module.exports = {
       return this.click('@separateIndexUrlCheckbox');
     }
   }],
-  elements: {    
+  elements: {
     loadButton: { selector: '#ok-button' },
     singleProbandButton: { selector: '#single-proband-button' },
     trioButton: { selector: '#trio-button' },
@@ -94,10 +94,10 @@ module.exports = {
         },
         inputTbiUrl: function(url) {
           this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
-        },        
+        },
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
-        },        
+        },
       }],
       elements: {
         variantsButton: { selector: '#vcf-dropdown-button' },
@@ -114,16 +114,16 @@ module.exports = {
       commands: [{
         selectPlatinumTrio: function() {
           return this.click('@variantsButton').click('@platinumTrio').waitForElementVisible('@vcfSampleBox');
-        }, 
+        },
         inputUrl: function(url) {
           this.setValue('@urlInput', [url, this.api.Keys.ENTER]);
         },
         inputTbiUrl: function(url) {
           this.setValue('@tbiUrlInput', [url, this.api.Keys.ENTER]);
-        },        
+        },
         inputAlignmentsUrl: function(url) {
           return this.setValue('@bamUrlInput', [url]);
-        }  
+        }
       }],
       elements: {
         variantsButton: { selector: '#vcf-dropdown-button' },

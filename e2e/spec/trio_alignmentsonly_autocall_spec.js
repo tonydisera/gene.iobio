@@ -10,7 +10,7 @@ module.exports = {
     indexPage = client.page.index();
     nav = client.page.nav();
     dataCard = indexPage.section.dataCard;
-    matrixTrack = indexPage.section.matrixTrack;  
+    matrixTrack = indexPage.section.matrixTrack;
     probandVariantCard = indexPage.section.probandVariantCard;
     appTitleSection = indexPage.section.appTitleSection;
     filterPanel = indexPage.section.filterPanel;
@@ -23,8 +23,8 @@ module.exports = {
     indexPage.load();
 
     nav.clickGenes();
-    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);   
-    nav.searchGene("RAI1"); 
+    findGenesPanel.importGeneSet(['RAI1', 'AIRE', 'MYLK2', 'PDGFB', 'PDHA1']);
+    nav.searchGene("RAI1");
 
     nav.clickData();
     dataCard.selectTrio();
@@ -34,7 +34,7 @@ module.exports = {
     dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
-    client.pause(2000);
+    client.pause(12000);
     dataCard.clickLoad();
 
     client.pause(1000);
@@ -43,7 +43,7 @@ module.exports = {
 
   },
 
-  
+
 
   'Call variants for selected gene': function(client) {
     tooltip.selector = tooltip.MATRIX_TOOLTIP;
@@ -73,5 +73,5 @@ module.exports = {
     client.end();
   }
 
-  
+
 }

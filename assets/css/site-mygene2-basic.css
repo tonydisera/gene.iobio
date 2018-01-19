@@ -892,7 +892,7 @@ a.btn {
   height: 30px;
   background: #eee; }
 
-#nav-section {
+#gene-track {
   z-index: 2;
   margin-top: 0px;
   background-color: white;
@@ -1175,7 +1175,7 @@ section {
     margin-top: 0px !important;
     margin-bottom: 5px !important; }
   .variant-card #coverage-problem-alert {
-    width: 300px;
+    width: 230px;
     text-align: center;
     background-color: #857caf;
     color: white;
@@ -4924,7 +4924,7 @@ button {
   padding-bottom: 8px !important; }
 
 #region-track {
-  margin-bottom: 4px !important;
+  margin-bottom: 22px !important;
   text-align: left;
   padding-left: 10px; }
   #region-track .card-label {
@@ -4948,8 +4948,7 @@ button {
   text-align: left;
   font-size: 14px;
   color: #717171;
-  width: calc(100% - 160px);
-  margin-bottom: 15px; }
+  width: calc(100% - 160px); }
 
 #variant-heading {
   min-width: 140px !important;

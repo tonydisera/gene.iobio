@@ -81,8 +81,8 @@ lineD3 = function module() {
       var posx = d3.round(pos(d));
       var depthy = d3.round(depth(d));
 
-      var invertedx = x.invert(mousex); 
-      var invertedy = y.invert(mousey); 
+      var invertedx = x.invert(mousex);
+      var invertedy = y.invert(mousey);
 
       if (theDepth == null || theDepth == "") {
         theDepth = depthy.toString();
@@ -98,14 +98,14 @@ lineD3 = function module() {
           .style("opacity", 1);
       label.attr("x", 0)
            .attr("y", margin.top + 5)
-           .attr("class", "circle-label")           
+           .attr("class", "circle-label")
            .text(circleText);
 
       container.select(".circle-label")
                .attr( "x", function (d,i) {
                   var w = this.getBBox().width;
                   var x = mousex + margin.left - (w/2) + 3;
-    
+
                   if (x + (w/2) > innerWidth) {
                     // If the circle label is too far to the right,
                     // position it as far right as possible without
@@ -127,7 +127,7 @@ lineD3 = function module() {
       circle.attr("cx", mousex + margin.left + 2 )
             .attr("cy", mousey + margin.top )
             .attr("r", 3)
-              
+
     }
   };
 
@@ -135,22 +135,22 @@ lineD3 = function module() {
     if (container == null) {
       return;
     }
-    container.select(".circle").transition()        
-                 .duration(500)      
-                 .style("opacity", 0); 
-    
-    container.select(".circle-label").transition()        
-                 .duration(500)      
-                 .style("opacity", 0);                    
-    
+    container.select(".circle").transition()
+                 .duration(500)
+                 .style("opacity", 0);
+
+    container.select(".circle-label").transition()
+                 .duration(500)
+                 .style("opacity", 0);
+
     container.select(".tooltip").transition()
              .duration(500)
-             .style("opacity", 0); 
+             .style("opacity", 0);
   }
 
   function exports(selection, cb) {
 
-   
+
     selection.each(function(data) {
       theData = data;
 
@@ -159,7 +159,7 @@ lineD3 = function module() {
       // add tooltip div
       var tooltip = container.selectAll(".tooltip").data([0])
         .enter().append('div')
-          .attr("class", "tooltip")               
+          .attr("class", "tooltip")
           .style("opacity", 0)
           .style("pointer-events", "none");
 
@@ -178,7 +178,7 @@ lineD3 = function module() {
       // The chart dimensions could change after instantiation, so update viewbox dimensions
       // every time we draw the chart.
       d3.select(this).selectAll("svg")
-        .filter(function() { 
+        .filter(function() {
            return this.parentNode === container.node();
          })
         .attr('viewBox', "0 0 " + (parseInt(width) + margin.left + margin.right) + " " + parseInt(height));
@@ -218,8 +218,8 @@ lineD3 = function module() {
              .attr("class", "area-chart-gradient-bottom")
              .attr("offset", "100%");
       }
-  
-        
+
+
       var svgGroup =  svg.selectAll("g.group").data([data]).enter()
         .append("g")
         .attr("class", "group")
@@ -229,7 +229,7 @@ lineD3 = function module() {
       svgGroup.append("g")
               .attr("class", "regions");
 
-      // Tooltip     
+      // Tooltip
       svgGroup.on("mouseover", function(d) {
         if (container.select(".tooltip.region").empty()) {
           var tooltipText = '';
@@ -271,7 +271,7 @@ lineD3 = function module() {
             .duration(500)
             .style("opacity", 0);
         }
-      
+
       });
 
       var innerWidth = width - margin.left - margin.right;
@@ -304,7 +304,7 @@ lineD3 = function module() {
                d = d / 1000000 + "M";
              else if ((d / 1000) >= 1)
                d = d / 1000 + "K";
-             return d;            
+             return d;
           })
           .orient("bottom");
 
@@ -317,9 +317,9 @@ lineD3 = function module() {
           .scale(y)
       if (yAxisLine) {
           yAxis.innerTickSize(-innerWidth)
-               .outerTickSize(0)  
+               .outerTickSize(0)
                .tickPadding(-22)
-               .orient("left");       
+               .orient("left");
       } else {
           yAxis.orient("right");
       }
@@ -329,7 +329,7 @@ lineD3 = function module() {
         newTickValues.push(0);
         newTickValues.push(d3.round(y.domain()[1]/2));
         newTickValues.push(y.domain()[1])
-        yAxis.tickValues(newTickValues);          
+        yAxis.tickValues(newTickValues);
       } else if (yTicks) {
         xAxis.ticks(yTicks);
       }
@@ -352,9 +352,9 @@ lineD3 = function module() {
           .x(function(d) { return x(pos(d)); })
           .y0(innerHeight)
           .y1(function(d) { return y(depth(d)); });
-      } 
+      }
 
-      
+
       svgGroup = svg.selectAll("g.group")
       svgGroup.selectAll("g.x").remove();
       if (showXAxis) {
@@ -362,7 +362,7 @@ lineD3 = function module() {
           .append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + innerHeight + ")")
-          .call(xAxis);        
+          .call(xAxis);
       }
 
       svgGroup.selectAll("g.y").remove();
@@ -378,7 +378,7 @@ lineD3 = function module() {
       // to remove the path and then add the new one.
       svgGroup = svg.selectAll("g.group")
       svgGroup.select("#line-chart-path").remove();
-      
+
       var linePath = svgGroup.append("path")
         .datum(data)
         .attr("id", "line-chart-path")
@@ -403,7 +403,7 @@ lineD3 = function module() {
           .each("end", function(d) {
               dispatch.d3rendered();
           });
-          
+
       }
 
 
@@ -422,7 +422,7 @@ lineD3 = function module() {
           areaPath.transition()
              .duration(1000)
              .attrTween('d', function() {
-                { 
+                {
                   var interpolate = d3.scale.quantile()
                       .domain([0,1])
                       .range(d3.range(1, data.length + 1));
@@ -433,7 +433,7 @@ lineD3 = function module() {
                   }
                 }
               });
-             
+
         }
        }
 
@@ -463,14 +463,14 @@ lineD3 = function module() {
 
 
   exports.hideTooltip = function() {
-    container.select('.tooltip').classed("region", false);           
-    container.select('.tooltip').classed("locked", false);           
-    container.select('.tooltip').classed("black-arrow-left", false);           
-    container.select('.tooltip').classed("black-arrow-right", false);   
-    container.select('.tooltip').style("pointer-events", "none");       
-    container.select('.tooltip').transition()        
-       .duration(500)      
-       .style("opacity", 0);   
+    container.select('.tooltip').classed("region", false);
+    container.select('.tooltip').classed("locked", false);
+    container.select('.tooltip').classed("black-arrow-left", false);
+    container.select('.tooltip').classed("black-arrow-right", false);
+    container.select('.tooltip').style("pointer-events", "none");
+    container.select('.tooltip').transition()
+       .duration(500)
+       .style("opacity", 0);
   }
 
   exports.showHorizontalLine = function(yValue, label, clazz) {
@@ -501,7 +501,7 @@ lineD3 = function module() {
                   var label = d3.select(this).text();
                   dispatch.d3horizontallineclick(label);
                })
-               
+
 
     }
   }
@@ -520,7 +520,7 @@ lineD3 = function module() {
     var minRegionWidth = options && options.hasOwnProperty('minHeight') ? options.minHeight : 1;
     var regions   =  container.select("svg g.group g.regions").selectAll(".region").data(regions);
     var theY      =  regionHeight ? (d3.round(y(regionHeight))) : (height - margin.top - margin.bottom);
-    var theHeight =  regionHeight ? ((height - margin.top - margin.bottom) - theY) : 0;     
+    var theHeight =  regionHeight ? ((height - margin.top - margin.bottom) - theY) : 0;
     var regionsEnter = regions.enter();
     regions.enter()
            .append("rect")
@@ -544,26 +544,26 @@ lineD3 = function module() {
     });
 
     container.select("svg g.group g.regions").selectAll(".region, .region-glyph")
-             .on("mouseover", function(d) {  
+             .on("mouseover", function(d) {
                 // show the tooltip
-                var tooltip = container.select('.tooltip');   
-                tooltip.classed("region", true);           
+                var tooltip = container.select('.tooltip');
+                tooltip.classed("region", true);
                 var featureObject = d3.select(this);
                 dispatch.d3regiontooltip(featureObject, d, tooltip, false);
-             })                  
-             .on("mouseout", function(d) {   
+             })
+             .on("mouseout", function(d) {
                 if (container.select('.tooltip.region.locked').empty()) {
                   exports.hideTooltip();
                 }
              })
-             .on("click", function(d) {  
+             .on("click", function(d) {
                 // show the tooltip
-                var tooltip = container.select('.tooltip');   
-                tooltip.classed("region", true);           
-                tooltip.classed("locked", true);          
+                var tooltip = container.select('.tooltip');
+                tooltip.classed("region", true);
+                tooltip.classed("locked", true);
                 var featureObject = d3.select(this);
                 dispatch.d3regiontooltip(featureObject, d, tooltip, true, exports.hideTooltip);
-             }) 
+             })
 
   }
 
@@ -584,14 +584,14 @@ lineD3 = function module() {
     regionGlyph = _;
     return exports;
   }
- 
+
   exports.showTooltip = function(_) {
     if (!arguments.length) return showTooltip;
     showTooltip = _;
     return exports;
   };
 
- 
+
 
   exports.margin = function(_) {
     if (!arguments.length) return margin;
@@ -622,67 +622,67 @@ lineD3 = function module() {
     heightPercent = _;
     return exports;
   };
- 
+
   exports.brush = function(_) {
     if (!arguments.length) return brush;
     brush = _;
-    return exports; 
+    return exports;
   };
 
   exports.pos = function(_) {
     if (!arguments.length) return pos;
     pos = _;
-    return exports; 
+    return exports;
   }
 
   exports.depth = function(_) {
     if (!arguments.length) return depth;
     depth = _;
-    return exports; 
+    return exports;
   }
 
   exports.kind = function(_) {
     if (!arguments.length) return kind;
     kind = _;
-    return exports; 
+    return exports;
   }
 
   exports.maxDepth = function(_) {
     if (!arguments.length) return maxDepth;
     maxDepth = _;
-    return exports;     
+    return exports;
   }
 
   exports.showXAxis = function(_) {
     if (!arguments.length) return showXAxis;
     showXAxis = _;
-    return exports; 
+    return exports;
   }
 
   exports.showYAxis = function(_) {
     if (!arguments.length) return showYAxis;
     showYAxis = _;
-    return exports; 
+    return exports;
   }
 
   exports.yAxisLine = function(_) {
     if (!arguments.length) return yAxisLine;
     yAxisLine = _;
-    return exports; 
+    return exports;
   }
 
   exports.yTicks = function(_) {
     if (!arguments.length) return yTicks;
     yTicks = _;
-    return exports; 
+    return exports;
   }
 
   exports.yTickFormat = function(_) {
     if (!arguments.length) return yTickFormat;
     yTickFormat = _;
-    return exports; 
+    return exports;
   }
-  
+
   exports.formatXTick = function(_) {
     if (!arguments.length) return formatXTick;
     formatXTick = _;
