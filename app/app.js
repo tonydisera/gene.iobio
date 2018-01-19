@@ -1441,6 +1441,9 @@ function loadTracksForGeneImpl(bypassVariantCards, callback) {
         })
         .then(function() {
 
+          cacheHelper.showAnalyzeAllProgress();
+
+
           // Now show the variant cards and the ranked variants table
           getRelevantVariantCards().forEach(function(vc) {
             vc.promiseShowFinalizedVariants().then(function() {
