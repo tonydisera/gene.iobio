@@ -1344,7 +1344,7 @@ var effectCategories = [
       stream.end();
     }
 
-    var cmd = endpoint.annotateVariants({'writeStream': writeStream}, refName, null, regions, null, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, useServerCache);
+    var cmd = endpoint.annotateVariants({'writeStream': writeStream}, refName, regions, null, annotationEngine, isRefSeq, hgvsNotation, getRsId, vepAF, useServerCache);
 
 
     var buffer = "";
