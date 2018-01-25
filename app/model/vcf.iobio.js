@@ -154,31 +154,38 @@ var effectCategories = [
   exports.getHeader = function(callback) {
     if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
 
-      var buffer = "";
-      var success = false;
+      console.log('GETTTING VCF HEADER');
 
-      var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
+      $.get( "http://0.0.0.0:4000/vcfheader", { vcfURL: vcfURL } )
+      .done(callback);
 
-      cmd.on('data', function(data) {
-        if (data != undefined) {
-          success = true;
-          buffer += data;
-        }
-      });
+      // var buffer = "";
+      // var success = false;
 
-      cmd.on('end', function() {
-        if (success == null) {
-          success = true;
-        }
-        if (success && buffer.length > 0) {
-          callback(buffer);
-        }
-      });
+      // console.log('GETTTING VCF HEADER');
 
-      cmd.on('error', function(error) {
-        console.log(error);
-      })
-      cmd.run();
+      // var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
+
+      // cmd.on('data', function(data) {
+      //   if (data != undefined) {
+      //     success = true;
+      //     buffer += data;
+      //   }
+      // });
+
+      // cmd.on('end', function() {
+      //   if (success == null) {
+      //     success = true;
+      //   }
+      //   if (success && buffer.length > 0) {
+      //     callback(buffer);
+      //   }
+      // });
+
+      // cmd.on('error', function(error) {
+      //   console.log(error);
+      // })
+      // cmd.run();
 
     } else if (vcfFile) {
         var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
