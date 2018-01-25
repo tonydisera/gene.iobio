@@ -24,14 +24,14 @@ module.exports = {
     dataCard.selectSingle();
     dataCard.selectGenomeBuild('GRCh37');
     dataCard.checkSeparateUrlForIndex();
-    dataCard.section.probandData.inputUrl("https://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/snps_only.vcf.gz")
-    dataCard.section.probandData.inputTbiUrl("https://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/index/snps_only.vcf.gz.tbi")
+    dataCard.section.probandData.inputUrl("http://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/snps_only.vcf.gz")
+    dataCard.section.probandData.inputTbiUrl("http://s3.amazonaws.com/iobio/app_testing/vcf_files/diff_index_url/index/snps_only.vcf.gz.tbi")
     client.pause(1000);
     dataCard.section.probandData.selectSample('NA19238');
     client.pause(1000);
 
-    dataCard.section.probandData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/app_testing/bam_files/diff_index_url/wgs_platinum_NA12878_brca2.bam");
-    dataCard.section.probandData.inputAlignmentsBaiUrl("https://s3.amazonaws.com/iobio/app_testing/bam_files/diff_index_url/index/wgs_platinum_NA12878_brca2.bam.bai");
+    dataCard.section.probandData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/app_testing/bam_files/diff_index_url/wgs_platinum_NA12878_brca2.bam");
+    dataCard.section.probandData.inputAlignmentsBaiUrl("http://s3.amazonaws.com/iobio/app_testing/bam_files/diff_index_url/index/wgs_platinum_NA12878_brca2.bam.bai");
 
     dataCard.searchGene('BRCA2');
 

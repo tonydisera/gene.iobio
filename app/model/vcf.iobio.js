@@ -152,40 +152,13 @@ var effectCategories = [
   }
 
   exports.getHeader = function(callback) {
+    // Monolisth TODO: still need to support files
+
     if (sourceType.toLowerCase() == SOURCE_TYPE_URL.toLowerCase() && vcfURL != null) {
 
-      console.log('GETTTING VCF HEADER');
-
-      $.get( "http://0.0.0.0:4000/vcfheader", { vcfURL: vcfURL } )
-      .done(callback);
-
-      // var buffer = "";
-      // var success = false;
-
-      // console.log('GETTTING VCF HEADER');
-
-      // var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
-
-      // cmd.on('data', function(data) {
-      //   if (data != undefined) {
-      //     success = true;
-      //     buffer += data;
-      //   }
-      // });
-
-      // cmd.on('end', function() {
-      //   if (success == null) {
-      //     success = true;
-      //   }
-      //   if (success && buffer.length > 0) {
-      //     callback(buffer);
-      //   }
-      // });
-
-      // cmd.on('error', function(error) {
-      //   console.log(error);
-      // })
-      // cmd.run();
+      endpoint.getVcfHeaderM(vcfURL, tbiUrl)
+      .done(callback)
+      .fail(error => { console.log(error) });
 
     } else if (vcfFile) {
         var vcfReader = new readBinaryVCF(tabixFile, vcfFile, function(tbiR) {
@@ -206,42 +179,22 @@ var effectCategories = [
     var buffer = "";
     var recordCount = 0;
 
-    var cmd = endpoint.getVcfHeader(url, tbiUrl);
-
-    cmd.on('data', function(data) {
-      if (data != undefined) {
-        success = true;
-        buffer += data;
-      }
-    });
-
-    cmd.on('end', function() {
-      if (success == null) {
-        success = true;
-      }
-      if (success && buffer.length > 0) {
-        buffer.split("\n").forEach( function(rec) {
+    endpoint.getVcfHeaderM(vcfURL, tbiUrl)
+      .done(data => {
+        data.split("\n").forEach( function(rec) {
           if (rec.indexOf("#") == 0) {
             me._parseHeaderForInfoFields(rec);
           }
         })
-        callback(success);
-      }
-    });
-
-    cmd.on('error', function(error) {
-      if (me.ignoreErrorMessage(error)) {
-      } else {
-        if (success == null) {
-          success = false;
+        callback(true);
+      })
+      .fail(error => {
+        if (me.ignoreErrorMessage(error)) {
+        } else {
           console.log(error);
-          callback(success, me.translateErrorMessage(error));
+          callback(false, me.translateErrorMessage(error));
         }
-      }
-
-    });
-
-    cmd.run();
+       });
   }
 
   exports.ignoreErrorMessage = function(error) {
@@ -939,35 +892,19 @@ var effectCategories = [
   exports._getRemoteSampleNames = function(callback) {
     var me = this;
 
-    var cmd = endpoint.getVcfHeader(vcfURL, tbiUrl);
 
-
-    var headerData = "";
-    // Use Results
-    cmd.on('data', function(data) {
-         if (data == undefined) {
-            return;
-         }
-         headerData += data;
-    });
-
-    cmd.on('end', function(data) {
-        var headerRecords = headerData.split("\n");
-         headerRecords.forEach(function(headerRec) {
-              if (headerRec.indexOf("#CHROM") == 0) {
-                var headerFields = headerRec.split("\t");
-                var sampleNames = headerFields.slice(9);
-                callback(sampleNames);
-              }
-         });
-
-    });
-
-    cmd.on('error', function(error) {
-      console.log(error);
-    });
-
-    cmd.run();
+    endpoint.getVcfHeaderM(vcfURL, tbiUrl)
+    .done(data => {
+      var headerRecords = data.split("\n");
+      headerRecords.forEach(function(headerRec) {
+        if (headerRec.indexOf("#CHROM") == 0) {
+          var headerFields = headerRec.split("\t");
+          var sampleNames = headerFields.slice(9);
+          callback(sampleNames);
+        }
+      });
+    })
+    .fail(error => console.log(error)); // not positive that fail is working here
 
   }
 

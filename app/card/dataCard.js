@@ -8,14 +8,14 @@ function DataCard() {
     father:  'NA12891'
   };
   this.defaultUrls = {
-    proband: 'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
-    mother:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
-    father:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz'
+    proband: 'http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
+    mother:  'http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz',
+    father:  'http://s3.amazonaws.com/iobio/gene/wgs_platinum/platinum-trio.vcf.gz'
   };
   this.defaultBamUrls = {
-    proband: 'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12878.bam',
-    mother:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12892.bam',
-    father:  'https://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12891.bam'
+    proband: 'http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12878.bam',
+    mother:  'http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12892.bam',
+    father:  'http://s3.amazonaws.com/iobio/gene/wgs_platinum/NA12891.bam'
   };
   this.defaultSampleNames = {
     proband: 'NA12878',
@@ -40,14 +40,14 @@ function DataCard() {
     father:  'NA12891'
   };
   this.demoUrls = {
-    proband: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
-    mother:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
-    father:  'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz'
+    proband: 'http://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+    mother:  'http://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+    father:  'http://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz'
   };
   this.demoBamUrls = {
-    proband: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
-    mother:  'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam',
-    father:  'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam'
+    proband: 'http://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+    mother:  'http://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam',
+    father:  'http://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam'
   };
   this.demoSampleNames = {
     proband: 'NA12878',
@@ -64,19 +64,19 @@ function DataCard() {
 
   this.eduTourUrls = [
   {
-    proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    mother:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    father:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
+    proband: 'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    mother:  'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    father:  'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
   },
   {
-    proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    mother:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    father:  'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
+    proband: 'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    mother:  'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    father:  'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
   },
   {
-    proband: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    mother: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
-    father: 'https://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
+    proband: 'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    mother: 'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz',
+    father: 'http://s3.amazonaws.com/iobio/NHMU/nhmu.vcf.gz'
   }
   ];
 

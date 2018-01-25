@@ -33,12 +33,12 @@ module.exports = {
     nav.clickData();
     dataCard.selectTrio();
     dataCard.selectGenomeBuild('GRCh37');
-    dataCard.section.probandData.inputUrl("https://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12878.vcf.gz");
-    dataCard.section.motherData.inputUrl( "https://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12892.vcf.gz");
-    dataCard.section.fatherData.inputUrl( "https://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12891.vcf.gz");
-    dataCard.section.probandData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
-    dataCard.section.motherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
-    dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
+    dataCard.section.probandData.inputUrl("http://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12878.vcf.gz");
+    dataCard.section.motherData.inputUrl( "http://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12892.vcf.gz");
+    dataCard.section.fatherData.inputUrl( "http://s3.amazonaws.com/iobio/app_testing/vcf_files/single_sample/platinum-exome-NA12891.vcf.gz");
+    dataCard.section.probandData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
+    dataCard.section.motherData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
+    dataCard.section.fatherData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
     client.pause(2000);

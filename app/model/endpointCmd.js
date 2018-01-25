@@ -8,6 +8,10 @@ function EndpointCmd(useSSL, IOBIOServiceNames, launchTimestamp, genomeBuildHelp
 }
 
 
+EndpointCmd.prototype.getVcfHeaderM = function(vcfUrl, tbiUrl) {
+  return($.get( "http://0.0.0.0:4000/vcfheader", { vcfUrl: vcfUrl } ));
+}
+
 EndpointCmd.prototype.getVcfHeader = function(vcfUrl, tbiUrl) {
   var me = this;
   var args = ['-H', '"'+vcfUrl+'"'];

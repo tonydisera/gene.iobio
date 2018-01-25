@@ -10,10 +10,15 @@ var tabix = '/Users/chase/Tools/tabix-0.2.6/tabix'
 app.use(cors())
 
 app.get('/vcfheader', function (req, res) {
-  console.log('vcfHeader request');
-  var header = spawn(tabix, ['-H', req.query.vcfURL])
+  var header = spawn(tabix, ['-H', req.query.vcfUrl])
   header.stdout.pipe(res);
 });
+
+// app.get('/vcfReadDepth', function (req, res) {
+//   console.log('vcfHeader request');
+//   var header = spawn(tabix, ['-H', req.query.vcfURL])
+//   header.stdout.pipe(res);
+// });
 
 // app.get('/baiReadDepth', function (req, res) {
 // 	var baiReadDepth = spawn('/Users/chase/Code/playground/monolith_test/baiReadDepth.sh', [req.query.baiUrl]);

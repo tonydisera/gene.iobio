@@ -29,9 +29,9 @@ module.exports = {
     nav.clickData();
     dataCard.selectTrio();
     dataCard.selectGenomeBuild('GRCh37');
-    dataCard.section.probandData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
-    dataCard.section.motherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
-    dataCard.section.fatherData.inputAlignmentsUrl("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
+    dataCard.section.probandData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam");
+    dataCard.section.motherData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam");
+    dataCard.section.fatherData.inputAlignmentsUrl("http://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
     dataCard.section.probandData.inputName("proband");
 
     client.pause(12000);

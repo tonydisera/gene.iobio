@@ -19,8 +19,8 @@ var useSSL                = true;
 var useServerCache        = false;
 
 // config files
-var global_siteConfigUrl    =  "https://s3.amazonaws.com/gene.iobio.config/site-config.json";
-var global_clinvarGenesUrl  =  "https://s3.amazonaws.com/gene.iobio.config/clinvar-counts.txt";
+var global_siteConfigUrl    =  "http://s3.amazonaws.com/gene.iobio.config/site-config.json";
+var global_clinvarGenesUrl  =  "http://s3.amazonaws.com/gene.iobio.config/clinvar-counts.txt";
 
 // Get clinvar annotations from 'eutils' or 'vcf'
 var clinvarSource         = "vcf";

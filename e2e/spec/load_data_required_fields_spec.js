@@ -23,7 +23,7 @@ module.exports = {
     nav.clickData();
     dataCard.selectSingle();
     dataCard.selectGenomeBuild('GRCh37');
-    dataCard.section.probandData.inputUrl("https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz");
+    dataCard.section.probandData.inputUrl("http://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz");
     dataCard.searchGene('AIRE');
     client.pause(2000);
 

@@ -12,9 +12,9 @@ module.exports = {
   // or an error is thrown
   asyncHookTimeout : 10000,
 
-  variantFileUrl: 'https://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
-  NA12877SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12877.exome.bam',
-  NA12878SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
-  NA12891SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
-  NA12892SampleFileUrl: 'https://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
+  variantFileUrl: 'http://s3.amazonaws.com/iobio/samples/vcf/platinum-exome.vcf.gz',
+  NA12877SampleFileUrl: 'http://s3.amazonaws.com/iobio/samples/bam/NA12877.exome.bam',
+  NA12878SampleFileUrl: 'http://s3.amazonaws.com/iobio/samples/bam/NA12878.exome.bam',
+  NA12891SampleFileUrl: 'http://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam',
+  NA12892SampleFileUrl: 'http://s3.amazonaws.com/iobio/samples/bam/NA12892.exome.bam'
 };
