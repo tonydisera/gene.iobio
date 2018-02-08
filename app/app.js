@@ -1702,17 +1702,19 @@ function promiseJointCallVariants(geneObject, theTranscript, loadedTrioVcfData, 
     }
     var refreshClinvarAnnots = function(trioFbData) {
       for (var rel in trioFbData) {
-        trioFbData[rel].features.forEach(function (fbVariant) {
-          if (fbVariant.source) {
-            fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
-            fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
-            fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
-            fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
-            fbVariant.source.clinvar                     = fbVariant.clinvar;
-            fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
-            fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
-          }
-        });
+        if (trioFbData[rel]) {
+          trioFbData[rel].features.forEach(function (fbVariant) {
+            if (fbVariant.source) {
+              fbVariant.source.clinVarUid                  = fbVariant.clinVarUid;
+              fbVariant.source.clinVarClinicalSignificance = fbVariant.clinVarClinicalSignificance;
+              fbVariant.source.clinVarAccession            = fbVariant.clinVarAccession;
+              fbVariant.source.clinvarRank                 = fbVariant.clinvarRank;
+              fbVariant.source.clinvar                     = fbVariant.clinvar;
+              fbVariant.source.clinVarPhenotype            = fbVariant.clinVarPhenotype;
+              fbVariant.source.clinvarSubmissions          = fbVariant.clinvarSubmissions;
+            }
+          });
+        }
       }
     }
 
@@ -2266,10 +2268,12 @@ function promiseAnnotateWithClinvar(resultMap, geneObject, transcript, isBackgro
     var unionVcfData = {features: []}
     for (var rel in resultMap) {
       var vcfData = resultMap[rel];
-      if (!vcfData.loadState['clinvar']) {
-       vcfData.features.forEach(function(feature) {
-          uniqueVariants[formatClinvarKey(feature)] = true;
-       })
+      if (vcfData) {
+        if (!vcfData.loadState['clinvar']) {
+         vcfData.features.forEach(function(feature) {
+            uniqueVariants[formatClinvarKey(feature)] = true;
+         })
+        }
       }
     }
     if (Object.keys(uniqueVariants).length == 0) {
@@ -2306,13 +2310,15 @@ function promiseAnnotateWithClinvar(resultMap, geneObject, transcript, isBackgro
           // Use the clinvar variant lookup to initialize variants with clinvar annotations
           for (var rel in resultMap) {
             var vcfData = resultMap[rel];
-            if (!vcfData.loadState['clinvar']) {
-              var p = refreshVariantsWithClinvarLookup(vcfData, clinvarLookup);
-              if (!isBackground) {
-                getVariantCard(rel).model.vcfData = vcfData;
+            if (vcfData) {
+              if (!vcfData.loadState['clinvar']) {
+                var p = refreshVariantsWithClinvarLookup(vcfData, clinvarLookup);
+                if (!isBackground) {
+                  getVariantCard(rel).model.vcfData = vcfData;
+                }
+                //var p = getVariantCard(rel).model._promiseCacheData(vcfData, CacheHelper.VCF_DATA, vcfData.gene.gene_name, vcfData.transcript);
+                refreshPromises.push(p);
               }
-              //var p = getVariantCard(rel).model._promiseCacheData(vcfData, CacheHelper.VCF_DATA, vcfData.gene.gene_name, vcfData.transcript);
-              refreshPromises.push(p);
             }
           }
 
