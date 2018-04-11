@@ -110,12 +110,7 @@ $(document).ready(function(){
 
   determineStyle();
 
-  if (utility.detectIE() != false) {
-    alert("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.");
-    alertify.alert("Warning. Gene.iobio has not been tested and verified on Internet Explorer.  Use the Google Chrome browser for the best performance of gene.iobio.");
-  } else if (!utility.isChrome()) {
-    alertify.alert("Use the Google Chrome browser for the best performance of gene.iobio.");
-  }
+
 
   initHub();
 
@@ -163,6 +158,14 @@ $(document).ready(function(){
    .then(function() {
       showWelcomePanel();
       init();
+
+      if (utility.detectIE() != false) {
+        alertify.set('notifier', 'position', 'top-right');
+        alertify.error("Warning. Gene.iobio has been tested and verified on Chrome, Firefox, and Safari browsers.  Please run gene.iobio from one of these browsers.", 0);
+      } else if (!utility.isChrome()) {
+        alertify.set('notifier', 'position', 'top-right');
+        alertify.warning("Use the Google Chrome browser for the best performance of gene.iobio.", 10);
+      }
    },
    function(error) {
       alertify.alert("Unable to initialize gene.iobio due to following error: " + error);
