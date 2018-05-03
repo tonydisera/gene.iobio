@@ -1,4 +1,3 @@
-@charset "UTF-8";
 body {
   font-family: "Quattrocento Sans", sans-serif, sans-serif !important;
   margin-top: -5px; }
@@ -102,17 +101,21 @@ body {
   font-size: 15px;
   padding-top: 5px;
   padding-bottom: 5px; }
+
 .nav-pills > li > a:hover {
   color: #5d809d !important; }
+
 .nav-pills > li > a:focus {
   color: #5d809d !important; }
 
 .nav-pills > li.active > a {
   color: white !important;
   background-color: #5d809d; }
+
 .nav-pills > li.active > a:hover {
   color: white !important;
   background-color: #5d809d; }
+
 .nav-pills > li.active > a:focus {
   color: white !important;
   background-color: #5d809d; }
@@ -156,20 +159,20 @@ h5 {
   border-color: #5d809d; }
 
 .pagination > li > a {
-  line-height: 0.4;
+  line-height: .4;
   color: #717171 !important;
   font-size: 11px; }
 
 .pagination > li.prev a {
   font-size: 18px;
-  line-height: 0.7;
+  line-height: .7;
   padding-top: 1px;
   padding-bottom: 3px;
   color: #5d809d !important; }
 
 .pagination > li.next a {
   font-size: 18px;
-  line-height: 0.7;
+  line-height: .7;
   padding-top: 1px;
   padding-bottom: 3px;
   color: #5d809d !important; }
@@ -202,15 +205,17 @@ h5 {
   color: #5d809d; }
 
 .modal-header .close {
-  opacity: 0.5;
+  opacity: .5;
   font-size: 32px; }
 
 .form-group .radio label {
   font-size: 14px;
   line-height: 16px m;
   color: #717171; }
+
 .form-group .radio input[type=radio]:checked ~ .check {
   background-color: #5d809d; }
+
 .form-group .radio input[type=radio]:checked ~ .circle {
   border-color: #5d809d; }
 
@@ -277,7 +282,7 @@ h5 {
   color: #717171; }
 
 .selectize-control.multi .selectize-input:after {
-  content: "";
+  content: '\e252';
   font-family: "Glyphicons Halflings";
   line-height: 2;
   display: block;
@@ -289,7 +294,7 @@ h5 {
   cursor: pointer; }
 
 .selectize-control.multi .selectize-input.dropdown-active:after {
-  content: "";
+  content: '\e253';
   font-family: "Glyphicons Halflings";
   background-color: white; }
 
@@ -410,26 +415,30 @@ i.material-icons {
 #minimize-button .material-icons {
   font-size: 14px;
   color: #717171; }
+
 #minimize-button.disabled {
-  opacity: 0.4;
+  opacity: .4;
   pointer-events: none; }
 
 #shrink-button .material-icons {
   font-size: 14px;
   color: #717171; }
+
 #shrink-button.disabled {
-  opacity: 0.4;
+  opacity: .4;
   pointer-events: none; }
 
 #expand-button .material-icons {
   font-size: 14px;
   color: #717171; }
+
 #expand-button.disabled {
-  opacity: 0.4;
+  opacity: .4;
   pointer-events: none; }
 
 .btn.btn-default {
   background-color: #fff; }
+
 .btn.btn-raised {
   background-color: #fff !important; }
 
@@ -503,8 +512,10 @@ i.material-icons {
   background: none;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.12);
   border: none; }
+
 .chosen-container-single .chosen-drop {
   border-radius: 0px; }
+
 .chosen-container-single .chosen-single div b {
   background: url("chosen-sprite.png") no-repeat 0px 0px; }
 
@@ -573,7 +584,7 @@ i.material-icons {
   padding-bottom: 10px !important; }
 
 .tlyPageGuideStepIndex {
-  opacity: 0.3; }
+  opacity: .3; }
 
 .tlypageguide-active .tlyPageGuideStepIndex {
   opacity: 1; }
@@ -667,7 +678,7 @@ i.material-icons {
       content: ""; }
     #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next.disabled {
       color: rgba(0, 0, 0, 0.26) !important;
-      opacity: 0.65 !important;
+      opacity: .65 !important;
       cursor: not-allowed !important; }
     #tlyPageGuideWrapper #tlyPageGuideMessages a.pageguide-next.hide {
       visibility: hidden !important;
@@ -766,17 +777,17 @@ body {
   color: #eee;
   margin-top: 3px; }
   .icon-credit a {
-    color: #96C774 !important; }
+    color: #96C774  !important; }
     .icon-credit a:hover {
-      color: #96C774 !important; }
+      color: #96C774  !important; }
     .icon-credit a:focus {
-      color: #96C774 !important; }
+      color: #96C774  !important; }
   .icon-credit #freepick-info a {
-    color: #96C774 !important; }
+    color: #96C774  !important; }
     .icon-credit #freepick-info a:hover {
-      color: #96C774 !important; }
+      color: #96C774  !important; }
     .icon-credit #freepick-info a:focus {
-      color: #96C774 !important; }
+      color: #96C774  !important; }
 
 .card-label {
   color: #5d809d !important;
@@ -863,11 +874,13 @@ a.btn {
 
 .material-dropdown .form-control {
   background: white; }
+
 .material-dropdown li.disabled {
   color: #d2d2d2;
   cursor: auto; }
   .material-dropdown li.disabled:hover {
     background: white; }
+
 .material-dropdown li:hover {
   background: #c8c8c8; }
 
@@ -980,7 +993,7 @@ section {
 
 .poweredbyheader {
   font-size: 15px;
-  color: #96C774 !important;
+  color: #96C774  !important;
   font-family: "Quicksand";
   margin-top: 1px;
   margin-bottom: 0px; }
@@ -1021,7 +1034,7 @@ section {
   fill: #316693; }
 
 .bar rect {
-  opacity: 0.75;
+  opacity: .75;
   fill: #316693; }
   .bar rect.selected {
     fill: #3c9ff4; }
@@ -1063,9 +1076,6 @@ section {
 
 #gene-region-end {
   padding-left: 5px; }
-
-#view-finder-track {
-  align-items: center; }
 
 #region-chart .axis text {
   font-size: 15px;
@@ -1173,7 +1183,7 @@ section {
     margin-top: 0px;
     margin-bottom: 10px; }
   .variant-card #bam-track .loader {
-    margin-top: 0px !important;
+    margin-top: -0px !important;
     margin-bottom: 5px !important; }
   .variant-card #coverage-problem-alert {
     width: 230px;
@@ -1272,7 +1282,7 @@ header {
 
 #matrix-track g.bookmark, #examine-card g.bookmark, .tooltip g.bookmark {
   fill: #3773A7;
-  opacity: 0.7; }
+  opacity: .7; }
 
 #gene-badge-button g.bookmark {
   fill: #5d809d;
@@ -1334,7 +1344,7 @@ header {
   #bam-depth .threshold line {
     stroke-width: 1px;
     stroke: lightgray;
-    stroke-dasharray: 5, 5; }
+    stroke-dasharray: 5,5; }
   #bam-depth .threshold text {
     font-size: 12px;
     fill: #717171;
@@ -1434,7 +1444,7 @@ header {
   stroke-width: 1px; }
 
 #bam-depth .y.axis line {
-  stroke-width: 0.5px; }
+  stroke-width: .5px; }
 
 #gene-viz {
   margin-top: -25px; }
@@ -1453,14 +1463,14 @@ header {
 
 .brush .extent {
   stroke: #000;
-  fill-opacity: 0.125;
+  fill-opacity: .125;
   shape-rendering: crispEdges; }
 
 .variant {
   opacity: 1;
   stroke: #000;
   stroke-width: 1px;
-  stroke-opacity: 0.3; }
+  stroke-opacity: .3; }
   .variant.current {
     stroke: #036DB7 !important;
     stroke-width: 1.5px !important;
@@ -1469,16 +1479,19 @@ header {
 .filter-symbol {
   stroke: #000 !important;
   stroke-width: 1px !important;
-  stroke-opacity: 0.3 !important; }
+  stroke-opacity: .3 !important; }
 
 .ibo-variant .reference {
   stroke: #969696; }
+
 .ibo-variant .name {
   font-size: 18px;
   fill: #787878; }
+
 .ibo-variant .arrow {
   stroke: #969696;
   fill: none; }
+
 .ibo-variant .axis {
   font-size: 13px; }
   .ibo-variant .axis path, .ibo-variant .axis line {
@@ -1488,7 +1501,7 @@ header {
 
 .brush-line, .dashed {
   stroke: #969696;
-  stroke-dasharray: 5, 5; }
+  stroke-dasharray: 5,5; }
 
 .divider text {
   font-size: 12px;
@@ -1577,7 +1590,7 @@ header {
   .tt-dropdown-menu .tt-dataset-name {
     z-index: 1033 !important; }
     .tt-dropdown-menu .tt-dataset-name .tt-suggestions {
-      z-index: 1033 !important; }
+      z-index: 1033  !important; }
 
 .tt-input, .tt-hint {
   padding: 5px 8px !important;
@@ -1636,8 +1649,10 @@ header {
 
 input::-webkit-input-placeholder {
   font-size: 14px !important; }
+
 input::-moz-placeholder {
   font-size: 14px !important; }
+
 inputinput:-moz-placeholder {
   font-size: 14px !important; }
 
@@ -1654,12 +1669,14 @@ inputinput:-moz-placeholder {
   border-color: #5d809d; }
   .checkbox input[type=checkbox]:checked + .checkbox-material .check:before {
     color: #5d809d; }
+
 .checkbox label {
   font-size: 12px;
   line-height: 13px;
   color: #717171; }
   .checkbox label .check {
     margin-right: 0px; }
+
 .checkbox .checkbox-material {
   top: 0px; }
   .checkbox .checkbox-material .check {
@@ -1688,6 +1705,7 @@ inputinput:-moz-placeholder {
 
 #freebayes-settings-modal .fb-setting {
   padding-top: 10px; }
+
 #freebayes-settings-modal .fb-setting-label {
   width: 200px;
   display: inline-block; }
@@ -1720,6 +1738,19 @@ inputinput:-moz-placeholder {
   justify-content: space-around;
   flex-direction: column;
   align-items: center; }
+  #welcome-area .beta-info {
+    margin-bottom: 20px;
+    margin-top: 20px; }
+    #welcome-area .beta-info .beta-icon {
+      font-size: 28px;
+      color: #95c627;
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 4px;
+      margin-top: 3px; }
+    #welcome-area .beta-info .beta-link {
+      font-size: 24px;
+      color: #5d809d !important; }
   #welcome-area .welcome-panel {
     background-color: white;
     padding-bottom: 15px;
@@ -1731,8 +1762,11 @@ inputinput:-moz-placeholder {
     #welcome-area .welcome-panel #welcome-label {
       color: #5d809d;
       font-size: 20px; }
+    #welcome-area .welcome-panel #welcome-label-big {
+      color: #5d809d;
+      font-size: 24px; }
     #welcome-area .welcome-panel #what-is-new-link {
-      font-size: 18px; }
+      font-size: 24px; }
     #welcome-area .welcome-panel #helpful-articles-link {
       font-size: 18px; }
     #welcome-area .welcome-panel button {
@@ -1876,17 +1910,19 @@ inputinput:-moz-placeholder {
     #screencast-panel .video-container .iframe-placeholder {
       position: relative;
       height: 0;
-      padding-bottom: 75%; }
+      padding-bottom: 75.0%; }
 
 /* Bootstrap accordion */
 #slider-left #slider-left-content a {
   color: #5d809d !important; }
+
 #slider-left #slider-left-content .subheading {
   font-size: 15px;
   color: #5d809d !important;
   margin-bottom: 0px;
   margin-top: 35px;
   text-align: center; }
+
 #slider-left .navbar {
   background-color: #636161 !important;
   min-height: 30px !important; }
@@ -1896,6 +1932,7 @@ inputinput:-moz-placeholder {
   #slider-left .navbar .container-fluid {
     margin: 0px;
     padding: 0px; }
+
 #slider-left .nav li {
   padding-top: 5px;
   padding-bottom: 4px;
@@ -1905,26 +1942,31 @@ inputinput:-moz-placeholder {
   text-align: center; }
   #slider-left .nav li a {
     font-size: 14px;
-    padding: 4px 8px 0px 2px !important; }
+    padding: 4px 8px 0px 2px  !important; }
     #slider-left .nav li a:hover {
       background-color: initial; }
     #slider-left .nav li a:focus {
       background-color: initial; }
   #slider-left .nav li.active {
-    background-color: white !important; }
+    background-color: white  !important; }
     #slider-left .nav li.active a {
       color: #5d809d !important; }
       #slider-left .nav li.active a #search-dna-glyph {
         fill: #5d809d !important; }
+
 #slider-left .btn.btn-raised {
   background-color: transparent !important;
   color: #717171 !important; }
+
 #slider-left textarea {
   background-color: transparent !important; }
+
 #slider-left .icon-button-sm {
   color: #717171 !important; }
+
 #slider-left .icon-button i {
   color: #5d809d !important; }
+
 #slider-left .icon-button-sm i {
   color: #5d809d !important; }
 
@@ -1933,7 +1975,7 @@ inputinput:-moz-placeholder {
 
 #close-slide-left-glyph {
   color: #636161;
-  line-height: 0.8;
+  line-height: .8;
   font-size: 36px;
   font-weight: bold; }
 
@@ -2077,16 +2119,19 @@ inputinput:-moz-placeholder {
     opacity: 0; }
   to {
     opacity: 1; } }
+
 @-moz-keyframes fadeIn {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
+
 @keyframes fadeIn {
   from {
     opacity: 0; }
   to {
     opacity: 1; } }
+
 .fade-in {
   opacity: 0;
   /* make things invisible upon start */
@@ -2098,9 +2143,9 @@ inputinput:-moz-placeholder {
   /* this makes sure that after animation is done we remain at the last keyframe value (opacity: 1) */
   -moz-animation-fill-mode: forwards;
   animation-fill-mode: forwards;
-  -webkit-animation-duration: 0.6s;
-  -moz-animation-duration: 0.6s;
-  animation-duration: 0.6s; }
+  -webkit-animation-duration: .6s;
+  -moz-animation-duration: .6s;
+  animation-duration: .6s; }
 
 #clear-filters-link {
   float: right !important;
@@ -2302,8 +2347,10 @@ inputinput:-moz-placeholder {
 #trio-symbol .parent .left {
   stroke: #5d809d;
   stroke: #5d809d; }
+
 #trio-symbol .parent .right {
   stroke: #5d809d; }
+
 #trio-symbol .proband .left, #trio-symbol .proband .right {
   stroke: #5d809d; }
 
@@ -2379,12 +2426,16 @@ inputinput:-moz-placeholder {
 
 #feature-matrix .impact_HIGH {
   pointer-events: none; }
+
 #feature-matrix .impact_MODERATE {
   pointer-events: none; }
+
 #feature-matrix .impact_MODIFIER {
   pointer-events: none; }
+
 #feature-matrix .impact_LOW {
   pointer-events: none; }
+
 #feature-matrix .impact_NOIMPACT, #feature-matrix .impact_none, #feature-matrix .effect_none {
   pointer-events: none; }
 
@@ -2531,7 +2582,7 @@ inputinput:-moz-placeholder {
 
 .impact.inactive, .vepImpact.inactive, .highestImpactVep.inactive, .zygosity.inactive, .afexaclevels.inactive, .af1000glevels.inactive, .inheritance.inactive, .polyphen.inactive, .sift.inactive, .regulatory.inactive, .clinvar.inactive, .uasibs.inactive {
   pointer-events: none;
-  opacity: 0.4; }
+  opacity: .4; }
 
 .effect.inactive, .vepConsequence.inactive {
   pointer-events: none;
@@ -2597,6 +2648,7 @@ inputinput:-moz-placeholder {
   font-size: 14px; }
   .file label:hover {
     background-color: #eee; }
+
 .file input {
   position: absolute;
   display: inline-block;
@@ -2641,16 +2693,19 @@ inputinput:-moz-placeholder {
 
 #dataModal .form-group-sm .form-control {
   font-size: 13px; }
+
 #dataModal #vcf-dropdown-button {
   font-size: 13px;
   width: 100px;
   padding-top: 1px;
   padding-bottom: 0px; }
+
 #dataModal #bam-dropdown-button {
   font-size: 12px;
   width: 100px;
   padding-top: 1px;
   padding-bottom: 0px; }
+
 #dataModal #vcf-sample-box span {
   font-size: 13px;
   width: 110px;
@@ -2659,29 +2714,38 @@ inputinput:-moz-placeholder {
   vertical-align: top;
   padding-top: 4px;
   height: 30px; }
+
 #dataModal #vcf-sample-select-box {
   display: inline-block;
   width: 200px; }
   #dataModal #vcf-sample-select-box input {
     width: 200px !important; }
+
 #dataModal #unaffected-sibs-box .selectize-input input {
   width: inherit !important; }
+
 #dataModal #unaffected-sibs-box .selectize-input.has-items input {
   width: initial !important; }
+
 #dataModal #affected-sibs-box .selectize-input input {
   width: inherit !important; }
+
 #dataModal #affected-sibs-box .selectize-input.has-items input {
   width: initial !important; }
+
 #dataModal .form-group {
   margin-top: -5px; }
+
 #dataModal .form-group-header {
   font-size: 15px;
   color: #717171;
   margin-left: 25px;
   display: inline-block;
   margin-top: 10px; }
+
 #dataModal #import-help-icon {
   color: #5d809d !important; }
+
 #dataModal #export-bookmarks {
   font-size: 14px;
   display: inline-block;
@@ -2690,10 +2754,12 @@ inputinput:-moz-placeholder {
     font-size: 18px;
     margin-top: -3px;
     margin-right: 2px; }
+
 #dataModal #download-bookmarks {
   font-size: 14px;
   display: inline-block;
   color: #5d809d; }
+
 #dataModal .nav-pills li {
   margin-left: 20px;
   margin-right: 20px;
@@ -2704,24 +2770,33 @@ inputinput:-moz-placeholder {
     padding-right: 20px; }
   #dataModal .nav-pills li.active {
     border: solid thin #3586c0; }
+
 #dataModal #export-loader {
   color: #717171; }
+
 #dataModal button {
   font-size: 14px; }
+
 #dataModal #select-species-box .selectize-dropdown {
   font-size: 14px; }
+
 #dataModal #select-species-box .selectize-input {
   font-size: 14px;
   line-height: 15px; }
+
 #dataModal #select-build-box .selectize-dropdown {
   font-size: 14px; }
+
 #dataModal #select-build-box .selectize-input {
   font-size: 14px;
   line-height: 15px; }
+
 #dataModal #select-build-box .selectize-input input {
   width: 145px !important; }
+
 #dataModal #bloodhound-data-dialog .tt-hint {
   font-size: 14px !important; }
+
 #dataModal #bloodhound-data-dialog #enter-gene-name-data-dialog {
   color: #717171;
   font-size: 14px !important; }
@@ -2746,13 +2821,16 @@ inputinput:-moz-placeholder {
 
 #zoom-region-chart .tooltip .danger {
   color: #aab2ff; }
+
 #zoom-region-chart .tooltip a.danger {
   color: #aab2ff !important; }
+
 #zoom-region-chart .tooltip #exon-tooltip-close {
   float: right;
   color: white !important;
   font-weight: bold;
   font-size: 14px !important; }
+
 #zoom-region-chart .tooltip #exon-tooltip-title {
   display: inline-block;
   float: left; }
@@ -2858,11 +2936,14 @@ inputinput:-moz-placeholder {
 .tooltip-zygosity.hom {
   background-color: rgba(165, 48, 48, 0.76) !important;
   color: white; }
+
 .tooltip-zygosity.homref {
   background-color: #5D809D !important;
   color: white; }
+
 .tooltip-zygosity.unknown {
   background-color: #b9edf3 !important; }
+
 .tooltip-zygosity.none {
   background-color: transparent !important;
   border: solid thin #5D809D !important; }
@@ -2934,11 +3015,14 @@ inputinput:-moz-placeholder {
 
 rect.alt-count {
   stroke: black !important; }
+
 rect.ref-count {
   stroke: black !important;
   fill: none !important; }
+
 rect.alt-count {
   fill: #6A9C2F !important; }
+
 rect.other-count {
   stroke: black !important;
   fill: #848484 !important; }
@@ -2952,14 +3036,18 @@ rect.other-count {
 
 text.alt-count {
   fill: white !important; }
+
 text.alt-count-under {
   fill: #717171 !important; }
+
 text.other-count {
-  fill: white !important;
+  fill: white  !important;
   font-style: italic !important; }
+
 text.other-count-under {
   fill: #717171 !important;
   font-style: italic !important; }
+
 text.ref-count {
   fill: #717171 !important; }
 
@@ -2977,6 +3065,7 @@ text.ref-count {
   position: absolute;
   display: inline-block;
   content: ""; }
+
 .tooltip.chevron:after {
   border-top: 9px solid #3586c0;
   border-left: 9px solid transparent;
@@ -2984,56 +3073,76 @@ text.ref-count {
   position: absolute;
   display: inline-block;
   content: ""; }
+
 .tooltip.chevron.chevron-vertical.chevron-top:before {
   bottom: -12px; }
+
 .tooltip.chevron.chevron-vertical.chevron-top:after {
   bottom: -9px; }
+
 .tooltip.chevron.chevron-vertical.chevron-bottom:before {
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
   top: -12px; }
+
 .tooltip.chevron.chevron-vertical.chevron-bottom:after {
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
   top: -9px; }
+
 .tooltip.chevron.chevron-vertical.chevron-right:before {
   left: 8px; }
+
 .tooltip.chevron.chevron-vertical.chevron-right:after {
   left: 11px; }
+
 .tooltip.chevron.chevron-vertical.chevron-left:before {
   right: 8px; }
+
 .tooltip.chevron.chevron-vertical.chevron-left:after {
   right: 11px; }
+
 .tooltip.chevron.chevron-vertical.chevron-center:before {
   right: var(--tooltip-center-before); }
+
 .tooltip.chevron.chevron-vertical.chevron-center:after {
   right: var(--tooltip-center); }
+
 .tooltip.chevron.chevron-horizontal.chevron-right:before {
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
   left: -15px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-right:after {
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg);
   left: -13px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-left:before {
   -webkit-transform: rotate(-90deg);
   transform: rotate(-90deg);
   right: -16px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-left:after {
   -webkit-transform: rotate(-90deg);
   transform: rotate(-90deg);
   right: -14px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-top:before {
   bottom: 11px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-top:after {
   bottom: 12px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-bottom:before {
   top: 11px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-bottom:after {
   top: 12px; }
+
 .tooltip.chevron.chevron-horizontal.chevron-middle:before {
   top: var(--tooltip-middle-before); }
+
 .tooltip.chevron.chevron-horizontal.chevron-middle:after {
   top: var(--tooltip-middle); }
 
@@ -3048,6 +3157,7 @@ text.ref-count {
   -webkit-transform: rotate(202deg);
   transform: rotate(202deg);
   content: ""; }
+
 .tooltip.left-arrow:after {
   position: absolute;
   display: inline-block;
@@ -3071,6 +3181,7 @@ text.ref-count {
   -webkit-transform: rotate(160deg);
   transform: rotate(160deg);
   content: ""; }
+
 .tooltip.right-arrow:after {
   position: absolute;
   display: inline-block;
@@ -3300,6 +3411,7 @@ text.ref-count {
   #bookmark-card a #import-help-icon {
     color: #5d809d !important;
     margin-left: 2px; }
+
 #bookmark-card .bookmark {
   font-size: 12px;
   cursor: pointer;
@@ -3370,11 +3482,14 @@ text.ref-count {
       vertical-align: top; }
       #bookmark-card .bookmark .variant-label .rsid:hover {
         text-decoration: underline !important; }
+
 #bookmark-card div.bookmark-box {
   clear: both; }
+
 #bookmark-card div.bookmark-gene {
   clear: both;
   padding-top: 10px; }
+
 #bookmark-card a.bookmark-gene {
   font-size: 13px;
   cursor: pointer;
@@ -3383,16 +3498,21 @@ text.ref-count {
   padding-top: 4px;
   margin-bottom: -5px;
   color: #717171 !important; }
+
 #bookmark-card .phenotype-symbol {
   stroke: #717171; }
+
 #bookmark-card .bookmark-call-button {
   margin: 0px 0px 0px 12px;
   padding: 0px 8px 0px 8px; }
+
 #bookmark-card .called-variant-indicator {
   display: inline-block;
   vertical-align: top; }
+
 #bookmark-card #favorite-badge {
   stroke: #717171; }
+
 #bookmark-card .favorite-indicator {
   cursor: pointer;
   float: right;
@@ -3401,8 +3521,10 @@ text.ref-count {
   margin-top: -2px;
   margin-left: 5px;
   margin-right: 5px; }
+
 #bookmark-card .phenotypes-container {
   overflow-x: hidden; }
+
 #bookmark-card .phenotypes {
   font-size: 10px;
   color: #9e9e9e;
@@ -3410,24 +3532,32 @@ text.ref-count {
   margin-top: 5px;
   overflow-x: hidden;
   max-height: 80px; }
+
 #bookmark-card .phenotypes-container.expand .phenotypes {
   max-height: none; }
+
 #bookmark-card .phenotypes-container .expander {
   margin-left: 5px;
   font-size: 11px;
   display: none; }
+
 #bookmark-card .phenotypes-container.large .expander {
   display: block; }
+
 #bookmark-card .phenotypes-container .expander a#more {
   display: inline;
   cursor: pointer; }
+
 #bookmark-card .phenotypes-container .expander a#less {
   display: none;
   cursor: pointer; }
+
 #bookmark-card .phenotypes-container.expand .expander a#more {
   display: none; }
+
 #bookmark-card .phenotypes-container.expand .expander a#less {
   display: inline; }
+
 #bookmark-card li {
   color: #717171 !important;
   font-size: 12px; }
@@ -3439,6 +3569,7 @@ text.ref-count {
   display: none;
   float: right;
   padding-top: 3px; }
+
 #bookmark-panel.editmode i#remove-bookmark {
   display: inline; }
 
@@ -3446,14 +3577,16 @@ text.ref-count {
   fill: none;
   stroke: #1574C7;
   stroke-width: 5;
-  opacity: 0.6; }
+  opacity: .6; }
+
 #vcf-track .bookmark line {
   stroke: #1574C7;
   stroke-width: 5;
-  opacity: 0.8; }
+  opacity: .8; }
+
 #vcf-track .bookmark g {
   fill: #1574C7;
-  opacity: 0.8; }
+  opacity: .8; }
 
 #phenolyzer-results rect {
   fill: #cccccc;
@@ -3461,9 +3594,11 @@ text.ref-count {
   #phenolyzer-results rect.selected {
     fill: #89a7bf;
     stroke: grey d; }
+
 #phenolyzer-results text.name {
   fill: #717171 !important;
   font-size: 12px; }
+
 #phenolyzer-results text.score {
   fill: #717171 !important;
   font-size: 12px; }
@@ -3471,6 +3606,7 @@ text.ref-count {
 #zoom-region-chart.ibo-gene .cds.danger {
   fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
+
 #zoom-region-chart.ibo-gene .utr.danger {
   fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
@@ -3478,6 +3614,7 @@ text.ref-count {
 #gene-viz.ibo-gene .cds.danger {
   fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
+
 #gene-viz.ibo-gene .utr.danger {
   fill: rgba(133, 124, 175, 0.85);
   stroke: #555da5; }
@@ -3581,7 +3718,7 @@ text.ref-count {
     font-size: 11px !important; }
   #genes-card #phenolyzer-disclaimer {
     color: #717171 !important;
-    font-style: italic !important; }
+    font-style: italic  !important; }
   #genes-card #phenolyzer-refresh-genes-button {
     float: left;
     margin-right: 30px;
@@ -3655,10 +3792,10 @@ textarea#genes-to-copy {
   display: inline-block; }
 
 #gene-badge.failed-filter {
-  opacity: 0.65; }
+  opacity: .65; }
 
 #gene-badge.loading {
-  border-left: #d8d8d8 solid 10px; }
+  border-left: #d8d8d8  solid 10px; }
 
 #gene-badge.loading.selected {
   border-left: #5d809d solid 12px; }
@@ -3768,40 +3905,55 @@ textarea#genes-to-copy {
 
 #gene-badge.visited #gene-badge-loaded {
   display: inline; }
+
 #gene-badge.visited #gene-badge-name {
   color: #717171 !important; }
+
 #gene-badge.called #gene-badge-called {
   display: inline; }
+
 #gene-badge.has-called-variants #gene-badge-has-called-variants {
   display: inline; }
+
 #gene-badge.has-coverage-problem #gene-badge-coverage-problem {
   display: inline-block; }
+
 #gene-badge.has-harmful-variant #gene-badge-harmful-variant {
   display: inline-block; }
+
 #gene-badge.has-harmful1-variant #gene-badge-harmful1-variant {
   display: inline-block; }
+
 #gene-badge.has-harmful2-variant #gene-badge-harmful2-variant {
   display: inline-block; }
+
 #gene-badge.has-harmful3-variant #gene-badge-harmful3-variant {
   display: inline-block; }
+
 #gene-badge:hover #gene-badge-remove {
   visibility: visible; }
 
 #gene-badge.visited.error #gene-badge-loaded {
   display: none; }
+
 #gene-badge.visited.error #gene-badge-error {
   display: inline; }
+
 #gene-badge.called.error #gene-badge-called {
   display: none; }
+
 #gene-badge.has-called-variants.error #gene-badge-has-called-variants {
   display: none; }
 
 #gene-badge.visited.warning #gene-badge-loaded {
   display: none; }
+
 #gene-badge.visited.warning #gene-badge-warning {
   display: inline; }
+
 #gene-badge.called.warning #gene-badge-called {
   display: none; }
+
 #gene-badge.has-called-variants.warning #gene-badge-has-called-variants {
   display: none; }
 
@@ -3938,6 +4090,7 @@ textarea#genes-to-copy {
 
 #manage-cache-modal .modal-dialog {
   width: 500px; }
+
 #manage-cache-modal .modal-body {
   margin-top: 30px;
   margin-bottom: 30px; }
@@ -3945,11 +4098,13 @@ textarea#genes-to-copy {
     width: 100px;
     padding-top: 2px;
     padding-bottom: 2px; }
+
 #manage-cache-modal .cache-label {
   width: 220px;
   display: inline-block;
   height: 30px;
   font-size: 14px; }
+
 #manage-cache-modal .cache-size {
   width: 60px;
   display: inline-block;
@@ -3981,6 +4136,7 @@ textarea#genes-to-copy {
   font-size: 13px !important;
   color: #5d809d !important;
   font-family: "Quattrocento Sans", sans-serif; }
+
 #slider-left button.help-link {
   padding-top: 0px;
   padding-bottom: 0px;
@@ -3989,6 +4145,7 @@ textarea#genes-to-copy {
   font-size: 13px;
   color: #5d809d !important;
   font-family: "Quattrocento Sans", sans-serif; }
+
 #slider-left .help-info {
   margin-left: 10px;
   font-size: 11px;
@@ -3999,8 +4156,10 @@ textarea#genes-to-copy {
   #slider-left .help-info a.help-link {
     display: block;
     font-size: 11px !important; }
+
 #slider-left #help-card div {
   margin-bottom: 20px; }
+
 #slider-left .usecases li {
   padding-top: 20px; }
   #slider-left .usecases li .inline {
@@ -4047,7 +4206,7 @@ textarea#genes-to-copy {
       margin: 0px; }
   .videos .video-text {
     margin: -10px 15px 2px 15px;
-    font-family: "helvetica"; }
+    font-family: 'helvetica'; }
   .videos .video-byline {
     color: #787878;
     font-weight: 300;
@@ -4157,17 +4316,19 @@ textarea#genes-to-copy {
   color: #5d809d;
   margin-top: -22px;
   opacity: 1; }
+
 #feedback-modal #feedback-warning {
   width: 70%;
   display: inline-block;
   margin-right: 10px; }
+
 #feedback-modal #feedback-screen-capture {
   background-color: #EEEEEE;
   overflow: scroll;
   display: block;
   padding: 5px;
   height: 300px;
-  opacity: 0.8; }
+  opacity: .8; }
   #feedback-modal #feedback-screen-capture #feedback-container {
     display: block;
     position: initial;
@@ -4191,6 +4352,7 @@ textarea#genes-to-copy {
   margin-top: -7px;
   color: #969696;
   font-style: italic; }
+
 #matrix-track #low-quality-legend {
   font-size: 12px;
   margin-left: 20px;
@@ -4206,6 +4368,7 @@ textarea#genes-to-copy {
     vertical-align: bottom;
     float: left;
     margin-top: 5px; }
+
 #matrix-track #low-quality-legend-text {
   width: 160px;
   float: left;
@@ -4214,6 +4377,7 @@ textarea#genes-to-copy {
   color: #969696;
   font-style: italic;
   line-height: 13px; }
+
 #matrix-track #zero-variants {
   color: white;
   font-size: 14px;
@@ -4233,18 +4397,24 @@ textarea#genes-to-copy {
   fill: white;
   stroke: #dedede;
   stroke-width: 1px; }
+
 #feature-matrix .col.danger rect.cellbox {
   fill: rgba(187, 0, 0, 0.13); }
+
 #feature-matrix .col.low-quality rect.cellbox {
   fill: rgba(215, 217, 220, 0.31); }
+
 #feature-matrix .colhdr text {
   font-size: 11px;
   pointer-events: none; }
+
 #feature-matrix rect.cellbox:hover {
   cursor: pointer;
   font-weight: bold; }
+
 #feature-matrix .col.active rect.cellbox {
   fill: transparent; }
+
 #feature-matrix rect.colbox {
   fill: none;
   opacity: 0;
@@ -4255,10 +4425,12 @@ textarea#genes-to-copy {
     opacity: 1;
     pointer-events: none;
     outline-offset: -2px; }
+
 #feature-matrix .col.active rect.colbox {
   stroke: #969696;
   stroke-width: 1px;
   opacity: 1; }
+
 #feature-matrix text {
   font-size: 12px;
   fill: #787878;
@@ -4268,9 +4440,11 @@ textarea#genes-to-copy {
     fill: #5d809d !important; }
     #feature-matrix text.clickable:hover {
       fill: #3586c0 !important; }
+
 #feature-matrix .axis .tick text.current {
   font-weight: bold !important;
   fill: black !important; }
+
 #feature-matrix .y.axis .tick .up #arrow-up, #feature-matrix .y.axis .tick .down #arrow-down {
   opacity: 0; }
 
@@ -4279,7 +4453,7 @@ textarea#genes-to-copy {
   #feature-matrix.shift-rows .y.axis .tick .up #arrow-up, #feature-matrix.shift-rows .y.axis .tick .down #arrow-down {
     fill: #E0E0E0;
     stroke: #ABABAB;
-    stroke-width: 0.5px;
+    stroke-width: .5px;
     opacity: 1; }
   #feature-matrix.shift-rows .y.axis .tick text:hover, #feature-matrix.shift-rows .y.axis .tick text.current, #feature-matrix.shift-rows .y.axis .tick text.active {
     font-weight: bold;
@@ -4346,10 +4520,12 @@ textarea#genes-to-copy {
     cursor: auto;
     fill: #717171;
     font-size: 12px; }
+
 #legend .legend-text {
   color: #717171;
   font-size: 12px;
   cursor: auto; }
+
 #legend .legend-label {
   font-size: 13px;
   color: #717171;
@@ -4358,12 +4534,15 @@ textarea#genes-to-copy {
 
 #legend.level-basic .legend-element text {
   font-size: initial; }
+
 #legend.level-basic .legend-label {
   font-size: 14px; }
+
 #legend.level-basic .legend-symbol.exon {
   cursor: pointer;
   fill: rgba(93, 128, 157, 0.63);
   stroke: #5d809d; }
+
 #legend.level-basic .exon-symbol text {
   font-size: 14px;
   fill: #717171; }
@@ -4489,15 +4668,19 @@ textarea#genes-to-copy {
 #transcript-card #show-known-variants-cb-area {
   margin-left: 10px !important;
   float: none !important; }
+
 #transcript-card #show-known-variants-card-cb-area {
   float: none !important;
   margin-left: 20px !important;
   display: inline-block !important; }
+
 #transcript-card #known-variants-nav-area {
   display: inline-block;
   padding-top: 6px; }
+
 #transcript-card #known-variants-chart {
   margin-bottom: -20px !important; }
+
 #transcript-card #known-variants-cards {
   margin-left: -10px;
   margin-right: -10px;
@@ -4525,6 +4708,7 @@ textarea#genes-to-copy {
 
 #known-variants-cards #vcf-chart-label {
   display: none !important; }
+
 #known-variants-cards #variant-heading {
   min-width: initial;
   max-width: initial; }
@@ -4542,19 +4726,19 @@ textarea#genes-to-copy {
     #known-variants-chart svg .layer.benign .stacked-element {
       fill: #9cc231;
       stroke: #717171;
-      stroke-width: 0.5px; }
+      stroke-width: .5px; }
     #known-variants-chart svg .layer.path .stacked-element {
       fill: #ad494A;
       stroke: #717171;
-      stroke-width: 0.5px; }
+      stroke-width: .5px; }
     #known-variants-chart svg .layer.other .stacked-element {
       fill: #e7ba52;
       stroke: #717171;
-      stroke-width: 0.5px; }
+      stroke-width: .5px; }
     #known-variants-chart svg .layer.unknown .stacked-element {
       fill: #bdbdbd;
       stroke: #717171;
-      stroke-width: 0.5px; }
+      stroke-width: .5px; }
 
 #analyze-all-genes {
   vertical-align: top;
@@ -4665,13 +4849,16 @@ textarea#genes-to-copy {
 @media screen and (max-device-width: 1030px), screen and (max-width: 1030px) {
   #region-track {
     margin-left: 200px !important; } }
+
 @media screen and (max-device-width: 800px), screen and (max-width: 800px) {
   #region-track {
     margin-left: 200px !important; } }
+
 @media screen and (max-device-width: 1250px), screen and (max-width: 1250px) {
   .navbar ul.nav > li > a {
     padding-right: 13px;
     padding-left: 13px; } }
+
 @media screen and (max-device-width: 1142px), screen and (max-width: 1142px) {
   #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
     width: 180px; }
@@ -4679,7 +4866,6 @@ textarea#genes-to-copy {
     width: 180px; }
   #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
     width: 180px; }
-
   .navbar ul.nav > li #genes-menu-item {
     vertical-align: initial;
     padding-top: 0px; }
@@ -4690,16 +4876,15 @@ textarea#genes-to-copy {
       display: none; }
     .navbar ul.nav > li > a svg {
       display: none; }
-
   #slider-left .navbar ul.nav > li {
     padding-top: 8px; }
     #slider-left .navbar ul.nav > li > a {
       padding-top: 3px !important; }
     #slider-left .navbar ul.nav > li > a#clear-filters-link {
       padding-top: 0px !important; }
-
   #close-slide-left {
     top: 12px; } }
+
 @media screen and (max-width: 1003px) {
   #genes-panel #analyze-all-panel #analyzed-progress-bar #analyze-all-progress {
     width: 120px; }
@@ -4707,7 +4892,6 @@ textarea#genes-to-copy {
     width: 120px; }
   #genes-panel #analyze-all-panel #analyzed-progress-bar #call-all-progress {
     width: 120px; }
-
   .navbar .navbar-brand {
     margin-right: -10px; }
   .navbar .vertical-divider {
@@ -4750,6 +4934,7 @@ textarea#genes-to-copy {
   .navbar ul.nav > li .navbar-form {
     padding-right: 5px;
     padding-left: 2px; } }
+
 @media screen and (max-width: 903px) {
   .navbar .navbar-brand {
     margin-right: -15px; }
@@ -4785,11 +4970,11 @@ textarea#genes-to-copy {
     padding-left: 9px; }
     .navbar ul.nav > li > a p.wrapped.wide {
       width: 67px; } }
+
 @media screen and (max-width: 767px) {
   .collapse.in .or {
     display: none !important; } }
+
 @media screen and (max-height: 510px) {
   textarea#genes-to-copy {
     height: 150px; } }
-
-/*# sourceMappingURL=site.css.map */
