@@ -119,9 +119,12 @@ $(document).ready(function(){
 
   detectWindowResize();
 
+  promiseLoadSiteConfig().then(function() {
+
     // Load handlebar templates
-  templateUtil.promiseLoadTemplates(welcomePanel)
-   .then(function() {
+    return templateUtil.promiseLoadTemplates(welcomePanel);
+  })
+  .then(function() {
 
     // Now init genome builder helper
     genomeBuildHelper = new GenomeBuildHelper();
@@ -132,7 +135,6 @@ $(document).ready(function(){
      });
    })
    .then(function() {
-
     // now init cache
     return promiseInitCache();
    })
@@ -144,9 +146,6 @@ $(document).ready(function(){
     endpoint = new EndpointCmd(useSSL, IOBIO, cacheHelper.launchTimestamp, genomeBuildHelper, utility.getHumanRefNames)
 
     return cacheHelper.promiseCheckCacheSize();
-   })
-   .then(function() {
-     return promiseLoadSiteConfig();
    })
    .then(function() {
      return geneModel.promiseLoadClinvarGenes();
@@ -218,7 +217,7 @@ function initHub() {
 
 function promiseLoadSiteConfig() {
 
-  var p = new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
 
     $.ajax({
         url: global_siteConfigUrl,
